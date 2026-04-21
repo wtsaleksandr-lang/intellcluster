@@ -20,10 +20,37 @@
   <!-- Synthesized answer -->
   <div class="rv">
     <div class="fig-label">FIG <span>1</span> — SYNTHESIZED ANSWER</div>
-    <div class="panel accent-bar" style="padding:28px 28px 28px 24px;margin-bottom:32px;">
-      <div style="white-space:pre-wrap;line-height:1.75;font-size:14.5px;color:var(--text);">{{ result.output }}</div>
+    <div class="panel accent-bar md-output" id="mdOutput" style="padding:28px 28px 28px 24px;margin-bottom:32px;">
+      <noscript><pre style="white-space:pre-wrap;line-height:1.75;font-size:14.5px;color:var(--text);">{{ result.output }}</pre></noscript>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var raw = {{ result.output | tojson }};
+      var el = document.getElementById('mdOutput');
+      if (window.marked && el) {
+        el.innerHTML = window.marked.parse(raw, { breaks: true });
+      } else if (el) {
+        el.innerHTML = '<pre style="white-space:pre-wrap;">' + raw.replace(/</g, '&lt;') + '</pre>';
+      }
+    });
+  </script>
+  <style>
+    .md-output { font-size: 14.5px; line-height: 1.75; color: var(--text); }
+    .md-output h1, .md-output h2, .md-output h3 { font-family: 'Newsreader', Georgia, serif; font-weight: 600; letter-spacing: -0.2px; margin: 1.4em 0 0.5em; }
+    .md-output h1 { font-size: 26px; } .md-output h2 { font-size: 22px; } .md-output h3 { font-size: 18px; }
+    .md-output p { margin: 0.7em 0; }
+    .md-output ul, .md-output ol { margin: 0.7em 0 0.7em 1.3em; }
+    .md-output strong { color: var(--text); font-weight: 600; }
+    .md-output code { background: var(--bg); padding: 1px 5px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+    .md-output pre { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; overflow-x: auto; }
+    .md-output blockquote { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--text-muted); }
+    .md-output a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-border); }
+    .md-output table { border-collapse: collapse; margin: 1em 0; font-size: 13px; width: 100%; }
+    .md-output th, .md-output td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+    .md-output th { background: var(--surface2); font-weight: 600; }
+  </style>
 
   {% if result.strategist_outputs %}
   <div class="rv rv1">

@@ -56,6 +56,30 @@
     </div>
   </div>
 
+  <!-- Outcome capture -->
+  <div id="outcomeBlock" class="rv" style="margin:40px 0;padding:22px 24px;background:var(--surface);border:1px dashed var(--border2);border-radius:12px;">
+    <div class="fig-label" style="margin-bottom:10px;">FIG <span>B</span> — HOW DID IT GO?</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+      Come back after you've acted on this decision. Tell us how it worked out — we use this to improve recommendations.
+    </p>
+    <div id="outcomeForm">
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        {% for r in [1, 2, 3, 4, 5] %}
+        <button type="button" data-rating="{{ r }}" class="rating-btn" style="flex:1;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-size:14px;font-weight:600;">
+          {{ r }}
+        </button>
+        {% endfor %}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-bottom:14px;padding:0 4px;">
+        <span>Tool was wrong</span><span>Great recommendation</span>
+      </div>
+      <input type="text" id="chosenOption" placeholder="Which option did you actually choose? (optional)" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:10px;">
+      <textarea id="outcomeNote" rows="2" placeholder="Any notes on how it went? (optional)" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;resize:vertical;margin-bottom:12px;"></textarea>
+      <button type="button" id="submitOutcome" style="width:100%;padding:10px;background:var(--accent);color:#fff;font-weight:600;border:none;border-radius:8px;font-size:12px;cursor:pointer;" disabled>Submit feedback</button>
+    </div>
+    <div id="outcomeThanks" style="display:none;text-align:center;padding:12px;color:var(--green);font-size:13px;">Thanks — feedback saved. This helps us improve.</div>
+  </div>
+
   <!-- CTA -->
   <div style="text-align:center;">
     <a href="/" style="display:inline-block;padding:10px 28px;background:var(--accent);color:#fff;font-weight:600;border-radius:8px;font-size:13px;text-decoration:none;">Make your own decision</a>
@@ -63,4 +87,40 @@
   </div>
 
 </div>
+
+<script>
+(function() {
+  var rating = null;
+  var btns = document.querySelectorAll('.rating-btn');
+  var submitBtn = document.getElementById('submitOutcome');
+  btns.forEach(function(b) {
+    b.addEventListener('click', function() {
+      rating = parseInt(this.dataset.rating);
+      btns.forEach(function(x){ x.style.background = 'var(--surface2)'; x.style.borderColor = 'var(--border)'; x.style.color = 'var(--text-muted)'; });
+      this.style.background = 'var(--accent-dim)';
+      this.style.borderColor = 'var(--accent-border)';
+      this.style.color = 'var(--accent)';
+      submitBtn.disabled = false;
+    });
+  });
+  submitBtn.addEventListener('click', async function() {
+    if (!rating) return;
+    var chosen = document.getElementById('chosenOption').value.trim();
+    var note = document.getElementById('outcomeNote').value.trim();
+    try {
+      var r = await fetch('/phronesis/api/outcome', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ run_id: {{ result.run_id | tojson }}, rating: rating, note: note, chosen_option: chosen }),
+      });
+      if (r.ok) {
+        document.getElementById('outcomeForm').style.display = 'none';
+        document.getElementById('outcomeThanks').style.display = 'block';
+      } else {
+        alert('Could not save — please try again.');
+      }
+    } catch (e) { alert('Network error. Please try again.'); }
+  });
+})();
+</script>
 {% endblock %}

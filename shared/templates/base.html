@@ -46,7 +46,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
+/* Dark theme is the default */
+:root, html[data-theme="dark"] {
   --bg: #0d1117;
   --surface: #161b22;
   --surface2: #1c2129;
@@ -69,6 +70,19 @@
   --red-dim: rgba(248,81,73,0.08);
   --amber: #d29922;
   --amber-dim: rgba(210,153,34,0.10);
+}
+
+/* Light theme */
+html[data-theme="light"] {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface2: #f4f3ef;
+  --border: #e2e0d9;
+  --border-subtle: rgba(0,0,0,0.05);
+
+  --text: #1a1a1a;
+  --text-muted: #5a5a5a;
+  --text-dim: #9a9a9a;
 }
 
 /* Phronesis uses the warm orange (decision warmth) — default */
@@ -242,6 +256,10 @@ button, a.nav-tool, .chip { min-height: 36px; }
       <a href="/phronesis" data-tool="phronesis" class="nav-tool" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Phronesis</a>
       <a href="/synthesis" data-tool="synthesis" class="nav-tool" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Synthesis</a>
       <a href="/pricing" class="nav-tool hide-mobile" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Pricing</a>
+      <button id="themeToggle" title="Toggle theme" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:none;border-radius:6px;cursor:pointer;color:var(--text-muted);transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='none'">
+        <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
     </div>
   </div>
 </nav>
@@ -268,9 +286,35 @@ button, a.nav-tool, .chip { min-height: 36px; }
 <style>
 .nav-tool:hover { color: var(--text) !important; background: rgba(255,255,255,0.04); }
 .nav-tool.active { color: var(--accent) !important; background: var(--accent-dim); }
+html[data-theme="light"] .nav-tool:hover { background: rgba(0,0,0,0.04); }
 </style>
 <script>
 (function() {
+  // Theme init
+  var stored = localStorage.getItem('intellcluster_theme');
+  if (stored === 'light' || stored === 'dark') {
+    document.documentElement.setAttribute('data-theme', stored);
+  }
+  function updateThemeIcons() {
+    var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    var moon = document.getElementById('themeIconMoon'), sun = document.getElementById('themeIconSun');
+    if (!moon || !sun) return;
+    moon.style.display = theme === 'dark' ? 'block' : 'none';
+    sun.style.display = theme === 'light' ? 'block' : 'none';
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    updateThemeIcons();
+    var btn = document.getElementById('themeToggle');
+    if (btn) btn.addEventListener('click', function() {
+      var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      var next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('intellcluster_theme', next);
+      updateThemeIcons();
+    });
+  });
+
+  // Active tool highlight in nav
   var path = window.location.pathname;
   var tool = path.startsWith('/synthesis') ? 'synthesis' : path.startsWith('/phronesis') ? 'phronesis' : null;
   if (tool) document.querySelectorAll('.nav-tool[data-tool="' + tool + '"]').forEach(function(el) { el.classList.add('active'); });
@@ -278,5 +322,6 @@ button, a.nav-tool, .chip { min-height: 36px; }
 </script>
 
 {% block scripts %}{% endblock %}
+<script src="/static/typing_animation.js" defer></script>
 </body>
 </html>

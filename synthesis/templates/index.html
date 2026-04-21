@@ -44,7 +44,7 @@
   </div>
 
   <div id="composer" class="rv rv1" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:border-color 0.25s,box-shadow 0.3s;">
-    <textarea id="inp" rows="4" maxlength="4000"
+    <textarea id="inp" rows="4" maxlength="4000" data-typing="synthesis"
       placeholder="Ask a deep research question. Example: 'What's the most effective pricing strategy for a B2B SaaS targeting enterprise customers in 2026, considering recent AI-driven cost pressures?'"
       style="width:100%;background:transparent;border:none;padding:20px 20px 10px;font-size:15px;color:var(--text);font-family:inherit;resize:none;outline:none;line-height:1.6;min-height:110px;"></textarea>
 
@@ -106,6 +106,26 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  .md-output { font-size: 14.5px; line-height: 1.75; color: var(--text); }
+  .md-output h1, .md-output h2, .md-output h3 { font-family: 'Newsreader', Georgia, serif; font-weight: 600; letter-spacing: -0.2px; margin: 1.4em 0 0.5em; }
+  .md-output h1 { font-size: 24px; }
+  .md-output h2 { font-size: 20px; color: var(--text); }
+  .md-output h3 { font-size: 17px; }
+  .md-output p { margin: 0.7em 0; }
+  .md-output ul, .md-output ol { margin: 0.7em 0 0.7em 1.3em; }
+  .md-output li { margin: 0.35em 0; }
+  .md-output strong { color: var(--text); font-weight: 600; }
+  .md-output code { background: var(--bg); padding: 1px 5px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  .md-output pre { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; overflow-x: auto; margin: 0.8em 0; }
+  .md-output pre code { background: transparent; padding: 0; font-size: 12px; }
+  .md-output blockquote { border-left: 3px solid var(--accent); padding-left: 14px; margin: 0.8em 0; color: var(--text-muted); }
+  .md-output a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-border); }
+  .md-output table { border-collapse: collapse; margin: 1em 0; font-size: 13px; width: 100%; }
+  .md-output th, .md-output td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+  .md-output th { background: var(--surface2); color: var(--text); font-weight: 600; }
+</style>
 <script>
 const inp = document.getElementById('inp'), goBtn = document.getElementById('goBtn');
 const PS = document.getElementById('PS'), SL = document.getElementById('modelList');
@@ -278,11 +298,16 @@ function renderFinal(d) {
   const runId = d.run_id || '';
   const shareUrl = runId ? (location.origin + '/synthesis/result/' + runId) : '';
 
+  // Render markdown if marked.js is loaded
+  const body = (window.marked && typeof window.marked.parse === 'function')
+    ? window.marked.parse(text, { breaks: true })
+    : '<div style="white-space:pre-wrap;line-height:1.75;">' + escapeHtml(text) + '</div>';
+
   RS.innerHTML = `
     <div class="rv">
       <div class="fig-label">FIG <span>1</span> — SYNTHESIZED ANSWER</div>
-      <div class="panel accent-bar" style="padding:28px 28px 28px 24px;">
-        <div style="white-space:pre-wrap;line-height:1.75;font-size:14.5px;color:var(--text);">${escapeHtml(text)}</div>
+      <div class="panel accent-bar md-output" style="padding:28px 28px 28px 24px;">
+        ${body}
       </div>
     </div>
     <div class="rv rv1" style="margin-top:24px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">

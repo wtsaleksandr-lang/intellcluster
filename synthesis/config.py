@@ -216,6 +216,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"  # Allow IntellCluster env vars (Stripe, SMTP, etc.) without errors
 
     @property
     def effective_min_models(self) -> int:

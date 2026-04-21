@@ -1,117 +1,223 @@
 {% extends "base.html" %}
 {% block title %}Pricing — IntellCluster{% endblock %}
-{% block meta_desc %}IntellCluster pricing. Free for casual use, Pro ($19/mo) for power users, Team ($49/seat/mo) for collaborative decisions.{% endblock %}
-{% block og_title %}IntellCluster pricing — Free, Pro, Team{% endblock %}
-{% block og_desc %}Start free. Upgrade to Pro for unlimited multi-model analysis. Team tier for collaborative decisions with stakeholder voting.{% endblock %}
+{% block meta_desc %}Simple, honest pricing for IntellCluster. Free tier, Starter at $9/mo, Pro at $19/mo, or pay-as-you-go credit packs starting at $5.{% endblock %}
+{% block og_title %}IntellCluster pricing — Free, $9 Starter, $19 Pro, credits from $5{% endblock %}
+{% block og_desc %}Subscription or pay-as-you-go. 7-day free trial on paid plans. Credits never expire.{% endblock %}
 
 {% block content %}
-<div style="max-width:980px;margin:0 auto;padding:0 20px;">
+<div style="max-width:1080px;margin:0 auto;padding:0 20px;">
 
-<section style="padding:56px 0 32px;text-align:center;" class="rv">
+<!-- Hero -->
+<section style="padding:64px 0 24px;text-align:center;" class="rv">
   <div class="fig-label">INTELLCLUSTER <span>·</span> PRICING</div>
-  <h1 class="t-display" style="font-size:clamp(30px,5vw,44px);font-weight:600;line-height:1.15;letter-spacing:-0.5px;">
-    Simple pricing.<br>Built to scale with your decisions.
+  <h1 class="t-display" style="font-size:clamp(32px,5vw,48px);font-weight:600;line-height:1.1;letter-spacing:-0.6px;">
+    Pay only for intelligence<br>you actually use.
   </h1>
-  <p style="margin-top:14px;color:var(--text-muted);font-size:15px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6;">
-    Start free. Upgrade when you need deeper analysis, unlimited runs, or team collaboration.
+  <p style="margin-top:16px;color:var(--text-muted);font-size:16px;max-width:560px;margin-left:auto;margin-right:auto;line-height:1.6;">
+    Subscribe for monthly credits, or buy credit packs once and use them whenever. No hidden fees. Credits never expire.
   </p>
 </section>
 
-<section style="padding:24px 0 60px;">
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;" class="grid-3 rv rv1">
+<!-- Billing toggle -->
+<section style="padding:12px 0 32px;text-align:center;">
+  <div class="rv rv1" style="display:inline-flex;align-items:center;gap:6px;padding:5px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
+    <button id="billMonthly" class="bill-btn active" data-billing="monthly" style="padding:8px 18px;font-size:12px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;">Monthly</button>
+    <button id="billAnnual" class="bill-btn" data-billing="annual" style="padding:8px 18px;font-size:12px;font-weight:600;background:transparent;color:var(--text-muted);border:none;border-radius:6px;cursor:pointer;">Annual <span class="t-mono" style="font-size:9px;margin-left:4px;color:var(--green);">-22%</span></button>
+  </div>
+</section>
 
-    <!-- FREE -->
-    <div class="panel" style="padding:28px;display:flex;flex-direction:column;">
-      <div class="fig-label" style="margin-bottom:8px;">FREE</div>
-      <h2 class="t-display" style="font-size:28px;font-weight:600;">Decide</h2>
-      <div style="margin-top:14px;font-size:14px;color:var(--text-muted);">For casual use.</div>
-      <div style="margin-top:20px;">
-        <span class="t-display" style="font-size:40px;font-weight:600;">$0</span>
-        <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
-      </div>
-      <ul style="list-style:none;margin-top:24px;padding:0;font-size:13px;color:var(--text-muted);line-height:1.9;">
-        <li>✓ 5 decisions / month</li>
-        <li>✓ Synthesis research (3 models)</li>
-        <li>✓ 2 AI analysts per decision</li>
-        <li>✓ 90-day decision history</li>
-        <li>✓ Basic shareable links</li>
-      </ul>
-      <div style="flex:1;"></div>
-      <a href="/phronesis" style="margin-top:24px;display:block;text-align:center;padding:10px;background:var(--surface2);color:var(--text);font-weight:600;border:1px solid var(--border);border-radius:8px;font-size:13px;text-decoration:none;">Start Free</a>
-    </div>
+<!-- Subscription plans -->
+<section style="padding:0 0 40px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;" class="grid-3 rv rv2">
 
-    <!-- PRO (recommended) -->
-    <div class="panel accent-bar" style="padding:28px;display:flex;flex-direction:column;position:relative;border-color:var(--accent-border);box-shadow:0 0 0 1px var(--accent-border);">
-      <div style="position:absolute;top:-10px;right:20px;padding:3px 10px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.8px;border-radius:4px;text-transform:uppercase;">Recommended</div>
-      <div class="fig-label" style="margin-bottom:8px;color:var(--accent);">PRO</div>
-      <h2 class="t-display" style="font-size:28px;font-weight:600;">Decide Better</h2>
-      <div style="margin-top:14px;font-size:14px;color:var(--text-muted);">For serious decision-makers.</div>
-      <div style="margin-top:20px;">
-        <span class="t-display" style="font-size:40px;font-weight:600;">$19</span>
-        <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
-      </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">$15/mo billed annually</div>
-      <ul style="list-style:none;margin-top:24px;padding:0;font-size:13px;color:var(--text-muted);line-height:1.9;">
-        <li>✓ Unlimited decisions</li>
-        <li>✓ Synthesis expert mode (5 models)</li>
-        <li>✓ 3 analysts + adversarial mode</li>
-        <li>✓ Permanent history + outcome tracking</li>
-        <li>✓ Custom criteria templates</li>
-        <li>✓ PDF / CSV export</li>
-        <li>✓ Priority support</li>
-      </ul>
-      <div style="flex:1;"></div>
-      <a href="/pricing/upgrade?plan=pro" style="margin-top:24px;display:block;text-align:center;padding:10px;background:var(--accent);color:#fff;font-weight:600;border-radius:8px;font-size:13px;text-decoration:none;">Join Pro waitlist</a>
-    </div>
+    {% for plan_id, plan in plans.items() %}
+    <div class="pricing-card{% if plan.highlighted %} pricing-highlight{% endif %}" data-plan-id="{{ plan_id }}" style="background:var(--surface);border:1px solid {% if plan.highlighted %}var(--accent-border){% else %}var(--border){% endif %};border-radius:14px;padding:30px 26px;display:flex;flex-direction:column;position:relative;transition:transform 0.25s cubic-bezier(0.22,1,0.36,1), border-color 0.25s, box-shadow 0.3s;{% if plan.highlighted %}box-shadow:0 0 0 1px var(--accent-border), 0 20px 50px -20px rgba(255,106,61,0.15);{% endif %}">
 
-    <!-- TEAM -->
-    <div class="panel" style="padding:28px;display:flex;flex-direction:column;">
-      <div class="fig-label" style="margin-bottom:8px;">TEAM</div>
-      <h2 class="t-display" style="font-size:28px;font-weight:600;">Decide Together</h2>
-      <div style="margin-top:14px;font-size:14px;color:var(--text-muted);">For teams &amp; organizations.</div>
-      <div style="margin-top:20px;">
-        <span class="t-display" style="font-size:40px;font-weight:600;">$49</span>
-        <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ seat / month</span>
+      {% if plan.highlighted %}
+      <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);padding:4px 12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:0.8px;border-radius:5px;text-transform:uppercase;">Most popular</div>
+      {% endif %}
+
+      <div class="fig-label" style="margin-bottom:6px;{% if plan.highlighted %}color:var(--accent);{% endif %}">{{ plan.name|upper }}</div>
+      <h2 class="t-display" style="font-size:26px;font-weight:600;letter-spacing:-0.3px;">{{ plan.tagline }}</h2>
+
+      <div style="margin-top:22px;min-height:60px;">
+        {% if plan.monthly_price == 0 %}
+          <span class="t-display" style="font-size:44px;font-weight:600;">$0</span>
+          <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Forever</div>
+        {% else %}
+          <div class="plan-price-monthly" style="display:block;">
+            <span class="t-display" style="font-size:44px;font-weight:600;">${{ plan.monthly_price }}</span>
+            <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
+          </div>
+          <div class="plan-price-annual" style="display:none;">
+            <span class="t-display" style="font-size:44px;font-weight:600;">${{ (plan.annual_price / 12)|round(0, 'floor')|int }}</span>
+            <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">${{ plan.annual_price }} billed annually · save {{ plan.annual_discount_pct }}%</div>
+          </div>
+        {% endif %}
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">3-seat minimum · $39/seat annually</div>
-      <ul style="list-style:none;margin-top:24px;padding:0;font-size:13px;color:var(--text-muted);line-height:1.9;">
-        <li>✓ Everything in Pro</li>
-        <li>✓ Stakeholder collaboration</li>
-        <li>✓ Weighted expertise voting</li>
-        <li>✓ Consensus heatmap</li>
-        <li>✓ Admin dashboard</li>
-        <li>✓ Audit trail export</li>
-        <li>✓ SSO / SAML</li>
+
+      <div style="margin-top:14px;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text-muted);">
+        <strong style="color:var(--text);">{{ plan.credits_per_month }}</strong> credits / month
+      </div>
+
+      <ul style="list-style:none;margin:24px 0 0;padding:0;font-size:13px;color:var(--text-muted);line-height:2;">
+        {% for f in plan.features %}<li>✓ {{ f }}</li>{% endfor %}
+        {% for l in plan.limitations %}<li style="color:var(--text-dim);">&mdash; {{ l }}</li>{% endfor %}
       </ul>
+
       <div style="flex:1;"></div>
-      <a href="/pricing/upgrade?plan=team" style="margin-top:24px;display:block;text-align:center;padding:10px;background:var(--surface2);color:var(--text);font-weight:600;border:1px solid var(--border);border-radius:8px;font-size:13px;text-decoration:none;">Join Team waitlist</a>
+
+      {% if plan.monthly_price == 0 %}
+        <a href="/phronesis" style="margin-top:26px;display:block;text-align:center;padding:11px;background:var(--surface2);color:var(--text);font-weight:600;border:1px solid var(--border);border-radius:9px;font-size:13px;text-decoration:none;transition:border-color 0.15s;">Start free</a>
+      {% else %}
+        <button class="plan-cta" data-plan="{{ plan_id }}" style="margin-top:26px;padding:11px;background:{% if plan.highlighted %}var(--accent);color:#fff;{% else %}var(--surface2);color:var(--text);border:1px solid var(--border);{% endif %}font-weight:600;border:{% if not plan.highlighted %}1px solid var(--border){% else %}none{% endif %};border-radius:9px;font-size:13px;cursor:pointer;transition:opacity 0.15s;">
+          {% if stripe_live %}Start 7-day free trial{% else %}Join {{ plan.name }} waitlist{% endif %}
+        </button>
+      {% endif %}
     </div>
+    {% endfor %}
 
   </div>
 </section>
 
+<!-- Credit packs -->
+<section style="padding:40px 0 32px;border-top:1px solid var(--border-subtle);" class="rv rv3">
+  <div style="text-align:center;margin-bottom:24px;">
+    <div class="fig-label">OR PAY-AS-YOU-GO</div>
+    <h2 class="t-display" style="font-size:26px;font-weight:600;">Credit packs</h2>
+    <p style="margin-top:8px;color:var(--text-muted);font-size:13px;">One-time purchase. Credits never expire. No subscription.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:780px;margin:0 auto;">
+    {% for pack_id, pack in credit_packs.items() %}
+    <div class="pricing-card" style="background:var(--surface);border:1px solid {% if pack.highlighted %}var(--accent-border){% else %}var(--border){% endif %};border-radius:12px;padding:22px;text-align:center;position:relative;transition:transform 0.2s, border-color 0.2s;">
+      {% if pack.highlighted %}
+      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);padding:3px 10px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.6px;border-radius:4px;text-transform:uppercase;">{{ pack.tagline }}</div>
+      {% else %}
+      <div class="t-mono" style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">{{ pack.tagline }}</div>
+      {% endif %}
+      <div class="t-display" style="font-size:36px;font-weight:600;margin-top:8px;">${{ pack.price_usd }}</div>
+      <div style="font-size:14px;color:var(--accent);font-weight:600;margin-top:4px;">{{ pack.credits }} credits</div>
+      <div class="t-mono" style="font-size:10px;color:var(--text-dim);margin-top:4px;">${{ "%.3f"|format(pack.price_per_credit) }} / credit</div>
+      <button class="pack-cta" data-pack="{{ pack_id }}" style="margin-top:18px;width:100%;padding:9px;background:{% if pack.highlighted %}var(--accent);color:#fff;border:none;{% else %}transparent;color:var(--text);border:1px solid var(--border);{% endif %}font-weight:600;border-radius:8px;font-size:12px;cursor:pointer;">
+        {% if stripe_live %}Buy credits{% else %}Join waitlist{% endif %}
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Credit cost table -->
+  <div style="max-width:560px;margin:32px auto 0;padding:18px 22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
+    <div class="fig-label" style="margin-bottom:12px;">WHAT CREDITS COST</div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:6px 16px;font-size:13px;">
+      <div style="color:var(--text-muted);">Phronesis standard (compare options)</div><div class="t-mono" style="color:var(--text);text-align:right;">1 credit</div>
+      <div style="color:var(--text-muted);">Phronesis deep (3 flagship models)</div><div class="t-mono" style="color:var(--text);text-align:right;">3 credits</div>
+      <div style="color:var(--text-muted);">Synthesis standard (5 models)</div><div class="t-mono" style="color:var(--text);text-align:right;">6 credits</div>
+      <div style="color:var(--text-muted);">Synthesis expert (flagship models)</div><div class="t-mono" style="color:var(--text);text-align:right;">15 credits</div>
+    </div>
+  </div>
+</section>
+
 <!-- FAQ -->
-<section style="padding:32px 0 60px;border-top:1px solid var(--border-subtle);" class="rv rv2">
+<section style="padding:48px 0 80px;border-top:1px solid var(--border-subtle);" class="rv">
   <div class="fig-label">FIG <span>A</span> — FAQ</div>
-  <div style="display:flex;flex-direction:column;gap:4px;margin-top:16px;">
+  <div style="display:flex;flex-direction:column;gap:4px;margin-top:16px;max-width:760px;margin-left:auto;margin-right:auto;">
     <details class="panel" style="padding:0;">
-      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">When does Pro billing start?</summary>
-      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">IntellCluster is in public beta. Pro access is available to waitlist members during launch. Billing begins once Stripe integration is live — you'll be notified at least 7 days before the first charge.</div>
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;">What happens during the 7-day free trial?<svg class="chv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">You get full access to the plan's features. Cancel anytime before the 7 days end and you won't be charged. If you don't cancel, your subscription begins on day 8.</div>
     </details>
     <details class="panel" style="padding:0;">
-      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">Can I use both Phronesis and Synthesis on one plan?</summary>
-      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Yes. Every plan includes both tools. Pro/Team unlocks the expert modes and unlimited usage for both.</div>
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;">How do monthly credits work?<svg class="chv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Subscription credits refill on your billing date. Unused credits in a billing period don't roll over. Pay-as-you-go credit packs, however, never expire.</div>
     </details>
     <details class="panel" style="padding:0;">
-      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">What happens if I cancel?</summary>
-      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Your decisions remain accessible for 90 days after cancellation, then are archived. Export them any time before that.</div>
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;">Can I switch between plans?<svg class="chv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Yes. Upgrades take effect immediately with prorated billing. Downgrades take effect at the end of the current billing period.</div>
     </details>
     <details class="panel" style="padding:0;">
-      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">Do you offer enterprise pricing?</summary>
-      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Yes. Custom plans available for 50+ seats with API access, SLAs, and data residency. Contact via the waitlist form and mention enterprise.</div>
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;">What if I run out of credits mid-month?<svg class="chv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Buy a one-time credit pack at any time. Packs sit on top of your subscription credits and never expire.</div>
+    </details>
+    <details class="panel" style="padding:0;">
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;">Do you offer refunds?<svg class="chv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg></summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">If you cancel a subscription within 14 days of the first charge and haven't used more than 50% of your credits, we'll refund it. Credit packs are non-refundable but usable forever.</div>
     </details>
   </div>
 </section>
 
 </div>
+
+<style>
+  /* Hover lift */
+  .pricing-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-border);
+  }
+  .pricing-highlight:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 0 1px var(--accent-border), 0 28px 60px -20px rgba(255,106,61,0.22);
+  }
+  .plan-cta:hover, .pack-cta:hover { opacity: 0.88; }
+  details[open] .chv { transform: rotate(180deg); }
+  .chv { transition: transform 0.2s; }
+  .bill-btn.active { background: var(--accent) !important; color: #fff !important; }
+</style>
+
+<script>
+(function() {
+  var billing = 'monthly';
+  var monthlyBtn = document.getElementById('billMonthly');
+  var annualBtn = document.getElementById('billAnnual');
+  function setBilling(b) {
+    billing = b;
+    monthlyBtn.classList.toggle('active', b === 'monthly');
+    annualBtn.classList.toggle('active', b === 'annual');
+    monthlyBtn.style.background = b === 'monthly' ? 'var(--accent)' : 'transparent';
+    monthlyBtn.style.color = b === 'monthly' ? '#fff' : 'var(--text-muted)';
+    annualBtn.style.background = b === 'annual' ? 'var(--accent)' : 'transparent';
+    annualBtn.style.color = b === 'annual' ? '#fff' : 'var(--text-muted)';
+    document.querySelectorAll('.plan-price-monthly').forEach(function(el){ el.style.display = b === 'monthly' ? 'block' : 'none'; });
+    document.querySelectorAll('.plan-price-annual').forEach(function(el){ el.style.display = b === 'annual' ? 'block' : 'none'; });
+  }
+  monthlyBtn.onclick = function(){ setBilling('monthly'); };
+  annualBtn.onclick = function(){ setBilling('annual'); };
+
+  // Plan CTAs
+  document.querySelectorAll('.plan-cta').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      var planId = this.dataset.plan;
+      try {
+        var r = await fetch('/pricing/checkout', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({plan: planId, billing: billing}),
+        });
+        var d = await r.json();
+        if (d.url) { window.location.href = d.url; }
+        else if (d.fallback_url) { window.location.href = d.fallback_url; }
+        else { alert(d.error || 'Checkout unavailable'); }
+      } catch (e) { window.location.href = '/pricing/upgrade?plan=' + planId; }
+    });
+  });
+
+  // Credit pack CTAs
+  document.querySelectorAll('.pack-cta').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      var packId = this.dataset.pack;
+      try {
+        var r = await fetch('/pricing/checkout', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({pack: packId}),
+        });
+        var d = await r.json();
+        if (d.url) { window.location.href = d.url; }
+        else if (d.fallback_url) { window.location.href = d.fallback_url; }
+        else { alert(d.error || 'Checkout unavailable'); }
+      } catch (e) { window.location.href = '/pricing/upgrade?plan=pro'; }
+    });
+  });
+})();
+</script>
 {% endblock %}

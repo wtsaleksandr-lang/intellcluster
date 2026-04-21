@@ -43,6 +43,13 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 
 app = FastAPI(title="IntellCluster", version="0.1.0")
 
+# Rate limiting middleware
+from shared.rate_limit import rate_limit_middleware
+app.middleware("http")(rate_limit_middleware)
+
+# Analytics
+from shared.analytics import log_event, get_plausible_domain
+
 # Mount admin routes (/admin, /admin/login, /admin/logout)
 app.include_router(admin_router)
 
@@ -74,8 +81,28 @@ async def robots():
 
 @app.get("/sitemap.xml", include_in_schema=False)
 async def sitemap():
-    from fastapi.responses import FileResponse
-    return FileResponse("shared/static/sitemap.xml", media_type="application/xml")
+    """Dynamic sitemap — includes static pages + all /compare/{slug} programmatic pages."""
+    from fastapi.responses import Response
+    from shared.seo_pages import all_compare_slugs
+
+    base = "https://intellcluster.com"
+    static_urls = [
+        ("/", "1.0", "weekly"),
+        ("/phronesis", "0.9", "weekly"),
+        ("/synthesis", "0.9", "weekly"),
+        ("/pricing", "0.7", "monthly"),
+        ("/compare", "0.8", "weekly"),
+        ("/privacy", "0.3", "yearly"),
+        ("/terms", "0.3", "yearly"),
+    ]
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>']
+    lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    for path, priority, freq in static_urls:
+        lines.append(f'  <url><loc>{base}{path}</loc><priority>{priority}</priority><changefreq>{freq}</changefreq></url>')
+    for slug in all_compare_slugs():
+        lines.append(f'  <url><loc>{base}/compare/{slug}</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>')
+    lines.append('</urlset>')
+    return Response(content="\n".join(lines), media_type="application/xml")
 
 
 @app.get("/favicon.svg", include_in_schema=False)
@@ -86,7 +113,94 @@ async def favicon():
 
 @app.get("/pricing", response_class=HTMLResponse)
 async def pricing_page(request: Request):
-    return templates.TemplateResponse(request, "pricing.html")
+    from shared.pricing import PLANS, CREDIT_PACKS, stripe_configured
+    return templates.TemplateResponse(request, "pricing.html", {
+        "plans": PLANS,
+        "credit_packs": CREDIT_PACKS,
+        "stripe_live": stripe_configured(),
+    })
+
+
+# ─── Stripe checkout ───
+
+@app.post("/pricing/checkout")
+async def pricing_checkout(request: Request):
+    """Start a Stripe Checkout session. Body: {plan: 'starter'|'pro', billing: 'monthly'|'annual'}
+       OR: {pack: 'pack_5'|'pack_15'|'pack_30'}
+       Falls back to waitlist if Stripe not configured."""
+    from shared.stripe_integration import create_subscription_checkout, create_credit_pack_checkout
+    from shared.pricing import stripe_configured
+
+    body = await request.json()
+    email = body.get("email")
+    base = str(request.base_url).rstrip("/")
+    success_url = f"{base}/pricing/success?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{base}/pricing"
+
+    if "plan" in body:
+        plan_id = body["plan"]
+        billing = body.get("billing", "monthly")
+        if not stripe_configured():
+            return JSONResponse({"error": "Stripe not configured", "fallback_url": f"/pricing/upgrade?plan={plan_id}"}, status_code=503)
+        url = create_subscription_checkout(plan_id, billing, email, success_url, cancel_url)
+        if not url:
+            return JSONResponse({"error": f"Could not create checkout for {plan_id}"}, status_code=400)
+        return {"url": url}
+
+    if "pack" in body:
+        pack_id = body["pack"]
+        if not stripe_configured():
+            return JSONResponse({"error": "Stripe not configured", "fallback_url": "/pricing/upgrade?plan=pro"}, status_code=503)
+        url = create_credit_pack_checkout(pack_id, email, success_url, cancel_url)
+        if not url:
+            return JSONResponse({"error": f"Could not create checkout for {pack_id}"}, status_code=400)
+        return {"url": url}
+
+    return JSONResponse({"error": "Missing plan or pack"}, status_code=400)
+
+
+@app.get("/pricing/success", response_class=HTMLResponse)
+async def pricing_success(request: Request, session_id: str | None = None):
+    return templates.TemplateResponse(request, "checkout_success.html", {"session_id": session_id})
+
+
+@app.post("/api/stripe/webhook")
+async def stripe_webhook(request: Request):
+    from shared.stripe_integration import verify_webhook_signature, handle_webhook_event
+    sig_header = request.headers.get("stripe-signature", "")
+    payload = await request.body()
+    event = verify_webhook_signature(payload, sig_header)
+    if not event:
+        return JSONResponse({"error": "Invalid signature"}, status_code=400)
+    handle_webhook_event(event)
+    return {"received": True}
+
+
+@app.get("/compare", response_class=HTMLResponse)
+async def compare_index(request: Request):
+    from shared.seo_pages import load_compare_pages, page_slug
+    pages = load_compare_pages()
+    for p in pages:
+        p["slug"] = page_slug(p.get("options", []))
+    return templates.TemplateResponse(request, "compare_index.html", {"pages": pages})
+
+
+@app.get("/compare/{slug}", response_class=HTMLResponse)
+async def compare_page_view(request: Request, slug: str):
+    from shared.seo_pages import get_compare_page
+    page = get_compare_page(slug)
+    if not page:
+        return templates.TemplateResponse(request, "404.html", status_code=404)
+    return templates.TemplateResponse(request, "compare.html", {"page": page, "preset_slug": slug})
+
+
+@app.get("/api/compare-preset/{slug}")
+async def compare_preset(slug: str):
+    from shared.seo_pages import get_compare_page
+    page = get_compare_page(slug)
+    if not page:
+        return JSONResponse(status_code=404, content={"error": "Preset not found"})
+    return {"question": page.get("question"), "options": page.get("options", []), "criteria": page.get("criteria", [])}
 
 
 @app.get("/privacy", response_class=HTMLResponse)
@@ -120,12 +234,20 @@ async def upgrade_submit(
     from datetime import datetime as _dt, timezone as _tz
     wl_dir = _Path("history"); wl_dir.mkdir(exist_ok=True)
     wl_file = wl_dir / "waitlist.jsonl"
+    clean_email = email.strip().lower()[:200]
     with open(wl_file, "a", encoding="utf-8") as f:
         f.write(_json.dumps({
             "timestamp": _dt.now(_tz.utc).isoformat(),
             "plan": plan,
-            "email": email.strip().lower()[:200],
+            "email": clean_email,
         }) + "\n")
+    # Send confirmation email (no-op in dev mode if SMTP unset)
+    from shared.email import waitlist_confirmation
+    try:
+        waitlist_confirmation(clean_email, plan)
+    except Exception:
+        pass
+    log_event("waitlist_signup", {"plan": plan, "email_hash": hash(clean_email) % (10**10)})
     return templates.TemplateResponse(request, "upgrade.html", {"plan": plan, "submitted": True})
 
 
@@ -228,14 +350,27 @@ async def phronesis_decide(req_body: DecisionRequest, req: Request):
 async def _stream_phronesis(input_data: DecisionInput):
     queue = asyncio.Queue()
 
+    log_event("phronesis_started", {
+        "options_count": len(input_data.options),
+        "criteria_count": len(input_data.criteria),
+        "depth": input_data.settings.depth,
+    })
+
     def on_step(step: str, detail: str):
         queue.put_nowait({"step": step, "detail": detail})
 
     async def run():
         try:
             result = await run_decision_pipeline(input_data, on_step=on_step)
+            log_event("phronesis_completed", {
+                "run_id": result.run_id,
+                "winner": result.winner[:100],
+                "confidence": result.confidence_level,
+                "latency_ms": result.latency_ms,
+            })
             queue.put_nowait({"result": _phronesis_result_dict(result)})
         except Exception as e:
+            log_event("phronesis_error", {"error": str(e)[:200]})
             queue.put_nowait({"error": str(e)[:300]})
         queue.put_nowait(None)
 
@@ -319,6 +454,23 @@ async def phronesis_upload(file: UploadFile = File(...)):
 @app.get("/phronesis/api/history")
 async def phronesis_history():
     return {"decisions": get_recent_decisions(limit=20)}
+
+
+# ─── Outcome tracking ───
+
+class OutcomeRequest(BaseModel):
+    run_id: str = Field(min_length=4, max_length=64)
+    rating: int = Field(ge=1, le=5)
+    note: str = Field(default="", max_length=1000)
+    chosen_option: str = Field(default="", max_length=200)
+
+
+@app.post("/phronesis/api/outcome")
+async def phronesis_outcome(req: OutcomeRequest):
+    from shared.tracking.outcomes import record_outcome
+    entry = record_outcome(req.run_id, req.rating, req.note, req.chosen_option)
+    log_event("outcome_reported", {"run_id": req.run_id, "rating": req.rating})
+    return {"ok": True, "entry": entry}
 
 
 # Legacy redirects
@@ -448,6 +600,13 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
                 "output": final_output,
                 "strategist_outputs": strategist_outputs,
                 "model_count": len(models),
+            })
+            log_event("synthesis_completed", {
+                "run_id": run_id,
+                "mode": mode,
+                "category": category,
+                "output_length": len(final_output),
+                "phases": len(strategist_outputs),
             })
         except Exception:
             pass

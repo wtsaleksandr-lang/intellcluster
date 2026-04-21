@@ -1,0 +1,108 @@
+[
+  {
+    "category": "CRM",
+    "title": "HubSpot vs Salesforce vs Pipedrive — Which CRM in 2026?",
+    "intro": "Three CRMs, three philosophies. HubSpot is the marketing-first all-in-one. Salesforce is the enterprise-grade platform. Pipedrive is the sales-focused specialist. Here's how they compare across the criteria that matter for a growing team.",
+    "question": "Which CRM should a 10-person sales team adopt?",
+    "options": ["HubSpot", "Salesforce", "Pipedrive"],
+    "criteria": [
+      {"name": "Ease of use", "weight": 9},
+      {"name": "Price", "weight": 8},
+      {"name": "Integrations", "weight": 6},
+      {"name": "Reporting power", "weight": 5}
+    ],
+    "summary_points": [
+      "HubSpot wins on onboarding speed and marketing integration.",
+      "Salesforce leads on customization and enterprise reporting, at 3-5x the price.",
+      "Pipedrive is fastest for sales-focused teams that don't need deep marketing features."
+    ]
+  },
+  {
+    "category": "Dev laptops",
+    "title": "MacBook Air M3 vs ThinkPad X1 Carbon vs Framework 16",
+    "intro": "The three most-shortlisted developer laptops at the $1,200-1,500 price point. Each represents a different philosophy: polished ecosystem, proven business machine, or modular/repairable.",
+    "question": "Best laptop under $1500 for software development?",
+    "options": ["MacBook Air M3 15-inch", "ThinkPad X1 Carbon Gen 12", "Framework Laptop 16"],
+    "criteria": [
+      {"name": "Performance", "weight": 9},
+      {"name": "Build quality", "weight": 7},
+      {"name": "Value for money", "weight": 8},
+      {"name": "Keyboard quality", "weight": 6}
+    ],
+    "summary_points": [
+      "MacBook Air M3 has the best perf-per-dollar and best display, but limited ports.",
+      "ThinkPad X1 Carbon is the most durable and has the best keyboard for long sessions.",
+      "Framework 16 is the most flexible (upgradable, repairable) but has lower battery life."
+    ]
+  },
+  {
+    "category": "Cloud hosting",
+    "title": "AWS vs Vercel + Supabase vs Railway for SaaS MVPs",
+    "intro": "Where should a bootstrapped SaaS ship? The three default answers in 2026 have sharp tradeoffs across cost, developer experience, and scale ceiling.",
+    "question": "Best cloud platform for launching a SaaS MVP?",
+    "options": ["AWS (EC2 + RDS + S3)", "Vercel + Supabase", "Railway"],
+    "criteria": [
+      {"name": "Ease of setup", "weight": 9},
+      {"name": "Cost at low scale", "weight": 8},
+      {"name": "Scalability", "weight": 5},
+      {"name": "Developer experience", "weight": 7}
+    ],
+    "summary_points": [
+      "Vercel + Supabase is the fastest path to production for teams building standard web apps.",
+      "Railway shines on simplicity and one-click deploys, but gets expensive at scale.",
+      "AWS wins on long-term ceiling but has a steep operational learning curve."
+    ]
+  },
+  {
+    "category": "Pricing strategy",
+    "title": "Freemium vs Flat Subscription vs Usage-Based Pricing",
+    "intro": "Three pricing models, three growth patterns. Each optimizes for different customer behaviors — and each has a distinct failure mode when applied to the wrong product.",
+    "question": "What pricing model works best for a B2B SaaS with 50 enterprise clients?",
+    "options": ["Freemium with paid tiers", "Flat monthly subscription", "Usage-based pricing"],
+    "criteria": [
+      {"name": "Revenue predictability", "weight": 9},
+      {"name": "Customer acquisition", "weight": 7},
+      {"name": "Scalability", "weight": 8}
+    ],
+    "summary_points": [
+      "Flat subscription is the safest choice when your product has steady usage patterns.",
+      "Usage-based aligns revenue with value delivered, best for infrastructure/API products.",
+      "Freemium only works if you can monetize <5% of your user base at high ACV."
+    ]
+  },
+  {
+    "category": "Marketing channels",
+    "title": "Content + SEO vs Paid Ads vs Cold Outreach — Which Wins in 2026?",
+    "intro": "Three acquisition channels, three very different cost structures and timelines. For a bootstrapped SaaS, the right choice depends on your runway and your ICP.",
+    "question": "Which marketing strategy should a bootstrapped SaaS pursue this quarter?",
+    "options": ["Content marketing + SEO", "Paid ads (Google + Meta)", "Cold email outreach"],
+    "criteria": [
+      {"name": "Cost efficiency", "weight": 9},
+      {"name": "Speed to results", "weight": 7},
+      {"name": "Long-term value", "weight": 6}
+    ],
+    "summary_points": [
+      "Content + SEO has the longest payback but compounds into the strongest moat.",
+      "Paid ads give the fastest signal on product-market fit if you can afford a $10k+ test.",
+      "Cold outreach is the cheapest way to validate ICP with 10-50 pilot customers."
+    ]
+  },
+  {
+    "category": "Electric vehicles",
+    "title": "Tesla Model 3 vs Ford Mach-E vs Hyundai Ioniq 5",
+    "intro": "The three most-shortlisted EVs under $50k in 2026. Each appeals to a different buyer: tech-first, SUV-converted, or design-led.",
+    "question": "Which electric vehicle for daily commuting under $50k?",
+    "options": ["Tesla Model 3 Long Range", "Ford Mustang Mach-E", "Hyundai Ioniq 5"],
+    "criteria": [
+      {"name": "Range", "weight": 10},
+      {"name": "Value for money", "weight": 8},
+      {"name": "Tech features", "weight": 6},
+      {"name": "Reliability", "weight": 7}
+    ],
+    "summary_points": [
+      "Tesla Model 3 leads on range and Supercharger access, but interior feels basic for the price.",
+      "Mach-E balances SUV practicality with EV performance, strongest on familiar UX.",
+      "Ioniq 5 has the best-in-class fast charging and the most distinctive design."
+    ]
+  }
+]
