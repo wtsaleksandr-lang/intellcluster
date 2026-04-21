@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, Request, UploadFile, File
+from fastapi import FastAPI, Request, UploadFile, File, Form as FastAPIForm
 from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -33,6 +33,7 @@ from phronesis.engine.types import DecisionInput, AnalysisSettings
 from phronesis.engine.pipeline import run_decision_pipeline
 from phronesis.engine.extractor import extract_decision, suggest_chips
 from shared.tracking.history import get_recent_decisions, get_decision_by_run_id
+from shared.admin import admin_router
 
 # Synthesis imports
 from synthesis.orchestrator.pipeline import run_pipeline as run_synthesis_pipeline
@@ -41,6 +42,9 @@ UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 app = FastAPI(title="IntellCluster", version="0.1.0")
+
+# Mount admin routes (/admin, /admin/login, /admin/logout)
+app.include_router(admin_router)
 
 # Templates — search multiple directories (Jinja2 searches in order)
 templates = Jinja2Templates(directory=[
@@ -60,6 +64,71 @@ async def homepage(request: Request):
     return templates.TemplateResponse(request, "index.html")
 
 
+# ─── SEO: robots.txt + sitemap.xml at root ───
+
+@app.get("/robots.txt", include_in_schema=False)
+async def robots():
+    from fastapi.responses import FileResponse
+    return FileResponse("shared/static/robots.txt", media_type="text/plain")
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+async def sitemap():
+    from fastapi.responses import FileResponse
+    return FileResponse("shared/static/sitemap.xml", media_type="application/xml")
+
+
+@app.get("/favicon.svg", include_in_schema=False)
+async def favicon():
+    from fastapi.responses import FileResponse
+    return FileResponse("shared/static/favicon.svg", media_type="image/svg+xml")
+
+
+@app.get("/pricing", response_class=HTMLResponse)
+async def pricing_page(request: Request):
+    return templates.TemplateResponse(request, "pricing.html")
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+async def privacy_page(request: Request):
+    return templates.TemplateResponse(request, "privacy.html")
+
+
+@app.get("/terms", response_class=HTMLResponse)
+async def terms_page(request: Request):
+    return templates.TemplateResponse(request, "terms.html")
+
+
+@app.get("/pricing/upgrade", response_class=HTMLResponse)
+async def upgrade_form(request: Request, plan: str = "pro"):
+    if plan not in ("pro", "team"):
+        plan = "pro"
+    return templates.TemplateResponse(request, "upgrade.html", {"plan": plan, "submitted": False})
+
+
+@app.post("/pricing/upgrade", response_class=HTMLResponse)
+async def upgrade_submit(
+    request: Request,
+    plan: str = FastAPIForm(...),
+    email: str = FastAPIForm(...),
+):
+    if plan not in ("pro", "team"):
+        plan = "pro"
+    # Save to waitlist (simple JSONL append)
+    from pathlib import Path as _Path
+    import json as _json
+    from datetime import datetime as _dt, timezone as _tz
+    wl_dir = _Path("history"); wl_dir.mkdir(exist_ok=True)
+    wl_file = wl_dir / "waitlist.jsonl"
+    with open(wl_file, "a", encoding="utf-8") as f:
+        f.write(_json.dumps({
+            "timestamp": _dt.now(_tz.utc).isoformat(),
+            "plan": plan,
+            "email": email.strip().lower()[:200],
+        }) + "\n")
+    return templates.TemplateResponse(request, "upgrade.html", {"plan": plan, "submitted": True})
+
+
 @app.get("/api/health")
 async def health():
     return {
@@ -68,6 +137,22 @@ async def health():
         "providers": settings.available_judges(),
         "has_api_keys": settings.has_any_api_key(),
     }
+
+
+# ─── Intent routing (cross-tool handoff detection) ───
+
+from shared.intent_router import classify_intent
+
+class IntentRequest(BaseModel):
+    text: str = Field(min_length=8, max_length=4000)
+    current_tool: str | None = Field(default=None, pattern="^(phronesis|synthesis)$")
+
+
+@app.post("/api/intent")
+async def intent(req: IntentRequest):
+    """Classify user input. Returns which tool best fits + handoff recommendation."""
+    result = await classify_intent(req.text, current_tool=req.current_tool)
+    return result
 
 
 # ═══════════════════════════════════════════════════════
@@ -104,7 +189,7 @@ async def phronesis_result(request: Request, run_id: str):
     decision = get_decision_by_run_id(run_id)
     if not decision:
         return templates.TemplateResponse(request, "404.html", status_code=404)
-    return templates.TemplateResponse(request, "result.html", {"result": decision})
+    return templates.TemplateResponse(request, "result.html", {"result": decision, "tool": "phronesis"})
 
 
 @app.post("/phronesis/api/decide")
@@ -262,6 +347,15 @@ async def synthesis_home(request: Request):
     return templates.TemplateResponse(request, "index.html", {"tool": "synthesis"})
 
 
+@app.get("/synthesis/result/{run_id}", response_class=HTMLResponse)
+async def synthesis_result(request: Request, run_id: str):
+    from shared.tracking.synthesis_history import get_synthesis_run
+    result = get_synthesis_run(run_id)
+    if not result:
+        return templates.TemplateResponse(request, "404.html", {"tool": "synthesis"}, status_code=404)
+    return templates.TemplateResponse(request, "result.html", {"result": result, "tool": "synthesis"})
+
+
 @app.post("/synthesis/api/run")
 async def synthesis_run(req_body: SynthesisRequest, req: Request):
     if not settings.has_any_api_key():
@@ -285,8 +379,15 @@ async def synthesis_run(req_body: SynthesisRequest, req: Request):
 
 
 async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, models: list, admin_overrides: dict):
+    from shared.tracking.synthesis_history import save_synthesis_run
+
     queue = asyncio.Queue()
     model_tasks = {}
+
+    # Capture outputs for persistence
+    strategist_outputs = {}
+    final_output = None
+    phase_names = []
 
     pipeline_task = asyncio.create_task(
         run_synthesis_pipeline(
@@ -311,6 +412,21 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
 
         event = item.get("event", "")
         data = item.get("data", {})
+
+        # Inject run_id into key events so frontend can link to /synthesis/result/{id}
+        if event in ("decision", "done"):
+            data = {**data, "run_id": run_id}
+
+        # Capture for persistence
+        if event == "phases_info":
+            phase_names = data.get("names", [])
+        elif event == "strategist":
+            phase = data.get("phase", 0)
+            phase_name = phase_names[phase - 1] if 0 < phase <= len(phase_names) else f"Phase {phase}"
+            strategist_outputs[phase_name] = data.get("result", "")
+        elif event == "decision":
+            final_output = data.get("result", "")
+
         yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
         if event == "done" or event == "error":
@@ -320,6 +436,21 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
         await pipeline_task
     except Exception:
         pass
+
+    # Persist the run
+    if final_output:
+        try:
+            save_synthesis_run({
+                "run_id": run_id,
+                "prompt": prompt,
+                "category": category,
+                "mode": mode,
+                "output": final_output,
+                "strategist_outputs": strategist_outputs,
+                "model_count": len(models),
+            })
+        except Exception:
+            pass
 
 
 # ═══════════════════════════════════════════════════════

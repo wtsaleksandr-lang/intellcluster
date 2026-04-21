@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Research Analysis — Synthesis{% endblock %}
+{% block meta_desc %}{{ result.prompt[:150] }}{% endblock %}
+{% block og_title %}Synthesis research: {{ result.prompt[:80] }}{% endblock %}
+{% block og_desc %}Multi-model research output from IntellCluster Synthesis.{% endblock %}
+
+{% block content %}
+<div style="max-width:760px;margin:0 auto;padding:40px 20px;">
+
+  <div class="fig-label">SYNTHESIS <span>·</span> RESEARCH OUTPUT</div>
+  <h1 class="t-display" style="font-size:22px;font-weight:500;color:var(--text);margin-bottom:12px;line-height:1.4;">{{ result.prompt[:300] }}</h1>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-bottom:36px;">
+    <span>{{ result.run_id }}</span>
+    <span>·</span>
+    <span>{{ result.mode|upper }}</span>
+    <span>·</span>
+    <span>{{ result.model_count|default(5) }} MODELS</span>
+  </div>
+
+  <!-- Synthesized answer -->
+  <div class="rv">
+    <div class="fig-label">FIG <span>1</span> — SYNTHESIZED ANSWER</div>
+    <div class="panel accent-bar" style="padding:28px 28px 28px 24px;margin-bottom:32px;">
+      <div style="white-space:pre-wrap;line-height:1.75;font-size:14.5px;color:var(--text);">{{ result.output }}</div>
+    </div>
+  </div>
+
+  {% if result.strategist_outputs %}
+  <div class="rv rv1">
+    <div class="fig-label">FIG <span>2</span> — PER-PHASE STRATEGIST SYNTHESIS</div>
+    {% for phase_name, phase_output in result.strategist_outputs.items() %}
+    <details class="panel" style="margin-bottom:6px;padding:0;">
+      <summary style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500;color:var(--text);">
+        {{ phase_name }}
+        <svg class="chv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" style="transition:transform 0.2s;"><path d="M19 9l-7 7-7-7"/></svg>
+      </summary>
+      <div style="padding:0 18px 18px;white-space:pre-wrap;line-height:1.7;font-size:13px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:14px;">{{ phase_output }}</div>
+    </details>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- CTA -->
+  <div class="rv rv2" style="text-align:center;margin-top:32px;">
+    <a href="/synthesis" style="display:inline-block;padding:10px 28px;background:var(--accent);color:#fff;font-weight:600;border-radius:8px;font-size:13px;text-decoration:none;">Run new research</a>
+    <div style="margin-top:14px;">
+      <a href="/phronesis" class="t-mono" style="font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:0.5px;">
+        COMPARING OPTIONS? → PHRONESIS
+      </a>
+    </div>
+  </div>
+
+  <style>
+    details[open] .chv { transform: rotate(180deg); }
+  </style>
+
+</div>
+{% endblock %}

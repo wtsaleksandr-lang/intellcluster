@@ -1,0 +1,21 @@
+{# Reusable handoff banner component.
+   Usage: {% include "_handoff.html" %}
+   Requires: handoff_target (phronesis|synthesis), handoff_reason (string), handoff_url (string) #}
+
+{% if handoff_target %}
+<div id="handoffBanner" class="rv" style="margin:16px 0;padding:16px 18px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:10px;display:flex;align-items:flex-start;gap:14px;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0;margin-top:1px;">
+    <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+  </svg>
+  <div style="flex:1;min-width:0;">
+    <div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">
+      {% if handoff_target == "phronesis" %}This looks like a decision{% else %}This looks like deep research{% endif %}
+    </div>
+    <div style="font-size:13px;color:var(--text);line-height:1.5;">
+      {{ handoff_reason }} — {% if handoff_target == "phronesis" %}Phronesis ranks options for you{% else %}Synthesis runs deep multi-model research{% endif %}.
+    </div>
+  </div>
+  <a href="{{ handoff_url }}" style="flex-shrink:0;padding:8px 16px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;text-decoration:none;border-radius:6px;white-space:nowrap;">Switch →</a>
+  <button onclick="document.getElementById('handoffBanner').style.display='none'" style="flex-shrink:0;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;line-height:1;padding:4px;">×</button>
+</div>
+{% endif %}

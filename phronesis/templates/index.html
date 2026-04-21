@@ -1,5 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Compare Options. Make Smarter Decisions.{% endblock %}
+{% block title %}Phronesis — Compare Options. Make Smarter Decisions.{% endblock %}
+{% block meta_desc %}Phronesis — practical wisdom for every decision. Describe your options in plain language; three independent AI analysts evaluate them blindly and rank them by your weighted criteria.{% endblock %}
+{% block og_title %}Phronesis — Practical wisdom for every decision{% endblock %}
+{% block og_desc %}Three independent AI analysts compare your options blindly. Ranked output with scores, strengths, and confidence levels.{% endblock %}
 
 {% block content %}
 <div style="max-width:760px;margin:0 auto;padding:0 20px;">
@@ -17,6 +20,23 @@
     <p style="margin-top:12px;color:var(--text-muted);font-size:15px;max-width:480px;margin-left:auto;margin-right:auto;">
       Describe your decision. Independent analysts evaluate your options blindly and rank them.
     </p>
+  </div>
+
+  <!-- Handoff suggestion (shown when intent router detects wrong-tool input) -->
+  <div id="handoffBanner" style="display:none;width:100%;margin-bottom:16px;padding:14px 16px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:10px;align-items:flex-start;gap:12px;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0;margin-top:2px;">
+      <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+    </svg>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;">
+        This looks like deep research, not a decision
+      </div>
+      <div id="handoffReason" style="font-size:12px;color:var(--text-muted);line-height:1.5;">
+        Synthesis runs multi-model research on open questions. Phronesis ranks specific options.
+      </div>
+    </div>
+    <a id="handoffLink" href="/synthesis" style="flex-shrink:0;padding:6px 14px;background:var(--accent);color:#fff;font-size:11px;font-weight:600;text-decoration:none;border-radius:6px;white-space:nowrap;">Try Synthesis →</a>
+    <button onclick="document.getElementById('handoffBanner').style.display='none';window._handoffDismissed=true;" style="flex-shrink:0;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px;">×</button>
   </div>
 
   <!-- COMPOSER -->
@@ -185,6 +205,15 @@ const inp=document.getElementById('inp'),composer=document.getElementById('compo
   settingsPop=document.getElementById('settingsPop'),attachList=document.getElementById('attachList');
 const CIRC=97.4;let extractedData=null,suggestTimer=null,attachedFiles=[];
 
+// Hydrate from Synthesis handoff
+(function(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('from')==='synthesis'){
+    const saved=sessionStorage.getItem('intellcluster_handoff_prompt');
+    if(saved){inp.value=saved;sessionStorage.removeItem('intellcluster_handoff_prompt');inp.dispatchEvent(new Event('input'));}
+  }
+})();
+
 /* Expand on focus */
 inp.addEventListener('focus',()=>{
   inp.style.minHeight='140px';
@@ -232,7 +261,7 @@ composer.addEventListener('drop',e=>{e.preventDefault();document.getElementById(
 async function handleFiles(fl){
   if(!fl||!fl.length)return;
   for(const f of fl){if(attachedFiles.length>=5)break;const fd=new FormData();fd.append('file',f);
-    try{const r=await fetch('/api/upload',{method:'POST',body:fd});if(r.ok){const d=await r.json();attachedFiles.push({name:d.filename,original:d.original});}}catch(e){}}
+    try{const r=await fetch('/phronesis/api/upload',{method:'POST',body:fd});if(r.ok){const d=await r.json();attachedFiles.push({name:d.filename,original:d.original});}}catch(e){}}
   renderAttach();
 }
 function renderAttach(){
@@ -248,11 +277,35 @@ const EXAMPS=["Should I buy Tesla Model 3 or Mach-E for commuting?","Compare Hub
 EXAMPS.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t;b.onclick=()=>{inp.value=t;inp.focus();inp.dispatchEvent(new Event('input'));triggerExtract();};document.getElementById('exGrid').appendChild(b);});
 
 /* Suggestions */
-inp.addEventListener('input',()=>{clearTimeout(suggestTimer);exPrev.style.display='none';extractedData=null;if(inp.value.trim().length>=25)suggestTimer=setTimeout(fetchChips,1500);else{chipArea.innerHTML='';chipArea.style.padding='0 16px';}});
-async function fetchChips(){const t=inp.value.trim();if(t.length<25)return;try{const r=await fetch('/api/suggest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});if(!r.ok)return;const{chips}=await r.json();chipArea.innerHTML='';chipArea.style.padding=chips.length?'6px 16px 10px':'0 16px';chips.forEach(c=>{const el=document.createElement('span');el.className='chip';el.style.fontSize='11px';el.style.padding='4px 10px';el.textContent=c;el.onclick=()=>{inp.value+='\n'+c+'.';el.remove();inp.focus();inp.dispatchEvent(new Event('input'));};chipArea.appendChild(el);});}catch(e){}}
+let intentTimer=null;
+inp.addEventListener('input',()=>{
+  clearTimeout(suggestTimer);clearTimeout(intentTimer);
+  exPrev.style.display='none';extractedData=null;
+  const t=inp.value.trim();
+  if(t.length>=25){suggestTimer=setTimeout(fetchChips,1500);intentTimer=setTimeout(checkIntent,1200);}
+  else{chipArea.innerHTML='';chipArea.style.padding='0 16px';document.getElementById('handoffBanner').style.display='none';}
+});
+async function fetchChips(){const t=inp.value.trim();if(t.length<25)return;try{const r=await fetch('/phronesis/api/suggest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});if(!r.ok)return;const{chips}=await r.json();chipArea.innerHTML='';chipArea.style.padding=chips.length?'6px 16px 10px':'0 16px';chips.forEach(c=>{const el=document.createElement('span');el.className='chip';el.style.fontSize='11px';el.style.padding='4px 10px';el.textContent=c;el.onclick=()=>{inp.value+='\n'+c+'.';el.remove();inp.focus();inp.dispatchEvent(new Event('input'));};chipArea.appendChild(el);});}catch(e){}}
+
+async function checkIntent(){
+  if(window._handoffDismissed)return;
+  const t=inp.value.trim();if(t.length<25)return;
+  try{
+    const r=await fetch('/api/intent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,current_tool:'phronesis'})});
+    if(!r.ok)return;
+    const d=await r.json();
+    const banner=document.getElementById('handoffBanner');
+    if(d.should_handoff&&d.tool==='synthesis'){
+      document.getElementById('handoffReason').textContent=d.reason||'Synthesis runs multi-model research on open questions. Phronesis ranks specific options.';
+      sessionStorage.setItem('intellcluster_handoff_prompt',t);
+      document.getElementById('handoffLink').href='/synthesis?from=phronesis';
+      banner.style.display='flex';
+    }else{banner.style.display='none';}
+  }catch(e){}
+}
 
 /* Extract */
-async function triggerExtract(){const t=inp.value.trim();if(t.length<15)return;try{const r=await fetch('/api/extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});if(!r.ok)return;extractedData=await r.json();document.getElementById('exQ').textContent=extractedData.question||'';document.getElementById('exO').textContent=(extractedData.options||[]).join('  \u2022  ');document.getElementById('exC').textContent=(extractedData.criteria||[]).map(c=>c.name).join(', ');exPrev.style.display='block';chipArea.innerHTML='';chipArea.style.padding='0 16px';}catch(e){}}
+async function triggerExtract(){const t=inp.value.trim();if(t.length<15)return;try{const r=await fetch('/phronesis/api/extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});if(!r.ok)return;extractedData=await r.json();document.getElementById('exQ').textContent=extractedData.question||'';document.getElementById('exO').textContent=(extractedData.options||[]).join('  \u2022  ');document.getElementById('exC').textContent=(extractedData.criteria||[]).map(c=>c.name).join(', ');exPrev.style.display='block';chipArea.innerHTML='';chipArea.style.padding='0 16px';}catch(e){}}
 document.getElementById('clearEx').onclick=()=>{exPrev.style.display='none';extractedData=null;};
 
 /* Settings reader */
@@ -277,7 +330,7 @@ async function runPipeline(payload){
   PS.style.display='block';ES.style.display='none';RS.style.display='none';
   SL.innerHTML='';stepsDone=0;setProg(0,'Preparing analysis');
   try{
-    const r=await fetch('/api/decide',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(payload)});
+    const r=await fetch('/phronesis/api/decide',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(payload)});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'Request failed');}
     const ct=r.headers.get('content-type')||'';
     if(ct.includes('text/event-stream')){

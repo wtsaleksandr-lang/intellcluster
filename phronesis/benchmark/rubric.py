@@ -1,5 +1,5 @@
 """
-Benchmark rubric for evaluating Decision Intelligence Tool outputs.
+Benchmark rubric for evaluating Phronesis outputs.
 Judges grade the QUALITY of the tool's decision analysis, not the decision itself.
 """
 

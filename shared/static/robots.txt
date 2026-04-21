@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /uploads/
 
-Sitemap: /sitemap.xml
+Sitemap: https://intellcluster.com/sitemap.xml

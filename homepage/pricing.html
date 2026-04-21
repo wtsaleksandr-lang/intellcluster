@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Pricing — IntellCluster{% endblock %}
+{% block meta_desc %}IntellCluster pricing. Free for casual use, Pro ($19/mo) for power users, Team ($49/seat/mo) for collaborative decisions.{% endblock %}
+{% block og_title %}IntellCluster pricing — Free, Pro, Team{% endblock %}
+{% block og_desc %}Start free. Upgrade to Pro for unlimited multi-model analysis. Team tier for collaborative decisions with stakeholder voting.{% endblock %}
+
+{% block content %}
+<div style="max-width:980px;margin:0 auto;padding:0 20px;">
+
+<section style="padding:56px 0 32px;text-align:center;" class="rv">
+  <div class="fig-label">INTELLCLUSTER <span>·</span> PRICING</div>
+  <h1 class="t-display" style="font-size:clamp(30px,5vw,44px);font-weight:600;line-height:1.15;letter-spacing:-0.5px;">
+    Simple pricing.<br>Built to scale with your decisions.
+  </h1>
+  <p style="margin-top:14px;color:var(--text-muted);font-size:15px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.6;">
+    Start free. Upgrade when you need deeper analysis, unlimited runs, or team collaboration.
+  </p>
+</section>
+
+<section style="padding:24px 0 60px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;" class="grid-3 rv rv1">
+
+    <!-- FREE -->
+    <div class="panel" style="padding:28px;display:flex;flex-direction:column;">
+      <div class="fig-label" style="margin-bottom:8px;">FREE</div>
+      <h2 class="t-display" style="font-size:28px;font-weight:600;">Decide</h2>
+      <div style="margin-top:14px;font-size:14px;color:var(--text-muted);">For casual use.</div>
+      <div style="margin-top:20px;">
+        <span class="t-display" style="font-size:40px;font-weight:600;">$0</span>
+        <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
+      </div>
+      <ul style="list-style:none;margin-top:24px;padding:0;font-size:13px;color:var(--text-muted);line-height:1.9;">
+        <li>✓ 5 decisions / month</li>
+        <li>✓ Synthesis research (3 models)</li>
+        <li>✓ 2 AI analysts per decision</li>
+        <li>✓ 90-day decision history</li>
+        <li>✓ Basic shareable links</li>
+      </ul>
+      <div style="flex:1;"></div>
+      <a href="/phronesis" style="margin-top:24px;display:block;text-align:center;padding:10px;background:var(--surface2);color:var(--text);font-weight:600;border:1px solid var(--border);border-radius:8px;font-size:13px;text-decoration:none;">Start Free</a>
+    </div>
+
+    <!-- PRO (recommended) -->
+    <div class="panel accent-bar" style="padding:28px;display:flex;flex-direction:column;position:relative;border-color:var(--accent-border);box-shadow:0 0 0 1px var(--accent-border);">
+      <div style="position:absolute;top:-10px;right:20px;padding:3px 10px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.8px;border-radius:4px;text-transform:uppercase;">Recommended</div>
+      <div class="fig-label" style="margin-bottom:8px;color:var(--accent);">PRO</div>
+      <h2 class="t-display" style="font-size:28px;font-weight:600;">Decide Better</h2>
+      <div style="margin-top:14px;font-size:14px;color:var(--text-muted);">For serious decision-makers.</div>
+      <div style="margin-top:20px;">
+        <span class="t-display" style="font-size:40px;font-weight:600;">$19</span>
+        <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">$15/mo billed annually</div>
+      <ul style="list-style:none;margin-top:24px;padding:0;font-size:13px;color:var(--text-muted);line-height:1.9;">
+        <li>✓ Unlimited decisions</li>
+        <li>✓ Synthesis expert mode (5 models)</li>
+        <li>✓ 3 analysts + adversarial mode</li>
+        <li>✓ Permanent history + outcome tracking</li>
+        <li>✓ Custom criteria templates</li>
+        <li>✓ PDF / CSV export</li>
+        <li>✓ Priority support</li>
+      </ul>
+      <div style="flex:1;"></div>
+      <a href="/pricing/upgrade?plan=pro" style="margin-top:24px;display:block;text-align:center;padding:10px;background:var(--accent);color:#fff;font-weight:600;border-radius:8px;font-size:13px;text-decoration:none;">Join Pro waitlist</a>
+    </div>
+
+    <!-- TEAM -->
+    <div class="panel" style="padding:28px;display:flex;flex-direction:column;">
+      <div class="fig-label" style="margin-bottom:8px;">TEAM</div>
+      <h2 class="t-display" style="font-size:28px;font-weight:600;">Decide Together</h2>
+      <div style="margin-top:14px;font-size:14px;color:var(--text-muted);">For teams &amp; organizations.</div>
+      <div style="margin-top:20px;">
+        <span class="t-display" style="font-size:40px;font-weight:600;">$49</span>
+        <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ seat / month</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">3-seat minimum · $39/seat annually</div>
+      <ul style="list-style:none;margin-top:24px;padding:0;font-size:13px;color:var(--text-muted);line-height:1.9;">
+        <li>✓ Everything in Pro</li>
+        <li>✓ Stakeholder collaboration</li>
+        <li>✓ Weighted expertise voting</li>
+        <li>✓ Consensus heatmap</li>
+        <li>✓ Admin dashboard</li>
+        <li>✓ Audit trail export</li>
+        <li>✓ SSO / SAML</li>
+      </ul>
+      <div style="flex:1;"></div>
+      <a href="/pricing/upgrade?plan=team" style="margin-top:24px;display:block;text-align:center;padding:10px;background:var(--surface2);color:var(--text);font-weight:600;border:1px solid var(--border);border-radius:8px;font-size:13px;text-decoration:none;">Join Team waitlist</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding:32px 0 60px;border-top:1px solid var(--border-subtle);" class="rv rv2">
+  <div class="fig-label">FIG <span>A</span> — FAQ</div>
+  <div style="display:flex;flex-direction:column;gap:4px;margin-top:16px;">
+    <details class="panel" style="padding:0;">
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">When does Pro billing start?</summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">IntellCluster is in public beta. Pro access is available to waitlist members during launch. Billing begins once Stripe integration is live — you'll be notified at least 7 days before the first charge.</div>
+    </details>
+    <details class="panel" style="padding:0;">
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">Can I use both Phronesis and Synthesis on one plan?</summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Yes. Every plan includes both tools. Pro/Team unlocks the expert modes and unlimited usage for both.</div>
+    </details>
+    <details class="panel" style="padding:0;">
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">What happens if I cancel?</summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Your decisions remain accessible for 90 days after cancellation, then are archived. Export them any time before that.</div>
+    </details>
+    <details class="panel" style="padding:0;">
+      <summary style="padding:14px 18px;cursor:pointer;font-size:13px;font-weight:500;">Do you offer enterprise pricing?</summary>
+      <div style="padding:0 18px 14px;font-size:13px;color:var(--text-muted);line-height:1.6;">Yes. Custom plans available for 50+ seats with API access, SLAs, and data residency. Contact via the waitlist form and mention enterprise.</div>
+    </details>
+  </div>
+</section>
+
+</div>
+{% endblock %}

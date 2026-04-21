@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="70%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ff6a3d" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ff6a3d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g transform="translate(80,80)">
+    <text x="0" y="30" font-family="'JetBrains Mono', monospace" font-size="14" fill="#484f58" letter-spacing="3">MULTI-MODEL AI INTELLIGENCE</text>
+    <text x="0" y="190" font-family="'Newsreader', Georgia, serif" font-size="110" font-weight="600" fill="#e6edf3" letter-spacing="-3">IntellCluster</text>
+    <text x="0" y="280" font-family="'Newsreader', Georgia, serif" font-size="48" font-weight="400" fill="#8b949e">Phronesis &middot; Synthesis</text>
+    <text x="0" y="430" font-family="'Newsreader', Georgia, serif" font-size="36" fill="#e6edf3" font-weight="400">Two tools.</text>
+    <text x="0" y="475" font-family="'Newsreader', Georgia, serif" font-size="36" fill="#ff6a3d" font-weight="600">One research lab.</text>
+    <g transform="translate(0,530)">
+      <rect x="0" y="0" width="4" height="28" fill="#ff6a3d"/>
+      <text x="20" y="20" font-family="'JetBrains Mono', monospace" font-size="16" fill="#8b949e">intellcluster.com</text>
+    </g>
+  </g>
+</svg>

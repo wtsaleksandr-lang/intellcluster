@@ -5,13 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>{% block title %}IntellCluster{% endblock %} | IntellCluster</title>
 <meta name="description" content="{% block meta_desc %}IntellCluster — multi-model AI intelligence for decisions and deep research. Phronesis compares options. Synthesis researches answers.{% endblock %}">
+<meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+<link rel="canonical" href="{% block canonical %}{{ request.url }}{% endblock %}">
+
 <meta property="og:title" content="{% block og_title %}IntellCluster — Multi-model AI intelligence{% endblock %}">
 <meta property="og:description" content="{% block og_desc %}Phronesis ranks your options. Synthesis runs deep multi-model research. Two tools, one ecosystem.{% endblock %}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{% block og_type %}website{% endblock %}">
 <meta property="og:url" content="{{ request.url }}">
 <meta property="og:site_name" content="IntellCluster">
+<meta property="og:image" content="{% block og_image %}/static/og-default.svg{% endblock %}">
+
+<meta name="twitter:title" content="{% block twitter_title %}{{ self.og_title() }}{% endblock %}">
+<meta name="twitter:description" content="{% block twitter_desc %}{{ self.og_desc() }}{% endblock %}">
+<meta name="theme-color" content="#0d1117">
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "IntellCluster",
+  "url": "https://intellcluster.com",
+  "description": "Multi-model AI intelligence for decisions and deep research.",
+  "sameAs": []
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "IntellCluster",
+  "url": "https://intellcluster.com"
+}
+</script>
+{% endblock %}
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2696;</text></svg>">
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="apple-touch-icon" href="/static/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -27,6 +57,7 @@
   --text-muted: #8b949e;
   --text-dim: #484f58;
 
+  /* Parent brand accent (warm orange — IntellCluster identity) */
   --accent: #ff6a3d;
   --accent-dim: rgba(255,106,61,0.10);
   --accent-border: rgba(255,106,61,0.25);
@@ -38,6 +69,22 @@
   --red-dim: rgba(248,81,73,0.08);
   --amber: #d29922;
   --amber-dim: rgba(210,153,34,0.10);
+}
+
+/* Phronesis uses the warm orange (decision warmth) — default */
+body.tool-phronesis {
+  --accent: #ff6a3d;
+  --accent-dim: rgba(255,106,61,0.10);
+  --accent-border: rgba(255,106,61,0.25);
+  --accent-glow: rgba(255,106,61,0.06);
+}
+
+/* Synthesis uses cool cyan-teal (research clarity) — distinct but related */
+body.tool-synthesis {
+  --accent: #4dd0c8;
+  --accent-dim: rgba(77,208,200,0.10);
+  --accent-border: rgba(77,208,200,0.25);
+  --accent-glow: rgba(77,208,200,0.06);
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -165,14 +212,25 @@ input[type=text]:focus, textarea:focus { outline: none; border-color: var(--acce
   .grid-3 { grid-template-columns: 1fr !important; }
   .hide-mobile { display: none !important; }
   body { font-size: 13px; }
+  /* Settings popover full-width on mobile */
+  #settingsPop { width: calc(100vw - 32px) !important; left: 8px !important; right: 8px !important; }
 }
 @media (max-width: 480px) {
   .panel { padding: 14px; }
+  nav > div { padding: 0 14px !important; }
+}
+/* Touch targets minimum 44px */
+button, a.nav-tool, .chip { min-height: 36px; }
+
+/* Handoff banner flex on mobile */
+#handoffBanner { flex-wrap: wrap; }
+@media (max-width: 640px) {
+  #handoffBanner a { width: 100%; text-align: center; }
 }
 </style>
 {% block head %}{% endblock %}
 </head>
-<body>
+<body{% if tool %} class="tool-{{ tool }}"{% endif %}>
 
 <!-- Nav -->
 <nav style="border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 50; background: rgba(13,17,23,0.92); backdrop-filter: blur(12px);">
@@ -183,6 +241,7 @@ input[type=text]:focus, textarea:focus { outline: none; border-color: var(--acce
     <div style="display: flex; align-items: center; gap: 4px; font-size: 12px;">
       <a href="/phronesis" data-tool="phronesis" class="nav-tool" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Phronesis</a>
       <a href="/synthesis" data-tool="synthesis" class="nav-tool" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Synthesis</a>
+      <a href="/pricing" class="nav-tool hide-mobile" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Pricing</a>
     </div>
   </div>
 </nav>
@@ -196,9 +255,10 @@ input[type=text]:focus, textarea:focus { outline: none; border-color: var(--acce
       <span class="t-display" style="font-size: 13px; color: var(--text-muted); font-weight: 600;">IntellCluster</span>
       <span style="margin-left: 8px;">&copy; 2026</span>
     </div>
-    <div style="display: flex; gap: 20px;">
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
       <a href="/phronesis" style="color: var(--text-dim); text-decoration: none;">Phronesis</a>
       <a href="/synthesis" style="color: var(--text-dim); text-decoration: none;">Synthesis</a>
+      <a href="/pricing" style="color: var(--text-dim); text-decoration: none;">Pricing</a>
       <a href="/privacy" style="color: var(--text-dim); text-decoration: none;">Privacy</a>
       <a href="/terms" style="color: var(--text-dim); text-decoration: none;">Terms</a>
     </div>

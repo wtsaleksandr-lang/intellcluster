@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Join {{ plan|title }} Waitlist — IntellCluster{% endblock %}
+{% block meta_desc %}Join the IntellCluster {{ plan }} waitlist. Be notified when billing opens.{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
+
+{% block content %}
+<div style="max-width:520px;margin:80px auto;padding:0 20px;text-align:center;">
+
+  <div class="fig-label">INTELLCLUSTER <span>·</span> {{ plan|upper }} WAITLIST</div>
+  <h1 class="t-display" style="font-size:32px;font-weight:600;letter-spacing:-0.3px;margin-bottom:12px;">
+    {% if plan == 'pro' %}Decide Better.{% elif plan == 'team' %}Decide Together.{% else %}Upgrade{% endif %}
+  </h1>
+  <p style="color:var(--text-muted);font-size:14px;line-height:1.6;margin-bottom:32px;">
+    {% if plan == 'pro' %}
+      Pro unlocks unlimited decisions, expert-mode research, permanent history, and outcome tracking.
+    {% elif plan == 'team' %}
+      Team adds stakeholder collaboration, weighted voting, and admin dashboards for organizations.
+    {% else %}
+      Be the first to know when upgrades open.
+    {% endif %}
+    Leave your email — we'll notify you when billing goes live.
+  </p>
+
+  {% if submitted %}
+  <div class="panel accent-bar" style="padding:20px 24px;text-align:left;margin-bottom:16px;">
+    <div class="fig-label" style="margin-bottom:6px;color:var(--green);">CONFIRMED</div>
+    <div style="font-size:13px;color:var(--text);">You're on the list. We'll reach out when {{ plan|title }} billing opens.</div>
+  </div>
+  <a href="/" style="font-size:13px;color:var(--accent);text-decoration:none;">Back to IntellCluster →</a>
+  {% else %}
+  <form method="post" action="/pricing/upgrade" class="panel" style="padding:20px;text-align:left;">
+    <input type="hidden" name="plan" value="{{ plan }}">
+    <label class="fig-label" style="margin-bottom:6px;">EMAIL</label>
+    <input type="email" name="email" required placeholder="you@company.com" autocomplete="email"
+           style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:14px;">
+    <button type="submit" style="width:100%;padding:10px;background:var(--accent);color:#fff;font-weight:600;border:none;border-radius:8px;font-size:13px;cursor:pointer;">
+      Join {{ plan|title }} waitlist
+    </button>
+  </form>
+  <p style="margin-top:16px;font-size:11px;color:var(--text-dim);">No spam. Unsubscribe anytime.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

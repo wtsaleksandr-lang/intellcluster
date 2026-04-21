@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Decision Intelligence Tool — Quality Benchmark.
+Phronesis — Quality Benchmark.
 Runs 20 test prompts, collects outputs, evaluates with independent judges, produces report.
 
 Usage:
@@ -202,7 +202,7 @@ def generate_report(prompts, outputs, eval_results) -> str:
     lines = []
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    lines.append("# Decision Intelligence Tool - Quality Benchmark Report")
+    lines.append("# Phronesis - Quality Benchmark Report")
     lines.append(f"\nGenerated: {now}")
     lines.append(f"Prompts evaluated: {len(eval_results)}/{len(prompts)}")
 
@@ -267,7 +267,7 @@ def generate_report(prompts, outputs, eval_results) -> str:
         # Verdict
         lines.append("\n## Verdict\n")
         if avg >= 7.5:
-            lines.append("The Decision Intelligence Tool produces **high-quality** recommendations across categories. Ready for public beta.")
+            lines.append("Phronesis produces **high-quality** recommendations across categories. Ready for public beta.")
         elif avg >= 6.0:
             lines.append("The tool produces **good quality** recommendations. Some dimensions need polish before broad launch.")
         elif avg >= 4.5:

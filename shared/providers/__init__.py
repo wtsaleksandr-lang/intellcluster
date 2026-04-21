@@ -1,6 +1,6 @@
 """
-Provider registry for Decision Intelligence Tool.
-Ported from ai-orchestrator — adapted for judge-only usage.
+Shared LLM provider registry for IntellCluster.
+Used by both Phronesis (judges) and Synthesis (research models).
 """
 
 import os
