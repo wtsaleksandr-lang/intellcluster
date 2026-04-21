@@ -1,0 +1,992 @@
+{
+  "round": 2,
+  "timestamp": "2026-04-18T21:20:25.202497+00:00",
+  "prompts": [
+    "P01",
+    "P04",
+    "P11",
+    "P02",
+    "P10",
+    "P12",
+    "P05",
+    "P06",
+    "P13",
+    "P08",
+    "P14",
+    "P07",
+    "P03",
+    "P09",
+    "P15"
+  ],
+  "per_prompt": [
+    {
+      "prompt_id": "P01",
+      "prompt_title": "Contradictory Strategy Resolution",
+      "category": "decision_strategy",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.33,
+            "depth": 9.0,
+            "actionability": 10.0,
+            "reasoning": 9.0,
+            "usefulness": 9.67,
+            "overall": 9.4
+          },
+          "rank_points": 12,
+          "times_ranked_first": 3
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 8.67,
+            "depth": 9.0,
+            "actionability": 8.33,
+            "reasoning": 9.0,
+            "usefulness": 8.67,
+            "overall": 8.73
+          },
+          "rank_points": 9,
+          "times_ranked_first": 3
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 7.67,
+            "actionability": 6.67,
+            "reasoning": 7.67,
+            "usefulness": 7.0,
+            "overall": 7.34
+          },
+          "rank_points": 6,
+          "times_ranked_first": 3
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.0,
+            "depth": 5.33,
+            "actionability": 5.0,
+            "reasoning": 5.67,
+            "usefulness": 5.33,
+            "overall": 5.67
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P04",
+      "prompt_title": "Business Model Validation",
+      "category": "business_ideas_validation",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.33,
+            "depth": 10.0,
+            "actionability": 9.67,
+            "reasoning": 9.67,
+            "usefulness": 10.0,
+            "overall": 9.73
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 5.33,
+            "actionability": 4.67,
+            "reasoning": 6.33,
+            "usefulness": 5.33,
+            "overall": 5.87
+          },
+          "rank_points": 4,
+          "times_ranked_first": 1
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 8.0,
+            "depth": 7.67,
+            "actionability": 6.0,
+            "reasoning": 7.67,
+            "usefulness": 6.0,
+            "overall": 7.07
+          },
+          "rank_points": 5,
+          "times_ranked_first": 2
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.33,
+            "actionability": 9.0,
+            "reasoning": 9.67,
+            "usefulness": 9.33,
+            "overall": 9.27
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P11",
+      "prompt_title": "Impossible Trade-Off Prioritization",
+      "category": "decision_strategy",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 8.33,
+            "depth": 8.0,
+            "actionability": 6.0,
+            "reasoning": 8.33,
+            "usefulness": 7.67,
+            "overall": 7.67
+          },
+          "rank_points": 7,
+          "times_ranked_first": 1
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 6.0,
+            "actionability": 5.0,
+            "reasoning": 6.67,
+            "usefulness": 6.0,
+            "overall": 6.27
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.67,
+            "depth": 9.67,
+            "actionability": 10.0,
+            "reasoning": 9.67,
+            "usefulness": 10.0,
+            "overall": 9.8
+          },
+          "rank_points": 12,
+          "times_ranked_first": 3
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.0,
+            "actionability": 8.33,
+            "reasoning": 9.67,
+            "usefulness": 9.0,
+            "overall": 9.0
+          },
+          "rank_points": 8,
+          "times_ranked_first": 2
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P02",
+      "prompt_title": "Competitive Landscape Deep Dive",
+      "category": "competitor_market_research",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 6.67,
+            "depth": 5.33,
+            "actionability": 3.0,
+            "reasoning": 5.67,
+            "usefulness": 4.33,
+            "overall": 5.0
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 5.33,
+            "actionability": 6.0,
+            "reasoning": 6.0,
+            "usefulness": 5.67,
+            "overall": 6.13
+          },
+          "rank_points": 6,
+          "times_ranked_first": 3
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.33,
+            "depth": 9.33,
+            "actionability": 9.67,
+            "reasoning": 9.33,
+            "usefulness": 9.67,
+            "overall": 9.47
+          },
+          "rank_points": 12,
+          "times_ranked_first": 3
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 8.67,
+            "depth": 9.0,
+            "actionability": 6.67,
+            "reasoning": 9.0,
+            "usefulness": 8.33,
+            "overall": 8.33
+          },
+          "rank_points": 9,
+          "times_ranked_first": 3
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P10",
+      "prompt_title": "Year-Ahead Market Forecast",
+      "category": "deep_research",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.5,
+            "depth": 10.0,
+            "actionability": 9.0,
+            "reasoning": 10.0,
+            "usefulness": 10.0,
+            "overall": 9.7
+          },
+          "rank_points": 8,
+          "times_ranked_first": 2
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 6.5,
+            "depth": 5.5,
+            "actionability": 4.5,
+            "reasoning": 6.0,
+            "usefulness": 4.5,
+            "overall": 5.4
+          },
+          "rank_points": 3,
+          "times_ranked_first": 1
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.5,
+            "depth": 4.5,
+            "actionability": 3.5,
+            "reasoning": 5.0,
+            "usefulness": 4.5,
+            "overall": 5.0
+          },
+          "rank_points": 3,
+          "times_ranked_first": 1
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 8.5,
+            "depth": 9.0,
+            "actionability": 8.0,
+            "reasoning": 9.0,
+            "usefulness": 7.5,
+            "overall": 8.4
+          },
+          "rank_points": 6,
+          "times_ranked_first": 2
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "P12",
+      "prompt_title": "Blind Spot Detection in a Real Business",
+      "category": "competitor_market_research",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 10.0,
+            "actionability": 9.0,
+            "reasoning": 9.0,
+            "usefulness": 10.0,
+            "overall": 9.4
+          },
+          "rank_points": 8,
+          "times_ranked_first": 2
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 8.5,
+            "depth": 9.0,
+            "actionability": 8.5,
+            "reasoning": 8.5,
+            "usefulness": 9.0,
+            "overall": 8.7
+          },
+          "rank_points": 6,
+          "times_ranked_first": 2
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 5.5,
+            "depth": 4.5,
+            "actionability": 3.5,
+            "reasoning": 5.0,
+            "usefulness": 4.5,
+            "overall": 4.6
+          },
+          "rank_points": 4,
+          "times_ranked_first": 2
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 6.0,
+            "depth": 4.0,
+            "actionability": 3.5,
+            "reasoning": 4.5,
+            "usefulness": 4.0,
+            "overall": 4.4
+          },
+          "rank_points": 2,
+          "times_ranked_first": 2
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "P05",
+      "prompt_title": "Go-To-Market Strategy Under Constraints",
+      "category": "marketing_growth",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.33,
+            "actionability": 9.33,
+            "reasoning": 8.67,
+            "usefulness": 9.33,
+            "overall": 9.13
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.33,
+            "depth": 5.33,
+            "actionability": 5.0,
+            "reasoning": 5.67,
+            "usefulness": 5.33,
+            "overall": 5.73
+          },
+          "rank_points": 4,
+          "times_ranked_first": 1
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 7.33,
+            "actionability": 4.33,
+            "reasoning": 7.33,
+            "usefulness": 5.67,
+            "overall": 6.47
+          },
+          "rank_points": 5,
+          "times_ranked_first": 2
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.67,
+            "depth": 9.33,
+            "actionability": 9.67,
+            "reasoning": 9.33,
+            "usefulness": 9.67,
+            "overall": 9.53
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P06",
+      "prompt_title": "Technical Architecture Decision",
+      "category": "ai_systems_automation",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.33,
+            "actionability": 9.0,
+            "reasoning": 9.33,
+            "usefulness": 9.33,
+            "overall": 9.2
+          },
+          "rank_points": 9,
+          "times_ranked_first": 3
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.33,
+            "depth": 6.67,
+            "actionability": 6.33,
+            "reasoning": 7.0,
+            "usefulness": 6.33,
+            "overall": 6.73
+          },
+          "rank_points": 6,
+          "times_ranked_first": 3
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 6.67,
+            "depth": 5.0,
+            "actionability": 5.0,
+            "reasoning": 5.33,
+            "usefulness": 5.0,
+            "overall": 5.4
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.67,
+            "depth": 10.0,
+            "actionability": 10.0,
+            "reasoning": 10.0,
+            "usefulness": 10.0,
+            "overall": 9.93
+          },
+          "rank_points": 12,
+          "times_ranked_first": 3
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P13",
+      "prompt_title": "Crisis Execution Plan with Dependencies",
+      "category": "marketing_growth",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.33,
+            "depth": 10.0,
+            "actionability": 10.0,
+            "reasoning": 9.33,
+            "usefulness": 10.0,
+            "overall": 9.73
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.0,
+            "depth": 5.0,
+            "actionability": 5.0,
+            "reasoning": 5.67,
+            "usefulness": 5.0,
+            "overall": 5.53
+          },
+          "rank_points": 4,
+          "times_ranked_first": 1
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 7.67,
+            "actionability": 6.67,
+            "reasoning": 7.67,
+            "usefulness": 7.0,
+            "overall": 7.34
+          },
+          "rank_points": 5,
+          "times_ranked_first": 2
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.33,
+            "actionability": 9.33,
+            "reasoning": 9.0,
+            "usefulness": 9.33,
+            "overall": 9.2
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P08",
+      "prompt_title": "Risk Analysis with Mitigations",
+      "category": "deep_research",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.0,
+            "actionability": 9.0,
+            "reasoning": 9.0,
+            "usefulness": 9.0,
+            "overall": 9.0
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.33,
+            "actionability": 9.33,
+            "reasoning": 9.33,
+            "usefulness": 9.33,
+            "overall": 9.26
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.33,
+            "depth": 7.0,
+            "actionability": 7.0,
+            "reasoning": 7.0,
+            "usefulness": 7.0,
+            "overall": 7.07
+          },
+          "rank_points": 6,
+          "times_ranked_first": 3
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 6.67,
+            "depth": 4.67,
+            "actionability": 5.0,
+            "reasoning": 5.33,
+            "usefulness": 4.67,
+            "overall": 5.27
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P14",
+      "prompt_title": "Cascade Failure Scenario Analysis",
+      "category": "deep_research",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 8.0,
+            "depth": 6.67,
+            "actionability": 6.33,
+            "reasoning": 7.0,
+            "usefulness": 6.33,
+            "overall": 6.87
+          },
+          "rank_points": 6,
+          "times_ranked_first": 3
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.33,
+            "depth": 9.33,
+            "actionability": 8.33,
+            "reasoning": 9.33,
+            "usefulness": 9.33,
+            "overall": 9.13
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 5.0,
+            "actionability": 4.67,
+            "reasoning": 5.67,
+            "usefulness": 5.0,
+            "overall": 5.6
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.0,
+            "actionability": 8.67,
+            "reasoning": 9.0,
+            "usefulness": 9.0,
+            "overall": 8.93
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P07",
+      "prompt_title": "Pricing Strategy with Anchoring",
+      "category": "product_offer_design",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 5.0,
+            "depth": 4.0,
+            "actionability": 3.0,
+            "reasoning": 4.5,
+            "usefulness": 3.5,
+            "overall": 4.0
+          },
+          "rank_points": 2,
+          "times_ranked_first": 2
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.0,
+            "actionability": 9.0,
+            "reasoning": 9.0,
+            "usefulness": 9.0,
+            "overall": 9.0
+          },
+          "rank_points": 6,
+          "times_ranked_first": 2
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.0,
+            "depth": 5.0,
+            "actionability": 5.5,
+            "reasoning": 5.0,
+            "usefulness": 5.0,
+            "overall": 5.5
+          },
+          "rank_points": 4,
+          "times_ranked_first": 2
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.5,
+            "depth": 9.5,
+            "actionability": 9.5,
+            "reasoning": 10.0,
+            "usefulness": 10.0,
+            "overall": 9.7
+          },
+          "rank_points": 8,
+          "times_ranked_first": 2
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "P03",
+      "prompt_title": "Multi-Variable Decision Matrix",
+      "category": "comparison_evaluation",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.33,
+            "depth": 9.67,
+            "actionability": 10.0,
+            "reasoning": 9.67,
+            "usefulness": 9.67,
+            "overall": 9.67
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.0,
+            "depth": 6.33,
+            "actionability": 4.67,
+            "reasoning": 6.33,
+            "usefulness": 5.33,
+            "overall": 5.93
+          },
+          "rank_points": 5,
+          "times_ranked_first": 2
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.33,
+            "depth": 4.67,
+            "actionability": 3.67,
+            "reasoning": 5.0,
+            "usefulness": 4.67,
+            "overall": 5.07
+          },
+          "rank_points": 4,
+          "times_ranked_first": 1
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 8.67,
+            "depth": 9.67,
+            "actionability": 8.0,
+            "reasoning": 9.67,
+            "usefulness": 9.33,
+            "overall": 9.07
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P09",
+      "prompt_title": "Content Strategy with SEO Focus",
+      "category": "funnel_conversion",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.0,
+            "actionability": 8.67,
+            "reasoning": 8.67,
+            "usefulness": 8.67,
+            "overall": 8.8
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.0,
+            "actionability": 8.67,
+            "reasoning": 9.0,
+            "usefulness": 9.0,
+            "overall": 8.93
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.33,
+            "depth": 6.67,
+            "actionability": 5.67,
+            "reasoning": 6.67,
+            "usefulness": 5.67,
+            "overall": 6.4
+          },
+          "rank_points": 6,
+          "times_ranked_first": 3
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 6.67,
+            "depth": 4.33,
+            "actionability": 3.67,
+            "reasoning": 5.0,
+            "usefulness": 4.33,
+            "overall": 4.8
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "P15",
+      "prompt_title": "Contradictory Data Reconciliation",
+      "category": "comparison_evaluation",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 9.33,
+            "depth": 9.33,
+            "actionability": 10.0,
+            "reasoning": 9.33,
+            "usefulness": 9.33,
+            "overall": 9.46
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 8.67,
+            "depth": 9.33,
+            "actionability": 8.67,
+            "reasoning": 9.33,
+            "usefulness": 9.0,
+            "overall": 9.0
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 6.33,
+            "depth": 5.33,
+            "actionability": 3.33,
+            "reasoning": 6.0,
+            "usefulness": 4.0,
+            "overall": 5.0
+          },
+          "rank_points": 3,
+          "times_ranked_first": 3
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.33,
+            "depth": 6.0,
+            "actionability": 6.0,
+            "reasoning": 6.33,
+            "usefulness": 6.0,
+            "overall": 6.33
+          },
+          "rank_points": 6,
+          "times_ranked_first": 3
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    }
+  ],
+  "aggregation": {
+    "total_prompts": 15,
+    "win_counts": {
+      "orchestrator": 12,
+      "standalone_anthropic": 3
+    },
+    "win_rate": {
+      "orchestrator": 0.8,
+      "standalone_anthropic": 0.2
+    },
+    "category_performance": {
+      "decision_strategy": {
+        "orchestrator": 2
+      },
+      "business_ideas_validation": {
+        "orchestrator": 1
+      },
+      "competitor_market_research": {
+        "orchestrator": 1,
+        "standalone_anthropic": 1
+      },
+      "deep_research": {
+        "orchestrator": 3
+      },
+      "marketing_growth": {
+        "orchestrator": 2
+      },
+      "ai_systems_automation": {
+        "standalone_anthropic": 1
+      },
+      "product_offer_design": {
+        "standalone_anthropic": 1
+      },
+      "comparison_evaluation": {
+        "orchestrator": 2
+      },
+      "funnel_conversion": {
+        "orchestrator": 1
+      }
+    },
+    "avg_scores_overall": {
+      "orchestrator": {
+        "clarity": 9.24,
+        "depth": 9.42,
+        "actionability": 9.39,
+        "reasoning": 9.32,
+        "usefulness": 9.53,
+        "overall": 9.38
+      },
+      "standalone_anthropic": {
+        "clarity": 8.96,
+        "depth": 9.3,
+        "actionability": 8.7,
+        "reasoning": 9.25,
+        "usefulness": 9.1,
+        "overall": 9.06
+      },
+      "standalone_google": {
+        "clarity": 7.09,
+        "depth": 6.42,
+        "actionability": 5.13,
+        "reasoning": 6.66,
+        "usefulness": 5.66,
+        "overall": 6.19
+      },
+      "standalone_openai": {
+        "clarity": 7.15,
+        "depth": 5.03,
+        "actionability": 4.75,
+        "reasoning": 5.54,
+        "usefulness": 5.06,
+        "overall": 5.5
+      }
+    },
+    "judge_agreement_rate": 0.47
+  },
+  "speed_data": {
+    "orchestrator": {
+      "avg": 271.0900666666667,
+      "min": 232.659,
+      "max": 312.398
+    },
+    "standalone_openai": {
+      "avg": 11.073866666666667,
+      "min": 7.68,
+      "max": 15.349
+    },
+    "standalone_anthropic": {
+      "avg": 83.9398,
+      "min": 62.184,
+      "max": 97.185
+    },
+    "standalone_google": {
+      "avg": 23.48026666666667,
+      "min": 20.82,
+      "max": 25.888
+    }
+  },
+  "cost_data": {}
+}

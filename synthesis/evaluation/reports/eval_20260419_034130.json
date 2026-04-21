@@ -1,0 +1,3774 @@
+{
+  "round": "3-fixed",
+  "timestamp": "2026-04-19T03:41:30.374384+00:00",
+  "testing_profile": "cheap",
+  "prompts": [
+    "R3-L01",
+    "R3-L02",
+    "R3-L03",
+    "R3-L04",
+    "R3-L05",
+    "R3-L06",
+    "R3-L07",
+    "R3-L08",
+    "R3-L09",
+    "R3-L10",
+    "R3-S01",
+    "R3-S02",
+    "R3-S03",
+    "R3-S04",
+    "R3-S05",
+    "R3-S06",
+    "R3-S07",
+    "R3-S08",
+    "R3-S09",
+    "R3-S10"
+  ],
+  "per_prompt": [
+    {
+      "prompt_id": "R3-L01",
+      "prompt_title": "Oversize Cargo Route Legality",
+      "category": "logistics",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.5,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.5,
+            "assumptions_stated": 8.0,
+            "overall": 9.0
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "No hallucinations detected; all state agency names, contact details, and permit types are accurate. The 16 ft height exceeding Texas's 14 ft legal limit is correctly stated. Bridge and utility coordination requirements are realistic."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 8.0,
+            "actionability": 8.0,
+            "commercial_value": 8.0,
+            "freshness": 8.5,
+            "clarity": 8.0,
+            "assumptions_stated": 7.5,
+            "overall": 8.0
+          },
+          "rank_points": 6,
+          "hallucinations": [
+            "No hallucinations detected. The Superload thresholds for each state are correctly identified (e.g., GA at 16' tall, NC at 14' wide and 16' tall), and the analysis of axle weight distribution requirements is accurate and realistic."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.0,
+            "practical_usefulness": 6.0,
+            "actionability": 5.0,
+            "commercial_value": 5.0,
+            "freshness": 6.5,
+            "clarity": 6.5,
+            "assumptions_stated": 5.0,
+            "overall": 5.5
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "Yes—claims South Carolina is crossed on the standard route. The direct route is TX → LA → MS → AL → GA → NC (six states), not seven. This error suggests either a routing hallucination or a failure to verify the actual path. Additionally, the response is cut off mid-sentence at 'peak traffic times in major metropolitan areas (e.g., Houston). Weekend travel often' and does not complete the Texas section, suggesting incomplete output."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 6.0,
+            "practical_usefulness": 5.0,
+            "actionability": 4.5,
+            "commercial_value": 4.0,
+            "freshness": 5.0,
+            "clarity": 6.0,
+            "assumptions_stated": 3.5,
+            "overall": 4.5
+          },
+          "rank_points": 2,
+          "hallucinations": [
+            "Yes—multiple. (1) Claims Louisiana permits process in 1–2 business days when this load's 16 ft height will trigger superload review requiring 15–60+ days. (2) Lists South Carolina as traversed when it is not on the primary route. (3) Claims a 4–5 day transit time at 45–55 mph without accounting for daylight-only travel restrictions, which would require 6–7+ days. (4) Does not address the 16 ft height at all in escort or utility coordination sections, a critical omission. (5) Claims Mississippi processing time is 1–2 days without noting the 16 ft height will trigger extended review."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-L02",
+      "prompt_title": "Trailer Type Selection",
+      "category": "logistics",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.5,
+            "practical_usefulness": 9.5,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.5,
+            "assumptions_stated": 9.0,
+            "overall": 9.5
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "None detected. The response correctly identifies regulatory citations, realistic cost ranges, and properly states assumptions about the JLG stowed length as a critical unknown rather than presenting it as fact."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 7.0,
+            "practical_usefulness": 6.0,
+            "actionability": 5.0,
+            "commercial_value": 5.0,
+            "freshness": 6.5,
+            "clarity": 7.0,
+            "assumptions_stated": 4.5,
+            "overall": 6.0
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "Yes. States JLG 460SJ 'typical' folded dimensions without specifying actual values and provides a minimum tie-down spec (2 chains) that conflicts with best practice for equipment on elevated decks, where 4 tie-downs are recommended. Response cuts off mid-sentence at the end, suggesting incomplete analysis."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 7.0,
+            "actionability": 6.0,
+            "commercial_value": 6.0,
+            "freshness": 7.5,
+            "clarity": 7.5,
+            "assumptions_stated": 6.0,
+            "overall": 7.0
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "None in the complete portions, but the incomplete analysis makes it unreliable for a paying client. The statement about '2-axle flatbed' capacity is slightly imprecise but not technically false."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 8.5,
+            "actionability": 8.0,
+            "commercial_value": 8.5,
+            "freshness": 8.5,
+            "clarity": 8.5,
+            "assumptions_stated": 7.5,
+            "overall": 8.5
+          },
+          "rank_points": 6,
+          "hallucinations": [
+            "No clear hallucinations, but the statement 'you may need a multi-axle permit or jeep/booster axle' for the CAT 320 at 90,000–100,000+ lbs GVW is reasonable caution, though not all standard configurations trigger this. Response flags this as a verification task rather than asserting it as fact, which is appropriate."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-L03",
+      "prompt_title": "Freight Quote Estimate",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.5,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 8.5,
+            "clarity": 9.5,
+            "assumptions_stated": 9.0,
+            "overall": 9.5
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No hallucinations detected; all figures are within industry benchmarks and clearly labeled as estimates."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 9.0,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 8.5,
+            "clarity": 9.0,
+            "assumptions_stated": 8.5,
+            "overall": 8.5
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "The fuel surcharge estimate may not align with current market conditions.",
+            "Potential concern: States DOE diesel 'may be higher (~$5.00–$5.60)' without verification; this is speculation presented as a plausible scenario rather than a fact, but it's flagged as needing verification, so it's stated conditionally rather than falsely."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.0,
+            "practical_usefulness": 6.5,
+            "actionability": 6.0,
+            "commercial_value": 6.0,
+            "freshness": 6.0,
+            "clarity": 7.5,
+            "assumptions_stated": 7.5,
+            "overall": 6.5
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "No clear hallucinations, but the response is vague and generic; it reads like a template rather than a current-market analysis."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 5.5,
+            "practical_usefulness": 5.0,
+            "actionability": 4.5,
+            "commercial_value": 4.0,
+            "freshness": 4.5,
+            "clarity": 6.5,
+            "assumptions_stated": 5.0,
+            "overall": 5.0
+          },
+          "rank_points": 2,
+          "hallucinations": [
+            "The fuel surcharge calculation method is not standard and could lead to inaccuracies.",
+            "Yes—the fuel surcharge calculation formula is misleading and does not reflect how real carrier FSC matrices work; baselined at $1.25/gallon suggests outdated industry knowledge."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-L04",
+      "prompt_title": "Ocean vs Truck vs Rail Comparison",
+      "category": "logistics",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 4.0,
+            "practical_usefulness": 3.0,
+            "actionability": 2.5,
+            "commercial_value": 3.0,
+            "freshness": 5.5,
+            "clarity": 5.5,
+            "assumptions_stated": 4.0,
+            "overall": 3.5
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "No clear hallucinations, but lacks depth in cost analysis.",
+            "Yes — the response is truncated and does not deliver any substantive analysis despite promising one."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.0,
+            "actionability": 9.0,
+            "commercial_value": 9.0,
+            "freshness": 8.5,
+            "clarity": 8.5,
+            "assumptions_stated": 8.5,
+            "overall": 9.0
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "No hallucinations detected.",
+            "None detected — all rates, regulations, and timelines align with 2025 market conditions; explicitly acknowledges volatility and recommends rate-locking 45–60 days ahead."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 8.0,
+            "actionability": 8.0,
+            "commercial_value": 8.0,
+            "freshness": 8.0,
+            "clarity": 8.5,
+            "assumptions_stated": 7.5,
+            "overall": 8.0
+          },
+          "rank_points": 6,
+          "hallucinations": [
+            "No hallucinations detected.",
+            "None detected — rates and timelines are realistic and appropriately cautious; acknowledges Panama Canal drought risk appropriately."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 5.5,
+            "practical_usefulness": 4.5,
+            "actionability": 3.5,
+            "commercial_value": 4.0,
+            "freshness": 5.0,
+            "clarity": 6.0,
+            "assumptions_stated": 3.5,
+            "overall": 4.5
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "No hallucinations detected.",
+            "Yes — trucking costs from West Coast to Dallas are quoted at $1,500–$2,000/container when market reality (2025) is $4,500–$6,000; this alone inflates the 'cost savings' of Option 1 vs. Options 2/3 by approximately 50%, making the financial recommendation unreliable. Rail costs also appear understated. No discussion of Section 301 tariffs, which dwarf the entire freight cost."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-L05",
+      "prompt_title": "Border Customs Risk Checklist",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.5,
+            "practical_usefulness": 9.5,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.5,
+            "assumptions_stated": 8.5,
+            "overall": 9.5
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No significant hallucinations detected. The $50K customs bond recommendation is appropriate as guidance (actual bonds are value-based but $50K is a reasonable starting reference). Minor uncertainty: the statement 'verify — APHIS may require tighter window' on the 14-day certificate window shows appropriate epistemic humility."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 7.0,
+            "actionability": 6.5,
+            "commercial_value": 6.5,
+            "freshness": 7.5,
+            "clarity": 7.5,
+            "assumptions_stated": 6.0,
+            "overall": 7.0
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "Potential issue: References 'SAGARPA' as the phytosanitary authority for Mexico. SAGARPA was renamed to SADER (Secretaría de Agricultura y Desarrollo Rural) in 2020. The actual certifying body is SENASICA under SADER. This is an outdated reference that would confuse operators trying to contact the correct authority. Also truncated without completing contingency section."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 6.5,
+            "practical_usefulness": 5.0,
+            "actionability": 4.0,
+            "commercial_value": 3.5,
+            "freshness": 6.0,
+            "clarity": 6.0,
+            "assumptions_stated": 4.0,
+            "overall": 5.0
+          },
+          "rank_points": 2,
+          "hallucinations": [
+            "Multiple critical inaccuracies: (1) States strawberry temperature as '32°F to 34°F' which is correct, but then recommends '2-4 hours' clearance time as standard, which conflicts with realistic produce inspection timelines that routinely exceed 4 hours; (2) Provides no mention of APHIS-approved production regions for avocados, which is a fatal omission; (3) Does not mention phytosanitary certificate must be ORIGINAL or the specific 30-day validity window; (4) References 'SAGARPA' instead of SADER/SENASICA (same error as Response B, indicating outdated source material)."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.5,
+            "practical_usefulness": 9.0,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 9.5,
+            "clarity": 9.0,
+            "assumptions_stated": 8.5,
+            "overall": 9.0
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No significant hallucinations detected. The temperature ranges, HS codes, regulatory authorities, and inspection procedures all align with current USDA/FDA/CBP standards. The emphasis on APHIS systems-approach for avocados and fruit-cutting protocols is accurate and reflects actual 2024-2026 practice. The municipality-level approval warning for Jalisco avocados is correct and operationally critical."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-L06",
+      "prompt_title": "Fuel Market Impact on Pricing",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.33,
+            "actionability": 9.33,
+            "commercial_value": 9.33,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 8.0,
+            "overall": 9.33
+          },
+          "rank_points": 9,
+          "hallucinations": [
+            "None detected. All figures are reasonable projections based on stated assumptions (15% spike, $3.80-4.00 baseline, 6.5 MPG regional typical)."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 6.67,
+            "practical_usefulness": 5.67,
+            "actionability": 4.67,
+            "commercial_value": 4.67,
+            "freshness": 6.33,
+            "clarity": 7.0,
+            "assumptions_stated": 5.33,
+            "overall": 5.33
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "No outright false claims, but the response is so vague it borders on useless—'consider offering loyalty discounts,' 'consult with financial advisors,' 'follow diesel supply forecasts' are not actionable steps."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 7.33,
+            "actionability": 7.0,
+            "commercial_value": 7.0,
+            "freshness": 8.0,
+            "clarity": 8.0,
+            "assumptions_stated": 7.33,
+            "overall": 7.0
+          },
+          "rank_points": 6,
+          "hallucinations": [
+            "None detected, though the incomplete state makes full evaluation difficult. The math and methodology shown are sound."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.33,
+            "practical_usefulness": 9.67,
+            "actionability": 9.67,
+            "commercial_value": 9.67,
+            "freshness": 9.67,
+            "clarity": 9.67,
+            "assumptions_stated": 8.67,
+            "overall": 9.67
+          },
+          "rank_points": 12,
+          "hallucinations": [
+            "None detected. References to EIA PADD 3 index, distillate inventory thresholds, and Gulf Coast refinery operations are accurate as of 2026."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L07",
+      "prompt_title": "Fast Quote Response",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 9.0,
+            "actionability": 9.5,
+            "commercial_value": 9.0,
+            "freshness": 8.5,
+            "clarity": 9.5,
+            "assumptions_stated": 9.5,
+            "overall": 9.0
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "None detected. Rate ranges ($1,850–$2,100 standard, $3,200–$3,800 expedited) are reasonable for the lane and weight class. Freight class estimates (85–92.5) and transit times (2–3 business days standard) are accurate."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 6.0,
+            "practical_usefulness": 6.0,
+            "actionability": 5.0,
+            "commercial_value": 4.0,
+            "freshness": 6.5,
+            "clarity": 7.0,
+            "assumptions_stated": 5.0,
+            "overall": 5.5
+          },
+          "rank_points": 2,
+          "hallucinations": [
+            "Yes. Transit time of 1–2 business days for a pickup tomorrow to Nashville is unrealistic—this would imply overnight or next-morning delivery, which contradicts the pickup timing. The rate of $2,500 with 'standard freight insurance included' is stated without justification or confidence level, making it appear arbitrary. No explanation of why this pricing model (flat rate vs. range) is used."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.5,
+            "practical_usefulness": 7.5,
+            "actionability": 8.0,
+            "commercial_value": 7.0,
+            "freshness": 7.5,
+            "clarity": 8.0,
+            "assumptions_stated": 7.5,
+            "overall": 7.5
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "No clear hallucinations. Rate range is defensible for PTL on this lane. However, the response assumes the user knows today's date is Friday without stating it, and the formatting suggests this is a template despite instructions to provide ready-to-send copy."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 9.0,
+            "actionability": 9.5,
+            "commercial_value": 9.0,
+            "freshness": 8.5,
+            "clarity": 9.5,
+            "assumptions_stated": 9.0,
+            "overall": 9.0
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No hallucinations. The rate of $3,100 is presented as a defensible midpoint with transparent reasoning about margin. Transit time (1–2 business days, 530 miles, high-frequency lane) is realistic. Fuel surcharge reference to DOE diesel pricing is current practice. Carrier liability of $25/lb per NMFC is accurate."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-L08",
+      "prompt_title": "Shipment Cost Breakdown",
+      "category": "logistics",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.33,
+            "practical_usefulness": 7.33,
+            "actionability": 6.67,
+            "commercial_value": 6.67,
+            "freshness": 6.33,
+            "clarity": 8.0,
+            "assumptions_stated": 8.67,
+            "overall": 6.67
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No",
+            "No major hallucinations detected, but response is truncated and cannot be properly evaluated in full.",
+            "none detected, but the incompleteness is a critical flaw."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.67,
+            "actionability": 9.67,
+            "commercial_value": 9.67,
+            "freshness": 9.0,
+            "clarity": 9.67,
+            "assumptions_stated": 9.0,
+            "overall": 9.33
+          },
+          "rank_points": 12,
+          "hallucinations": [
+            "No",
+            "No hallucinations detected. All rates, fees, and regulatory details are plausible and consistent with 2026 market conditions. HS codes, port names, and charge descriptions are accurate."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 8.0,
+            "actionability": 8.0,
+            "commercial_value": 8.0,
+            "freshness": 6.67,
+            "clarity": 8.33,
+            "assumptions_stated": 7.67,
+            "overall": 8.0
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "Yes, some cost estimates appear inflated or inconsistent with current market rates.",
+            "No hallucinations detected. All figures, duty rates, and procedural details are accurate. Rate ranges are appropriate for stated timeframe."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 3.33,
+            "practical_usefulness": 3.0,
+            "actionability": 2.67,
+            "commercial_value": 2.33,
+            "freshness": 3.0,
+            "clarity": 5.67,
+            "assumptions_stated": 3.67,
+            "overall": 2.67
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "Yes, some figures are inconsistent with typical market rates.",
+            "Yes—major hallucination: total cost estimate of $3,000–$6,000 is drastically understated and misleading. This response omits or severely underestimates VAT (likely $5,000+), duty, and logistics. A business following this estimate would face a 3–5x budget shortfall. Port name 'Port of London' is also imprecise (should be Felixstowe, Southampton, or Thamesport).",
+            "Yes, the total cost estimate of $3,000 - $6,000 USD for a 20ft container door-to-door from High Point to London is a severe hallucination and far below realistic market rates."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L09",
+      "prompt_title": "Demurrage Avoidance Plan",
+      "category": "logistics",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 7.0,
+            "practical_usefulness": 6.0,
+            "actionability": 5.0,
+            "commercial_value": 5.33,
+            "freshness": 6.0,
+            "clarity": 8.0,
+            "assumptions_stated": 5.33,
+            "overall": 5.67
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No clear hallucinations, but claims about 'free days' and negotiations lack specificity; does not mention FMC regulations or current 2024 rules."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.33,
+            "practical_usefulness": 5.33,
+            "actionability": 5.0,
+            "commercial_value": 5.67,
+            "freshness": 7.0,
+            "clarity": 8.0,
+            "assumptions_stated": 7.0,
+            "overall": 5.33
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "None detected in the provided portion, but incompleteness makes evaluation impossible for most of the claimed plan."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.67,
+            "actionability": 10.0,
+            "commercial_value": 10.0,
+            "freshness": 9.33,
+            "clarity": 9.67,
+            "assumptions_stated": 8.67,
+            "overall": 9.33
+          },
+          "rank_points": 12,
+          "hallucinations": [
+            "No hallucinations detected. Terminal49 is a real service; DemurrageUSA is real; ContainerPort Group and Port City Logistics are real operators; FMC OSRA 2022 and May 2024 rule are correctly cited; cost estimates are realistic for Savannah region."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.33,
+            "practical_usefulness": 8.33,
+            "actionability": 8.33,
+            "commercial_value": 8.33,
+            "freshness": 8.33,
+            "clarity": 8.33,
+            "assumptions_stated": 7.67,
+            "overall": 8.33
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "No hallucinations. GoComet, Container xChange, Portcast, FreightAmigo are all real tools with realistic pricing. GCT (Georgia Container Terminal) is correct. Pricing estimates are realistic. However, 'Project44 (Movement)' appears to be a conflation—Project44 exists but 'Movement' is not their product name."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L10",
+      "prompt_title": "Multi-Stop Route Optimization",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.5,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.5,
+            "assumptions_stated": 8.0,
+            "overall": 9.5
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "None detected. All mileage estimates are within standard DOT routing ranges. Securement references to §393.118 and §393.110 are accurate FMCSA regulations. HOS calculations are correct (7 hrs Day 1, 4.5 hrs Day 2)."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 5.5,
+            "practical_usefulness": 5.5,
+            "actionability": 5.0,
+            "commercial_value": 4.5,
+            "freshness": 7.0,
+            "clarity": 7.5,
+            "assumptions_stated": 4.5,
+            "overall": 5.0
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "Yes, the mileage estimates are inaccurate and do not reflect real distances.",
+            "Yes. Critical hallucination: Response B claims the route arrives in Nashville at 1:30 PM and attempts delivery within a 6am-12pm window. This is logically impossible and represents a fundamental misunderstanding of the constraints. The total mileage of 640 miles is also likely understated (Birmingham-Chattanooga is ~148 mi, Chattanooga-Nashville ~133 mi, but the actual I-24 routing via Chattanooga to Nashville adds significant distance; this sequence also creates backtracking that inflates true miles)."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 9.0,
+            "actionability": 9.0,
+            "commercial_value": 9.0,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 7.5,
+            "overall": 9.0
+          },
+          "rank_points": 6,
+          "hallucinations": [
+            "None detected. Time-zone logic is correct (Birmingham is Central, Nashville is Eastern). FMCSA regulation citations (§393.118, §393.110) are accurate. Truck stop reference (TA Travel Center Lebanon TN Exit 238) is a real, verified location suitable for overnight parking. Fuel calculation (142 gallons ÷ 6 MPG for 851 miles) is arithmetically sound."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 5.5,
+            "practical_usefulness": 4.0,
+            "actionability": 3.5,
+            "commercial_value": 3.5,
+            "freshness": 6.0,
+            "clarity": 5.0,
+            "assumptions_stated": 3.5,
+            "overall": 4.0
+          },
+          "rank_points": 2,
+          "hallucinations": [
+            "Yes, the mileage and route details are vague and not well-supported.",
+            "Yes. Response D claims an 856-mile route but never delivers the full plan, the actual sequence, schedule, or justification. The incomplete state makes any accuracy assessment speculative, but the abrupt cut-off suggests either generation failure or truncation."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-S01",
+      "prompt_title": "AI Assistant for Local Plumber",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 9.0,
+            "actionability": 9.0,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 7.5,
+            "overall": 8.5
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No significant hallucinations detected. Costs are accurate (GoHighLevel Starter $97/month is correct as of 2024-2025), GHL features described (missed call text-back, workflows, calendar) are real and current. Phone forwarding codes (*72 for AT&T, *71 for Verizon) are accurate. The revenue loss calculation ($1,800-4,000/day) is plausible for a 3-person plumbing team at industry rates but framed as potential rather than guaranteed."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 9.0,
+            "actionability": 9.0,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 7.5,
+            "overall": 8.5
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No hallucinations detected. All facts verified: GoHighLevel $97/month Starter plan is current (2024-2025), phone forwarding codes are accurate, 2-hour buffer time for Austin commute is realistic, the 40-60% quote conversion claim is industry-standard for home services. The $30,000-60,000/year recovery calculation is conservative and credible."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 5.0,
+            "practical_usefulness": 4.5,
+            "actionability": 3.5,
+            "commercial_value": 4.0,
+            "freshness": 5.0,
+            "clarity": 5.5,
+            "assumptions_stated": 4.0,
+            "overall": 4.5
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "This response appears to be a stub or truncated output rather than intentional hallucination. However, as delivered to the client, it provides zero usable content."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 5.5,
+            "practical_usefulness": 5.0,
+            "actionability": 4.0,
+            "commercial_value": 4.0,
+            "freshness": 5.5,
+            "clarity": 6.0,
+            "assumptions_stated": 4.5,
+            "overall": 4.5
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "Minor issues: (1) PhoneWagon is not a well-known or actively marketed tool as of 2024-2025—Grasshopper is more common but less feature-rich than GoHighLevel; (2) Freshsales 'starting at $15/month' is outdated—Freshsales minimum is typically $25-50/month for active CRM features; (3) the claim that Calendly Basic plan is 'free' is true but extremely limited (1 calendar only, no team, no custom fields)—not practical for a 3-tech operation. (4) No mention of API reliability or silent integration failures between 5 disparate tools—a known pain point for non-technical users."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-S02",
+      "prompt_title": "Quote Calculator Pricing Logic",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 9.5,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 7.5,
+            "clarity": 9.0,
+            "assumptions_stated": 7.5,
+            "overall": 9.0
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "No significant hallucinations detected; pricing ranges align with 2024–2025 HVAC industry standards. The tonnage multiplier of 2.8× for premium brands is aggressive but defensible for high-end equipment like Trane XV series."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 9.0,
+            "actionability": 9.5,
+            "commercial_value": 9.0,
+            "freshness": 9.5,
+            "clarity": 8.5,
+            "assumptions_stated": 8.0,
+            "overall": 8.5
+          },
+          "rank_points": 7,
+          "hallucinations": [
+            "None detected. Pricing is current and realistic; R-454B transition mention is accurate and timely. The $/sqft approach ($1.10–$2.80 for AC) reflects actual 2025–2026 dealer costs."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 6.0,
+            "practical_usefulness": 5.0,
+            "actionability": 4.0,
+            "commercial_value": 4.0,
+            "freshness": 5.5,
+            "clarity": 6.5,
+            "assumptions_stated": 5.0,
+            "overall": 4.5
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "Yes—significant logical error: multiplying a base cost by 0.9 for 'budget' tier implies budget equipment costs 10% *less* than the midpoint, but the response shows base costs for budget as $3,000–$7,000 for Central AC, which is actually *above* realistic wholesale costs ($1,200–$1,800 per ton = $2,400–$5,400 for 2–3 ton unit). The 'Low/Medium/High Complexity = $1,000/$2,000/$3,000 flat labor' is absurdly under-scoped and would bankrupt the company. Example calculation: $15,100 quote for a 2,500 sqft, 2-zone new ductwork central AC is 40–50% below market cost."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 6.0,
+            "practical_usefulness": 5.5,
+            "actionability": 4.5,
+            "commercial_value": 4.5,
+            "freshness": 5.5,
+            "clarity": 6.5,
+            "assumptions_stated": 6.5,
+            "overall": 5.0
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "No clear hallucinations, but the incompleteness makes it impossible to verify all claims. The 'Hourly_Rate = $85–$125' is realistic, but without complete ductwork costs and worked examples, it's non-actionable for implementation."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-S03",
+      "prompt_title": "SEO Growth Plan for Electrician",
+      "category": "smb_growth",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.67,
+            "actionability": 9.67,
+            "commercial_value": 9.67,
+            "freshness": 9.67,
+            "clarity": 9.33,
+            "assumptions_stated": 8.33,
+            "overall": 9.67
+          },
+          "rank_points": 12,
+          "hallucinations": [
+            "No significant hallucinations detected; all keyword volumes, cost estimates, and technical recommendations are realistic and grounded. Search volumes align with typical Denver metro metrics. The plan acknowledges realistic timelines (e.g., Maps 3-pack not guaranteed in 6 months)."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 6.67,
+            "practical_usefulness": 5.67,
+            "actionability": 4.67,
+            "commercial_value": 4.67,
+            "freshness": 6.0,
+            "clarity": 6.33,
+            "assumptions_stated": 5.67,
+            "overall": 5.33
+          },
+          "rank_points": 6,
+          "hallucinations": [
+            "No clear hallucinations, but the incompleteness makes it impossible to assess the full accuracy of recommendations. The sections that exist are generic and could apply to any local service business.",
+            "yes - Suggesting to 'Incentivize reviews with a small discount on future services' is against Google's review policies and could lead to penalties."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.33,
+            "practical_usefulness": 9.0,
+            "actionability": 9.0,
+            "commercial_value": 9.0,
+            "freshness": 8.0,
+            "clarity": 8.67,
+            "assumptions_stated": 9.0,
+            "overall": 8.67
+          },
+          "rank_points": 9,
+          "hallucinations": [
+            "No hallucinations detected. Keyword volumes and competition levels are accurate. The realistic caveat about 3-pack competitiveness is actually a strength, not a weakness—it demonstrates professional honesty rather than overselling.",
+            "yes - The blog post title 'How Much Does an Electrical Panel Upgrade Cost in Denver? (2024 Guide)' is a hallucination as the prompt requested a 2026 plan."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 5.67,
+            "practical_usefulness": 4.67,
+            "actionability": 3.67,
+            "commercial_value": 3.67,
+            "freshness": 5.0,
+            "clarity": 6.33,
+            "assumptions_stated": 4.33,
+            "overall": 4.33
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "No outright hallucinations, but the keyword volumes provided appear generic and lower than typical for the Denver metro area (e.g., 'Electrician near me' at 3,600/mo is conservative; typical metro estimates run 3,200–4,500). The vague cost allocation ($250 for 'content creation and SEO optimization' is imprecise) suggests lack of primary research. The suggestion to 'incentivize reviews' with discounts is ethically questionable under Google's policies.",
+            "yes - Suggesting to 'Incentivize reviews with a small discount on future services' is against Google's review policies. 'Host a small community event or workshop' is an unrealistic and indirect SEO activity for a $500/month budget."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S04",
+      "prompt_title": "Booking Automation Workflow",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.33,
+            "actionability": 9.33,
+            "commercial_value": 9.33,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 8.0,
+            "overall": 9.33
+          },
+          "rank_points": 10,
+          "hallucinations": [
+            "No",
+            "None detected. All tool names, pricing, and features are current and accurate as of 2024-2025. Zapier pricing ($20/mo for Starter) is correct. Acuity at $20/mo for Growing plan is accurate. Square's 2.6% + 10¢ fee structure is standard."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.33,
+            "practical_usefulness": 6.0,
+            "actionability": 5.33,
+            "commercial_value": 5.33,
+            "freshness": 7.67,
+            "clarity": 7.0,
+            "assumptions_stated": 6.0,
+            "overall": 5.67
+          },
+          "rank_points": 5,
+          "hallucinations": [
+            "No",
+            "Acuity Scheduling 'Growing Plan' at $27/month appears to be outdated or incorrect pricing (Response A and industry sources cite $20/month for equivalent tier). SMS cost estimate of $20/month for 200 texts is plausible but generic. Response stops incomplete, suggesting it may be truncated or unfinished work.",
+            "none detected, but the response is incomplete."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 6.0,
+            "practical_usefulness": 5.33,
+            "actionability": 5.0,
+            "commercial_value": 4.33,
+            "freshness": 6.67,
+            "clarity": 7.0,
+            "assumptions_stated": 5.0,
+            "overall": 5.0
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "No",
+            "No clear hallucinations, but Acuity Emerging plan at $14/month appears to be a budget tier with reduced calendar support (1 calendar max), which is inadequate for a 2-vehicle operation. Response recommends this without acknowledging the limitation. Twilio 'approximately $20/month' is vague and depends heavily on volume (could be $5–50/month).",
+            "yes, the claim that Acuity's Emerging plan supports two vehicles/calendars is false; it only supports one."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.67,
+            "actionability": 9.67,
+            "commercial_value": 9.67,
+            "freshness": 9.33,
+            "clarity": 9.33,
+            "assumptions_stated": 8.33,
+            "overall": 9.67
+          },
+          "rank_points": 11,
+          "hallucinations": [
+            "No",
+            "None detected. Jobber pricing, feature set (booking, dispatch, SMS/email automation, invoicing, payments in one platform), and positioning as a field-service-specific tool are accurate. The $75/month buffer calculation is transparent. All workflow steps and timeline triggers are realistic and Jobber-native features."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S05",
+      "prompt_title": "Missed Call Lead Recovery",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 8.0,
+            "actionability": 8.0,
+            "commercial_value": 8.0,
+            "freshness": 9.0,
+            "clarity": 8.0,
+            "assumptions_stated": 7.0,
+            "overall": 8.0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.0,
+            "actionability": 9.0,
+            "commercial_value": 9.0,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 8.0,
+            "overall": 9.0
+          },
+          "rank_points": 4,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 8.0,
+            "actionability": 8.0,
+            "commercial_value": 8.0,
+            "freshness": 8.0,
+            "clarity": 8.0,
+            "assumptions_stated": 7.0,
+            "overall": 8.0
+          },
+          "rank_points": 2,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 7.0,
+            "actionability": 7.0,
+            "commercial_value": 7.0,
+            "freshness": 8.0,
+            "clarity": 7.0,
+            "assumptions_stated": 6.0,
+            "overall": 7.0
+          },
+          "rank_points": 1,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 1
+    },
+    {
+      "prompt_id": "R3-S06",
+      "prompt_title": "Review Generation Funnel",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 7.0,
+            "actionability": 7.5,
+            "commercial_value": 6.5,
+            "freshness": 7.5,
+            "clarity": 7.5,
+            "assumptions_stated": 6.0,
+            "overall": 7.0
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "None detected, though claims about Birdeye/Podium pricing and HubSpot CRM free tier availability should be verified for current 2026 accuracy."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 8.0,
+            "practical_usefulness": 7.5,
+            "actionability": 7.5,
+            "commercial_value": 7.5,
+            "freshness": 8.0,
+            "clarity": 7.5,
+            "assumptions_stated": 6.5,
+            "overall": 7.5
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "None detected in the completed portion; the 93% BrightLocal statistic is reasonable but not verified for current 2026 accuracy."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.5,
+            "practical_usefulness": 9.0,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.5,
+            "assumptions_stated": 9.0,
+            "overall": 9.5
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "None detected; all recommendations are grounded in realistic conversion rates (15–25%), tool pricing, and implementation timelines with clear reasoning."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.5,
+            "practical_usefulness": 8.0,
+            "actionability": 8.0,
+            "commercial_value": 8.0,
+            "freshness": 8.0,
+            "clarity": 8.0,
+            "assumptions_stated": 7.5,
+            "overall": 8.0
+          },
+          "rank_points": 5,
+          "hallucinations": [
+            "None detected in completed sections; conversion rate claims are reasonable but presented without source citations."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-S07",
+      "prompt_title": "Google Maps Ranking Strategy",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.67,
+            "practical_usefulness": 9.0,
+            "actionability": 9.0,
+            "commercial_value": 9.0,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 7.67,
+            "overall": 9.0
+          },
+          "rank_points": 11,
+          "hallucinations": [
+            "None detected. All recommendations align with current Google Maps best practices. Pricing estimates ($300-600 for photographer, $200-400 for 360 tours, $75-150 for schema markup) are realistic for 2026. Review velocity targets (2-5/week as 'natural') are accurate to Google's detection algorithms."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 8.33,
+            "practical_usefulness": 9.33,
+            "actionability": 9.33,
+            "commercial_value": 9.0,
+            "freshness": 9.0,
+            "clarity": 9.0,
+            "assumptions_stated": 7.67,
+            "overall": 9.0
+          },
+          "rank_points": 10,
+          "hallucinations": [
+            "Minor imprecision: Review velocity targets (8-15 new reviews per month) are realistic but the specific timeframe breakdown claims are somewhat optimistic without accounting for seasonality. Tool pricing appears current (NiceJob $75, Podium $99 are market-rate 2026 figures). No major false claims detected."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.67,
+            "practical_usefulness": 6.33,
+            "actionability": 6.67,
+            "commercial_value": 6.33,
+            "freshness": 7.67,
+            "clarity": 8.0,
+            "assumptions_stated": 6.67,
+            "overall": 6.33
+          },
+          "rank_points": 6,
+          "hallucinations": [
+            "None directly false, but significant incompleteness masks what could be shallow analysis. The post ideas are generic enough to apply to any landscaping company in any city, not tailored to Phoenix's unique climate/market (xeriscape, monsoon prep, heat tolerance are mentioned but underexploited)."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 5.0,
+            "practical_usefulness": 4.33,
+            "actionability": 4.33,
+            "commercial_value": 3.67,
+            "freshness": 5.67,
+            "clarity": 6.67,
+            "assumptions_stated": 4.67,
+            "overall": 4.0
+          },
+          "rank_points": 3,
+          "hallucinations": [
+            "Yes—critical hallucination: 'Offer a simple incentive, like a discount on future services or a small gift card for completed reviews' directly violates Google's review policies and could result in profile suspension. This is not a minor error; it's actionable bad advice. Cost breakdown ($1,800-2,700) is vague and does not match the work required. Review target of 100-120 in 90 days (22-27/month, ~5.5-6.75/week) is extremely aggressive without systematic methodology—presented without context on feasibility or required infrastructure.",
+            "yes, 'Offer a simple incentive, like a discount on future services or a small gift card for completed reviews.' This directly violates Google's review policy."
+          ]
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S08",
+      "prompt_title": "Social Media Auto-Post Workflow",
+      "category": "smb_growth",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.5,
+            "actionability": 9.5,
+            "commercial_value": 9.5,
+            "freshness": 9.0,
+            "clarity": 9.5,
+            "assumptions_stated": 8.0,
+            "overall": 9.5
+          },
+          "rank_points": 8,
+          "hallucinations": [
+            "None detected. All tool recommendations (Publer, Canva Pro, Zapier) are real and current. The $64/month pricing is accurate for the specified tiers. The sample posts are contextually appropriate and well-structured."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.5,
+            "practical_usefulness": 7.5,
+            "actionability": 7.0,
+            "commercial_value": 7.5,
+            "freshness": 8.0,
+            "clarity": 7.5,
+            "assumptions_stated": 6.5,
+            "overall": 7.0
+          },
+          "rank_points": 5,
+          "hallucinations": [
+            "Possible: The claim that Metricool offers 'Premium 5 Brands' at ~$25/month needs verification—pricing and plan names may have changed. The response doesn't provide the promised full month of sample posts, making it incomplete for the stated requirements."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 7.5,
+            "practical_usefulness": 8.5,
+            "actionability": 8.0,
+            "commercial_value": 8.5,
+            "freshness": 8.0,
+            "clarity": 8.0,
+            "assumptions_stated": 7.0,
+            "overall": 8.0
+          },
+          "rank_points": 5,
+          "hallucinations": [
+            "Possible mention of 'Moquito' in the pest calendar table (July row) appears to be a typo for 'Mosquito,' but this is a minor editorial error, not a factual hallucination. All tool recommendations and pricing are accurate."
+          ]
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 5.5,
+            "practical_usefulness": 5.0,
+            "actionability": 4.5,
+            "commercial_value": 4.5,
+            "freshness": 5.5,
+            "clarity": 6.0,
+            "assumptions_stated": 4.0,
+            "overall": 4.5
+          },
+          "rank_points": 2,
+          "hallucinations": [
+            "Several concerning gaps and inaccuracies: (1) No mention of Google Business Profile posting capability verification for the recommended tools (Buffer and Hootsuite—neither is identified as the 'best' choice for GBP as of 2026). (2) Jasper AI pricing at $29/month is outdated; Jasper's current pricing starts higher. (3) The sample posts provided are bland, non-specific, and don't include Florida-specific details, seasonal accuracy, or realistic pest control expertise. (4) Claims Canva is 'free' as primary option but then recommends Pro ($12.95/month)—misleading framing."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-S09",
+      "prompt_title": "Subscription Upsell Offers",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 3.33,
+            "practical_usefulness": 2.33,
+            "actionability": 2.0,
+            "commercial_value": 2.33,
+            "freshness": 3.67,
+            "clarity": 3.0,
+            "assumptions_stated": 2.33,
+            "overall": 2.67
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "Yes—the response appears truncated and was never finished, making it impossible to evaluate the actual plan promised.",
+            "none detected (due to incompleteness)"
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 10.0,
+            "actionability": 10.0,
+            "commercial_value": 10.0,
+            "freshness": 9.33,
+            "clarity": 9.67,
+            "assumptions_stated": 8.67,
+            "overall": 9.67
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 7.33,
+            "practical_usefulness": 8.0,
+            "actionability": 7.67,
+            "commercial_value": 8.0,
+            "freshness": 7.67,
+            "clarity": 8.67,
+            "assumptions_stated": 7.0,
+            "overall": 8.0
+          },
+          "rank_points": 9,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 3.67,
+            "practical_usefulness": 3.33,
+            "actionability": 3.0,
+            "commercial_value": 2.67,
+            "freshness": 3.33,
+            "clarity": 6.67,
+            "assumptions_stated": 4.0,
+            "overall": 3.33
+          },
+          "rank_points": 5,
+          "hallucinations": [
+            "yes, the proposed pricing model is a significant hallucination of market reality and profitability for a professional cleaning service, especially given the client's existing $250 deep clean price."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S10",
+      "prompt_title": "Lead Nurturing Automation",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 7.33,
+            "practical_usefulness": 7.0,
+            "actionability": 6.0,
+            "commercial_value": 6.33,
+            "freshness": 7.67,
+            "clarity": 7.67,
+            "assumptions_stated": 5.67,
+            "overall": 6.67
+          },
+          "rank_points": 5,
+          "hallucinations": [
+            "No major hallucinations detected, but claims that HubSpot Starter and ActiveCampaign offer automation 'within budget' without confirming actual pricing (HubSpot Starter is ~$50/month, but full automation capabilities are limited)."
+          ]
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 8.67,
+            "practical_usefulness": 9.33,
+            "actionability": 9.0,
+            "commercial_value": 9.0,
+            "freshness": 9.33,
+            "clarity": 9.0,
+            "assumptions_stated": 8.33,
+            "overall": 9.0
+          },
+          "rank_points": 10,
+          "hallucinations": [
+            "None detected. All claims are grounded: GoHighLevel pricing verified, ROI math is realistic ($3,500 avg job × 3 recovered leads = $10,500), and technical features described match actual platform capabilities."
+          ]
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 7.33,
+            "practical_usefulness": 6.0,
+            "actionability": 5.0,
+            "commercial_value": 5.33,
+            "freshness": 7.0,
+            "clarity": 7.67,
+            "assumptions_stated": 5.67,
+            "overall": 6.0
+          },
+          "rank_points": 4,
+          "hallucinations": [
+            "No clear hallucinations, but the response is vague on critical execution details. Claims about 'value-driven engagement' are presented as strategy without concrete examples of how to implement them."
+          ]
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 9.0,
+            "practical_usefulness": 9.33,
+            "actionability": 9.67,
+            "commercial_value": 9.67,
+            "freshness": 9.33,
+            "clarity": 9.33,
+            "assumptions_stated": 9.0,
+            "overall": 9.33
+          },
+          "rank_points": 11,
+          "hallucinations": [
+            "None detected. All technical claims verified (GoHighLevel features, pricing, workflow capabilities). ROI math is conservative and realistic. The $80K-$120K figure is based on clear assumptions (4-6 additional closes × $3,500-$30K per job), which may vary by market but is clearly stated."
+          ]
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    }
+  ],
+  "aggregation": {
+    "total_prompts": 20,
+    "win_counts": {
+      "orchestrator": 11,
+      "standalone_anthropic": 9
+    },
+    "win_rate": {
+      "orchestrator": 0.55,
+      "standalone_anthropic": 0.45
+    },
+    "category_performance": {
+      "logistics": {
+        "orchestrator": 5,
+        "standalone_anthropic": 5
+      },
+      "smb_growth": {
+        "standalone_anthropic": 4,
+        "orchestrator": 6
+      }
+    },
+    "avg_scores_overall": {
+      "orchestrator": {
+        "clarity": 9.21,
+        "depth": 0,
+        "actionability": 9.38,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 9.08
+      },
+      "standalone_anthropic": {
+        "clarity": 8.8,
+        "depth": 0,
+        "actionability": 8.81,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 8.76
+      },
+      "standalone_google": {
+        "clarity": 6.88,
+        "depth": 0,
+        "actionability": 5.47,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 5.85
+      },
+      "standalone_openai": {
+        "clarity": 6.75,
+        "depth": 0,
+        "actionability": 4.69,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 5.05
+      }
+    },
+    "judge_agreement_rate": 0.6
+  },
+  "speed_data": {
+    "orchestrator": {
+      "avg": 248.98380000000003,
+      "min": 168.039,
+      "max": 309.29
+    },
+    "standalone_openai": {
+      "avg": 9.31615,
+      "min": 5.09,
+      "max": 12.283
+    },
+    "standalone_anthropic": {
+      "avg": 77.36045,
+      "min": 32.16,
+      "max": 98.975
+    },
+    "standalone_google": {
+      "avg": 21.0736,
+      "min": 14.579,
+      "max": 23.1
+    }
+  },
+  "cost_summary": {
+    "standalone_openai": {
+      "total_cost": 0.199899375,
+      "calls": 20,
+      "models_used": [
+        "gpt-4o"
+      ]
+    },
+    "standalone_anthropic": {
+      "total_cost": 0.9687847500000001,
+      "calls": 20,
+      "models_used": [
+        "claude-sonnet-4-6"
+      ]
+    },
+    "standalone_google": {
+      "total_cost": 0.0167977125,
+      "calls": 20,
+      "models_used": [
+        "gemini-2.5-flash"
+      ]
+    },
+    "judge_openai": {
+      "total_cost": 0.0314673375,
+      "calls": 20,
+      "models_used": [
+        "gpt-4o-mini"
+      ]
+    },
+    "judge_anthropic": {
+      "total_cost": 0.16637980000000002,
+      "calls": 19,
+      "models_used": [
+        "claude-haiku-4-5-20251001"
+      ]
+    },
+    "judge_google": {
+      "total_cost": 0.0136858875,
+      "calls": 8,
+      "models_used": [
+        "gemini-2.5-flash"
+      ]
+    }
+  },
+  "cost_total": 1.3970148625,
+  "pipeline_integrity": {
+    "total": 20,
+    "valid": 0,
+    "valid_with_warnings": 20,
+    "degraded": 0,
+    "invalid": 0,
+    "runs": [
+      {
+        "prompt_id": "R3-L01",
+        "prompt_title": "Oversize Cargo Route Legality",
+        "category": "logistics",
+        "timestamp": "2026-04-19T01:27:10.563574+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 17130,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 70496,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 23842,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 81219,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 30328,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 11934,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Route Identification & Initial State Regulatory Scan"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 13622,
+          "total_runtime_ms": 20628,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L02",
+        "prompt_title": "Trailer Type Selection",
+        "category": "logistics",
+        "timestamp": "2026-04-19T01:34:18.018275+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 19675,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 76962,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 21938,
+              "output_length": 646
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 59280,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 46387,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 9759,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 7883,
+          "total_runtime_ms": 20486,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L03",
+        "prompt_title": "Freight Quote Estimate",
+        "category": "logistics",
+        "timestamp": "2026-04-19T01:40:21.227881+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 15731,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 86263,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22143,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 49984,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 33673,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 10157,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Market Data & Benchmarking"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 7188,
+          "total_runtime_ms": 21194,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L04",
+        "prompt_title": "Ocean vs Truck vs Rail Comparison",
+        "category": "logistics",
+        "timestamp": "2026-04-19T01:45:52.567191+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 18437,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 77351,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 28881,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 59479,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 35044,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 9692,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 8759,
+          "total_runtime_ms": 20199,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L05",
+        "prompt_title": "Border Customs Risk Checklist",
+        "category": "logistics",
+        "timestamp": "2026-04-19T01:52:13.263063+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 15852,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 89579,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 37132,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 118618,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 37254,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 15799,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Regulatory Research and Data Gathering"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 13645,
+          "total_runtime_ms": 21128,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L06",
+        "prompt_title": "Fuel Market Impact on Pricing",
+        "category": "logistics",
+        "timestamp": "2026-04-19T02:00:03.830120+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 18020,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 75415,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 25941,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 64623,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 42101,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 12742,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Market & Industry Analysis"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 13430,
+          "total_runtime_ms": 22395,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L07",
+        "prompt_title": "Fast Quote Response",
+        "category": "logistics",
+        "timestamp": "2026-04-19T02:07:18.292309+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13848,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 86591,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 30522,
+              "output_length": 552
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 47699,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 30495,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 6494,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Freight Quote Estimation & Logistics Analysis"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 4048,
+          "total_runtime_ms": 14579,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L08",
+        "prompt_title": "Shipment Cost Breakdown",
+        "category": "logistics",
+        "timestamp": "2026-04-19T02:11:42.144737+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 14884,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 83544,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 27995,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 69303,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 32387,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 13075,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Core Freight & Logistics Cost Estimation"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 10065,
+          "total_runtime_ms": 21267,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L09",
+        "prompt_title": "Demurrage Avoidance Plan",
+        "category": "logistics",
+        "timestamp": "2026-04-19T02:18:19.299169+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 17612,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 95334,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 19499,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 76100,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 32860,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 13194,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Research & Root Cause Analysis"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 12677,
+          "total_runtime_ms": 21343,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L10",
+        "prompt_title": "Multi-Stop Route Optimization",
+        "category": "logistics",
+        "timestamp": "2026-04-19T02:25:58.331289+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 11750,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 54256,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 26917,
+              "output_length": 629
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 79730,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 34831,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 7521,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 6009,
+          "total_runtime_ms": 18755,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S01",
+        "prompt_title": "AI Assistant for Local Plumber",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T02:31:08.402349+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "not_needed",
+          "web_search": false
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13994,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 81750,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22597,
+              "output_length": 689
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 61676,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 40477,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 12879,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 11372,
+          "total_runtime_ms": 23101,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S02",
+        "prompt_title": "Quote Calculator Pricing Logic",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T02:37:57.185825+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 19265,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 66717,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 23970,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 87713,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 40601,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 11286,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: HVAC Market Cost & Labor Analysis (April 2026)"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 10700,
+          "total_runtime_ms": 20289,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S03",
+        "prompt_title": "SEO Growth Plan for Electrician",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T02:44:39.523919+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22160,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 77349,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22554,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 88911,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 43338,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14672,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "6-Month Local SEO Growth Plan Development"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 13662,
+          "total_runtime_ms": 21818,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S04",
+        "prompt_title": "Booking Automation Workflow",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T02:51:48.999550+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 21474,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 76312,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 24389,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 69645,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 39171,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 7701,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Market Research & Tool Selection for Automation"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 10464,
+          "total_runtime_ms": 21558,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S05",
+        "prompt_title": "Missed Call Lead Recovery",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T02:58:07.854698+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 16316,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 52521,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22566,
+              "output_length": 587
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 85641,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 31503,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 9964,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: System Design and Tool Identification"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 10162,
+          "total_runtime_ms": 22987,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S06",
+        "prompt_title": "Review Generation Funnel",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T03:04:11.170888+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 15825,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 88777,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 25667,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 81839,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 44675,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 15233,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Strategy & Negative Feedback Mitigation Framework"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14867,
+          "total_runtime_ms": 22724,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S07",
+        "prompt_title": "Google Maps Ranking Strategy",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T03:11:40.331596+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 17258,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 81785,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 25423,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 83244,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 38315,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 10974,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Competitive & Local SEO Landscape Analysis"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14311,
+          "total_runtime_ms": 22513,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S08",
+        "prompt_title": "Social Media Auto-Post Workflow",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T03:19:03.651817+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13839,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 81200,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 23429,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 77297,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 30000,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 11023,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "System Design & Tooling Analysis"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 13620,
+          "total_runtime_ms": 21964,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S09",
+        "prompt_title": "Subscription Upsell Offers",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T03:26:22.700457+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 15699,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 87654,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22202,
+              "output_length": 641
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 83390,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 45732,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14126,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Subscription Model Design & Strategy"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14190,
+          "total_runtime_ms": 20568,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S10",
+        "prompt_title": "Lead Nurturing Automation",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T03:33:35.526934+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "not_needed",
+          "web_search": false
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 18423,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 80023,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22739,
+              "output_length": 684
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 88126,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 45902,
+              "output_length": 2000
+            }
+          },
+          "total_models": 5,
+          "successful": 5,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14479,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Lead Nurturing Strategy & System Design"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 15098,
+          "total_runtime_ms": 21984,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      }
+    ]
+  }
+}

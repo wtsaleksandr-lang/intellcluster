@@ -1,0 +1,2130 @@
+{
+  "timestamp": "2026-04-19T06:45:19.183336+00:00",
+  "total_runs": 20,
+  "valid": 0,
+  "valid_with_warnings": 20,
+  "degraded": 0,
+  "invalid": 0,
+  "runs": [
+    {
+      "prompt_id": "R4-01",
+      "prompt_title": "Pivot or Persist Decision",
+      "category": "strategy",
+      "timestamp": "2026-04-19T04:29:30.221384+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 14530,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 81348,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 22277,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 90138,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 36323,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 6938,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Current State Assessment & Market Context"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 15085,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-02",
+      "prompt_title": "Acquisition Channel Prioritization",
+      "category": "strategy",
+      "timestamp": "2026-04-19T04:36:12.011208+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "not_needed",
+        "web_search": false
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 25703,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 90266,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 22516,
+            "output_length": 593
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 93861,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 43788,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 12993,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Channel Data Collection & Benchmarking"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 11434,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-03",
+      "prompt_title": "Contradictory Expert Advice",
+      "category": "contradiction",
+      "timestamp": "2026-04-19T04:42:38.293289+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash (JSON parse failed)",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 18073,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 70449,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 20693,
+            "output_length": 612
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 49941,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 37167,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 7165,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Main Task"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 7132,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-04",
+      "prompt_title": "Data Interpretation Conflict",
+      "category": "contradiction",
+      "timestamp": "2026-04-19T04:47:21.080302+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 12914,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 61025,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 11577,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 39219,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 20644,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 5892,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Data Interpretation & Anomaly Identification"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 7661,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-05",
+      "prompt_title": "90-Day Execution Plan with Dependencies",
+      "category": "planning",
+      "timestamp": "2026-04-19T04:51:44.240803+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "not_needed",
+        "web_search": false
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 19185,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 89515,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 23205,
+            "output_length": 934
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 82036,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 45424,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 16827,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Requirements & Compliance Analysis"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 15559,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-06",
+      "prompt_title": "Launch Sequencing Under Constraints",
+      "category": "planning",
+      "timestamp": "2026-04-19T04:58:45.269932+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "not_needed",
+        "web_search": false
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 16175,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 95399,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 21335,
+            "output_length": 1417
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 59232,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 339621,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 13994,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Market & Seeding Strategy"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 14562,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-07",
+      "prompt_title": "Competitor Moat Analysis",
+      "category": "competitive",
+      "timestamp": "2026-04-19T05:10:19.101579+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "required",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 21155,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 90718,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 32487,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 109005,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 36669,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 17274,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Comprehensive Competitive Analysis"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 15623,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-08",
+      "prompt_title": "Market Entry Timing Analysis",
+      "category": "competitive",
+      "timestamp": "2026-04-19T05:17:39.585645+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "required",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 25069,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 74099,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 25356,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 91648,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 36457,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 13064,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Competitor & Market Landscape Analysis"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 16734,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-09",
+      "prompt_title": "Pricing Page Optimization",
+      "category": "pricing",
+      "timestamp": "2026-04-19T05:24:57.031185+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "required",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 13773,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 87183,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 22336,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 80876,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 47789,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 9548,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Strategic Analysis & Problem Definition"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 15083,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-10",
+      "prompt_title": "Dynamic Pricing Model Design",
+      "category": "pricing",
+      "timestamp": "2026-04-19T05:31:28.234141+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 23126,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 87569,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 25589,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 83434,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 43836,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 13302,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Market & Variable Analysis"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 14723,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-11",
+      "prompt_title": "Microservices Migration Decision",
+      "category": "architecture",
+      "timestamp": "2026-04-19T05:38:16.223204+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 14370,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 59219,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 27903,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 94041,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 47980,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 11349,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Architectural Suitability Assessment"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 13228,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-12",
+      "prompt_title": "Real-Time System Cost Optimization",
+      "category": "architecture",
+      "timestamp": "2026-04-19T05:44:38.994446+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 18367,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 75934,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 19718,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 68727,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 36502,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 11099,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Architecture Audit & Cost Driver Identification"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 13910,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-13",
+      "prompt_title": "Hazmat Shipment Compliance",
+      "category": "logistics",
+      "timestamp": "2026-04-19T05:51:10.313926+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "required",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 10761,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 77490,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 12334,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 66068,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 31853,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 9813,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Regulatory Identification and Initial Assessment"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 14094,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-14",
+      "prompt_title": "Intermodal Cost-Benefit Analysis",
+      "category": "logistics",
+      "timestamp": "2026-04-19T05:57:26.324282+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "required",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 27103,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 83258,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 51744,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 74553,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 38106,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 13794,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Logistics & Initial Cost Mapping"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 7283,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-15",
+      "prompt_title": "Home Service Lead Machine",
+      "category": "smb",
+      "timestamp": "2026-04-19T06:03:49.576165+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 22473,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 88851,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 33692,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 87652,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 48963,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 9980,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Market & Competitive Landscape Analysis"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 15009,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-16",
+      "prompt_title": "Multi-Location Expansion Playbook",
+      "category": "smb",
+      "timestamp": "2026-04-19T06:10:42.349846+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 18359,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 82681,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 22810,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 97317,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 31326,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 13659,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Market & Operational Feasibility Assessment"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 13604,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-17",
+      "prompt_title": "Supply Chain Disruption Response",
+      "category": "risk",
+      "timestamp": "2026-04-19T06:17:31.678066+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "required",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 16860,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 94976,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 14855,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 76467,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 34383,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 11408,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Crisis Assessment & Immediate Response"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 14677,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-18",
+      "prompt_title": "Regulatory Change Impact Assessment",
+      "category": "risk",
+      "timestamp": "2026-04-19T06:24:43.348027+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "required",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 17064,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 79872,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 21754,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 53321,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 32486,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 11118,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: EU AI Act Landscape & Risk Categorization"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 16728,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-19",
+      "prompt_title": "Ambiguous Client Request",
+      "category": "messy",
+      "timestamp": "2026-04-19T06:31:18.910781+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 17126,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 95227,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 20567,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 76280,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 41858,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 17055,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Single Phase: CX Modernization Strategy & Clarification"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 13733,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    },
+    {
+      "prompt_id": "R4-20",
+      "prompt_title": "Conflicting Stakeholder Requirements",
+      "category": "messy",
+      "timestamp": "2026-04-19T06:38:14.430033+00:00",
+      "validity": "VALID_WITH_WARNINGS",
+      "routing": {
+        "mode": "standard",
+        "tier": null,
+        "complexity": null,
+        "freshness": "helpful",
+        "web_search": true
+      },
+      "prompt_engineer": {
+        "model": "gemini-2.5-flash",
+        "completed": true
+      },
+      "research": {
+        "models_selected": [
+          "gpt-4o-mini",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_scheduled": [
+          "gpt-4o",
+          "claude-sonnet-4-6",
+          "gemini-2.5-flash",
+          "deepseek-chat",
+          "grok-3"
+        ],
+        "models_skipped": [
+          "gpt-4o-mini"
+        ],
+        "per_model": {
+          "gpt-4o": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 19195,
+            "output_length": 2000
+          },
+          "claude-sonnet-4-6": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 88245,
+            "output_length": 2000
+          },
+          "gemini-2.5-flash": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 23695,
+            "output_length": 2000
+          },
+          "deepseek-chat": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 128670,
+            "output_length": 2000
+          },
+          "grok-3": {
+            "status": "success",
+            "started": true,
+            "completed": true,
+            "failed": false,
+            "runtime_ms": 33700,
+            "output_length": 2000
+          }
+        },
+        "total_models": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "synthesis": {
+        "strategist_completed": true,
+        "strategist_output_length": 11570,
+        "decision_maker_completed": true,
+        "decision_maker_output_length": 0
+      },
+      "phases": {
+        "total": 1,
+        "completed": 1,
+        "names": [
+          "Phase 1: Stakeholder Request Deep Dive"
+        ]
+      },
+      "final": {
+        "output_generated": true,
+        "output_length": 13390,
+        "total_runtime_ms": 0,
+        "cost_estimate": null
+      },
+      "warnings": [
+        "Models skipped (no provider): ['gpt-4o-mini']",
+        "Models skipped (no provider): ['gpt-4o-mini']"
+      ],
+      "errors": []
+    }
+  ]
+}

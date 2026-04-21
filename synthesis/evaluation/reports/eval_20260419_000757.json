@@ -1,0 +1,3430 @@
+{
+  "round": 3,
+  "timestamp": "2026-04-19T00:07:57.096932+00:00",
+  "prompts": [
+    "R3-L01",
+    "R3-L02",
+    "R3-L03",
+    "R3-L04",
+    "R3-L05",
+    "R3-L06",
+    "R3-L07",
+    "R3-L08",
+    "R3-L09",
+    "R3-L10",
+    "R3-S01",
+    "R3-S02",
+    "R3-S03",
+    "R3-S04",
+    "R3-S05",
+    "R3-S06",
+    "R3-S07",
+    "R3-S08",
+    "R3-S09",
+    "R3-S10"
+  ],
+  "per_prompt": [
+    {
+      "prompt_id": "R3-L01",
+      "prompt_title": "Oversize Cargo Route Legality",
+      "category": "logistics",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 6.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 7,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 8.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 9,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 4,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_openai",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L02",
+      "prompt_title": "Trailer Type Selection",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 11,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 6.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L03",
+      "prompt_title": "Freight Quote Estimate",
+      "category": "logistics",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 7.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 7,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 8,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L04",
+      "prompt_title": "Ocean vs Truck vs Rail Comparison",
+      "category": "logistics",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 11,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 8.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 6.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_openai",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L05",
+      "prompt_title": "Border Customs Risk Checklist",
+      "category": "logistics",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 5,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 9,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 6.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 4,
+          "hallucinations": []
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L06",
+      "prompt_title": "Fuel Market Impact on Pricing",
+      "category": "logistics",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 7.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 7,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 10.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 8,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L07",
+      "prompt_title": "Fast Quote Response",
+      "category": "logistics",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 7.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 7,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 6.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 8,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L08",
+      "prompt_title": "Shipment Cost Breakdown",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 11,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 6.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L09",
+      "prompt_title": "Demurrage Avoidance Plan",
+      "category": "logistics",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 11,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 6.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 4,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 5,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-L10",
+      "prompt_title": "Multi-Stop Route Optimization",
+      "category": "logistics",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 7.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 5,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.5,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 5,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.5,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.5,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 8,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 3.5,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 4.5,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 2,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_openai",
+      "judges_agree": true,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-S01",
+      "prompt_title": "AI Assistant for Local Plumber",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 2.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 4.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 4,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 5,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 11,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S02",
+      "prompt_title": "Quote Calculator Pricing Logic",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 1.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 4.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 11,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 6.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S03",
+      "prompt_title": "SEO Growth Plan for Electrician",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 7.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 4,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 8.5,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 8.5,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 5,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 8.5,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.5,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 5,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_openai",
+      "judges_agree": false,
+      "judge_count": 2
+    },
+    {
+      "prompt_id": "R3-S04",
+      "prompt_title": "Booking Automation Workflow",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 9,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 6.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 10.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 10.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 6.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S05",
+      "prompt_title": "Missed Call Lead Recovery",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 7.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 7,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 10.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 10.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 8,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S06",
+      "prompt_title": "Review Generation Funnel",
+      "category": "smb_growth",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 6.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 7,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 8.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 8,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S07",
+      "prompt_title": "Google Maps Ranking Strategy",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 1.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 2.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 6.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 10,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 11,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": false,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S08",
+      "prompt_title": "Social Media Auto-Post Workflow",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 7.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 7,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 8.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 8,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_google",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S09",
+      "prompt_title": "Subscription Upsell Offers",
+      "category": "smb_growth",
+      "systems": {
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 9,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 1.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 2.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 4.67,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 6.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": true,
+      "judge_count": 3
+    },
+    {
+      "prompt_id": "R3-S10",
+      "prompt_title": "Lead Nurturing Automation",
+      "category": "smb_growth",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 9.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 9,
+          "hallucinations": []
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 5.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 7.33,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 3,
+          "hallucinations": []
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 10.0,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 9.67,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 12,
+          "hallucinations": []
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "accuracy": 0,
+            "practical_usefulness": 0,
+            "actionability": 6.33,
+            "commercial_value": 0,
+            "freshness": 0,
+            "clarity": 8.0,
+            "assumptions_stated": 0,
+            "overall": 0
+          },
+          "rank_points": 6,
+          "hallucinations": []
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": true,
+      "judge_count": 3
+    }
+  ],
+  "aggregation": {
+    "total_prompts": 20,
+    "win_counts": {
+      "standalone_openai": 4,
+      "standalone_anthropic": 5,
+      "standalone_google": 8,
+      "orchestrator": 3
+    },
+    "win_rate": {
+      "standalone_openai": 0.2,
+      "standalone_anthropic": 0.25,
+      "standalone_google": 0.4,
+      "orchestrator": 0.15
+    },
+    "category_performance": {
+      "logistics": {
+        "standalone_openai": 3,
+        "standalone_anthropic": 3,
+        "standalone_google": 3,
+        "orchestrator": 1
+      },
+      "smb_growth": {
+        "standalone_google": 5,
+        "standalone_openai": 1,
+        "standalone_anthropic": 2,
+        "orchestrator": 2
+      }
+    },
+    "avg_scores_overall": {
+      "standalone_openai": {
+        "clarity": 7.23,
+        "depth": 0,
+        "actionability": 5.33,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 0.0
+      },
+      "standalone_anthropic": {
+        "clarity": 8.88,
+        "depth": 0,
+        "actionability": 8.97,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 0.0
+      },
+      "orchestrator": {
+        "clarity": 9.26,
+        "depth": 0,
+        "actionability": 9.49,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 0.0
+      },
+      "standalone_google": {
+        "clarity": 6.76,
+        "depth": 0,
+        "actionability": 5.13,
+        "reasoning": 0,
+        "usefulness": 0,
+        "overall": 0.0
+      }
+    },
+    "judge_agreement_rate": 0.55
+  },
+  "speed_data": {
+    "orchestrator": {
+      "avg": 243.14045000000002,
+      "min": 135.45,
+      "max": 296.471
+    },
+    "standalone_openai": {
+      "avg": 8.391,
+      "min": 4.844,
+      "max": 11.884
+    },
+    "standalone_anthropic": {
+      "avg": 76.08529999999999,
+      "min": 39.298,
+      "max": 97.338
+    },
+    "standalone_google": {
+      "avg": 20.76185,
+      "min": 16.185,
+      "max": 22.778
+    }
+  },
+  "pipeline_integrity": {
+    "total": 20,
+    "valid": 0,
+    "valid_with_warnings": 20,
+    "degraded": 0,
+    "invalid": 0,
+    "runs": [
+      {
+        "prompt_id": "R3-L01",
+        "prompt_title": "Oversize Cargo Route Legality",
+        "category": "logistics",
+        "timestamp": "2026-04-18T21:59:42.199040+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13822,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 35117,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13097,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 38500,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "error",
+              "started": true,
+              "completed": false,
+              "failed": true,
+              "runtime_ms": 522,
+              "output_length": 0,
+              "error": "HTTP 410: {\"error\":\"Live search is deprecated. Please switch to the Agent Tools API: https://docs.x.ai/docs/guides/tools/overview\"}"
+            }
+          },
+          "total_models": 5,
+          "successful": 4,
+          "failed": 1
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 8254,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Route and State Identification"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14162,
+          "total_runtime_ms": 20825,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L02",
+        "prompt_title": "Trailer Type Selection",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:05:31.904020+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 29047,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 71513,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 23739,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 61505,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "error",
+              "started": true,
+              "completed": false,
+              "failed": true,
+              "runtime_ms": 545,
+              "output_length": 0,
+              "error": "HTTP 410: {\"error\":\"Live search is deprecated. Please switch to the Agent Tools API: https://docs.x.ai/docs/guides/tools/overview\"}"
+            }
+          },
+          "total_models": 5,
+          "successful": 4,
+          "failed": 1
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 12027,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Equipment and Trailer Specifications Gathering"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 9367,
+          "total_runtime_ms": 19729,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L03",
+        "prompt_title": "Freight Quote Estimate",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:11:37.624440+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 12043,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 72663,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 21992,
+              "output_length": 617
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 50653,
+              "output_length": 2000
+            },
+            "grok-3": {
+              "status": "error",
+              "started": true,
+              "completed": false,
+              "failed": true,
+              "runtime_ms": 453,
+              "output_length": 0,
+              "error": "HTTP 410: {\"error\":\"Live search is deprecated. Please switch to the Agent Tools API: https://docs.x.ai/docs/guides/tools/overview\"}"
+            }
+          },
+          "total_models": 5,
+          "successful": 4,
+          "failed": 1
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 8800,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Baseline Freight Market Analysis & Mileage Calculation"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 7568,
+          "total_runtime_ms": 20632,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini']",
+          "Models skipped (no provider): ['gpt-4o-mini']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L04",
+        "prompt_title": "Ocean vs Truck vs Rail Comparison",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:16:39.201415+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 16960,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 72959,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 29426,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 78646,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 9882,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 8419,
+          "total_runtime_ms": 21496,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L05",
+        "prompt_title": "Border Customs Risk Checklist",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:22:57.082830+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 16106,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 85763,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 50455,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 60504,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 13394,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Regulatory Documentation & Pre-Shipment Requirements"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14754,
+          "total_runtime_ms": 22040,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L06",
+        "prompt_title": "Fuel Market Impact on Pricing",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:29:55.506709+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 46950,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 86585,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 28197,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 72353,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 10961,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Market Analysis & Outlook"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 15195,
+          "total_runtime_ms": 21071,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L07",
+        "prompt_title": "Fast Quote Response",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:37:15.651108+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 6978,
+              "output_length": 1779
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 38152,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 20486,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 31991,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 8327,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 5801,
+          "total_runtime_ms": 16186,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L08",
+        "prompt_title": "Shipment Cost Breakdown",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:41:05.178776+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 19971,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 80998,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 29415,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 73554,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 11951,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Market Rate & Regulatory Research"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 10195,
+          "total_runtime_ms": 20340,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L09",
+        "prompt_title": "Demurrage Avoidance Plan",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:47:38.610012+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 19179,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 87245,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 25220,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 78424,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14266,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Root Cause Analysis & Best Practice Research"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 13218,
+          "total_runtime_ms": 21814,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-L10",
+        "prompt_title": "Multi-Stop Route Optimization",
+        "category": "logistics",
+        "timestamp": "2026-04-18T22:54:54.613416+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 14054,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 46737,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 26830,
+              "output_length": 563
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 46653,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 5554,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 4424,
+          "total_runtime_ms": 18072,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S01",
+        "prompt_title": "AI Assistant for Local Plumber",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T22:59:45.172038+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "not_needed",
+          "web_search": false
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 15978,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 68804,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 21582,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 50213,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 12765,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: AI Assistant System Design & Initial Tool Identification"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 15111,
+          "total_runtime_ms": 21909,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S02",
+        "prompt_title": "Quote Calculator Pricing Logic",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:06:30.667622+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 24747,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 58967,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 24059,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 74572,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 11544,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "HVAC Cost Component Research and Data Gathering"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 11130,
+          "total_runtime_ms": 20025,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S03",
+        "prompt_title": "SEO Growth Plan for Electrician",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:12:31.615121+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash (JSON parse failed)",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13351,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 75339,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 24950,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 69972,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14758,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Main Task"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14241,
+          "total_runtime_ms": 22180,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S04",
+        "prompt_title": "Booking Automation Workflow",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:19:12.939005+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 11746,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 78251,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 23660,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 73067,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 9823,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Tool Identification and Vetting"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14516,
+          "total_runtime_ms": 19593,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S05",
+        "prompt_title": "Missed Call Lead Recovery",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:25:57.073562+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 16899,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 87621,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 15346,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 63263,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 12270,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: System Architecture & Lead Qualification Strategy"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 11296,
+          "total_runtime_ms": 22072,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S06",
+        "prompt_title": "Review Generation Funnel",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:32:07.522403+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 16285,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 90701,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 26235,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 85505,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14009,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Review Generation Strategy & Negative Feedback Management"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14270,
+          "total_runtime_ms": 21430,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S07",
+        "prompt_title": "Google Maps Ranking Strategy",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:39:15.523466+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "required",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 24849,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 83043,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 21649,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 86312,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 15051,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Comprehensive 90-Day Local SEO Plan"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14126,
+          "total_runtime_ms": 21322,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S08",
+        "prompt_title": "Social Media Auto-Post Workflow",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:46:19.138814+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13454,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 87705,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 25043,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 64809,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14747,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Automated Social Media System Architecture & Cost Analysis"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14358,
+          "total_runtime_ms": 21038,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S09",
+        "prompt_title": "Subscription Upsell Offers",
+        "category": "smb_growth",
+        "timestamp": "2026-04-18T23:53:15.843763+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "helpful",
+          "web_search": true
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 13149,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 83742,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 21430,
+              "output_length": 2000
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 59542,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14839,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Phase 1: Subscription Model Design & Pricing Strategy"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 14430,
+          "total_runtime_ms": 20688,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      },
+      {
+        "prompt_id": "R3-S10",
+        "prompt_title": "Lead Nurturing Automation",
+        "category": "smb_growth",
+        "timestamp": "2026-04-19T00:00:25.192767+00:00",
+        "validity": "VALID_WITH_WARNINGS",
+        "routing": {
+          "mode": "standard",
+          "tier": null,
+          "complexity": null,
+          "freshness": "not_needed",
+          "web_search": false
+        },
+        "prompt_engineer": {
+          "model": "gemini-2.5-flash",
+          "completed": true
+        },
+        "research": {
+          "models_selected": [
+            "gpt-4o-mini",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat",
+            "grok-3"
+          ],
+          "models_scheduled": [
+            "gpt-4o",
+            "claude-sonnet-4-6",
+            "gemini-2.5-flash",
+            "deepseek-chat"
+          ],
+          "models_skipped": [
+            "gpt-4o-mini",
+            "grok-3"
+          ],
+          "per_model": {
+            "gpt-4o": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 21008,
+              "output_length": 2000
+            },
+            "claude-sonnet-4-6": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 86706,
+              "output_length": 2000
+            },
+            "gemini-2.5-flash": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 22052,
+              "output_length": 746
+            },
+            "deepseek-chat": {
+              "status": "success",
+              "started": true,
+              "completed": true,
+              "failed": false,
+              "runtime_ms": 103811,
+              "output_length": 2000
+            }
+          },
+          "total_models": 4,
+          "successful": 4,
+          "failed": 0
+        },
+        "synthesis": {
+          "strategist_completed": true,
+          "strategist_output_length": 14066,
+          "decision_maker_completed": true,
+          "decision_maker_output_length": 0
+        },
+        "phases": {
+          "total": 1,
+          "completed": 1,
+          "names": [
+            "Lead Nurturing Strategy & Workflow Design"
+          ]
+        },
+        "final": {
+          "output_generated": true,
+          "output_length": 15471,
+          "total_runtime_ms": 22778,
+          "cost_estimate": null
+        },
+        "warnings": [
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']",
+          "Models skipped (no provider): ['gpt-4o-mini', 'grok-3']"
+        ],
+        "errors": []
+      }
+    ]
+  }
+}

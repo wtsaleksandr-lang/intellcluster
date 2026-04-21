@@ -1,0 +1,115 @@
+{
+  "timestamp": "2026-04-18T06:00:16.118931+00:00",
+  "prompts": [
+    "P01"
+  ],
+  "per_prompt": [
+    {
+      "prompt_id": "P01",
+      "prompt_title": "Contradictory Strategy Resolution",
+      "category": "decision_strategy",
+      "systems": {
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 8.0,
+            "depth": 6.33,
+            "actionability": 5.33,
+            "reasoning": 6.67,
+            "usefulness": 6.0,
+            "overall": 6.47
+          },
+          "rank_points": 4,
+          "times_ranked_first": 1
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 8.67,
+            "depth": 9.0,
+            "actionability": 9.67,
+            "reasoning": 9.0,
+            "usefulness": 9.67,
+            "overall": 9.2
+          },
+          "rank_points": 11,
+          "times_ranked_first": 2
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 7.67,
+            "depth": 7.67,
+            "actionability": 6.0,
+            "reasoning": 7.67,
+            "usefulness": 7.0,
+            "overall": 7.2
+          },
+          "rank_points": 5,
+          "times_ranked_first": 2
+        },
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 8.67,
+            "depth": 9.33,
+            "actionability": 8.33,
+            "reasoning": 9.67,
+            "usefulness": 9.33,
+            "overall": 9.07
+          },
+          "rank_points": 10,
+          "times_ranked_first": 1
+        }
+      },
+      "winner": "orchestrator",
+      "judges_agree": false,
+      "judge_count": 3
+    }
+  ],
+  "aggregation": {
+    "total_prompts": 1,
+    "win_counts": {
+      "orchestrator": 1
+    },
+    "win_rate": {
+      "orchestrator": 1.0
+    },
+    "category_performance": {
+      "decision_strategy": {
+        "orchestrator": 1
+      }
+    },
+    "avg_scores_overall": {
+      "standalone_openai": {
+        "clarity": 8.0,
+        "depth": 6.33,
+        "actionability": 5.33,
+        "reasoning": 6.67,
+        "usefulness": 6.0,
+        "overall": 6.47
+      },
+      "orchestrator": {
+        "clarity": 8.67,
+        "depth": 9.0,
+        "actionability": 9.67,
+        "reasoning": 9.0,
+        "usefulness": 9.67,
+        "overall": 9.2
+      },
+      "standalone_google": {
+        "clarity": 7.67,
+        "depth": 7.67,
+        "actionability": 6.0,
+        "reasoning": 7.67,
+        "usefulness": 7.0,
+        "overall": 7.2
+      },
+      "standalone_anthropic": {
+        "clarity": 8.67,
+        "depth": 9.33,
+        "actionability": 8.33,
+        "reasoning": 9.67,
+        "usefulness": 9.33,
+        "overall": 9.07
+      }
+    },
+    "judge_agreement_rate": 0.0
+  }
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "id": "R3-L01",
+    "title": "Oversize Cargo Route Legality",
+    "category": "logistics",
+    "prompt": "I need to ship a 14ft wide, 16ft tall, 85,000 lb transformer from Houston TX to Charlotte NC. What permits are required? Which states will I cross and what are their oversize regulations? What escort requirements apply? What is the estimated transit time and what routes should I avoid? Give me a realistic checklist I can hand to my driver and dispatch team.",
+    "tests": "Domain-specific permit knowledge, multi-state regulatory awareness, practical checklist generation"
+  },
+  {
+    "id": "R3-L02",
+    "title": "Trailer Type Selection",
+    "category": "logistics",
+    "prompt": "I have a customer who needs to ship 3 pieces of construction equipment: (1) a CAT 320 excavator, 50,000 lbs, 10ft wide, 10ft tall; (2) a Bobcat S650 skid steer, 8,500 lbs; (3) a JLG 460SJ boom lift, 15,500 lbs, 56ft long when not folded. What trailer types do I need — flatbed, step deck, RGN, or lowboy? Can I combine any on one load? What is the most cost-efficient configuration? Include tie-down requirements.",
+    "tests": "Equipment-specific knowledge, load planning, weight distribution reasoning, practical cost optimization"
+  },
+  {
+    "id": "R3-L03",
+    "title": "Freight Quote Estimate",
+    "category": "logistics",
+    "prompt": "Provide a freight quote estimate for shipping 42,000 lbs of palletized dry goods (non-hazmat) from Los Angeles CA to Chicago IL via dry van, full truckload. Include: estimated rate per mile, total estimated cost, expected transit time, fuel surcharge estimate, and any accessorial charges I should expect. Current diesel is approximately $3.80/gallon. Also note what would change the price significantly up or down.",
+    "tests": "Rate knowledge, mileage accuracy, fuel surcharge calculation, awareness of market conditions and variables"
+  },
+  {
+    "id": "R3-L04",
+    "title": "Ocean vs Truck vs Rail Comparison",
+    "category": "logistics",
+    "prompt": "Compare ocean freight, truck, and rail for shipping 2x 40ft containers of consumer electronics from Shenzhen, China to a warehouse in Dallas, TX. For each mode combination: estimate total cost, total transit time door-to-door, risk factors, insurance considerations, and customs/clearance requirements. Which option gives best balance of cost and speed? Current ocean rates from Asia to US West Coast are approximately $2,500-3,500 per 40ft container.",
+    "tests": "Multimodal logistics knowledge, international trade awareness, realistic cost estimation, risk comparison"
+  },
+  {
+    "id": "R3-L05",
+    "title": "Border Customs Risk Checklist",
+    "category": "logistics",
+    "prompt": "Create a comprehensive customs risk checklist for a freight broker shipping produce (strawberries, avocados, and bell peppers) from Guadalajara, Mexico to McAllen, TX via truck. Cover: required documentation (phytosanitary certificates, FDA prior notice, customs bond), common rejection reasons at the border, temperature requirements, USDA inspection process, estimated clearance time, and contingency plan if the load is held. I need this as a practical reference document for my team.",
+    "tests": "Cross-border compliance knowledge, perishable cargo specifics, USDA/FDA requirements, practical contingency planning"
+  },
+  {
+    "id": "R3-L06",
+    "title": "Fuel Market Impact on Pricing",
+    "category": "logistics",
+    "prompt": "Diesel prices have risen 15% in the last 6 weeks. How should I adjust my freight pricing as a mid-size carrier (50 trucks) running primarily Southeast US lanes? Cover: fuel surcharge recalculation methodology, which lanes are most impacted, how to communicate price increases to existing customers without losing them, whether to lock in fuel hedging contracts at current prices, and what the market outlook suggests for the next 90 days. I need practical steps, not theory.",
+    "tests": "Fuel surcharge mechanics, carrier economics, customer communication strategy, market forecasting"
+  },
+  {
+    "id": "R3-L07",
+    "title": "Fast Quote Response",
+    "category": "logistics",
+    "prompt": "A customer just emailed: 'Need to move 12 pallets of auto parts, 18,000 lbs total, from Detroit MI to Nashville TN. Need pickup tomorrow. What's your rate?' Draft a professional quote response email that includes: estimated rate, transit time, any assumptions I'm making, terms and conditions summary, and a line about additional services. Make it ready to send — not a template with blanks.",
+    "tests": "Professional communication, rate estimation speed, assumption transparency, ready-to-use output"
+  },
+  {
+    "id": "R3-L08",
+    "title": "Shipment Cost Breakdown",
+    "category": "logistics",
+    "prompt": "Break down the full cost of shipping a 20ft container of furniture from High Point NC to London, UK door-to-door. Include: inland trucking to port, ocean freight, port handling fees, BAF/CAF surcharges, UK customs duties and VAT, UK inland delivery, insurance, freight forwarder fees, and any other charges I'm likely to see. Use current approximate market rates. I want to understand every line item on the invoice.",
+    "tests": "International shipping cost structure knowledge, line-item accuracy, UK import duty awareness, completeness"
+  },
+  {
+    "id": "R3-L09",
+    "title": "Demurrage Avoidance Plan",
+    "category": "logistics",
+    "prompt": "My company regularly incurs $5,000-8,000/month in container demurrage and detention charges at the Port of Savannah. We import 15-20 containers per month. Create an actionable plan to reduce these charges by at least 50%. Include: process changes, technology solutions, carrier negotiation tactics, free-time extension strategies, pre-pull yard options, and KPIs to track improvement. I have 2 operations staff and a $2,000/month budget for any new tools.",
+    "tests": "Port operations knowledge, demurrage mechanics, practical cost reduction tactics, realistic budget constraints"
+  },
+  {
+    "id": "R3-L10",
+    "title": "Multi-Stop Route Optimization",
+    "category": "logistics",
+    "prompt": "I have a flatbed truck in Atlanta GA that needs to make 4 deliveries this week: (1) 12,000 lbs of steel beams to Birmingham AL, (2) 8,000 lbs of lumber to Memphis TN, (3) 15,000 lbs of pipe fittings to Nashville TN, (4) 6,000 lbs of HVAC units to Chattanooga TN. Truck max payload is 45,000 lbs. Optimize the route for minimum total miles while respecting weight limits at each stop. Consider that stops 1 and 3 have morning-only receiving hours (6am-12pm). Provide the optimal sequence, estimated total miles, and schedule.",
+    "tests": "Route optimization with weight constraints, time-window scheduling, practical logistics reasoning"
+  },
+  {
+    "id": "R3-S01",
+    "title": "AI Assistant for Local Plumber",
+    "category": "smb_growth",
+    "prompt": "I'm a plumber in Austin TX with 3 technicians. I get about 15-20 calls per day and miss roughly 40% of them because we're on jobs. Build me a complete AI assistant system plan: what to use for missed call handling, how to auto-text customers back, how to qualify leads automatically, how to schedule appointments, and how to follow up on quotes that didn't close. Budget: under $300/month total. I'm not technical — I need specific tool names and step-by-step setup instructions.",
+    "tests": "Practical tool recommendations, realistic budget constraints, step-by-step non-technical instructions, local service business understanding"
+  },
+  {
+    "id": "R3-S02",
+    "title": "Quote Calculator Pricing Logic",
+    "category": "smb_growth",
+    "prompt": "Design a quote calculator for an HVAC company that does installations and repairs. Variables: type of system (central AC, heat pump, furnace, mini-split), home square footage (500-5000 sqft), number of zones, ductwork condition (existing good, existing needs repair, new installation), equipment brand tier (budget, mid-range, premium), and labor rate by complexity. The calculator should produce an instant ballpark quote for the customer and a detailed internal estimate for the sales team. Give me the exact pricing logic with formulas and ranges I can implement.",
+    "tests": "Industry-specific pricing knowledge, multi-variable calculation design, dual-output requirement (customer vs internal)"
+  },
+  {
+    "id": "R3-S03",
+    "title": "SEO Growth Plan for Electrician",
+    "category": "smb_growth",
+    "prompt": "Create a 6-month SEO growth plan for a residential electrician serving the Denver metro area. Current state: basic website with 5 pages, no blog, 12 Google reviews, not ranking for any local keywords. Goal: appear in Google Maps 3-pack for 'electrician near me' and top 10 organic for 5 high-value service keywords. Include: specific keywords to target with estimated monthly search volumes, content plan (exact titles and topics), Google Business Profile optimization steps, citation building strategy, and review generation approach. Budget: $500/month.",
+    "tests": "Local SEO expertise, realistic keyword research, Google Maps ranking factors, practical content plan, budget-appropriate tactics"
+  },
+  {
+    "id": "R3-S04",
+    "title": "Booking Automation Workflow",
+    "category": "smb_growth",
+    "prompt": "Design a complete booking automation workflow for a mobile car detailing business with 2 vehicles. Current process: customers call or text to book, owner manually checks calendar, texts back availability, sends invoice via email. This wastes 2 hours per day. Design the automated version: online booking widget, automatic calendar sync, confirmation texts, reminder sequences, payment collection, and rebooking prompts. Specify exact tools (name and pricing), integration steps, and the customer journey from first click to completed booking. Budget: under $200/month.",
+    "tests": "Workflow design, tool-specific knowledge with pricing, customer journey mapping, integration feasibility"
+  },
+  {
+    "id": "R3-S05",
+    "title": "Missed Call Lead Recovery",
+    "category": "smb_growth",
+    "prompt": "I run a roofing company and miss about 8-10 calls per day during working hours because my crew is on roofs. Each missed call is potentially a $5,000-15,000 job. Design a missed call recovery system that: auto-texts within 30 seconds, qualifies the lead with a few questions, captures basic info (name, address, issue), sends a photo request, and routes hot leads to me immediately while queuing cold leads for evening follow-up. What specific tools do I need, what do they cost, and what does the text sequence look like? Write the actual text messages.",
+    "tests": "Revenue-impact awareness, specific tool recommendations, actual message copy, lead qualification logic"
+  },
+  {
+    "id": "R3-S06",
+    "title": "Review Generation Funnel",
+    "category": "smb_growth",
+    "prompt": "I'm a cleaning company owner with 80+ happy customers but only 14 Google reviews. My competitors have 50-200 reviews and rank above me. Build a complete review generation system: when to ask (timing relative to service), how to ask (text, email, in-person script), what to say (write the actual messages), how to handle negative feedback before it goes public, how to respond to reviews (templates), and how to maintain a steady stream of 5-10 new reviews per month. Include the tech stack needed and total monthly cost.",
+    "tests": "Review psychology, specific timing strategies, actual message templates, negative feedback handling, realistic volume expectations"
+  },
+  {
+    "id": "R3-S07",
+    "title": "Google Maps Ranking Strategy",
+    "category": "smb_growth",
+    "prompt": "My landscaping company in Phoenix AZ currently ranks #8 in Google Maps for 'landscaping Phoenix.' I want to reach the top 3. Current profile: 45 reviews (4.6 stars), basic photos, 3 service categories listed, posts once a month. Competitors in top 3 have 80-150 reviews, post weekly, and have hundreds of photos. Give me a specific 90-day plan to climb from #8 to top 3, including: GBP optimization checklist, posting schedule with content ideas, photo strategy, review velocity targets, citation gaps to fix, and any technical website changes needed. What will this realistically cost in time and money?",
+    "tests": "Google Business Profile ranking factors, competitive gap analysis, specific actionable tactics, realistic timeline expectations"
+  },
+  {
+    "id": "R3-S08",
+    "title": "Social Media Auto-Post Workflow",
+    "category": "smb_growth",
+    "prompt": "Set up a social media automation system for a pest control company. The owner has zero time for social media but knows it drives local awareness. Design a system that: auto-generates 3 posts per week (mix of tips, before/after, seasonal alerts), posts to Facebook, Instagram, and Google Business Profile simultaneously, uses AI to write the captions, and requires less than 15 minutes of owner input per week. Specify: exact tools, monthly costs, content templates for each post type, and a month's worth of sample posts for a pest control company in Florida.",
+    "tests": "Social media automation tool knowledge, content template design, multi-platform posting, realistic time requirements"
+  },
+  {
+    "id": "R3-S09",
+    "title": "Subscription Upsell Offers",
+    "category": "smb_growth",
+    "prompt": "I run a residential cleaning company. Average customer books one-time deep clean at $250, then 50% never rebook. Design a subscription/membership model that converts one-time customers to recurring revenue. Include: tier structure with pricing, what's included in each tier, the pitch script (what to say at end of first clean), email/text follow-up sequence for non-converters, and retention strategy for subscribers. Target: convert 30% of one-time customers to monthly or bi-weekly recurring. Calculate expected revenue impact for a company doing 40 one-time cleans per month.",
+    "tests": "Subscription model design, conversion psychology, revenue modeling, practical pitch scripts, retention strategy"
+  },
+  {
+    "id": "R3-S10",
+    "title": "Lead Nurturing Automation",
+    "category": "smb_growth",
+    "prompt": "My fence installation company gets about 30 quote requests per month. I close 8-10 (30% close rate). The other 20 go cold — I have no follow-up system. Design a lead nurturing automation that: follows up on day 1, 3, 7, 14, and 30 after the quote is sent, uses a mix of text and email, adjusts messaging based on whether they opened the quote, includes seasonal re-engagement for old leads, and escalates hot signals (like revisiting the quote page) to me immediately. Write the actual message sequences. Recommend specific tools under $100/month.",
+    "tests": "Lead nurturing sequence design, multi-channel messaging, behavioral triggers, actual copy writing, tool cost awareness"
+  }
+]

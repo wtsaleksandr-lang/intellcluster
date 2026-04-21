@@ -1,0 +1,162 @@
+[
+  {
+    "id": "D01",
+    "title": "CRM for small sales team",
+    "category": "business",
+    "question": "Which CRM should a 10-person sales team adopt?",
+    "options": ["HubSpot", "Salesforce", "Pipedrive", "Close.io"],
+    "criteria": [{"name": "Ease of use", "weight": 9}, {"name": "Price", "weight": 8}, {"name": "Integrations", "weight": 6}]
+  },
+  {
+    "id": "D02",
+    "title": "Marketing strategy under budget",
+    "category": "business",
+    "question": "Which marketing strategy should a bootstrapped SaaS pursue this quarter?",
+    "options": ["Content marketing + SEO", "Paid ads (Google + Meta)", "Cold email outreach"],
+    "criteria": [{"name": "Cost efficiency", "weight": 9}, {"name": "Speed to results", "weight": 7}, {"name": "Long-term value", "weight": 6}]
+  },
+  {
+    "id": "D03",
+    "title": "SaaS pricing model",
+    "category": "business",
+    "question": "What pricing model works best for a B2B SaaS with 50 enterprise clients?",
+    "options": ["Freemium with paid tiers", "Flat monthly subscription", "Usage-based pricing", "Per-seat licensing"],
+    "criteria": [{"name": "Revenue predictability", "weight": 9}, {"name": "Customer acquisition", "weight": 7}, {"name": "Scalability", "weight": 8}]
+  },
+  {
+    "id": "D04",
+    "title": "Hiring first engineer",
+    "category": "business",
+    "question": "Should a 3-person startup hire a senior full-stack engineer, a junior engineer + AI tools, or outsource to an agency?",
+    "options": ["Senior full-stack engineer ($150k)", "Junior engineer + AI tools ($80k)", "Development agency ($120k/year)"],
+    "criteria": [{"name": "Code quality", "weight": 8}, {"name": "Cost", "weight": 9}, {"name": "Speed of delivery", "weight": 7}, {"name": "Long-term value", "weight": 6}]
+  },
+  {
+    "id": "D05",
+    "title": "Freight forwarder selection",
+    "category": "business",
+    "question": "Compare 3 freight forwarders for oversized cargo shipments from China to EU.",
+    "options": ["Flexport", "Freightos marketplace", "Local customs broker + carrier"],
+    "criteria": [{"name": "Reliability", "weight": 9}, {"name": "Cost", "weight": 8}, {"name": "Oversized cargo experience", "weight": 10}, {"name": "Customs handling", "weight": 7}]
+  },
+  {
+    "id": "D06",
+    "title": "Laptop for development",
+    "category": "consumer",
+    "question": "Best laptop under $1500 for remote software development?",
+    "options": ["MacBook Air M3 15-inch", "ThinkPad X1 Carbon Gen 12", "Framework Laptop 16", "Dell XPS 15"],
+    "criteria": [{"name": "Performance", "weight": 9}, {"name": "Build quality", "weight": 7}, {"name": "Value for money", "weight": 8}, {"name": "Keyboard quality", "weight": 6}]
+  },
+  {
+    "id": "D07",
+    "title": "Electric vehicle choice",
+    "category": "consumer",
+    "question": "Should I buy Tesla Model 3, Ford Mach-E, or Hyundai Ioniq 5 for daily commuting? Budget $45k, range matters most.",
+    "options": ["Tesla Model 3 Long Range", "Ford Mustang Mach-E", "Hyundai Ioniq 5"],
+    "criteria": [{"name": "Range", "weight": 10}, {"name": "Value for money", "weight": 8}, {"name": "Tech features", "weight": 6}, {"name": "Reliability", "weight": 7}]
+  },
+  {
+    "id": "D08",
+    "title": "Mortgage comparison",
+    "category": "consumer",
+    "question": "30-year fixed at 6.5% vs 5/1 ARM at 5.8% vs 15-year fixed at 5.9% for a $400k home purchase?",
+    "options": ["30-year fixed at 6.5%", "5/1 ARM at 5.8%", "15-year fixed at 5.9%"],
+    "criteria": [{"name": "Monthly payment", "weight": 9}, {"name": "Total interest paid", "weight": 7}, {"name": "Risk level", "weight": 8}, {"name": "Flexibility", "weight": 5}]
+  },
+  {
+    "id": "D09",
+    "title": "Streaming service bundle",
+    "category": "consumer",
+    "question": "Which streaming combo gives best value: Netflix+Spotify, YouTube Premium family, or Apple One?",
+    "options": ["Netflix Standard + Spotify Premium ($28/mo)", "YouTube Premium Family ($23/mo)", "Apple One Family ($25/mo)"],
+    "criteria": [{"name": "Content variety", "weight": 8}, {"name": "Value for money", "weight": 9}, {"name": "Family sharing", "weight": 7}]
+  },
+  {
+    "id": "D10",
+    "title": "Cloud hosting for MVP",
+    "category": "technical",
+    "question": "Best cloud platform for launching a SaaS MVP: AWS, Vercel+Supabase, or Railway?",
+    "options": ["AWS (EC2 + RDS + S3)", "Vercel + Supabase", "Railway"],
+    "criteria": [{"name": "Ease of setup", "weight": 9}, {"name": "Cost at low scale", "weight": 8}, {"name": "Scalability", "weight": 5}, {"name": "Developer experience", "weight": 7}]
+  },
+  {
+    "id": "D11",
+    "title": "Database selection",
+    "category": "technical",
+    "question": "PostgreSQL vs MongoDB vs PlanetScale for a multi-tenant SaaS application?",
+    "options": ["PostgreSQL (self-managed)", "MongoDB Atlas", "PlanetScale (MySQL)"],
+    "criteria": [{"name": "Query flexibility", "weight": 8}, {"name": "Scalability", "weight": 7}, {"name": "Operational overhead", "weight": 9}, {"name": "Cost", "weight": 6}]
+  },
+  {
+    "id": "D12",
+    "title": "Training plan for beginner",
+    "category": "personal",
+    "question": "Best training plan for a beginner who wants to lose weight and build muscle?",
+    "options": ["3-day full body lifting program", "5-day push/pull/legs split", "Daily 30-minute HIIT sessions"],
+    "criteria": [{"name": "Effectiveness", "weight": 9}, {"name": "Time commitment", "weight": 7}, {"name": "Sustainability", "weight": 8}, {"name": "Injury risk", "weight": 6}]
+  },
+  {
+    "id": "D13",
+    "title": "Career move decision",
+    "category": "personal",
+    "question": "Stay at current job ($120k, boring but stable) vs join a startup ($90k + equity) vs freelance ($150k variable)?",
+    "options": ["Stay at current job ($120k)", "Join startup ($90k + equity)", "Go freelance ($150k variable)"],
+    "criteria": [{"name": "Income stability", "weight": 8}, {"name": "Growth potential", "weight": 9}, {"name": "Work-life balance", "weight": 7}, {"name": "Risk tolerance", "weight": 6}]
+  },
+  {
+    "id": "D14",
+    "title": "Diet approach",
+    "category": "personal",
+    "question": "Best diet approach for sustainable weight loss: calorie counting, intermittent fasting, or Mediterranean diet?",
+    "options": ["Calorie counting (CICO)", "Intermittent fasting (16:8)", "Mediterranean diet"],
+    "criteria": [{"name": "Effectiveness", "weight": 9}, {"name": "Sustainability", "weight": 10}, {"name": "Ease of following", "weight": 8}]
+  },
+  {
+    "id": "D15",
+    "title": "Logo design selection",
+    "category": "creative",
+    "question": "Which logo concept for a fintech startup: abstract geometric, wordmark with gradient, or minimal icon + text?",
+    "options": ["Abstract geometric symbol", "Wordmark with gradient", "Minimal icon + clean text"],
+    "criteria": [{"name": "Memorability", "weight": 9}, {"name": "Versatility", "weight": 8}, {"name": "Professional feel", "weight": 7}, {"name": "Uniqueness", "weight": 6}]
+  },
+  {
+    "id": "D16",
+    "title": "Content format for launch",
+    "category": "creative",
+    "question": "Best content format for a product launch: long-form blog post, short video series, or Twitter thread campaign?",
+    "options": ["Long-form blog post with SEO", "Short video series (TikTok/Reels)", "Twitter/X thread campaign"],
+    "criteria": [{"name": "Reach", "weight": 8}, {"name": "Engagement", "weight": 9}, {"name": "Production effort", "weight": 7}, {"name": "Shareability", "weight": 8}]
+  },
+  {
+    "id": "D17",
+    "title": "Vendor selection with tradeoffs",
+    "category": "business",
+    "question": "Choose payment processor: Stripe (2.9% + easy), Adyen (2.1% + complex), or PayPal (3.5% + instant)?",
+    "options": ["Stripe (2.9% + 30c, excellent DX)", "Adyen (2.1% + 12c, enterprise-grade)", "PayPal (3.49% + 49c, instant trust)"],
+    "criteria": [{"name": "Developer experience", "weight": 8}, {"name": "Transaction cost", "weight": 9}, {"name": "Customer trust", "weight": 7}, {"name": "Global coverage", "weight": 6}]
+  },
+  {
+    "id": "D18",
+    "title": "Hard tradeoff: speed vs quality",
+    "category": "business",
+    "question": "Launch MVP in 2 weeks with bugs, 6 weeks polished, or 3 months with full feature set?",
+    "options": ["2-week MVP (buggy, validates idea fast)", "6-week polished MVP (fewer features, solid UX)", "3-month full product (complete but slow to market)"],
+    "criteria": [{"name": "Speed to market", "weight": 10}, {"name": "Product quality", "weight": 7}, {"name": "Customer impression", "weight": 6}, {"name": "Learning speed", "weight": 8}]
+  },
+  {
+    "id": "D19",
+    "title": "Contradictory priorities",
+    "category": "personal",
+    "question": "Move to NYC ($3500/mo rent, best career opportunities) vs stay remote in Austin ($1800/mo, good quality of life) vs relocate to Lisbon ($1200/mo, adventure)?",
+    "options": ["Move to NYC", "Stay remote in Austin", "Relocate to Lisbon"],
+    "criteria": [{"name": "Career growth", "weight": 9}, {"name": "Cost of living", "weight": 8}, {"name": "Quality of life", "weight": 7}, {"name": "Social network", "weight": 5}]
+  },
+  {
+    "id": "D20",
+    "title": "Ambiguous decision with limited info",
+    "category": "business",
+    "question": "Should we build our own analytics dashboard, buy Mixpanel, or use open-source PostHog?",
+    "options": ["Build custom analytics", "Mixpanel ($400/mo)", "PostHog (self-hosted, free)"],
+    "criteria": [{"name": "Cost", "weight": 8}, {"name": "Customization", "weight": 7}, {"name": "Time to implement", "weight": 9}, {"name": "Data ownership", "weight": 6}]
+  }
+]

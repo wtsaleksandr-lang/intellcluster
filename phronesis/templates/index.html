@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+{% block title %}Compare Options. Make Smarter Decisions.{% endblock %}
+
+{% block content %}
+<div style="max-width:760px;margin:0 auto;padding:0 20px;">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HERO + COMPOSER                            -->
+<!-- ═══════════════════════════════════════════ -->
+<section id="inputSection" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 180px);padding:20px 0;margin-top:-20px;">
+
+  <!-- Hero text -->
+  <div class="rv" style="text-align:center;margin-bottom:32px;">
+    <h1 class="t-display" style="font-size:clamp(30px,5vw,42px);font-weight:600;color:var(--text);line-height:1.15;letter-spacing:-0.5px;">
+      What are you deciding?
+    </h1>
+    <p style="margin-top:12px;color:var(--text-muted);font-size:15px;max-width:480px;margin-left:auto;margin-right:auto;">
+      Describe your decision. Independent analysts evaluate your options blindly and rank them.
+    </p>
+  </div>
+
+  <!-- COMPOSER -->
+  <div id="composer" class="rv rv1" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:border-color 0.25s,box-shadow 0.3s;position:relative;">
+
+    <textarea id="inp" rows="3" maxlength="2000"
+      placeholder="Should I buy Tesla Model 3 or Mach-E for commuting? Budget is $45k, range and tech matter most..."
+      style="width:100%;background:transparent;border:none;padding:18px 20px 10px;font-size:15px;color:var(--text);font-family:inherit;resize:none;outline:none;line-height:1.6;min-height:76px;transition:min-height 0.3s ease;"></textarea>
+
+    <!-- Suggestion chips -->
+    <div id="chipArea" style="min-height:0;padding:0 16px;display:flex;flex-wrap:wrap;gap:6px;transition:padding 0.2s;"></div>
+
+    <!-- Extracted preview -->
+    <div id="exPrev" style="display:none;margin:4px 14px 10px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span class="fig-label" style="margin-bottom:0;">FIG <span>0</span> — PARSED INPUT</span>
+        <button id="clearEx" class="t-mono" style="font-size:9px;color:var(--text-dim);background:none;border:none;cursor:pointer;letter-spacing:0.5px;">CLEAR</button>
+      </div>
+      <div id="exQ" style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;"></div>
+      <div id="exO" style="font-size:12px;color:var(--text-muted);"></div>
+      <div id="exC" style="font-size:12px;color:var(--text-muted);margin-top:2px;"></div>
+    </div>
+
+    <!-- Drop overlay -->
+    <div id="dropOverlay" style="display:none;position:absolute;inset:0;background:rgba(255,106,61,0.04);border:2px dashed var(--accent);border-radius:12px;z-index:10;align-items:center;justify-content:center;pointer-events:none;">
+      <span style="font-size:13px;font-weight:500;color:var(--accent);padding:12px 20px;background:var(--surface);border-radius:8px;border:1px solid var(--accent-border);">Drop files here</span>
+    </div>
+
+    <!-- Attached files -->
+    <div id="attachList" style="display:none;padding:4px 16px 8px;flex-wrap:wrap;gap:6px;"></div>
+
+    <!-- TOOLBAR -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border-subtle);">
+      <div style="display:flex;align-items:center;gap:4px;">
+        <!-- Attach -->
+        <button id="attachBtn" title="Attach files" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:none;border-radius:6px;cursor:pointer;color:var(--text-dim);transition:color 0.15s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <!-- Settings -->
+        <button id="settingsBtn" title="Settings" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:none;border-radius:6px;cursor:pointer;color:var(--text-dim);transition:color 0.15s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <span class="t-mono hide-mobile" style="font-size:10px;color:var(--text-dim);margin-left:8px;letter-spacing:0.3px;">3 analysts &middot; blind evaluation</span>
+      </div>
+      <button id="goBtn" style="padding:8px 24px;background:var(--accent);color:#fff;font-weight:600;border:none;border-radius:8px;font-size:13px;cursor:pointer;transition:opacity 0.15s;font-family:inherit;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Analyze</button>
+    </div>
+
+    <!-- SETTINGS POPOVER -->
+    <div id="settingsPop" style="display:none;position:absolute;bottom:56px;left:8px;width:340px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;z-index:60;box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span style="font-size:13px;font-weight:600;color:var(--text);">Analysis Settings</span>
+        <button onclick="document.getElementById('settingsPop').style.display='none'" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;">&times;</button>
+      </div>
+
+      <!-- Depth -->
+      <div style="margin-bottom:16px;">
+        <div class="fig-label" style="margin-bottom:8px;">DEPTH</div>
+        <div style="display:flex;gap:4px;">
+          <button class="depth-btn" data-v="quick" data-desc="1 analyst, fastest. Good for simple A-vs-B. ~5s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Quick</button>
+          <button class="depth-btn" data-v="standard" data-desc="3 analysts evaluate blindly. Best balance. ~15s." style="flex:1;padding:8px;font-size:11px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
+          <button class="depth-btn" data-v="deep" data-desc="3 analysts, stronger models, deeper rubric. ~30s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Deep</button>
+        </div>
+        <p id="depthDesc" style="margin-top:6px;font-size:11px;color:var(--text-dim);line-height:1.5;">3 analysts evaluate blindly. Best balance. ~15s.</p>
+      </div>
+
+      <!-- Focus -->
+      <div style="margin-bottom:16px;">
+        <div class="fig-label" style="margin-bottom:8px;">FOCUS</div>
+        <div style="display:flex;gap:4px;">
+          <button class="focus-btn" data-v="balanced" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Balanced</button>
+          <button class="focus-btn" data-v="risks" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Risk-focused</button>
+          <button class="focus-btn" data-v="practical" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Practical</button>
+        </div>
+      </div>
+
+      <!-- Length -->
+      <div style="margin-bottom:16px;">
+        <div class="fig-label" style="margin-bottom:8px;">RESPONSE LENGTH</div>
+        <div style="display:flex;gap:4px;">
+          <button class="len-btn" data-v="concise" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Concise</button>
+          <button class="len-btn" data-v="standard" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
+          <button class="len-btn" data-v="detailed" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Detailed</button>
+        </div>
+      </div>
+
+      <!-- Web search -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);">
+        <div><div style="font-size:12px;color:var(--text);">Web search</div><div style="font-size:10px;color:var(--text-dim);">Fetch current prices &amp; data</div></div>
+        <label style="position:relative;width:36px;height:20px;cursor:pointer;">
+          <input type="checkbox" id="webSearch" style="opacity:0;width:0;height:0;">
+          <span style="position:absolute;inset:0;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:background 0.2s;"></span>
+          <span id="toggleDot" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--text-dim);border-radius:50%;transition:transform 0.2s,background 0.2s;"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMPLE PILLS -->
+  <div id="examples" class="rv rv2" style="width:100%;margin-top:24px;">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;" id="exGrid"></div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PROGRESS                                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="PS" style="display:none;">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 180px);padding:24px 0;margin-top:-20px;">
+    <div class="prog-circle" style="margin-bottom:24px;">
+      <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15.5"/><circle class="fill" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4" id="pFill"/></svg>
+      <div class="pct" id="pPct">0%</div>
+    </div>
+    <p class="t-display" style="font-size:22px;font-weight:500;color:var(--text);" id="pTitle">Preparing analysis</p>
+    <p class="t-mono" style="font-size:10px;color:var(--text-dim);margin-top:8px;letter-spacing:0.5px;">TYPICALLY 10-20 SECONDS</p>
+    <div id="SL" style="margin-top:28px;width:100%;max-width:340px;"></div>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div id="ES" style="display:none;">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;padding:24px 0;text-align:center;">
+    <p style="color:var(--red);font-weight:500;font-size:15px;" id="ET"></p>
+    <button onclick="location.reload()" class="t-mono" style="margin-top:14px;font-size:11px;color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:6px;padding:8px 20px;cursor:pointer;letter-spacing:0.3px;">TRY AGAIN</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="RS" style="display:none;padding:32px 0;"></div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- BELOW FOLD                                 -->
+<!-- ═══════════════════════════════════════════ -->
+<section id="belowFold" style="padding:56px 0;border-top:1px solid var(--border-subtle);">
+  <div class="fig-label rv">FIG <span>A</span> — HOW IT WORKS</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px;margin-top:8px;" class="grid-3 rv rv1">
+    <div>
+      <div class="t-mono" style="font-size:11px;color:var(--accent);margin-bottom:8px;">01</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">Describe your decision</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">Type naturally. AI extracts options, criteria, and weights from your description.</div>
+    </div>
+    <div>
+      <div class="t-mono" style="font-size:11px;color:var(--accent);margin-bottom:8px;">02</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">Analysts evaluate blindly</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">Options are shuffled and anonymized. No analyst knows which option is which.</div>
+    </div>
+    <div>
+      <div class="t-mono" style="font-size:11px;color:var(--accent);margin-bottom:8px;">03</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">Ranked results</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">Scores, strengths, weaknesses, confidence levels, and a shareable link.</div>
+    </div>
+  </div>
+</section>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const inp=document.getElementById('inp'),composer=document.getElementById('composer'),
+  chipArea=document.getElementById('chipArea'),exPrev=document.getElementById('exPrev'),
+  PS=document.getElementById('PS'),SL=document.getElementById('SL'),ES=document.getElementById('ES'),
+  ET=document.getElementById('ET'),RS=document.getElementById('RS'),EX=document.getElementById('examples'),
+  pFill=document.getElementById('pFill'),pPct=document.getElementById('pPct'),pTitle=document.getElementById('pTitle'),
+  inputSection=document.getElementById('inputSection'),belowFold=document.getElementById('belowFold'),
+  settingsPop=document.getElementById('settingsPop'),attachList=document.getElementById('attachList');
+const CIRC=97.4;let extractedData=null,suggestTimer=null,attachedFiles=[];
+
+/* Expand on focus */
+inp.addEventListener('focus',()=>{
+  inp.style.minHeight='140px';
+  composer.style.borderColor='var(--accent-border)';
+  composer.style.boxShadow='0 0 0 3px var(--accent-glow)';
+});
+inp.addEventListener('blur',()=>{
+  if(!inp.value.trim())inp.style.minHeight='76px';
+  composer.style.borderColor='var(--border)';
+  composer.style.boxShadow='none';
+});
+inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,300)+'px';});
+
+/* Settings popover */
+document.getElementById('settingsBtn').onclick=e=>{e.stopPropagation();settingsPop.style.display=settingsPop.style.display==='block'?'none':'block';};
+document.addEventListener('click',e=>{if(!settingsPop.contains(e.target)&&e.target!==document.getElementById('settingsBtn'))settingsPop.style.display='none';});
+
+/* Toggle groups */
+function setupToggle(cls){
+  document.querySelectorAll('.'+cls).forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('.'+cls).forEach(x=>{x.style.background='var(--bg)';x.style.borderColor='var(--border)';x.style.color='var(--text-muted)';x.style.fontWeight='400';});
+      b.style.background='var(--accent-dim)';b.style.borderColor='var(--accent-border)';b.style.color='var(--accent)';b.style.fontWeight='600';
+      if(b.dataset.desc)document.getElementById('depthDesc').textContent=b.dataset.desc;
+    };
+  });
+}
+setupToggle('depth-btn');setupToggle('focus-btn');setupToggle('len-btn');
+
+/* Web search toggle */
+document.getElementById('webSearch').onchange=function(){
+  const d=document.getElementById('toggleDot');
+  if(this.checked){d.style.transform='translateX(16px)';d.style.background='var(--accent)';}
+  else{d.style.transform='translateX(0)';d.style.background='var(--text-dim)';}
+};
+
+/* Files */
+document.getElementById('attachBtn').onclick=()=>document.getElementById('fileInput')?.click();
+const fi=document.createElement('input');fi.type='file';fi.id='fileInput';fi.multiple=true;fi.accept='image/*,.pdf,.csv,.txt,.json,.xlsx,.doc,.docx';fi.style.display='none';
+document.body.appendChild(fi);
+fi.onchange=function(){handleFiles(this.files);};
+composer.addEventListener('dragover',e=>{e.preventDefault();document.getElementById('dropOverlay').style.display='flex';});
+composer.addEventListener('dragleave',e=>{if(!composer.contains(e.relatedTarget))document.getElementById('dropOverlay').style.display='none';});
+composer.addEventListener('drop',e=>{e.preventDefault();document.getElementById('dropOverlay').style.display='none';handleFiles(e.dataTransfer.files);});
+async function handleFiles(fl){
+  if(!fl||!fl.length)return;
+  for(const f of fl){if(attachedFiles.length>=5)break;const fd=new FormData();fd.append('file',f);
+    try{const r=await fetch('/api/upload',{method:'POST',body:fd});if(r.ok){const d=await r.json();attachedFiles.push({name:d.filename,original:d.original});}}catch(e){}}
+  renderAttach();
+}
+function renderAttach(){
+  if(!attachedFiles.length){attachList.style.display='none';return;}
+  attachList.style.display='flex';attachList.innerHTML='';
+  attachedFiles.forEach((f,i)=>{const c=document.createElement('span');c.style.cssText='display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);';
+    c.innerHTML=`${esc(f.original||f.name)} <button onclick="attachedFiles.splice(${i},1);renderAttach();" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:12px;">&times;</button>`;
+    attachList.appendChild(c);});
+}
+
+/* Examples */
+const EXAMPS=["Should I buy Tesla Model 3 or Mach-E for commuting?","Compare HubSpot vs Salesforce vs Pipedrive for sales","Content + SEO vs paid ads vs cold outreach?","Best laptop under $1500 for development","Freemium vs subscription vs usage-based pricing","Full body vs PPL vs HIIT for weight loss + muscle"];
+EXAMPS.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t;b.onclick=()=>{inp.value=t;inp.focus();inp.dispatchEvent(new Event('input'));triggerExtract();};document.getElementById('exGrid').appendChild(b);});
+
+/* Suggestions */
+inp.addEventListener('input',()=>{clearTimeout(suggestTimer);exPrev.style.display='none';extractedData=null;if(inp.value.trim().length>=25)suggestTimer=setTimeout(fetchChips,1500);else{chipArea.innerHTML='';chipArea.style.padding='0 16px';}});
+async function fetchChips(){const t=inp.value.trim();if(t.length<25)return;try{const r=await fetch('/api/suggest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});if(!r.ok)return;const{chips}=await r.json();chipArea.innerHTML='';chipArea.style.padding=chips.length?'6px 16px 10px':'0 16px';chips.forEach(c=>{const el=document.createElement('span');el.className='chip';el.style.fontSize='11px';el.style.padding='4px 10px';el.textContent=c;el.onclick=()=>{inp.value+='\n'+c+'.';el.remove();inp.focus();inp.dispatchEvent(new Event('input'));};chipArea.appendChild(el);});}catch(e){}}
+
+/* Extract */
+async function triggerExtract(){const t=inp.value.trim();if(t.length<15)return;try{const r=await fetch('/api/extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});if(!r.ok)return;extractedData=await r.json();document.getElementById('exQ').textContent=extractedData.question||'';document.getElementById('exO').textContent=(extractedData.options||[]).join('  \u2022  ');document.getElementById('exC').textContent=(extractedData.criteria||[]).map(c=>c.name).join(', ');exPrev.style.display='block';chipArea.innerHTML='';chipArea.style.padding='0 16px';}catch(e){}}
+document.getElementById('clearEx').onclick=()=>{exPrev.style.display='none';extractedData=null;};
+
+/* Settings reader */
+function getSettings(){
+  const getActive=cls=>{let v='standard';document.querySelectorAll('.'+cls).forEach(b=>{if(b.style.fontWeight==='600')v=b.dataset.v;});return v;};
+  return{depth:getActive('depth-btn'),focus:getActive('focus-btn'),length:getActive('len-btn'),web_search:document.getElementById('webSearch')?.checked||false};
+}
+
+/* Analyze */
+document.getElementById('goBtn').onclick=async()=>{
+  const t=inp.value.trim();if(t.length<10){inp.focus();return;}
+  if(!extractedData)await triggerExtract();
+  if(!extractedData||!extractedData.options||extractedData.options.length<2){alert('Could not parse options. Add more detail.');inp.focus();return;}
+  runPipeline({...extractedData,settings:getSettings(),attachments:attachedFiles.map(f=>f.name)});
+};
+
+/* Pipeline */
+let stepsDone=0;const TOTAL=7;
+function setProg(pct,title){pFill.style.strokeDashoffset=CIRC*(1-pct/100);pPct.textContent=Math.round(pct)+'%';pTitle.textContent=title;}
+async function runPipeline(payload){
+  inputSection.style.display='none';belowFold.style.display='none';
+  PS.style.display='block';ES.style.display='none';RS.style.display='none';
+  SL.innerHTML='';stepsDone=0;setProg(0,'Preparing analysis');
+  try{
+    const r=await fetch('/api/decide',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(payload)});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'Request failed');}
+    const ct=r.headers.get('content-type')||'';
+    if(ct.includes('text/event-stream')){
+      const reader=r.body.getReader(),dec=new TextDecoder();let buf='';
+      while(true){const{done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});const lines=buf.split('\n');buf=lines.pop();
+        for(const l of lines){const tr=l.trim();if(!tr.startsWith('data: '))continue;
+          try{const d=JSON.parse(tr.slice(6));
+            if(d.step){stepsDone++;setProg(Math.min(Math.round(stepsDone/TOTAL*100),95),d.detail||d.step);
+              const el=document.createElement('div');el.style.cssText='display:flex;align-items:center;gap:10px;padding:4px 0;opacity:0;animation:stepIn 0.3s ease forwards;';
+              el.innerHTML=`<div class="step-dot step-done"></div><span class="t-mono" style="font-size:10px;color:var(--text-muted);letter-spacing:0.3px;">${esc(d.detail||d.step)}</span>`;
+              SL.appendChild(el);}
+            else if(d.run_id){setProg(100,'Analysis complete');pFill.classList.add('done');setTimeout(()=>{PS.style.display='none';renderResults(d);},500);}
+            else if(d.error)throw new Error(d.error);
+          }catch(pe){if(!pe.message.includes('JSON'))throw pe;}}}
+    }else{const d=await r.json();PS.style.display='none';renderResults(d);}
+  }catch(err){PS.style.display='none';ES.style.display='block';ET.textContent=err.message||'Something went wrong.';}
+}
+
+/* ═══ RENDER RESULTS ═══ */
+function renderResults(d){
+  RS.style.display='block';RS.innerHTML='';
+  const cM={high:{cls:'bdg-green',dot:'var(--green)'},moderate:{cls:'bdg-accent',dot:'var(--accent)'},low:{cls:'bdg-red',dot:'var(--red)'}};
+  const cf=cM[d.confidence_level]||cM.moderate;
+
+  /* FIG 1 — RECOMMENDATION */
+  RS.innerHTML+=`
+  <div class="rv">
+    <div class="fig-label">FIG <span>1</span> — RECOMMENDATION</div>
+    <div class="panel accent-bar" style="padding:24px 24px 24px 20px;margin-bottom:48px;">
+      <div style="font-size:12px;color:var(--accent);font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Best option</div>
+      <h2 class="t-display" style="font-size:clamp(22px,4vw,32px);font-weight:600;color:var(--text);line-height:1.2;">${esc(d.winner)}</h2>
+      <p style="color:var(--text-muted);margin-top:10px;font-size:14px;line-height:1.65;max-width:520px;">${esc(d.why_winner_won)}</p>
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+        <span class="bdg ${cf.cls}"><span style="width:6px;height:6px;border-radius:50%;background:${cf.dot};"></span>${d.confidence_score.toFixed(0)}% confidence</span>
+        <span class="bdg bdg-muted">${d.judges_agree?'Unanimous':'Split'} &middot; ${d.judge_count} analysts</span>
+      </div>
+    </div>
+  </div>`;
+
+  /* FIG 2 — CONFIDENCE ANALYSIS */
+  const w=d.ranked_options[0],r2=d.ranked_options[1];
+  const spread=w&&r2?(w.final_score-r2.final_score).toFixed(1):'--';
+  RS.innerHTML+=`
+  <div class="rv rv1">
+    <div class="fig-label">FIG <span>2</span> — CONFIDENCE ANALYSIS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:48px;" class="grid-3">
+      <div class="metric"><div class="metric-label">CONFIDENCE</div><div class="metric-bar"><div class="metric-fill" style="width:${d.confidence_score}%;background:${cf.dot};"></div></div><div class="metric-value" style="color:${cf.dot};">${d.confidence_score.toFixed(0)}%</div></div>
+      <div class="metric"><div class="metric-label">SCORE SPREAD</div><div class="metric-bar"><div class="metric-fill" style="width:${Math.min(parseFloat(spread)*15,100)}%;background:var(--accent);"></div></div><div class="metric-value">${spread} pts</div></div>
+      <div class="metric"><div class="metric-label">ANALYST AGREEMENT</div><div class="metric-bar"><div class="metric-fill" style="width:${d.judges_agree?100:40}%;background:${d.judges_agree?'var(--green)':'var(--amber)'};"></div></div><div class="metric-value">${d.judges_agree?'Yes':'Split'}</div></div>
+    </div>
+  </div>`;
+
+  /* FIG 3 — RANKED OPTIONS */
+  let cards=`<div class="rv rv2"><div class="fig-label">FIG <span>3</span> — RANKED OPTIONS</div><div style="margin-bottom:48px;">`;
+  d.ranked_options.forEach(opt=>{
+    const isW=opt.rank===1;const pct=Math.round(opt.final_score*10);
+    // Dimension scores as data table
+    let dims='';
+    Object.entries(opt.dimension_scores).forEach(([k,v])=>{if(k==='overall')return;
+      dims+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--border-subtle);"><span style="font-size:12px;color:var(--text-muted);text-transform:capitalize;">${k.replace(/_/g,' ')}</span><span class="t-mono" style="font-size:12px;color:var(--text);">${v.toFixed(1)}</span></div>`;});
+    // Strengths/weaknesses with dots
+    let pros=opt.strengths.map(s=>`<div style="display:flex;align-items:baseline;gap:8px;padding:2px 0;"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:6px;"></span><span style="font-size:12px;color:var(--text-muted);line-height:1.5;">${esc(s)}</span></div>`).join('');
+    let cons=opt.weaknesses.map(w=>`<div style="display:flex;align-items:baseline;gap:8px;padding:2px 0;"><span style="width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:6px;"></span><span style="font-size:12px;color:var(--text-muted);line-height:1.5;">${esc(w)}</span></div>`).join('');
+
+    cards+=`
+    <div class="panel${isW?' accent-bar':''}" style="margin-bottom:8px;${isW?'padding-left:20px;':''}">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span class="t-mono" style="font-size:14px;${isW?'color:var(--accent);font-weight:600;':'color:var(--text-dim);'};width:24px;">${String(opt.rank).padStart(2,'0')}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:15px;font-weight:600;color:var(--text);">${esc(opt.option)}</div>
+          <div class="score-bar" style="margin-top:8px;"><div class="score-fill" style="width:${pct}%;background:${isW?'var(--accent)':'rgba(255,255,255,0.12)'};"></div></div>
+        </div>
+        <span class="t-mono" style="font-size:14px;${isW?'color:var(--accent);':'color:var(--text-muted);'};font-weight:500;">${opt.final_score.toFixed(1)}</span>
+      </div>
+      ${dims?`<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">${dims}</div>`:''}
+      ${(pros||cons)?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">${pros}${cons}</div>`:''}
+    </div>`;
+  });
+  cards+='</div></div>';RS.innerHTML+=cards;
+
+  /* Share */
+  const shareUrl=location.origin+'/result/'+d.run_id;
+  RS.innerHTML+=`
+  <div class="rv rv3" style="text-align:center;padding-top:8px;">
+    <button id="SH" class="t-mono" style="font-size:11px;padding:8px 20px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;cursor:pointer;transition:all 0.15s;letter-spacing:0.3px;" onmouseover="this.style.borderColor='var(--accent-border)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">SHARE RESULT</button>
+    <p class="t-mono" style="font-size:9px;color:var(--text-dim);margin-top:10px;letter-spacing:0.5px;">${(d.latency_ms/1000).toFixed(1)}s &middot; $${d.total_cost_usd.toFixed(4)} &middot; ${d.run_id}</p>
+    <button onclick="location.reload()" style="margin-top:16px;font-size:13px;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:500;">New decision &rarr;</button>
+  </div>`;
+  document.getElementById('SH')?.addEventListener('click',function(){navigator.clipboard.writeText(shareUrl).then(()=>{this.textContent='COPIED';setTimeout(()=>{this.textContent='SHARE RESULT';},2000);});});
+  RS.scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>document.querySelectorAll('.metric-fill,.score-fill').forEach(el=>{const w=el.style.width;el.style.width='0';requestAnimationFrame(()=>el.style.width=w);}),50);
+}
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+</script>
+<style>@keyframes stepIn{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}</style>
+{% endblock %}

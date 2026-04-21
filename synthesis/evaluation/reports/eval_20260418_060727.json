@@ -1,0 +1,115 @@
+{
+  "timestamp": "2026-04-18T06:07:27.682959+00:00",
+  "prompts": [
+    "P04"
+  ],
+  "per_prompt": [
+    {
+      "prompt_id": "P04",
+      "prompt_title": "Business Model Validation",
+      "category": "business_ideas_validation",
+      "systems": {
+        "standalone_anthropic": {
+          "avg_scores": {
+            "clarity": 9.0,
+            "depth": 9.5,
+            "actionability": 9.0,
+            "reasoning": 9.5,
+            "usefulness": 9.5,
+            "overall": 9.3
+          },
+          "rank_points": 7,
+          "times_ranked_first": 1
+        },
+        "orchestrator": {
+          "avg_scores": {
+            "clarity": 8.5,
+            "depth": 9.5,
+            "actionability": 9.0,
+            "reasoning": 9.5,
+            "usefulness": 9.5,
+            "overall": 9.2
+          },
+          "rank_points": 7,
+          "times_ranked_first": 1
+        },
+        "standalone_openai": {
+          "avg_scores": {
+            "clarity": 7.0,
+            "depth": 5.0,
+            "actionability": 4.0,
+            "reasoning": 5.5,
+            "usefulness": 5.0,
+            "overall": 5.3
+          },
+          "rank_points": 2,
+          "times_ranked_first": 2
+        },
+        "standalone_google": {
+          "avg_scores": {
+            "clarity": 8.0,
+            "depth": 7.0,
+            "actionability": 5.5,
+            "reasoning": 7.0,
+            "usefulness": 6.5,
+            "overall": 6.8
+          },
+          "rank_points": 4,
+          "times_ranked_first": 2
+        }
+      },
+      "winner": "standalone_anthropic",
+      "judges_agree": false,
+      "judge_count": 2
+    }
+  ],
+  "aggregation": {
+    "total_prompts": 1,
+    "win_counts": {
+      "standalone_anthropic": 1
+    },
+    "win_rate": {
+      "standalone_anthropic": 1.0
+    },
+    "category_performance": {
+      "business_ideas_validation": {
+        "standalone_anthropic": 1
+      }
+    },
+    "avg_scores_overall": {
+      "standalone_anthropic": {
+        "clarity": 9.0,
+        "depth": 9.5,
+        "actionability": 9.0,
+        "reasoning": 9.5,
+        "usefulness": 9.5,
+        "overall": 9.3
+      },
+      "orchestrator": {
+        "clarity": 8.5,
+        "depth": 9.5,
+        "actionability": 9.0,
+        "reasoning": 9.5,
+        "usefulness": 9.5,
+        "overall": 9.2
+      },
+      "standalone_openai": {
+        "clarity": 7.0,
+        "depth": 5.0,
+        "actionability": 4.0,
+        "reasoning": 5.5,
+        "usefulness": 5.0,
+        "overall": 5.3
+      },
+      "standalone_google": {
+        "clarity": 8.0,
+        "depth": 7.0,
+        "actionability": 5.5,
+        "reasoning": 7.0,
+        "usefulness": 6.5,
+        "overall": 6.8
+      }
+    },
+    "judge_agreement_rate": 0.0
+  }
+}

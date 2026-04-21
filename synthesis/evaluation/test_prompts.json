@@ -1,0 +1,122 @@
+[
+  {
+    "id": "P01",
+    "title": "Contradictory Strategy Resolution",
+    "category": "decision_strategy",
+    "prompt": "I'm launching a B2B SaaS for project management. Some advisors say I should go freemium to build user base, others say premium-only to establish value. I have $50K runway and 6 months. My target is 10-person construction companies. What should I do and why? Address both sides honestly before recommending.",
+    "tests": "Ability to hold contradictory viewpoints, weigh trade-offs, and reach a reasoned conclusion rather than defaulting to one side",
+    "why_good": "Single models tend to pick one side quickly. Multi-model synthesis should surface genuine arguments from both perspectives and produce a more balanced recommendation."
+  },
+  {
+    "id": "P02",
+    "title": "Competitive Landscape Deep Dive",
+    "category": "competitor_market_research",
+    "prompt": "Analyze the competitive landscape for AI-powered customer support tools in 2026. Compare at least 5 major players including Intercom, Zendesk AI, Freshdesk, Ada, and Tidio. For each: positioning, pricing model, AI capabilities, weaknesses. Then identify the biggest gap in the market that a new entrant could exploit.",
+    "tests": "Breadth of knowledge across multiple companies, ability to synthesize competitive data into actionable gaps",
+    "why_good": "Different models have different training data about competitors. Combining perspectives should yield more complete coverage than any single model."
+  },
+  {
+    "id": "P03",
+    "title": "Multi-Variable Decision Matrix",
+    "category": "comparison_evaluation",
+    "prompt": "I need to choose between 4 tech stacks for a real-time collaboration app: (A) Next.js + Supabase + Liveblocks, (B) Remix + Firebase + Yjs, (C) SvelteKit + PocketBase + PartyKit, (D) Nuxt + Appwrite + Socket.io. Evaluate each on: developer experience, real-time performance, scalability to 100K users, cost at scale, ecosystem maturity, and hiring difficulty. Produce a clear recommendation with reasoning.",
+    "tests": "Structured comparison across many dimensions, avoiding oversimplification, producing a defensible recommendation",
+    "why_good": "Single models often have biases toward popular stacks. Multiple models should surface less-known but valid options and balance the analysis."
+  },
+  {
+    "id": "P04",
+    "title": "Business Model Validation",
+    "category": "business_ideas_validation",
+    "prompt": "Evaluate this business idea: An AI-powered service that monitors all public government contract postings across US federal, state, and local levels, then matches small businesses with relevant opportunities and auto-generates proposal drafts. Is this viable? What are the 3 biggest risks? What would a realistic first-year revenue look like if executed well? Be specific, not generic.",
+    "tests": "Depth of reasoning about market size, regulatory complexity, and realistic projections rather than surface-level encouragement",
+    "why_good": "Single models tend toward optimistic validation. Multi-model synthesis should produce more critical analysis by surfacing risks that individual models might downplay."
+  },
+  {
+    "id": "P05",
+    "title": "Go-To-Market Strategy Under Constraints",
+    "category": "marketing_growth",
+    "prompt": "Design a go-to-market strategy for a multi-AI answer engine (similar to my app) with zero marketing budget. The product compares outputs from 5+ AI models and synthesizes one answer. Target audience: consultants, researchers, and knowledge workers. Constraints: no paid ads, no sales team, founder is technical not marketing-savvy. Produce a 90-day plan with specific weekly actions, not vague advice.",
+    "tests": "Specificity of actionable steps, understanding of zero-budget constraints, creativity in distribution tactics",
+    "why_good": "Generic advice is easy. Specific weekly actions under real constraints require deeper reasoning. Multiple perspectives should yield more creative tactics."
+  },
+  {
+    "id": "P06",
+    "title": "Technical Architecture Decision",
+    "category": "ai_systems_automation",
+    "prompt": "Design the architecture for a system that processes 10,000 customer support tickets per day using AI. Requirements: auto-categorize tickets, route to correct team, draft responses for human review, escalate urgent issues, maintain conversation context across ticket updates, and produce daily analytics. The company uses AWS and has a PostgreSQL database. Budget: $2,000/month for AI API costs. Provide a detailed architecture including specific services, models, cost estimates, and failure handling.",
+    "tests": "Technical depth, realistic cost estimation, practical architecture choices, failure handling consideration",
+    "why_good": "Different models have different technical strengths. One model might be better at AWS architecture, another at cost estimation. Synthesis should be more complete."
+  },
+  {
+    "id": "P07",
+    "title": "Pricing Strategy with Anchoring",
+    "category": "product_offer_design",
+    "prompt": "Design a 3-tier pricing strategy for a multi-AI research tool. The tool runs user prompts through 5 AI models and synthesizes answers. Current cost per query is approximately $0.15-0.40 depending on mode. Target customers: freelance consultants ($50-150K income), small agencies (5-20 people), and enterprise research teams. Include: tier names, pricing, feature differentiation, anchoring psychology, annual vs monthly incentives, and a free trial strategy. Explain the psychology behind each pricing decision.",
+    "tests": "Pricing psychology knowledge, realistic cost-based reasoning, understanding of B2B vs B2C dynamics",
+    "why_good": "Pricing is inherently multi-perspective. Different models will suggest different structures. Synthesis should produce a more robust strategy than any single view."
+  },
+  {
+    "id": "P08",
+    "title": "Risk Analysis with Mitigations",
+    "category": "deep_research",
+    "prompt": "I'm building an AI startup that depends on API access to OpenAI, Anthropic, and Google models. Identify the top 10 business risks I face in the next 24 months, ranked by severity. For each risk: describe the scenario, estimate probability (low/medium/high), estimate impact (low/medium/high), and provide a specific mitigation strategy. Do not be generic — these should be risks specific to an AI API-dependent business in 2026.",
+    "tests": "Specificity and realism of risk identification, quality of mitigations, avoidance of generic/obvious risks",
+    "why_good": "Different models will identify different risks based on their training perspectives. Multi-model synthesis should produce a more comprehensive risk register."
+  },
+  {
+    "id": "P09",
+    "title": "Content Strategy with SEO Focus",
+    "category": "funnel_conversion",
+    "prompt": "Create a content strategy for a multi-AI answer engine. Goal: rank on Google for high-intent queries that potential users search before buying an AI tool. Produce: 15 specific article titles with target keywords, estimated search volume tier (high/medium/low), content type (comparison, guide, tutorial, case study), and a brief outline for each. Focus on topics where showing multi-model comparison adds unique value. Also explain the internal linking strategy between these pages.",
+    "tests": "SEO knowledge, specificity of keyword targeting, understanding of content-market fit, internal linking strategy",
+    "why_good": "Content strategy requires broad knowledge of search behavior, competitive content, and user intent. Multiple perspectives should identify more diverse content angles."
+  },
+  {
+    "id": "P10",
+    "title": "Year-Ahead Market Forecast",
+    "category": "deep_research",
+    "prompt": "Forecast the AI tools market for the next 12 months (April 2026 to April 2027). Cover: which AI model providers will gain or lose market share, what new capabilities will emerge, how pricing will evolve, which application categories will grow fastest, and what regulatory changes will impact the market. Separate clearly between: confirmed trends, likely developments, and speculative predictions. Be specific with names, numbers, and timelines where possible.",
+    "tests": "Ability to distinguish confirmed vs speculative, awareness of current market state, specificity of predictions, temporal reasoning",
+    "why_good": "Market forecasting benefits enormously from multiple perspectives. Each model has different knowledge cutoffs and biases. Synthesis should produce a more balanced and comprehensive forecast."
+  },
+  {
+    "id": "P11",
+    "title": "Impossible Trade-Off Prioritization",
+    "category": "decision_strategy",
+    "prompt": "You are advising a 12-person SaaS startup with $200K ARR and 8 months of runway. The CEO must choose exactly ONE priority for the next quarter — they cannot do more than one. Options: (A) Double down on sales to extend runway — current pipeline is weak. (B) Rebuild the core product to fix technical debt that causes 15% weekly churn. (C) Pursue a partnership with a Fortune 500 company that would take 3 months of engineering but could 10x revenue. (D) Cut team to 6 people and extend runway to 16 months. Analyze each option with brutally honest pros, cons, probability of success, and second-order consequences. Then make ONE recommendation and defend it against the strongest counterargument.",
+    "tests": "Forced prioritization under constraints, intellectual honesty about downsides, second-order thinking, defending a position against counterarguments",
+    "why_good": "Single models often hedge or refuse to commit. Multi-model synthesis forces diverse perspectives into a single defensible recommendation — exactly what an orchestrator should excel at."
+  },
+  {
+    "id": "P12",
+    "title": "Blind Spot Detection in a Real Business",
+    "category": "competitor_market_research",
+    "prompt": "Notion has become the dominant productivity tool for startups and knowledge workers. But every dominant product has blind spots that create opportunities. Identify 5 specific blind spots in Notion's product, business model, or go-to-market strategy that a well-funded competitor could exploit. For each blind spot: explain why Notion hasn't addressed it (structural reason, not laziness), who would be the ideal customer segment to target, and what the first product you'd build to exploit it would look like. Do not suggest generic improvements — only exploitable weaknesses.",
+    "tests": "Specificity of competitive insight, understanding of structural vs superficial weaknesses, creative strategic thinking",
+    "why_good": "Identifying genuine blind spots (not obvious complaints) requires deep understanding from multiple angles. Different models will surface different structural weaknesses."
+  },
+  {
+    "id": "P13",
+    "title": "Crisis Execution Plan with Dependencies",
+    "category": "marketing_growth",
+    "prompt": "Your e-commerce company just lost its primary payment processor (Stripe suspended you for 'high risk' — you sell supplements). You have 72 hours before checkout stops working. You have $15K in the bank, 2 developers, 1 marketing person, and 500 orders per day at $80 AOV. Create a minute-by-minute 72-hour crisis plan covering: immediate payment alternatives, customer communication strategy, legal response to Stripe, technical migration steps with dependencies (what blocks what), and a 30-day stabilization plan. Be specific about which payment processors accept supplement businesses and their onboarding timelines.",
+    "tests": "Execution under extreme time pressure, dependency mapping, domain-specific knowledge (payment processors for high-risk), parallel workstream coordination",
+    "why_good": "Crisis planning requires simultaneous expertise in payments, legal, engineering, and customer communication. No single model covers all domains equally well."
+  },
+  {
+    "id": "P14",
+    "title": "Cascade Failure Scenario Analysis",
+    "category": "deep_research",
+    "prompt": "Model a realistic cascade failure scenario for an AI-first company. Starting event: OpenAI raises API prices by 3x overnight (this has precedent). Trace the cascade through: immediate cost impact, customer pricing decisions, competitor responses, team morale, investor confidence, product roadmap changes, and strategic pivots. For each stage of the cascade, identify: the decision point, the 2-3 most likely outcomes, and which outcome you'd bet on with reasoning. End with a 'pre-mortem' — what this company should have done 6 months ago to be resilient to this scenario.",
+    "tests": "Systems thinking, cascade/second-order reasoning, realistic probability estimation, pre-mortem analysis",
+    "why_good": "Cascade analysis requires tracing consequences through multiple domains simultaneously. Different models will identify different cascade paths, producing a more complete failure map when synthesized."
+  },
+  {
+    "id": "P15",
+    "title": "Contradictory Data Reconciliation",
+    "category": "comparison_evaluation",
+    "prompt": "You've received these contradictory data points about the AI coding assistant market: (1) GitHub says Copilot has 1.8M paid subscribers and 77% retention. (2) A Stack Overflow survey shows 62% of developers tried AI coding tools but only 29% use them regularly. (3) Cursor reports 100K paid users and claims developers using their tool are '2x more productive'. (4) A Gartner report says enterprise AI coding adoption is only 14% as of Q1 2026. (5) YC says 40% of their latest batch was 'built entirely with AI coding tools'. Reconcile these seemingly contradictory data points into a coherent narrative. Where are the real numbers vs marketing claims? What does the actual market look like? What should a startup building AI dev tools conclude from this data?",
+    "tests": "Critical thinking about contradictory evidence, distinguishing signal from noise, recognizing selection bias and methodology differences, producing actionable conclusions from messy data",
+    "why_good": "Reconciling contradictory data is the hardest reasoning task. Single models tend to either accept all data uncritically or dismiss inconvenient points. Multi-model synthesis should produce more nuanced reconciliation."
+  }
+]

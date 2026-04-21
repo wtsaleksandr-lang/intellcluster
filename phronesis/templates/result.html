@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ result.winner }} — Decision Analysis{% endblock %}
+{% block meta_desc %}AI analysis: {{ result.question[:120] }}. Winner: {{ result.winner }}.{% endblock %}
+{% block og_title %}{{ result.winner }} — Best choice: {{ result.question[:80] }}{% endblock %}
+{% block og_desc %}Ranked {{ result.ranked_options|length }} options with {{ result.judge_count }} independent analysts.{% endblock %}
+
+{% block content %}
+{% set cM = {'high':{'cls':'bdg-green','dot':'var(--green)'},'moderate':{'cls':'bdg-accent','dot':'var(--accent)'},'low':{'cls':'bdg-red','dot':'var(--red)'}} %}
+{% set cf = cM.get(result.confidence_level, cM.moderate) %}
+
+<div style="max-width:760px;margin:0 auto;padding:40px 20px;">
+
+  <div class="fig-label rv">FIG <span>0</span> — DECISION ANALYSIS</div>
+  <h1 class="t-display rv rv1" style="font-size:22px;font-weight:500;color:var(--text);margin-bottom:36px;line-height:1.4;">{{ result.question }}</h1>
+
+  <!-- Recommendation -->
+  <div class="rv rv2">
+    <div class="fig-label">FIG <span>1</span> — RECOMMENDATION</div>
+    <div class="panel accent-bar" style="padding:24px 24px 24px 20px;margin-bottom:48px;">
+      <div style="font-size:12px;color:var(--accent);font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Best option</div>
+      <h2 class="t-display" style="font-size:28px;font-weight:600;color:var(--text);">{{ result.winner }}</h2>
+      {% if result.get('why_winner_won') %}
+      <p style="color:var(--text-muted);margin-top:10px;font-size:14px;line-height:1.65;">{{ result.why_winner_won }}</p>
+      {% endif %}
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+        <span class="bdg {{ cf.cls }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ cf.dot }};"></span>{{ result.confidence_score }}% confidence</span>
+        <span class="bdg bdg-muted">{{ 'Unanimous' if result.judges_agree else 'Split' }} &middot; {{ result.judge_count }} analysts</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ranked options -->
+  <div class="rv rv3">
+    <div class="fig-label">FIG <span>2</span> — RANKED OPTIONS</div>
+    <div style="margin-bottom:48px;">
+      {% for opt in result.ranked_options %}
+      {% set is_w = opt.rank == 1 %}
+      {% set pct = (opt.score * 10)|round|int %}
+      <div class="panel{{ ' accent-bar' if is_w else '' }}" style="margin-bottom:8px;{{ 'padding-left:20px;' if is_w else '' }}">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span class="t-mono" style="font-size:14px;{{ 'color:var(--accent);font-weight:600;' if is_w else 'color:var(--text-dim);' }};width:24px;">{{ '%02d'|format(opt.rank) }}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:15px;font-weight:600;color:var(--text);">{{ opt.option }}</div>
+            <div class="score-bar" style="margin-top:8px;"><div class="score-fill" style="width:{{ pct }}%;background:{{ 'var(--accent)' if is_w else 'rgba(255,255,255,0.12)' }};"></div></div>
+          </div>
+          <span class="t-mono" style="font-size:14px;{{ 'color:var(--accent);' if is_w else 'color:var(--text-muted);' }};font-weight:500;">{{ '%.1f'|format(opt.score) }}</span>
+        </div>
+        {% if opt.strengths or opt.weaknesses %}
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+          {% for s in opt.strengths %}<div style="display:flex;align-items:baseline;gap:8px;padding:2px 0;"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:6px;"></span><span style="font-size:12px;color:var(--text-muted);line-height:1.5;">{{ s }}</span></div>{% endfor %}
+          {% for w in opt.weaknesses %}<div style="display:flex;align-items:baseline;gap:8px;padding:2px 0;"><span style="width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:6px;"></span><span style="font-size:12px;color:var(--text-muted);line-height:1.5;">{{ w }}</span></div>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;">
+    <a href="/" style="display:inline-block;padding:10px 28px;background:var(--accent);color:#fff;font-weight:600;border-radius:8px;font-size:13px;text-decoration:none;">Make your own decision</a>
+    <p class="t-mono" style="font-size:9px;color:var(--text-dim);margin-top:12px;letter-spacing:0.5px;">{{ result.run_id }} &middot; {{ result.judge_count }} ANALYSTS</p>
+  </div>
+
+</div>
+{% endblock %}
