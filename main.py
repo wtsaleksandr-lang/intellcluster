@@ -91,6 +91,7 @@ async def sitemap():
         ("/phronesis", "0.9", "weekly"),
         ("/synthesis", "0.9", "weekly"),
         ("/pricing", "0.7", "monthly"),
+        ("/templates", "0.8", "weekly"),
         ("/compare", "0.8", "weekly"),
         ("/privacy", "0.3", "yearly"),
         ("/terms", "0.3", "yearly"),
@@ -176,6 +177,40 @@ async def stripe_webhook(request: Request):
     return {"received": True}
 
 
+@app.get("/og/compare/{slug}.svg", include_in_schema=False)
+async def og_compare(slug: str):
+    """Per-compare-page OG image (1200x630 SVG)."""
+    from fastapi.responses import Response
+    from shared.og import compare_og_svg, homepage_og_svg
+    from shared.seo_pages import get_compare_page
+
+    page = get_compare_page(slug)
+    if not page:
+        svg = homepage_og_svg()
+    else:
+        svg = compare_og_svg(
+            title=page.get("title", ""),
+            options=page.get("options", []),
+            category=page.get("category", ""),
+        )
+    return Response(
+        content=svg,
+        media_type="image/svg+xml",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+@app.get("/og/homepage.svg", include_in_schema=False)
+async def og_homepage():
+    from fastapi.responses import Response
+    from shared.og import homepage_og_svg
+    return Response(
+        content=homepage_og_svg(),
+        media_type="image/svg+xml",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
 @app.get("/compare", response_class=HTMLResponse)
 async def compare_index(request: Request):
     from shared.seo_pages import load_compare_pages, page_slug
@@ -201,6 +236,34 @@ async def compare_preset(slug: str):
     if not page:
         return JSONResponse(status_code=404, content={"error": "Preset not found"})
     return {"question": page.get("question"), "options": page.get("options", []), "criteria": page.get("criteria", [])}
+
+
+@app.get("/templates", response_class=HTMLResponse)
+async def templates_index(request: Request):
+    """Decision templates library — pre-filled starter frameworks."""
+    from shared.templates_library import templates_by_category
+    return templates.TemplateResponse(request, "templates_index.html", {
+        "by_category": templates_by_category(),
+    })
+
+
+@app.get("/api/template/{slug}")
+async def template_lookup(slug: str):
+    from shared.templates_library import get_template
+    t = get_template(slug)
+    if not t:
+        return JSONResponse(status_code=404, content={"error": "Template not found"})
+    return {
+        "question": t.get("description", t.get("title", "")),
+        "options": t.get("options", []),
+        "criteria": t.get("criteria", []),
+    }
+
+
+@app.get("/history", response_class=HTMLResponse)
+async def history_page(request: Request):
+    """User-facing history — reads from localStorage, no server-side user data."""
+    return templates.TemplateResponse(request, "history.html")
 
 
 @app.get("/privacy", response_class=HTMLResponse)
@@ -492,6 +555,7 @@ class SynthesisRequest(BaseModel):
     prompt: str = Field(min_length=10, max_length=8000)
     category: str = Field(default="deep_research")
     mode: str = Field(default="standard", pattern="^(standard|expert)$")
+    quick_mode: bool = False
 
 
 @app.get("/synthesis", response_class=HTMLResponse)
@@ -524,13 +588,13 @@ async def synthesis_run(req_body: SynthesisRequest, req: Request):
         admin_overrides = {"force_tier": "standard", "force_web_search": False}
 
     return StreamingResponse(
-        _stream_synthesis(run_id, req_body.prompt, req_body.category, req_body.mode, models, admin_overrides),
+        _stream_synthesis(run_id, req_body.prompt, req_body.category, req_body.mode, models, admin_overrides, req_body.quick_mode),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
     )
 
 
-async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, models: list, admin_overrides: dict):
+async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, models: list, admin_overrides: dict, quick_mode: bool = False):
     from shared.tracking.synthesis_history import save_synthesis_run
 
     queue = asyncio.Queue()
@@ -550,7 +614,7 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
             queue=queue,
             model_tasks=model_tasks,
             mode=mode,
-            quick_mode=False,
+            quick_mode=quick_mode,
             admin_overrides=admin_overrides,
         )
     )

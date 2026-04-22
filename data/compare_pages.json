@@ -104,5 +104,437 @@
       "Mach-E balances SUV practicality with EV performance, strongest on familiar UX.",
       "Ioniq 5 has the best-in-class fast charging and the most distinctive design."
     ]
+  },
+  {
+    "category": "AI coding tools",
+    "title": "GitHub Copilot vs Cursor vs Windsurf — Best AI Coding Assistant 2026",
+    "intro": "The three leading AI coding tools have converged on similar features but differ sharply on workflow. Copilot is the IDE-embedded veteran, Cursor is the forked-VSCode power tool, Windsurf is the agent-first newcomer.",
+    "question": "Which AI coding assistant should a senior engineer adopt full-time?",
+    "options": ["GitHub Copilot", "Cursor", "Windsurf"],
+    "criteria": [
+      {"name": "Code completion quality", "weight": 9},
+      {"name": "Agentic workflow", "weight": 8},
+      {"name": "Price", "weight": 6},
+      {"name": "IDE integration", "weight": 7}
+    ],
+    "summary_points": [
+      "Copilot is the safe enterprise choice with the deepest IDE integration.",
+      "Cursor wins for developers who want full-context multi-file edits and strong diff review.",
+      "Windsurf is the most agentic — best for building features with minimal hand-holding."
+    ]
+  },
+  {
+    "category": "AI models",
+    "title": "GPT-5 vs Claude Opus 4.6 vs Gemini 2.5 Pro — Which Frontier LLM in 2026?",
+    "intro": "The three frontier models each lead on different axes. Your choice depends on whether you optimize for raw reasoning, long-context writing, or multimodal + cost.",
+    "question": "Which frontier LLM for a production AI feature?",
+    "options": ["GPT-5", "Claude Opus 4.6", "Gemini 2.5 Pro"],
+    "criteria": [
+      {"name": "Reasoning quality", "weight": 10},
+      {"name": "Cost per token", "weight": 7},
+      {"name": "Context window", "weight": 6},
+      {"name": "Tool use & agentic", "weight": 8}
+    ],
+    "summary_points": [
+      "GPT-5 leads on raw reasoning and tool use, but is most expensive per token.",
+      "Claude Opus 4.6 wins on long-form writing and large context coherence.",
+      "Gemini 2.5 Pro is the best cost/multimodal balance, especially for vision + long video."
+    ]
+  },
+  {
+    "category": "Productivity",
+    "title": "Notion vs Obsidian vs Roam Research — Best Knowledge Management Tool",
+    "intro": "Three tools that built cult followings by solving knowledge management very differently. Notion is blocks + databases, Obsidian is markdown + local, Roam is outline + backlinks.",
+    "question": "Which knowledge management tool for a solo knowledge worker in 2026?",
+    "options": ["Notion", "Obsidian", "Roam Research"],
+    "criteria": [
+      {"name": "Local-first / data ownership", "weight": 8},
+      {"name": "Collaboration", "weight": 6},
+      {"name": "Graph / backlinks", "weight": 7},
+      {"name": "Ease of use", "weight": 8}
+    ],
+    "summary_points": [
+      "Notion wins for teams that need shared docs + lightweight databases.",
+      "Obsidian is the clear winner for data ownership, offline, and extensibility via plugins.",
+      "Roam pioneered backlinks but has lost ground to Obsidian + Logseq on price and reliability."
+    ]
+  },
+  {
+    "category": "Code editors",
+    "title": "VS Code vs JetBrains vs Zed — Which Editor for Professional Developers",
+    "intro": "The editor war has three serious contenders in 2026. Each has a distinct philosophy: extensible, batteries-included, or ground-up-fast.",
+    "question": "Which code editor for a full-time software engineer?",
+    "options": ["VS Code", "JetBrains (IntelliJ/WebStorm)", "Zed"],
+    "criteria": [
+      {"name": "Performance & speed", "weight": 8},
+      {"name": "Language intelligence", "weight": 9},
+      {"name": "Ecosystem / extensions", "weight": 7},
+      {"name": "Price", "weight": 5}
+    ],
+    "summary_points": [
+      "VS Code has the biggest extension ecosystem and free AI integrations.",
+      "JetBrains still leads on deep language intelligence (refactoring, inspections) for Java/Kotlin/Python.",
+      "Zed is the fastest and ships with great collaborative editing, but thinner ecosystem."
+    ]
+  },
+  {
+    "category": "Cloud providers",
+    "title": "AWS vs Google Cloud vs Azure — Choosing a Cloud for a Production SaaS",
+    "intro": "The three hyperscalers compete on overlapping services but diverge on pricing, regions, and which workloads they handle best. Most companies choose based on pre-existing enterprise relationships — but technical fit still matters.",
+    "question": "Which cloud provider for a growing SaaS with 10-100k users?",
+    "options": ["AWS", "Google Cloud", "Azure"],
+    "criteria": [
+      {"name": "Cost & discounts", "weight": 8},
+      {"name": "Reliability / SLA", "weight": 9},
+      {"name": "Developer experience", "weight": 7},
+      {"name": "ML / data services", "weight": 7}
+    ],
+    "summary_points": [
+      "AWS has the broadest service catalog and the best third-party integration support.",
+      "GCP has the best-in-class data/ML stack (BigQuery, Vertex AI) but narrower geography.",
+      "Azure wins for Microsoft-aligned enterprises (SSO, Office, SQL Server)."
+    ]
+  },
+  {
+    "category": "Analytics",
+    "title": "Google Analytics 4 vs Plausible vs PostHog",
+    "intro": "Three very different answers to 'how should a 2026 SaaS measure usage.' Free vs privacy-first paid vs product-analytics-first.",
+    "question": "Which analytics tool for a privacy-conscious SaaS in 2026?",
+    "options": ["Google Analytics 4", "Plausible", "PostHog"],
+    "criteria": [
+      {"name": "Privacy & cookie compliance", "weight": 9},
+      {"name": "Ease of setup", "weight": 7},
+      {"name": "Depth of product analytics", "weight": 6},
+      {"name": "Price", "weight": 7}
+    ],
+    "summary_points": [
+      "Plausible wins for simple marketing sites that need privacy-first compliance by default.",
+      "PostHog wins for product teams — funnels, session replay, feature flags in one tool.",
+      "GA4 is still powerful but heavy, privacy-fragile, and complex for casual users."
+    ]
+  },
+  {
+    "category": "Email marketing",
+    "title": "Mailchimp vs ConvertKit vs Beehiiv — Best Email Platform for Creators",
+    "intro": "Email is far from dead. Three platforms dominate 2026 — one legacy, one creator-focused, one newsletter-native.",
+    "question": "Which email platform for a creator growing from 1k to 50k subscribers?",
+    "options": ["Mailchimp", "ConvertKit", "Beehiiv"],
+    "criteria": [
+      {"name": "Deliverability", "weight": 9},
+      {"name": "Automation / sequences", "weight": 8},
+      {"name": "Price at scale", "weight": 7},
+      {"name": "Monetization (ads, paid subs)", "weight": 6}
+    ],
+    "summary_points": [
+      "Beehiiv wins for newsletter monetization (ads network, paid subs, referrals built-in).",
+      "ConvertKit is the best for creators running sequences and digital product sales.",
+      "Mailchimp is the legacy default but weakest for modern creator workflows."
+    ]
+  },
+  {
+    "category": "Payment processors",
+    "title": "Stripe vs Paddle vs LemonSqueezy — Best Payment Processor for SaaS",
+    "intro": "Stripe dominates, but merchant-of-record competitors have grown fast by removing sales tax headaches. Choice depends on whether you sell globally and whether you want to handle tax yourself.",
+    "question": "Best payment processor for a global SaaS in 2026?",
+    "options": ["Stripe", "Paddle", "LemonSqueezy"],
+    "criteria": [
+      {"name": "Fee structure", "weight": 8},
+      {"name": "Tax / MoR handling", "weight": 9},
+      {"name": "Developer experience", "weight": 7},
+      {"name": "Geographic coverage", "weight": 6}
+    ],
+    "summary_points": [
+      "Stripe has the best developer experience and lowest fees, but you handle global tax.",
+      "Paddle / LemonSqueezy are merchant-of-record: they handle tax, but take a higher cut.",
+      "For solo founders selling globally, MoR saves 10+ hours/month and is worth the fee."
+    ]
+  },
+  {
+    "category": "Frameworks",
+    "title": "Next.js vs Remix vs Astro — Best Web Framework for a Marketing Site",
+    "intro": "Three modern frameworks, three different sweet spots. Next.js dominates, but Remix and Astro have carved out loyal niches.",
+    "question": "Which web framework for a marketing site + blog + lightweight dashboard?",
+    "options": ["Next.js", "Remix", "Astro"],
+    "criteria": [
+      {"name": "Page performance / Core Web Vitals", "weight": 8},
+      {"name": "Developer experience", "weight": 7},
+      {"name": "Deployment flexibility", "weight": 7},
+      {"name": "Ecosystem / libraries", "weight": 6}
+    ],
+    "summary_points": [
+      "Astro wins for content-heavy sites — zero-JS by default, blazing Core Web Vitals.",
+      "Next.js is the safe choice with the biggest ecosystem and Vercel-first deploys.",
+      "Remix shines on progressive-enhancement apps where forms + data loading matter most."
+    ]
+  },
+  {
+    "category": "Databases",
+    "title": "PostgreSQL vs MongoDB vs SQLite — Which Database for a New Project",
+    "intro": "The three most common starting points for a new project. Each has a clear sweet spot — and a clear failure mode.",
+    "question": "Which database for a new SaaS product?",
+    "options": ["PostgreSQL", "MongoDB", "SQLite"],
+    "criteria": [
+      {"name": "Query flexibility (SQL/analytics)", "weight": 9},
+      {"name": "Operational simplicity", "weight": 8},
+      {"name": "Schema evolution", "weight": 7},
+      {"name": "Ecosystem / tooling", "weight": 7}
+    ],
+    "summary_points": [
+      "PostgreSQL is the default — SQL, JSON support, best tooling, scales far.",
+      "SQLite is underrated for single-server apps; simplest possible ops, excellent perf.",
+      "MongoDB fits event/log-shaped data but most 'I need schemaless' use cases are better on Postgres JSONB."
+    ]
+  },
+  {
+    "category": "Project management",
+    "title": "Linear vs Jira vs Asana — Best Project Tracker for a Product Team",
+    "intro": "Linear redefined what fast looks like; Jira still anchors enterprise; Asana focuses on cross-functional teams. Your team's workflow decides.",
+    "question": "Which project tracker for a product + engineering team of 15?",
+    "options": ["Linear", "Jira", "Asana"],
+    "criteria": [
+      {"name": "Speed & UX", "weight": 9},
+      {"name": "Engineering workflow fit", "weight": 8},
+      {"name": "Cross-functional collaboration", "weight": 6},
+      {"name": "Price per seat", "weight": 5}
+    ],
+    "summary_points": [
+      "Linear is the fastest and most loved by engineers — narrow but deep.",
+      "Jira wins for large orgs with compliance/audit and cross-project hierarchies.",
+      "Asana is best for teams where non-engineers drive work (marketing, ops)."
+    ]
+  },
+  {
+    "category": "Smartphones",
+    "title": "iPhone 16 Pro vs Pixel 9 Pro vs Galaxy S25 Ultra",
+    "intro": "The 2026 flagship smartphone decision. Three ecosystems, three camera philosophies, three very different AI stories.",
+    "question": "Best flagship smartphone for a mobile power user?",
+    "options": ["iPhone 16 Pro", "Pixel 9 Pro", "Galaxy S25 Ultra"],
+    "criteria": [
+      {"name": "Camera system", "weight": 9},
+      {"name": "Ecosystem lock-in / openness", "weight": 6},
+      {"name": "AI / on-device ML", "weight": 8},
+      {"name": "Battery life", "weight": 7}
+    ],
+    "summary_points": [
+      "iPhone 16 Pro wins on ecosystem polish and video, strongest for creators in iOS.",
+      "Pixel 9 Pro leads on computational photography and Gemini Nano on-device AI.",
+      "Galaxy S25 Ultra has the best pure hardware (zoom, battery, S Pen) but software still feels heavier."
+    ]
+  },
+  {
+    "category": "Headphones",
+    "title": "Sony WH-1000XM6 vs Bose QC Ultra vs AirPods Max",
+    "intro": "The three best premium noise-cancelling headphones in 2026. Each optimizes for something different: ANC power, sound quality, or ecosystem.",
+    "question": "Best premium noise-cancelling headphones for daily commuting?",
+    "options": ["Sony WH-1000XM6", "Bose QuietComfort Ultra", "AirPods Max (USB-C)"],
+    "criteria": [
+      {"name": "Noise cancellation", "weight": 9},
+      {"name": "Sound quality", "weight": 8},
+      {"name": "Comfort", "weight": 7},
+      {"name": "Price", "weight": 6}
+    ],
+    "summary_points": [
+      "Sony wins on features + app + codec support, still the enthusiast's pick.",
+      "Bose QC Ultra has the best raw ANC and most comfortable long-wear experience.",
+      "AirPods Max are unmatched only if you're all-in on Apple devices — pricey otherwise."
+    ]
+  },
+  {
+    "category": "Web browsers",
+    "title": "Chrome vs Arc vs Brave — Best Browser for Power Users",
+    "intro": "Chrome still dominates market share but Arc and Brave each attract a different kind of defector — design-obsessed or privacy-obsessed.",
+    "question": "Best browser for a privacy-conscious power user in 2026?",
+    "options": ["Google Chrome", "Arc", "Brave"],
+    "criteria": [
+      {"name": "Privacy & tracking protection", "weight": 9},
+      {"name": "Performance / memory use", "weight": 7},
+      {"name": "Tab / workspace management", "weight": 7},
+      {"name": "Extension ecosystem", "weight": 6}
+    ],
+    "summary_points": [
+      "Brave is the default for privacy + built-in ad blocking, Chromium-compatible.",
+      "Arc reimagines tabs with spaces + profiles — loved by designers, niche for engineers.",
+      "Chrome still leads on compatibility and web standards but weakest on privacy."
+    ]
+  },
+  {
+    "category": "Video conferencing",
+    "title": "Zoom vs Google Meet vs Microsoft Teams",
+    "intro": "Three tools, three different center-of-gravities. Zoom is the pure video specialist, Meet is calendar-first, Teams bundles everything with Office.",
+    "question": "Best video conferencing tool for a fully remote team of 30?",
+    "options": ["Zoom", "Google Meet", "Microsoft Teams"],
+    "criteria": [
+      {"name": "Call quality & reliability", "weight": 9},
+      {"name": "Integrations (calendar, chat)", "weight": 7},
+      {"name": "Price per seat", "weight": 7},
+      {"name": "External guest UX", "weight": 6}
+    ],
+    "summary_points": [
+      "Zoom has the most reliable quality and the smoothest external-guest experience.",
+      "Google Meet wins if your team lives in Google Workspace (Gmail, Calendar, Docs).",
+      "Teams wins for Microsoft-aligned orgs and bundles chat + docs at no extra cost."
+    ]
+  },
+  {
+    "category": "Smart homes",
+    "title": "Google Nest vs Amazon Alexa vs Apple HomeKit",
+    "intro": "Three smart home ecosystems, with Matter + Thread finally making cross-compatibility viable. The choice is more about voice assistant and privacy than device support.",
+    "question": "Best smart home ecosystem to commit to in 2026?",
+    "options": ["Google Nest / Home", "Amazon Alexa", "Apple HomeKit"],
+    "criteria": [
+      {"name": "Voice assistant smarts", "weight": 8},
+      {"name": "Device compatibility", "weight": 7},
+      {"name": "Privacy / data handling", "weight": 9},
+      {"name": "Ease of setup", "weight": 6}
+    ],
+    "summary_points": [
+      "HomeKit wins on privacy (local processing, end-to-end encryption) but slower on new devices.",
+      "Alexa has the broadest device support and the best speakers for most price points.",
+      "Google Nest leads on assistant smarts thanks to Gemini integration."
+    ]
+  },
+  {
+    "category": "Investments",
+    "title": "Index Funds vs Real Estate vs Individual Stocks — Best Long-Term Investment",
+    "intro": "Three classic wealth vehicles, three very different risk + time profiles. Your choice depends on horizon, involvement, and tax situation.",
+    "question": "Best long-term investment vehicle for a 35-year-old with $100k to deploy?",
+    "options": ["Index funds (S&P 500 / total market)", "Rental real estate", "Individual stocks"],
+    "criteria": [
+      {"name": "Expected return", "weight": 8},
+      {"name": "Time commitment", "weight": 7},
+      {"name": "Risk & volatility", "weight": 8},
+      {"name": "Tax efficiency", "weight": 6}
+    ],
+    "summary_points": [
+      "Index funds beat 90% of active strategies over 20-year horizons, with minimal time.",
+      "Real estate adds leverage + tax shields but demands management or a trusted operator.",
+      "Individual stock picking rarely outperforms indexes after taxes and time invested."
+    ]
+  },
+  {
+    "category": "Meeting notes",
+    "title": "Otter vs Fireflies vs Granola — Best AI Meeting Notes Tool",
+    "intro": "AI meeting note tools exploded in 2025. Three have separated from the pack, each with a different core bet.",
+    "question": "Best AI meeting notes tool for a founder in 20+ calls/week?",
+    "options": ["Otter", "Fireflies", "Granola"],
+    "criteria": [
+      {"name": "Transcript accuracy", "weight": 8},
+      {"name": "Summary quality", "weight": 9},
+      {"name": "Workflow integration", "weight": 7},
+      {"name": "Price", "weight": 6}
+    ],
+    "summary_points": [
+      "Granola wins for the 'personal notebook' workflow — blends your notes with AI summary.",
+      "Fireflies is the best for CRMs + structured outputs (deal tracking, action items).",
+      "Otter is the legacy leader with the best long-meeting reliability."
+    ]
+  },
+  {
+    "category": "Design tools",
+    "title": "Figma vs Sketch vs Adobe XD — Best Design Tool for Product Teams",
+    "intro": "Figma has dominated for years. But Sketch still has loyalists and Adobe XD remains if you're deep in Creative Cloud.",
+    "question": "Best design tool for a product design team of 5 in 2026?",
+    "options": ["Figma", "Sketch", "Adobe XD"],
+    "criteria": [
+      {"name": "Real-time collaboration", "weight": 10},
+      {"name": "Prototyping", "weight": 7},
+      {"name": "Design system support", "weight": 8},
+      {"name": "Price", "weight": 5}
+    ],
+    "summary_points": [
+      "Figma is the default — realtime collaboration, plugins, dev handoff all best-in-class.",
+      "Sketch still wins for Mac-only studios that want local files + lower cost.",
+      "Adobe XD has stagnated; only worth it if locked into Creative Cloud for other reasons."
+    ]
+  },
+  {
+    "category": "Task managers",
+    "title": "Todoist vs Things 3 vs TickTick",
+    "intro": "Three beloved personal task managers. Each has a distinct philosophy: cross-platform power, Mac beauty, or feature-rich all-in-one.",
+    "question": "Best personal task manager for a busy professional in 2026?",
+    "options": ["Todoist", "Things 3", "TickTick"],
+    "criteria": [
+      {"name": "Cross-platform support", "weight": 8},
+      {"name": "UI / delight", "weight": 8},
+      {"name": "Natural language input", "weight": 7},
+      {"name": "Price", "weight": 5}
+    ],
+    "summary_points": [
+      "Things 3 wins on UI + Mac/iOS beauty but Apple-only and no collaboration.",
+      "Todoist has the best cross-platform support and natural language parsing.",
+      "TickTick packs the most features (Pomodoro, calendar, habits) at the lowest price."
+    ]
+  },
+  {
+    "category": "Communication",
+    "title": "Slack vs Discord vs Microsoft Teams",
+    "intro": "Slack defined team chat; Discord has escaped gaming into communities; Teams bundles everything with Office.",
+    "question": "Best team communication tool for a 50-person company in 2026?",
+    "options": ["Slack", "Discord", "Microsoft Teams"],
+    "criteria": [
+      {"name": "Message threading / searchability", "weight": 8},
+      {"name": "Integrations (bots, apps)", "weight": 7},
+      {"name": "Audio / video quality", "weight": 6},
+      {"name": "Price per seat", "weight": 7}
+    ],
+    "summary_points": [
+      "Slack still has the best workflow integrations and search for professional teams.",
+      "Discord is the best free option and unbeaten for community-driven orgs.",
+      "Teams wins on price when already in Microsoft 365, but UX lags for most knowledge work."
+    ]
+  },
+  {
+    "category": "Business structure",
+    "title": "LLC vs S-Corp vs C-Corp — Best Business Structure for a US Founder",
+    "intro": "The three most common US business structures each have a very different tax + fundraising profile. Getting this right in year one saves real money.",
+    "question": "Best business structure for a solo founder planning to raise VC within 2 years?",
+    "options": ["LLC", "S-Corporation", "C-Corporation"],
+    "criteria": [
+      {"name": "Tax efficiency at early stage", "weight": 8},
+      {"name": "VC / investor compatibility", "weight": 9},
+      {"name": "Administrative burden", "weight": 6},
+      {"name": "Liability protection", "weight": 7}
+    ],
+    "summary_points": [
+      "C-Corp (Delaware) is required for nearly all US VC fundraising — form it day one.",
+      "LLC minimizes tax + admin for solo founders who won't raise outside capital.",
+      "S-Corp is the middle ground — good for small profitable businesses, unpopular with VCs."
+    ]
+  },
+  {
+    "category": "Ecommerce",
+    "title": "Shopify vs WooCommerce vs BigCommerce",
+    "intro": "Three ways to run an online store in 2026. Hosted simplicity, self-hosted flexibility, or enterprise-grade.",
+    "question": "Best ecommerce platform for a $500k/yr DTC brand?",
+    "options": ["Shopify", "WooCommerce", "BigCommerce"],
+    "criteria": [
+      {"name": "Ease of setup & ops", "weight": 8},
+      {"name": "App ecosystem", "weight": 7},
+      {"name": "Total cost (incl. fees)", "weight": 7},
+      {"name": "Customization depth", "weight": 6}
+    ],
+    "summary_points": [
+      "Shopify wins on ecosystem, conversion-optimized themes, and operational simplicity.",
+      "WooCommerce is the cheapest at scale but demands real WordPress/dev time to maintain.",
+      "BigCommerce is strongest for B2B + complex catalogs but thinner app ecosystem."
+    ]
+  },
+  {
+    "category": "Remote work",
+    "title": "Work From Home vs Hybrid vs Full Office",
+    "intro": "Three work models, three very different tradeoffs for culture, productivity, and cost. The right answer varies by team function and life stage.",
+    "question": "Best work model for a 25-person tech startup in 2026?",
+    "options": ["Fully remote (WFH)", "Hybrid (2-3 days in office)", "Full in-office"],
+    "criteria": [
+      {"name": "Individual productivity", "weight": 8},
+      {"name": "Team collaboration / culture", "weight": 8},
+      {"name": "Talent pool access", "weight": 7},
+      {"name": "Real estate / overhead cost", "weight": 6}
+    ],
+    "summary_points": [
+      "Fully remote opens the global talent pool and cuts overhead, but demands strong written culture.",
+      "Hybrid captures most of both benefits but requires careful coordination (anchor days).",
+      "Full in-office maximizes collaboration speed but shrinks hiring pool and adds cost."
+    ]
   }
 ]

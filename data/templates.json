@@ -1,0 +1,194 @@
+[
+  {
+    "slug": "choose-laptop",
+    "category": "Work & Tools",
+    "title": "Choose a laptop",
+    "description": "Which laptop should I buy for daily work and light travel?",
+    "options": ["MacBook Air M3", "ThinkPad X1 Carbon", "Framework 13"],
+    "criteria": [
+      {"name": "Performance", "weight": 8},
+      {"name": "Battery life", "weight": 8},
+      {"name": "Build quality", "weight": 7},
+      {"name": "Price", "weight": 7}
+    ]
+  },
+  {
+    "slug": "choose-crm",
+    "category": "SaaS",
+    "title": "Choose a CRM",
+    "description": "Which CRM should a 10-person sales team adopt in 2026?",
+    "options": ["HubSpot", "Salesforce", "Pipedrive"],
+    "criteria": [
+      {"name": "Ease of use", "weight": 9},
+      {"name": "Price", "weight": 8},
+      {"name": "Integrations", "weight": 6},
+      {"name": "Reporting", "weight": 5}
+    ]
+  },
+  {
+    "slug": "hiring-role",
+    "category": "Team",
+    "title": "Who to hire first",
+    "description": "For a 2-founder SaaS at $15k MRR, who should the first hire be?",
+    "options": ["Full-stack engineer", "Growth marketer", "Customer success manager"],
+    "criteria": [
+      {"name": "Impact on revenue in 6 months", "weight": 9},
+      {"name": "Founder time freed up", "weight": 7},
+      {"name": "Hiring difficulty", "weight": 6},
+      {"name": "Cost", "weight": 6}
+    ]
+  },
+  {
+    "slug": "buy-vs-rent",
+    "category": "Personal finance",
+    "title": "Buy vs rent (home)",
+    "description": "Should I buy a home now or keep renting for 2-3 more years?",
+    "options": ["Buy now with 20% down", "Rent and invest the down payment", "Wait 2-3 years, then decide"],
+    "criteria": [
+      {"name": "Expected 10-year return", "weight": 8},
+      {"name": "Monthly cash flow", "weight": 8},
+      {"name": "Flexibility / mobility", "weight": 7},
+      {"name": "Financial stress", "weight": 7}
+    ]
+  },
+  {
+    "slug": "pricing-model",
+    "category": "Business",
+    "title": "Pick a pricing model",
+    "description": "What pricing model works best for my new B2B SaaS?",
+    "options": ["Flat monthly subscription", "Usage-based pricing", "Freemium with paid tiers"],
+    "criteria": [
+      {"name": "Revenue predictability", "weight": 9},
+      {"name": "Customer acquisition speed", "weight": 7},
+      {"name": "Scalability", "weight": 8}
+    ]
+  },
+  {
+    "slug": "marketing-channel",
+    "category": "Growth",
+    "title": "Pick a marketing channel",
+    "description": "Which marketing channel should a bootstrapped SaaS pursue this quarter?",
+    "options": ["Content + SEO", "Paid ads", "Cold outreach"],
+    "criteria": [
+      {"name": "Cost efficiency", "weight": 9},
+      {"name": "Speed to results", "weight": 7},
+      {"name": "Long-term compounding", "weight": 7}
+    ]
+  },
+  {
+    "slug": "ai-coding-tool",
+    "category": "Developer tools",
+    "title": "Choose an AI coding assistant",
+    "description": "Which AI coding assistant for a full-time engineer?",
+    "options": ["GitHub Copilot", "Cursor", "Windsurf"],
+    "criteria": [
+      {"name": "Code completion quality", "weight": 9},
+      {"name": "Agentic workflow", "weight": 8},
+      {"name": "Price", "weight": 6},
+      {"name": "IDE integration", "weight": 7}
+    ]
+  },
+  {
+    "slug": "framework-for-marketing-site",
+    "category": "Developer tools",
+    "title": "Pick a web framework",
+    "description": "Which framework for a marketing site + blog + small dashboard?",
+    "options": ["Next.js", "Astro", "Remix"],
+    "criteria": [
+      {"name": "Core Web Vitals", "weight": 8},
+      {"name": "Developer experience", "weight": 7},
+      {"name": "Ecosystem", "weight": 7}
+    ]
+  },
+  {
+    "slug": "phone-upgrade",
+    "category": "Consumer",
+    "title": "Upgrade phone now or wait",
+    "description": "Should I upgrade my 3-year-old phone now or wait another year?",
+    "options": ["Upgrade to iPhone 16 Pro now", "Upgrade to Pixel 9 Pro now", "Wait one more year on my current phone"],
+    "criteria": [
+      {"name": "Camera improvement", "weight": 7},
+      {"name": "Battery health", "weight": 8},
+      {"name": "Cost", "weight": 7},
+      {"name": "New AI features", "weight": 6}
+    ]
+  },
+  {
+    "slug": "startup-vs-bigco",
+    "category": "Career",
+    "title": "Startup vs BigCo offer",
+    "description": "Should I take the startup offer or the BigCo offer?",
+    "options": ["Early-stage startup (equity upside, 20% pay cut)", "FAANG-tier BigCo (stable, 40% higher TC)", "Stay in current role and negotiate"],
+    "criteria": [
+      {"name": "Learning / growth", "weight": 9},
+      {"name": "Total comp 5-year expected", "weight": 8},
+      {"name": "Work-life balance", "weight": 7},
+      {"name": "Risk", "weight": 6}
+    ]
+  },
+  {
+    "slug": "invest-100k",
+    "category": "Personal finance",
+    "title": "Where to deploy $100k",
+    "description": "Best long-term home for a $100k windfall for a 35-year-old?",
+    "options": ["Index funds (S&P 500 / total market)", "Rental real estate", "Individual stocks"],
+    "criteria": [
+      {"name": "Expected 10-year return", "weight": 8},
+      {"name": "Time commitment", "weight": 7},
+      {"name": "Risk / volatility", "weight": 8},
+      {"name": "Tax efficiency", "weight": 6}
+    ]
+  },
+  {
+    "slug": "business-structure",
+    "category": "Business",
+    "title": "Pick a business structure",
+    "description": "Solo founder planning to raise VC — which US entity should I form?",
+    "options": ["LLC", "S-Corp", "Delaware C-Corp"],
+    "criteria": [
+      {"name": "VC / investor compatibility", "weight": 9},
+      {"name": "Tax efficiency early stage", "weight": 7},
+      {"name": "Admin burden", "weight": 6},
+      {"name": "Liability protection", "weight": 7}
+    ]
+  },
+  {
+    "slug": "ev-choice",
+    "category": "Consumer",
+    "title": "Choose an EV under $50k",
+    "description": "Best electric vehicle for daily commuting under $50k?",
+    "options": ["Tesla Model 3 Long Range", "Ford Mustang Mach-E", "Hyundai Ioniq 5"],
+    "criteria": [
+      {"name": "Range", "weight": 10},
+      {"name": "Value for money", "weight": 8},
+      {"name": "Charging network access", "weight": 7},
+      {"name": "Reliability", "weight": 7}
+    ]
+  },
+  {
+    "slug": "cloud-provider",
+    "category": "SaaS",
+    "title": "Pick a cloud provider",
+    "description": "Which cloud for a growing SaaS with 10-100k users?",
+    "options": ["AWS", "Google Cloud", "Azure"],
+    "criteria": [
+      {"name": "Total cost at our scale", "weight": 8},
+      {"name": "Reliability / SLA", "weight": 9},
+      {"name": "Developer experience", "weight": 7},
+      {"name": "Data / ML services", "weight": 7}
+    ]
+  },
+  {
+    "slug": "remote-policy",
+    "category": "Team",
+    "title": "Pick a work model",
+    "description": "Best work model for a 25-person tech startup?",
+    "options": ["Fully remote", "Hybrid (2-3 days in office)", "Full in-office"],
+    "criteria": [
+      {"name": "Productivity", "weight": 8},
+      {"name": "Team collaboration / culture", "weight": 8},
+      {"name": "Talent pool access", "weight": 7},
+      {"name": "Overhead cost", "weight": 6}
+    ]
+  }
+]

@@ -225,9 +225,10 @@ const CIRC=97.4;let extractedData=null,suggestTimer=null,attachedFiles=[];
     if(saved){inp.value=saved;sessionStorage.removeItem('intellcluster_handoff_prompt');inp.dispatchEvent(new Event('input'));return;}
   }
   const preset=params.get('preset');
-  if(preset){
-    // Load the compare page data via a simple JSON fetch
-    fetch('/api/compare-preset/'+encodeURIComponent(preset))
+  const template=params.get('template');
+  const hydrateUrl=preset?('/api/compare-preset/'+encodeURIComponent(preset)):(template?'/api/template/'+encodeURIComponent(template):null);
+  if(hydrateUrl){
+    fetch(hydrateUrl)
       .then(r=>r.ok?r.json():null)
       .then(d=>{if(!d)return;
         const q=d.question||'';
@@ -426,7 +427,17 @@ async function runPipeline(payload){
 }
 
 /* ═══ RENDER RESULTS ═══ */
+function recordLocalHistory(entry){
+  try{
+    const key='intellcluster_history_v1';
+    const list=JSON.parse(localStorage.getItem(key)||'[]');
+    list.unshift(entry);
+    while(list.length>100)list.pop();
+    localStorage.setItem(key,JSON.stringify(list));
+  }catch(e){}
+}
 function renderResults(d){
+  if(d&&d.run_id){recordLocalHistory({tool:'phronesis',run_id:d.run_id,title:d.question||'Decision',winner:d.winner||'',confidence:d.confidence_level||'',timestamp:new Date().toISOString()});}
   RS.style.display='block';RS.innerHTML='';
   const cM={high:{cls:'bdg-green',dot:'var(--green)'},moderate:{cls:'bdg-accent',dot:'var(--accent)'},low:{cls:'bdg-red',dot:'var(--red)'}};
   const cf=cM[d.confidence_level]||cM.moderate;

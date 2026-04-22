@@ -48,7 +48,7 @@
       placeholder="Ask a deep research question. Example: 'What's the most effective pricing strategy for a B2B SaaS targeting enterprise customers in 2026, considering recent AI-driven cost pressures?'"
       style="width:100%;background:transparent;border:none;padding:20px 20px 10px;font-size:15px;color:var(--text);font-family:inherit;resize:none;outline:none;line-height:1.6;min-height:110px;"></textarea>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border-subtle);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border-subtle);position:relative;">
       <div style="display:flex;align-items:center;gap:10px;">
         <select id="category" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;font-size:12px;font-family:inherit;outline:none;cursor:pointer;">
           <option value="deep_research">Deep Research</option>
@@ -59,12 +59,45 @@
           <option value="comparison_evaluation">Comparison</option>
           <option value="ai_systems_automation">AI Systems</option>
         </select>
-        <label style="display:flex;align-items:center;gap:6px;color:var(--text-muted);font-size:12px;cursor:pointer;">
-          <input type="checkbox" id="expertMode" style="accent-color:var(--accent);">
-          Expert mode
-        </label>
+        <button id="settingsBtn" type="button" title="Research settings" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:none;border-radius:6px;cursor:pointer;color:var(--text-dim);transition:color 0.15s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <span id="settingsSummary" class="t-mono hide-mobile" style="font-size:10px;color:var(--text-dim);letter-spacing:0.3px;">STANDARD &middot; BALANCED &middot; STANDARD</span>
       </div>
       <button id="goBtn" style="padding:8px 24px;background:var(--accent);color:#fff;font-weight:600;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;">Synthesize</button>
+    </div>
+
+    <!-- SETTINGS POPOVER -->
+    <div id="settingsPop" style="display:none;position:absolute;bottom:56px;left:8px;width:340px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;z-index:60;box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span style="font-size:13px;font-weight:600;color:var(--text);">Research Settings</span>
+        <button type="button" onclick="document.getElementById('settingsPop').style.display='none'" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;">&times;</button>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="fig-label" style="margin-bottom:8px;">DEPTH</div>
+        <div style="display:flex;gap:4px;">
+          <button type="button" class="depth-btn" data-v="quick" data-desc="Single-phase, fast. Good for simple questions. ~30s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Quick</button>
+          <button type="button" class="depth-btn" data-v="standard" data-desc="5 models, one research phase. ~60s." style="flex:1;padding:8px;font-size:11px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
+          <button type="button" class="depth-btn" data-v="expert" data-desc="5 stronger models, multi-phase research. ~120s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Expert</button>
+        </div>
+        <p id="depthDesc" style="margin-top:6px;font-size:11px;color:var(--text-dim);line-height:1.5;">5 models, one research phase. ~60s.</p>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="fig-label" style="margin-bottom:8px;">FOCUS</div>
+        <div style="display:flex;gap:4px;">
+          <button type="button" class="focus-btn" data-v="balanced" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Balanced</button>
+          <button type="button" class="focus-btn" data-v="skeptical" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Skeptical</button>
+          <button type="button" class="focus-btn" data-v="exploratory" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Exploratory</button>
+        </div>
+      </div>
+      <div style="margin-bottom:4px;">
+        <div class="fig-label" style="margin-bottom:8px;">RESPONSE LENGTH</div>
+        <div style="display:flex;gap:4px;">
+          <button type="button" class="len-btn" data-v="concise" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Concise</button>
+          <button type="button" class="len-btn" data-v="standard" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
+          <button type="button" class="len-btn" data-v="detailed" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Detailed</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -137,6 +170,40 @@ const CIRC = 97.4;
 const composer = document.getElementById('composer');
 inp.addEventListener('focus', () => { composer.style.borderColor='var(--accent-border)'; composer.style.boxShadow='0 0 0 3px var(--accent-glow)'; });
 inp.addEventListener('blur', () => { composer.style.borderColor='var(--border)'; composer.style.boxShadow='none'; });
+
+// Settings popover
+const settingsPop = document.getElementById('settingsPop');
+document.getElementById('settingsBtn').onclick = (e) => { e.stopPropagation(); settingsPop.style.display = settingsPop.style.display === 'block' ? 'none' : 'block'; };
+document.addEventListener('click', (e) => { if (!settingsPop.contains(e.target) && e.target !== document.getElementById('settingsBtn')) settingsPop.style.display = 'none'; });
+function setupToggle(cls) {
+  document.querySelectorAll('.'+cls).forEach(b => b.onclick = () => {
+    document.querySelectorAll('.'+cls).forEach(x => {
+      x.style.background = 'var(--bg)';
+      x.style.borderColor = 'var(--border)';
+      x.style.color = 'var(--text-muted)';
+      x.style.fontWeight = '400';
+    });
+    b.style.background = 'var(--accent-dim)';
+    b.style.borderColor = 'var(--accent-border)';
+    b.style.color = 'var(--accent)';
+    b.style.fontWeight = '600';
+    if (b.dataset.desc) document.getElementById('depthDesc').textContent = b.dataset.desc;
+    updateSettingsSummary();
+  });
+}
+setupToggle('depth-btn'); setupToggle('focus-btn'); setupToggle('len-btn');
+
+function getActive(cls) {
+  const active = [...document.querySelectorAll('.'+cls)].find(b => b.style.fontWeight === '600');
+  return active ? active.dataset.v : cls === 'depth-btn' ? 'standard' : (cls === 'focus-btn' ? 'balanced' : 'standard');
+}
+function updateSettingsSummary() {
+  const el = document.getElementById('settingsSummary');
+  if (el) el.textContent = [getActive('depth-btn'), getActive('focus-btn'), getActive('len-btn')].map(v => v.toUpperCase()).join(' · ');
+}
+function getSynthesisSettings() {
+  return { depth: getActive('depth-btn'), focus: getActive('focus-btn'), length: getActive('len-btn') };
+}
 
 // Hydrate from Phronesis handoff
 (function() {
@@ -212,7 +279,22 @@ goBtn.addEventListener('click', async () => {
   if (text.length < 10) { inp.focus(); return; }
 
   const category = document.getElementById('category').value;
-  const expert = document.getElementById('expertMode').checked;
+  const s = getSynthesisSettings();
+  const mode = s.depth === 'expert' ? 'expert' : 'standard';
+  const quick = s.depth === 'quick';
+
+  // Append focus + length steering to the prompt so downstream models respect it.
+  const focusText = s.focus === 'skeptical'
+    ? ' Focus especially on risks, weaknesses, and non-obvious failure modes.'
+    : s.focus === 'exploratory'
+    ? ' Surface surprising angles, adjacent considerations, and contrarian takes.'
+    : '';
+  const lenText = s.length === 'concise'
+    ? ' Keep the final answer concise (under 400 words, tight structure).'
+    : s.length === 'detailed'
+    ? ' Produce a thorough, well-structured deep-dive with headings and examples.'
+    : '';
+  const steeredPrompt = text + (focusText || lenText ? '\n\n[Preferences]' + focusText + lenText : '');
 
   inputSection.style.display = 'none';
   PS.style.display = 'block'; ES.style.display = 'none'; RS.style.display = 'none';
@@ -224,7 +306,7 @@ goBtn.addEventListener('click', async () => {
     const resp = await fetch('/synthesis/api/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
-      body: JSON.stringify({ prompt: text, category, mode: expert ? 'expert' : 'standard' }),
+      body: JSON.stringify({ prompt: steeredPrompt, category, mode, quick_mode: quick }),
     });
 
     if (!resp.ok) {
@@ -292,10 +374,28 @@ goBtn.addEventListener('click', async () => {
   }
 });
 
+function recordLocalHistory(entry) {
+  try {
+    const key = 'intellcluster_history_v1';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    list.unshift(entry);
+    while (list.length > 100) list.pop();
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (e) {}
+}
 function renderFinal(d) {
   RS.style.display = 'block';
   const text = d.result || d.output || '';
   const runId = d.run_id || '';
+  if (runId) {
+    const promptFull = inp.value.trim();
+    recordLocalHistory({
+      tool: 'synthesis',
+      run_id: runId,
+      title: promptFull.slice(0, 140),
+      timestamp: new Date().toISOString(),
+    });
+  }
   const shareUrl = runId ? (location.origin + '/synthesis/result/' + runId) : '';
 
   // Render markdown if marked.js is loaded

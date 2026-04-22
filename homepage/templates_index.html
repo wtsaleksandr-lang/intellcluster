@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Decision Templates — Start from a Ready-Made Framework{% endblock %}
+{% block meta_desc %}15+ pre-built decision templates — laptops, CRMs, pricing, hiring, and more. One click to pre-fill Phronesis with options and criteria.{% endblock %}
+{% block og_title %}Decision Templates — Start from a Ready-Made Framework{% endblock %}
+{% block og_desc %}Pre-built decision frameworks with options and criteria. One click to pre-fill Phronesis.{% endblock %}
+
+{% block content %}
+<div style="max-width:880px;margin:0 auto;padding:0 20px;">
+
+  <nav style="padding:20px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:0.3px;">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 6px;">/</span>
+    <span style="color:var(--text-muted);">Templates</span>
+  </nav>
+
+  <section style="padding:40px 0 32px;" class="rv">
+    <div class="fig-label">INTELLCLUSTER <span>·</span> TEMPLATES</div>
+    <h1 class="t-display" style="font-size:clamp(28px,4.5vw,40px);font-weight:600;letter-spacing:-0.4px;line-height:1.15;">Decision templates</h1>
+    <p style="margin-top:14px;color:var(--text-muted);font-size:15px;max-width:620px;line-height:1.7;">
+      Pre-built frameworks for the decisions we get asked most. Each template ships with options and
+      weighted criteria you can tweak. One click to pre-fill Phronesis.
+    </p>
+  </section>
+
+  {% for category, items in by_category.items() %}
+  <section class="rv rv1" style="padding:8px 0 24px;">
+    <div class="fig-label">{{ category.upper() }}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-top:10px;">
+      {% for t in items %}
+      <a href="/phronesis?template={{ t.slug }}" class="panel" style="display:block;padding:16px;text-decoration:none;color:inherit;border-radius:10px;transition:border-color 0.15s, transform 0.15s;" onmouseover="this.style.borderColor='var(--accent-border)';this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;">{{ t.title }}</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:10px;">{{ t.description }}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          {% for opt in t.options %}
+          <span class="t-mono" style="font-size:9px;padding:2px 6px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text-dim);">{{ opt[:26] }}</span>
+          {% endfor %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <section class="rv" style="padding:24px 0 48px;text-align:center;">
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">Don't see your decision? Start from a blank page.</p>
+    <a href="/phronesis" style="display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;font-weight:600;border-radius:8px;font-size:13px;text-decoration:none;">Open Phronesis →</a>
+  </section>
+
+</div>
+{% endblock %}
