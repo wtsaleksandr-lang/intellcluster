@@ -28,6 +28,7 @@
   "@type": "Organization",
   "name": "IntellCluster",
   "url": "https://intellcluster.com",
+  "logo": "https://intellcluster.com/static/favicon.svg",
   "description": "Multi-model AI intelligence for decisions and deep research.",
   "sameAs": []
 }
@@ -37,7 +38,12 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "IntellCluster",
-  "url": "https://intellcluster.com"
+  "url": "https://intellcluster.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://intellcluster.com/compare/{search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
 }
 </script>
 {% endblock %}
@@ -528,6 +534,11 @@ summary:focus-visible {
 }
 </style>
 {% block head %}{% endblock %}
+
+{# Plausible analytics — only loaded if PLAUSIBLE_DOMAIN env var is set #}
+{% if plausible_domain %}
+<script defer data-domain="{{ plausible_domain }}" src="https://plausible.io/js/script.js"></script>
+{% endif %}
 </head>
 <body{% if tool %} class="tool-{{ tool }}"{% endif %}>
 

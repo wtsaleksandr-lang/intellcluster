@@ -93,6 +93,10 @@ templates = Jinja2Templates(directory=[
     "homepage",
 ])
 
+# Site-wide Jinja globals (available on every render without per-route wiring)
+templates.env.globals["plausible_domain"] = os.environ.get("PLAUSIBLE_DOMAIN") or ""
+templates.env.globals["site_url"] = os.environ.get("SITE_URL", "https://intellcluster.com")
+
 
 # ═══════════════════════════════════════════════════════
 # HOMEPAGE

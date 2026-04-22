@@ -4,6 +4,34 @@
 {% block og_title %}IntellCluster — Multi-model AI intelligence{% endblock %}
 {% block og_desc %}Phronesis ranks options. Synthesis runs deep research. Both powered by 5 frontier AI models working in parallel.{% endblock %}
 
+{% block structured_data %}
+{{ super() }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "IntellCluster",
+  "url": "https://intellcluster.com",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "description": "Multi-model AI intelligence platform. Phronesis ranks options with blind multi-analyst evaluation. Synthesis runs deep multi-model research. Powered by GPT, Claude, Gemini, DeepSeek, and Grok.",
+  "offers": [
+    {"@type": "Offer", "name": "Free",    "price": "0",  "priceCurrency": "USD"},
+    {"@type": "Offer", "name": "Starter", "price": "9",  "priceCurrency": "USD"},
+    {"@type": "Offer", "name": "Pro",     "price": "19", "priceCurrency": "USD"}
+  ],
+  "featureList": [
+    "Blind multi-analyst decision ranking",
+    "Multi-model deep research synthesis",
+    "Weighted criteria evaluation",
+    "Confidence scoring",
+    "Shareable decision URLs",
+    "PDF export"
+  ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
 
 {% include "partials/_hero_bento.html" %}

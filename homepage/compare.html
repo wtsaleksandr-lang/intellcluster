@@ -33,6 +33,19 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": {{ page.title | tojson }},
+  "description": {{ page.intro | tojson }},
+  "itemListElement": [
+    {% for opt in page.options %}
+    {"@type": "ListItem", "position": {{ loop.index }}, "name": {{ opt | tojson }}}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
 {% endblock %}
 
 {% block content %}
