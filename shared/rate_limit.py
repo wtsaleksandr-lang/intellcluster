@@ -61,11 +61,25 @@ async def rate_limit_middleware(request: Request, call_next):
 
     if len(bucket) >= limit:
         retry_after = int(bucket[0] + window - now) + 1
+        reset_at = int(bucket[0] + window)
         return JSONResponse(
             status_code=429,
-            headers={"Retry-After": str(retry_after)},
+            headers={
+                "Retry-After": str(retry_after),
+                "X-RateLimit-Limit": str(limit),
+                "X-RateLimit-Remaining": "0",
+                "X-RateLimit-Reset": str(reset_at),
+            },
             content={"error": "Rate limit exceeded. Try again in a few seconds.", "retry_after_seconds": retry_after},
         )
 
     bucket.append(now)
-    return await call_next(request)
+    remaining = max(0, limit - len(bucket))
+    reset_at = int(bucket[0] + window) if bucket else int(now + window)
+
+    response = await call_next(request)
+    # Expose rate-limit state so clients can show usage without a round trip.
+    response.headers["X-RateLimit-Limit"] = str(limit)
+    response.headers["X-RateLimit-Remaining"] = str(remaining)
+    response.headers["X-RateLimit-Reset"] = str(reset_at)
+    return response

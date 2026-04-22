@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}IntellCluster{% endblock %} | IntellCluster</title>
 <meta name="description" content="{% block meta_desc %}IntellCluster — multi-model AI intelligence for decisions and deep research. Phronesis compares options. Synthesis researches answers.{% endblock %}">
 <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
@@ -19,7 +19,11 @@
 
 <meta name="twitter:title" content="{% block twitter_title %}{{ self.og_title() }}{% endblock %}">
 <meta name="twitter:description" content="{% block twitter_desc %}{{ self.og_desc() }}{% endblock %}">
-<meta name="theme-color" content="#020917">
+<meta name="theme-color" content="#020917" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+
+<!-- Apply stored theme before CSS parses, prevents FOUC on repeat visits. -->
+<script>(function(){try{var t=localStorage.getItem('intellcluster_theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 
 {% block structured_data %}
 <script type="application/ld+json">
