@@ -44,9 +44,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 <link rel="apple-touch-icon" href="/static/favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=instrument-serif:400,400i|dm-sans:400,500,600,700|jetbrains-mono:400,500,600&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════
    FIN-INSPIRED DESIGN TOKENS
@@ -493,16 +492,52 @@ button, a.nav-tool, .chip { min-height: 36px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════ */
+
+/* Skip-to-content link — visible only on focus */
+.skip-link {
+  position: absolute; top: -40px; left: 12px;
+  z-index: 200;
+  padding: 10px 16px;
+  background: var(--accent); color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  border-radius: 4px; text-decoration: none;
+  transition: top 0.2s var(--ease-out);
+}
+.skip-link:focus { top: 12px; outline: 2px solid var(--text-primary); outline-offset: 2px; }
+
+/* Consistent focus ring across the site — keyboard users only */
+:focus { outline: none; }
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, textarea:focus-visible, select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Visually-hidden helper for screen-reader-only text */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 </style>
 {% block head %}{% endblock %}
 </head>
 <body{% if tool %} class="tool-{{ tool }}"{% endif %}>
 
+<a href="#ic-main" class="skip-link">Skip to content</a>
+
 <!-- ═══════════ NAV ═══════════ -->
-<nav class="ic-nav">
+<nav class="ic-nav" aria-label="Primary">
   <div class="ic-nav-inner">
-    <a href="/" class="ic-brand">
-      <span class="brand-dot"></span>
+    <a href="/" class="ic-brand" aria-label="IntellCluster home">
+      <span class="brand-dot" aria-hidden="true"></span>
       <span class="brand-name">IntellCluster</span>
     </a>
     <div class="ic-nav-links">
@@ -511,19 +546,20 @@ button, a.nav-tool, .chip { min-height: 36px; }
       <a href="/templates" class="nav-tool hide-mobile">Templates</a>
       <a href="/history" class="nav-tool hide-mobile">History</a>
       <a href="/pricing" class="nav-tool hide-mobile">Pricing</a>
-      <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-        <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle light/dark theme">
+        <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <span class="sr-only">Toggle theme</span>
       </button>
       <a href="/pricing" class="ic-nav-cta">Get started</a>
     </div>
   </div>
 </nav>
 
-<main style="flex: 1;">{% block content %}{% endblock %}</main>
+<main id="ic-main" style="flex: 1;" role="main">{% block content %}{% endblock %}</main>
 
 <!-- ═══════════ FOOTER ═══════════ -->
-<footer class="ic-footer">
+<footer class="ic-footer" role="contentinfo" aria-label="Site links">
   <div class="ic-footer-inner">
     <div class="ic-footer-brand">
       <span class="brand-dot" style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
