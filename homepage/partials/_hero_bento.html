@@ -1,0 +1,811 @@
+<!-- ══════════════════════════════════════════════════════════════
+   IC HERO BENTO — dense admin composition with phone demo
+   Styles scoped to .ic-hero / .hb-* / .ph-*
+   ══════════════════════════════════════════════════════════════ -->
+<style>
+.ic-hero-wrap {
+  position: relative;
+  min-height: calc(100vh - 60px);
+  padding: 60px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+.ic-hero-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--text-tertiary);
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-bottom: 26px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-decor);
+}
+.ic-hero-label::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* STAGE */
+.hb-stage {
+  display: grid;
+  grid-template-columns: 160px 280px 340px 280px 160px;
+  grid-template-rows: repeat(8, 1fr);
+  gap: 3px;
+  width: 1232px; height: 780px;
+  max-width: 100%;
+  position: relative;
+}
+.hb-phone-wrap {
+  grid-column: 3; grid-row: 1 / -1;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3;
+}
+
+.hbp {
+  position: relative;
+  background: rgba(8, 15, 30, 0.55);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: var(--text-dim);
+  transition: opacity 1s var(--ease-quart), filter 1s var(--ease-quart);
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+.hbp .hbp-border { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hbp .hbp-border rect {
+  fill: none; stroke: rgba(255,255,255,0.14); stroke-width: 1;
+  rx: 6; ry: 6;
+  transition: stroke 1s var(--ease-quart);
+}
+.hbp .hbp-border .draw {
+  stroke: var(--accent-border); stroke-width: 1;
+  stroke-dasharray: 2400; stroke-dashoffset: 2400;
+  transition: stroke-dashoffset 1.1s var(--ease-quart) 0.1s;
+}
+.hbp.lit .hbp-border .draw { stroke-dashoffset: 0; }
+
+/* Depth tiers */
+.hbp-far  { opacity: 0.28; filter: blur(1.2px); }
+.hbp-mid  { opacity: 0.42; filter: blur(0.5px); }
+.hbp-near { opacity: 0.62; filter: blur(0); }
+.hbp.lit  { opacity: 1 !important; filter: blur(0) !important; }
+
+/* Panel typography */
+.hbp-label { font-size: 9px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--text-ghost); margin-bottom: 8px; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-label { color: var(--text-secondary); }
+.hbp-heading { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-heading { color: var(--text-primary); }
+
+.hbp-list { list-style: none; margin: 0; padding: 0; }
+.hbp-list li { display: flex; gap: 6px; margin-bottom: 4px; font-size: 9.5px; line-height: 1.45; color: var(--text-ghost); transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-list li { color: var(--text-secondary); }
+.hbp-list-num { color: var(--text-ghost); font-weight: 600; min-width: 12px; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-list-num { color: var(--text-primary); }
+
+.hbp-field { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.hbp-field:last-child { border: none; }
+.hbp-row-key { font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-ghost); transition: color 1s var(--ease-quart); }
+.hbp-row-val { font-size: 9.5px; color: var(--text-ghost); text-align: right; font-variant-numeric: tabular-nums; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-row-key { color: var(--text-muted); }
+.hbp.lit .hbp-row-val { color: var(--text-primary); }
+
+.hbp-func { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.06); border-radius: 5px; }
+.hbp-func-icon { width: 20px; height: 20px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-ghost); flex-shrink: 0; transition: all 1s var(--ease-quart); }
+.hbp-func-text { font-size: 9.5px; color: var(--text-ghost); line-height: 1.35; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-func-icon { color: var(--text-primary); border-color: var(--text-secondary); }
+.hbp.lit .hbp-func-text { color: var(--text-primary); }
+
+.hbp-big { font-size: 22px; font-weight: 600; font-family: 'DM Sans', sans-serif; color: var(--text-ghost); letter-spacing: -0.5px; margin-bottom: 3px; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-big { color: var(--text-primary); }
+.hbp-metric-label { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-ghost); transition: color 1s var(--ease-quart); }
+.hbp-metric-sub { font-size: 9px; color: var(--text-ghost); margin-top: 2px; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-metric-label { color: var(--text-tertiary); }
+.hbp.lit .hbp-metric-sub   { color: var(--text-dim); }
+
+/* Histogram */
+.hbp-histogram { width: 100%; height: 32px; display: block; margin-bottom: 4px; }
+.hbp-histogram rect { fill: rgba(255,255,255,0.28); transition: fill 1s var(--ease-quart); }
+.hbp.lit .hbp-histogram rect { fill: rgba(255,255,255,0.55); }
+.hbp-histogram rect.current { fill: var(--accent); }
+
+.hbp-tabs { display: flex; gap: 14px; font-size: 8.5px; letter-spacing: 0.8px; }
+.hbp-tab { color: var(--text-ghost); padding: 2px 0; border-bottom: 1px solid transparent; transition: all 1s var(--ease-quart); }
+.hbp-tab.current { color: var(--text-dim); border-color: var(--text-ghost); }
+.hbp.lit .hbp-tab { color: var(--text-muted); }
+.hbp.lit .hbp-tab.current { color: var(--text-primary); border-color: var(--text-primary); }
+
+/* Compare bars */
+.hbp-compare-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 9px; }
+.hbp-compare-name { width: 88px; color: var(--text-ghost); transition: color 1s var(--ease-quart); }
+.hbp-compare-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+.hbp-compare-fill { height: 100%; background: rgba(255,255,255,0.3); border-radius: 3px; transition: background 1s var(--ease-quart), width 1s var(--ease-quart); }
+.hbp.lit .hbp-compare-fill { background: rgba(255,255,255,0.55); }
+.hbp-compare-row.win .hbp-compare-fill { background: var(--accent) !important; }
+.hbp-compare-score { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-ghost); width: 26px; text-align: right; font-variant-numeric: tabular-nums; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-compare-name { color: var(--text-secondary); }
+.hbp.lit .hbp-compare-score { color: var(--text-primary); }
+
+/* Chain */
+.hbp-chain li { display: flex; gap: 6px; margin-bottom: 5px; font-size: 9.5px; line-height: 1.4; color: var(--text-ghost); transition: color 1s var(--ease-quart); }
+.hbp-chain li::before { content: '→'; color: var(--text-ghost); transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-chain li { color: var(--text-secondary); }
+.hbp.lit .hbp-chain li::before { color: var(--accent); }
+
+/* Latency waterfall */
+.hbp-wf-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.hbp-wf-name { font-size: 9px; color: var(--text-ghost); width: 66px; text-transform: uppercase; letter-spacing: 0.8px; transition: color 1s var(--ease-quart); }
+.hbp-wf-bar { flex: 1; height: 8px; background: rgba(255,255,255,0.03); border-radius: 2px; position: relative; }
+.hbp-wf-seg { position: absolute; height: 100%; background: rgba(255,255,255,0.3); border-radius: 2px; transition: background 1s var(--ease-quart); }
+.hbp.lit .hbp-wf-seg { background: rgba(255,255,255,0.55); }
+.hbp-wf-time { font-size: 8.5px; color: var(--text-ghost); width: 42px; text-align: right; font-variant-numeric: tabular-nums; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-wf-name, .hbp.lit .hbp-wf-time { color: var(--text-secondary); }
+
+/* Counters */
+.hbp-counters { display: flex; justify-content: space-between; gap: 4px; }
+.hbp-counter { flex: 1; text-align: center; }
+.hbp-counter-num { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; color: var(--text-ghost); transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-counter-num { color: var(--text-primary); }
+.hbp.lit .hbp-counter-num.good { color: #4ade80; }
+.hbp-counter-label { font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-ghost); margin-top: 2px; transition: color 1s var(--ease-quart); }
+.hbp.lit .hbp-counter-label { color: var(--text-muted); }
+
+/* Mini decoration blocks */
+.hbp-miniblock { height: 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; margin-bottom: 4px; }
+.hbp-minibars { display: flex; align-items: flex-end; gap: 2px; height: 36px; padding-top: 2px; }
+.hbp-minibars span { flex: 1; background: rgba(255,255,255,0.15); border-radius: 1px; }
+.hbp-donut { width: 56px; height: 56px; margin: 4px auto; }
+.hbp-donut circle { fill: none; stroke-width: 12; }
+.hbp-donut .bg { stroke: rgba(255,255,255,0.08); }
+.hbp-donut .fg { stroke: rgba(255,255,255,0.3); }
+.hbp.lit .hbp-donut .fg { stroke: var(--accent); }
+.hbp-donut-label { text-align: center; font-size: 8px; color: var(--text-ghost); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+.hbp.lit .hbp-donut-label { color: var(--text-secondary); }
+
+.hbp-icons { display: flex; gap: 6px; flex-wrap: wrap; }
+.hbp-icon { width: 22px; height: 22px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-ghost); transition: all 1s var(--ease-quart); }
+
+/* ═══════════════ PHONE ═══════════════ */
+.ph-phone {
+  position: relative;
+  width: 340px; height: 650px;
+  background: #020917;
+  border: 1.5px solid rgba(255,255,255,0.55);
+  border-radius: 30px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  cursor: pointer;
+}
+.ph-phone.paused::after {
+  content: 'Tap to resume'; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: #fff; background: rgba(2,9,23,0.85);
+  border: 1px solid rgba(255,255,255,0.22); padding: 8px 14px;
+  border-radius: 999px; pointer-events: none;
+  backdrop-filter: blur(4px); z-index: 5;
+  opacity: 0; animation: phPausedFade 0.3s var(--ease-quart) forwards;
+}
+@keyframes phPausedFade { to { opacity: 1; } }
+
+.ph-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 18px 14px; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.ph-header-left { display: flex; align-items: center; gap: 10px; }
+.ph-header-right { display: flex; align-items: center; gap: 14px; color: #fff; }
+.ph-iconbtn { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: #fff; }
+.ph-iconbtn svg { width: 18px; height: 18px; }
+.ph-logo { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.ph-logo svg { width: 100%; height: 100%; }
+.ph-brand { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+
+.ph-body { flex: 1; overflow-y: auto; padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 14px; scroll-behavior: smooth; justify-content: flex-end; }
+.ph-body::-webkit-scrollbar { width: 0; }
+.ph-body.reset { opacity: 0; transition: opacity 0.6s var(--ease-quart); }
+
+.ph-bubble-user {
+  align-self: flex-end; max-width: 84%;
+  padding: 11px 14px; background: var(--accent); color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px; font-weight: 500; line-height: 1.4; border-radius: 14px;
+  opacity: 0; transform: translateY(16px);
+  animation: phBubbleIn 0.5s var(--ease-quart) forwards;
+}
+@keyframes phBubbleIn { to { opacity: 1; transform: translateY(0); } }
+
+.ph-card-ai {
+  align-self: flex-start; max-width: 92%;
+  padding: 12px 14px 14px; background: transparent;
+  border: 1px solid rgba(255,255,255,0.22); border-radius: 14px;
+  color: #fff;
+  opacity: 0; transform: translateY(8px);
+  animation: phBubbleIn 0.4s var(--ease-quart) forwards;
+}
+.ph-card-ai-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 600; }
+.ph-card-ai-head .ph-logo { width: 14px; height: 14px; }
+.ph-card-ai-head .sub { font-weight: 400; color: rgba(255,255,255,0.72); }
+.ph-card-ai-head .sep { color: rgba(255,255,255,0.40); }
+.ph-card-ai-body { font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.5; letter-spacing: -0.05px; }
+.ph-card-ai-body strong { font-weight: 600; }
+
+.ph-typing {
+  align-self: flex-start; display: inline-flex; gap: 5px;
+  padding: 9px 13px; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.22); border-radius: 999px;
+  opacity: 0; animation: phBubbleIn 0.25s var(--ease-quart) forwards;
+}
+.ph-typing span { width: 5px; height: 5px; background: #fff; border-radius: 50%; animation: phTypingBounce 1.2s infinite ease-in-out; }
+.ph-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ph-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes phTypingBounce {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-3px); }
+}
+
+.ph-input {
+  display: flex; align-items: center; gap: 10px;
+  margin: 0 14px 14px; padding: 10px 6px 10px 16px;
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 999px;
+  transition: border-color 0.4s var(--ease-quart);
+}
+.ph-input.active { border-color: rgba(255,255,255,0.5); }
+.ph-placeholder { flex: 1; font-family: 'DM Sans', sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.40); min-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ph-placeholder.filled { color: #fff; }
+.ph-caret { display: inline-block; width: 1.5px; height: 14px; background: #fff; margin-left: 1px; vertical-align: middle; animation: phCaretBlink 0.8s infinite; }
+@keyframes phCaretBlink { 50% { opacity: 0; } }
+.ph-sendbtn { width: 28px; height: 28px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; color: #000; flex-shrink: 0; transition: transform 0.2s var(--ease-quart); }
+.ph-sendbtn.active { transform: scale(1.05); }
+.ph-sendbtn svg { width: 13px; height: 13px; }
+
+/* Scenario dots (below stage) */
+.ph-dots { margin-top: 18px; display: flex; gap: 8px; justify-content: center; }
+.ph-dots .dot { width: 24px; height: 3px; background: rgba(255,255,255,0.18); border-radius: 2px; transition: background 0.4s var(--ease-quart); }
+.ph-dots .dot.active { background: var(--accent); }
+
+/* Caption below stage */
+.ic-hero-caption { margin-top: 28px; text-align: center; max-width: 680px; padding: 0 20px; }
+.ic-hero-caption h1 {
+  font-family: 'Instrument Serif', ui-serif, Georgia, serif;
+  font-weight: 300; font-size: clamp(30px, 5vw, 56px);
+  line-height: 1.05; letter-spacing: -1px;
+}
+.ic-hero-caption h1 em { color: var(--accent); font-style: italic; }
+.ic-hero-caption h1 .muted { color: rgba(255,255,255,0.45); }
+html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
+.ic-hero-caption p {
+  margin-top: 14px; font-size: 14px; line-height: 1.65; color: var(--text-tertiary);
+}
+.ic-hero-cta-row {
+  margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+}
+.ic-hero-cta {
+  padding: 12px 22px; border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  text-decoration: none; letter-spacing: -0.01em;
+  transition: filter 0.2s var(--ease-quart), background 0.2s var(--ease-quart);
+}
+.ic-hero-cta.primary { background: var(--accent); color: #fff; }
+.ic-hero-cta.primary:hover { filter: brightness(1.1); }
+.ic-hero-cta.ghost {
+  background: transparent; color: var(--text-primary);
+  border: 1px solid var(--border-decor);
+}
+.ic-hero-cta.ghost:hover { background: rgba(255,255,255,0.05); }
+
+/* Responsive scaling */
+@media (max-width: 1280px) {
+  .hb-stage { transform: scale(0.82); transform-origin: top center; margin-bottom: -160px; }
+}
+@media (max-width: 1060px) {
+  .hb-stage { transform: scale(0.68); margin-bottom: -250px; }
+}
+@media (max-width: 860px) {
+  .ic-hero-wrap { min-height: 0; padding-top: 40px; }
+  .hb-stage {
+    transform: none;
+    grid-template-columns: 340px;
+    grid-template-rows: auto;
+    width: 340px; height: auto;
+    gap: 0;
+  }
+  .hb-stage > .hbp { display: none; }
+  .hb-phone-wrap { grid-column: 1; grid-row: 1; }
+}
+</style>
+
+<section class="ic-hero-wrap">
+  <span class="ic-hero-label">IntellCluster <span>·</span> Multi-model AI intelligence</span>
+
+  <div class="hb-stage">
+
+    <!-- ═══ ROW 1 ═══ -->
+    <div class="hbp hbp-far" style="grid-column:1; grid-row:1;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Agreement</div>
+      <div style="display:flex; align-items:center; gap:10px">
+        <svg class="hbp-donut" viewBox="0 0 100 100" style="width:44px; height:44px; margin:0">
+          <circle class="bg" cx="50" cy="50" r="40"/>
+          <circle class="fg" cx="50" cy="50" r="40" stroke-dasharray="230 251" transform="rotate(-90 50 50)"/>
+        </svg>
+        <div class="hbp-donut-label">92%</div>
+      </div>
+    </div>
+    <div class="hbp hbp-near" id="hbTimeline" style="grid-column:2; grid-row:1;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Decision Volume &middot; 7d</div>
+      <svg class="hbp-histogram" viewBox="0 0 260 28" preserveAspectRatio="none"></svg>
+      <div class="hbp-tabs" style="justify-content:space-between; margin-top:2px">
+        <span class="hbp-tab">16</span><span class="hbp-tab">17</span><span class="hbp-tab">18</span><span class="hbp-tab">19</span><span class="hbp-tab">20</span><span class="hbp-tab">21</span><span class="hbp-tab current">22</span>
+      </div>
+    </div>
+    <div class="hbp hbp-near" id="hbFlow" style="grid-column:4; grid-row:1/3;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Blind Jury Protocol</div>
+      <ol class="hbp-list">
+        <li><span class="hbp-list-num">1.</span>ANONYMIZE OPTIONS</li>
+        <li><span class="hbp-list-num">2.</span>DISTRIBUTE TO 3 ANALYSTS</li>
+        <li><span class="hbp-list-num">3.</span>CROSS-SCORE &middot; WEIGH</li>
+        <li><span class="hbp-list-num">4.</span>MEASURE CONVERGENCE</li>
+      </ol>
+    </div>
+    <div class="hbp hbp-far" style="grid-column:5; grid-row:1;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Engine</div>
+      <div class="hbp-miniblock" style="height:12px"></div>
+      <div class="hbp-miniblock" style="height:12px"></div>
+    </div>
+
+    <!-- ═══ ROW 2 ═══ -->
+    <div class="hbp hbp-far" style="grid-column:1; grid-row:2;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Activity</div>
+      <div class="hbp-minibars" style="height:36px">
+        <span style="height:40%"></span><span style="height:65%"></span><span style="height:50%"></span><span style="height:85%"></span><span style="height:35%"></span><span style="height:70%"></span><span style="height:90%"></span>
+      </div>
+    </div>
+    <div class="hbp hbp-near" id="hbFunction" style="grid-column:2; grid-row:2;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Active Function</div>
+      <div class="hbp-func">
+        <div class="hbp-func-icon">$</div>
+        <div class="hbp-func-text" id="hbFuncText">RANK_LAPTOPS<br><span style="opacity:0.75">PERF &middot; BUILD &middot; VALUE &middot; BATTERY</span></div>
+      </div>
+    </div>
+    <div class="hbp hbp-far" style="grid-column:5; grid-row:2;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Status</div>
+      <div class="hbp-miniblock" style="height:10px"></div>
+      <div class="hbp-miniblock" style="height:10px"></div>
+    </div>
+
+    <!-- ═══ ROW 3 ═══ -->
+    <div class="hbp hbp-far" style="grid-column:1; grid-row:3;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Queue</div>
+      <div class="hbp-miniblock" style="height:12px"></div>
+      <div class="hbp-miniblock" style="height:12px"></div>
+    </div>
+    <div class="hbp hbp-mid" style="grid-column:2; grid-row:3;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Model Pool</div>
+      <div class="hbp-icons">
+        <div class="hbp-icon">G</div><div class="hbp-icon">A</div><div class="hbp-icon">C</div><div class="hbp-icon">M</div><div class="hbp-icon">D</div><div class="hbp-icon">X</div>
+      </div>
+    </div>
+    <div class="hbp hbp-near" id="hbQuality" style="grid-column:4; grid-row:3;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Consensus Monitor</div>
+      <div class="hbp-counters">
+        <div class="hbp-counter"><div class="hbp-counter-num good">3/3</div><div class="hbp-counter-label">Agree</div></div>
+        <div class="hbp-counter"><div class="hbp-counter-num">0</div><div class="hbp-counter-label">Conflicts</div></div>
+        <div class="hbp-counter"><div class="hbp-counter-num">4</div><div class="hbp-counter-label">Criteria</div></div>
+      </div>
+    </div>
+    <div class="hbp hbp-far" style="grid-column:5; grid-row:3/5;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Uptime</div>
+      <svg class="hbp-donut" viewBox="0 0 100 100" style="width:70px; height:70px;">
+        <circle class="bg" cx="50" cy="50" r="40"/>
+        <circle class="fg" cx="50" cy="50" r="40" stroke-dasharray="248 251" transform="rotate(-90 50 50)"/>
+      </svg>
+      <div class="hbp-donut-label">99.98%</div>
+    </div>
+
+    <!-- ═══ ROW 4-5 ═══ -->
+    <div class="hbp hbp-far" style="grid-column:1; grid-row:4/6;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Cohort</div>
+      <svg class="hbp-donut" viewBox="0 0 100 100" style="width:70px; height:70px;">
+        <circle class="bg" cx="50" cy="50" r="40"/>
+        <circle class="fg" cx="50" cy="50" r="40" stroke-dasharray="140 251" transform="rotate(-90 50 50)"/>
+      </svg>
+      <div class="hbp-donut-label">56%</div>
+    </div>
+    <div class="hbp hbp-near" id="hbContext" style="grid-column:2; grid-row:4/6;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Decision Context</div>
+      <div class="hbp-field"><span class="hbp-row-key">User</span><span class="hbp-row-val" id="hbName">Alex K.</span></div>
+      <div class="hbp-field"><span class="hbp-row-key">Domain</span><span class="hbp-row-val" id="hbDomain">Laptops</span></div>
+      <div class="hbp-field"><span class="hbp-row-key">Budget</span><span class="hbp-row-val" id="hbBudget">$1,500</span></div>
+      <div class="hbp-field"><span class="hbp-row-key">Options</span><span class="hbp-row-val" id="hbOptions">3</span></div>
+      <div class="hbp-field"><span class="hbp-row-key">Criteria</span><span class="hbp-row-val" id="hbCriteria">4</span></div>
+    </div>
+    <div class="hbp hbp-near" id="hbRegistry" style="grid-column:4; grid-row:4/6;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Analyst Registry</div>
+      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent1">Analyst 1 &middot; General</span><span class="hbp-row-val" id="hbAgent1Score">9.2</span></div>
+      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent2">Analyst 2 &middot; Skeptic</span><span class="hbp-row-val" id="hbAgent2Score">8.8</span></div>
+      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent3">Analyst 3 &middot; Pragmatist</span><span class="hbp-row-val" id="hbAgent3Score">9.0</span></div>
+      <div class="hbp-field"><span class="hbp-row-key">Spread</span><span class="hbp-row-val" id="hbSpread">0.4</span></div>
+    </div>
+    <div class="hbp hbp-far" style="grid-column:5; grid-row:5;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Domains</div>
+      <div class="hbp-field"><span class="hbp-row-key">Tech</span><span class="hbp-row-val">38%</span></div>
+      <div class="hbp-field"><span class="hbp-row-key">Biz</span><span class="hbp-row-val">29%</span></div>
+    </div>
+
+    <!-- ═══ ROW 6 ═══ -->
+    <div class="hbp hbp-far" style="grid-column:1; grid-row:6;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Volume</div>
+      <div class="hbp-minibars" style="height:36px">
+        <span style="height:60%"></span><span style="height:45%"></span><span style="height:75%"></span><span style="height:90%"></span><span style="height:55%"></span>
+      </div>
+    </div>
+    <div class="hbp hbp-near" id="hbLatency" style="grid-column:2; grid-row:6;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Pipeline Latency</div>
+      <div class="hbp-wf-row"><span class="hbp-wf-name">Anon</span><span class="hbp-wf-bar"><span class="hbp-wf-seg" style="left:0; width:6%"></span></span><span class="hbp-wf-time">30ms</span></div>
+      <div class="hbp-wf-row"><span class="hbp-wf-name">Analysts</span><span class="hbp-wf-bar"><span class="hbp-wf-seg" style="left:6%; width:78%"></span></span><span class="hbp-wf-time">12s</span></div>
+      <div class="hbp-wf-row"><span class="hbp-wf-name">Verdict</span><span class="hbp-wf-bar"><span class="hbp-wf-seg" style="left:84%; width:12%"></span></span><span class="hbp-wf-time">180ms</span></div>
+    </div>
+    <div class="hbp hbp-near" id="hbCompare" style="grid-column:4; grid-row:6;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Accuracy vs Single-AI</div>
+      <div class="hbp-compare-row win"><span class="hbp-compare-name">IntellCluster</span><span class="hbp-compare-bar"><span class="hbp-compare-fill" style="width:94%"></span></span><span class="hbp-compare-score">94%</span></div>
+      <div class="hbp-compare-row"><span class="hbp-compare-name">GPT-4o</span><span class="hbp-compare-bar"><span class="hbp-compare-fill" style="width:71%"></span></span><span class="hbp-compare-score">71%</span></div>
+      <div class="hbp-compare-row"><span class="hbp-compare-name">Claude 3.5</span><span class="hbp-compare-bar"><span class="hbp-compare-fill" style="width:68%"></span></span><span class="hbp-compare-score">68%</span></div>
+      <div class="hbp-compare-row"><span class="hbp-compare-name">Gemini 1.5</span><span class="hbp-compare-bar"><span class="hbp-compare-fill" style="width:63%"></span></span><span class="hbp-compare-score">63%</span></div>
+    </div>
+    <div class="hbp hbp-far" style="grid-column:5; grid-row:6;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Models</div>
+      <div class="hbp-miniblock" style="height:10px"></div>
+      <div class="hbp-miniblock" style="height:10px"></div>
+      <div class="hbp-miniblock" style="height:10px"></div>
+    </div>
+
+    <!-- ═══ ROW 7 ═══ -->
+    <div class="hbp hbp-far" style="grid-column:1; grid-row:7;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Search</div>
+      <div style="font-size:9px; color:var(--text-ghost)">Q  decisions…</div>
+    </div>
+    <div class="hbp hbp-mid" style="grid-column:2; grid-row:7;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-big" id="hbScore">—</div>
+      <div class="hbp-metric-label">Winner Score</div>
+      <div class="hbp-metric-sub">Weighted &middot; 4 criteria</div>
+    </div>
+    <div class="hbp hbp-near" id="hbChain" style="grid-column:4; grid-row:7/9;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
+      <div class="hbp-label">Reasoning Chain</div>
+      <ul class="hbp-chain hbp-list" id="hbChainList">
+        <li>Parsed 3 options</li>
+        <li>Anonymized as A/B/C</li>
+        <li>Distributed to 3 analysts</li>
+        <li>Converged on Option A</li>
+      </ul>
+    </div>
+    <div class="hbp hbp-far" style="grid-column:5; grid-row:7;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Cluster</div>
+      <div class="hbp-field"><span class="hbp-row-key">Active</span><span class="hbp-row-val">47/52</span></div>
+    </div>
+
+    <!-- ═══ ROW 8 ═══ -->
+    <div class="hbp hbp-far" style="grid-column:1; grid-row:8;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-miniblock" style="height:10px"></div>
+      <div class="hbp-miniblock" style="height:10px"></div>
+    </div>
+    <div class="hbp hbp-mid" style="grid-column:2; grid-row:8;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-label">Analyst Trends &middot; 30d</div>
+      <svg viewBox="0 0 260 40" preserveAspectRatio="none" style="height:40px; width:100%">
+        <polyline fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" points="22,30 60,27 98,22 136,18 174,14 212,10 250,8"/>
+        <polyline fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.2" points="22,34 60,31 98,28 136,25 174,22 212,18 250,14"/>
+        <polyline fill="none" stroke="var(--accent)" stroke-width="1.4" points="22,26 60,20 98,16 136,12 174,8 212,5 250,3"/>
+      </svg>
+    </div>
+    <div class="hbp hbp-far" style="grid-column:5; grid-row:8;">
+      <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
+      <div class="hbp-field"><span class="hbp-row-key">Queue</span><span class="hbp-row-val">3</span></div>
+      <div class="hbp-field"><span class="hbp-row-key">p99</span><span class="hbp-row-val">13s</span></div>
+    </div>
+
+    <!-- ─── PHONE ─── -->
+    <div class="hb-phone-wrap">
+      <div class="ph-phone" id="phPhone">
+        <div class="ph-header">
+          <div class="ph-header-left">
+            <div class="ph-iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="ph-logo"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 2 L18 12 L28 10 L20 16 L28 22 L18 20 L16 30 L14 20 L4 22 L12 16 L4 10 L14 12 Z"/></svg></div>
+            <div class="ph-brand">IntellCluster</div>
+          </div>
+          <div class="ph-header-right">
+            <div class="ph-iconbtn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></div>
+          </div>
+        </div>
+        <div class="ph-body" id="phBody"></div>
+        <div class="ph-input" id="phInput">
+          <div class="ph-placeholder" id="phPlaceholder">Ask Phronesis to rank your options…</div>
+          <div class="ph-sendbtn" id="phSendBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ph-dots" id="phDots">
+    <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+
+  <div class="ic-hero-caption">
+    <h1>
+      <span class="muted">One decision.</span> <em>Three</em> <span class="muted">analysts.</span> <em>Zero</em> <span class="muted">guesswork.</span>
+    </h1>
+    <p>
+      Phronesis ranks your options with blind multi-analyst evaluation. Synthesis runs deep multi-model research. Both hit <strong style="color: var(--text-primary);">94% agreement</strong> vs 68–71% for single-AI models.
+    </p>
+    <div class="ic-hero-cta-row">
+      <a href="/phronesis" class="ic-hero-cta primary">Try Phronesis →</a>
+      <a href="/synthesis" class="ic-hero-cta ghost">Open Synthesis</a>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ═══════════ HERO BENTO — phone demo loop ═══════════ */
+(function() {
+  const hist = document.querySelector('.hbp-histogram');
+  if (hist) {
+    const heights = [16, 12, 22, 14, 26, 20, 28];
+    const total = 7;
+    const barW = 260 / total - 6;
+    for (let i = 0; i < total; i++) {
+      const x = 3 + i * (barW + 6);
+      const y = 32 - heights[i];
+      const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      r.setAttribute('x', x); r.setAttribute('y', y);
+      r.setAttribute('width', barW); r.setAttribute('height', heights[i]); r.setAttribute('rx', 1);
+      if (i === total - 1) r.classList.add('current');
+      hist.appendChild(r);
+    }
+  }
+
+  const scenarios = [
+    {
+      user: "MacBook Air M3 vs ThinkPad X1 vs Framework 13 for dev work under $1.5k?",
+      ai: `Winner: <strong>MacBook Air M3 15-inch</strong> &middot; 92% confidence.<br><br>All three analysts agreed. Leads on perf-per-dollar, battery, and display. ThinkPad wins on keyboard but loses on value. Framework is most flexible but rated lower on out-of-box experience.<br><br>Want the full scorecard?`,
+      funcText: 'RANK_LAPTOPS<br><span style="opacity:0.75">PERF · BUILD · VALUE · BATTERY</span>',
+      score: '9.0',
+      ctx: { name: 'Alex K.', domain: 'Laptops', budget: '$1,500', options: '3', criteria: '4' },
+      agents: [
+        { name: 'Analyst 1 · General',    score: '9.2' },
+        { name: 'Analyst 2 · Skeptic',    score: '8.8' },
+        { name: 'Analyst 3 · Pragmatist', score: '9.0' },
+        { name: 'Spread',                 score: '0.4' },
+      ],
+      chain: ['Parsed 3 options', 'Anonymized as A/B/C', 'Distributed to 3 analysts', 'Converged on Option A'],
+    },
+    {
+      user: "HubSpot vs Salesforce vs Pipedrive for a 10-person sales team?",
+      ai: `Winner: <strong>HubSpot</strong> &middot; 88% confidence.<br><br>Analysts converged on ease-of-use + marketing integration at your team size. Salesforce would win above 50 seats or with complex reporting needs. Pipedrive stays cheaper but loses to HubSpot on integrations.<br><br>Want me to weight price higher?`,
+      funcText: 'RANK_CRM<br><span style="opacity:0.75">USE · PRICE · INTEGRATIONS · REPORTS</span>',
+      score: '8.8',
+      ctx: { name: 'Morgan T.', domain: 'SaaS', budget: '$500/mo', options: '3', criteria: '4' },
+      agents: [
+        { name: 'Analyst 1 · General',    score: '8.9' },
+        { name: 'Analyst 2 · Skeptic',    score: '8.5' },
+        { name: 'Analyst 3 · Pragmatist', score: '9.0' },
+        { name: 'Spread',                 score: '0.5' },
+      ],
+      chain: ['Parsed 3 CRMs', 'Weighted 4 criteria', 'Ran blind evaluation', 'Converged on HubSpot'],
+    },
+    {
+      user: "Flat subscription, usage-based, or freemium for a B2B SaaS?",
+      ai: `Winner: <strong>Flat monthly subscription</strong> &middot; 94% confidence.<br><br>Unanimous. Flat wins on revenue predictability for enterprise customers. Usage-based fits infra/API products. Freemium only works if you can monetize &lt;5% of users at high ACV.<br><br>Your ICP points to flat — want to model pricing tiers?`,
+      funcText: 'RANK_PRICING<br><span style="opacity:0.75">PREDICTABILITY · CAC · SCALE</span>',
+      score: '9.4',
+      ctx: { name: 'Sam R.', domain: 'Pricing', budget: '—', options: '3', criteria: '3' },
+      agents: [
+        { name: 'Analyst 1 · General',    score: '9.5' },
+        { name: 'Analyst 2 · Skeptic',    score: '9.2' },
+        { name: 'Analyst 3 · Pragmatist', score: '9.4' },
+        { name: 'Spread',                 score: '0.3' },
+      ],
+      chain: ['Parsed 3 pricing models', 'Mapped to ICP', 'Ran blind evaluation', 'Converged on flat sub'],
+    },
+  ];
+
+  const T = { typeStart: 500, typeDuration: 2100, sendDelay: 250, aiTypingAt: 900, aiTypingHold: 1800 };
+
+  const phBody    = document.getElementById('phBody');
+  const phInput   = document.getElementById('phInput');
+  const phPlace   = document.getElementById('phPlaceholder');
+  const phSend    = document.getElementById('phSendBtn');
+  const phPhone   = document.getElementById('phPhone');
+  const dots      = document.querySelectorAll('#phDots .dot');
+
+  const activePanels = [
+    document.getElementById('hbFlow'),
+    document.getElementById('hbTimeline'),
+    document.getElementById('hbFunction'),
+    document.getElementById('hbContext'),
+    document.getElementById('hbLatency'),
+    document.getElementById('hbRegistry'),
+    document.getElementById('hbCompare'),
+    document.getElementById('hbChain'),
+    document.getElementById('hbQuality'),
+  ];
+
+  const refs = {
+    funcText: document.getElementById('hbFuncText'),
+    score:    document.getElementById('hbScore'),
+    name:     document.getElementById('hbName'),
+    domain:   document.getElementById('hbDomain'),
+    budget:   document.getElementById('hbBudget'),
+    options:  document.getElementById('hbOptions'),
+    criteria: document.getElementById('hbCriteria'),
+    a1: document.getElementById('hbAgent1'),  a1s: document.getElementById('hbAgent1Score'),
+    a2: document.getElementById('hbAgent2'),  a2s: document.getElementById('hbAgent2Score'),
+    a3: document.getElementById('hbAgent3'),  a3s: document.getElementById('hbAgent3Score'),
+    spread: document.getElementById('hbSpread'),
+    chain: document.getElementById('hbChainList'),
+  };
+
+  let isPaused = false, resumeResolve = null;
+  function togglePause(e) {
+    if (e && e.target && e.target.closest('.ph-body') && window.__sc) return;
+    isPaused = !isPaused;
+    phPhone.classList.toggle('paused', isPaused);
+    if (!isPaused && resumeResolve) { const r = resumeResolve; resumeResolve = null; r(); }
+  }
+  phPhone.addEventListener('click', togglePause);
+  phBody.addEventListener('scroll', () => {
+    window.__sc = true; clearTimeout(window.__st);
+    window.__st = setTimeout(() => { window.__sc = false; }, 150);
+  });
+
+  function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
+  function wait(ms) {
+    return new Promise(resolve => {
+      setTimeout(async () => {
+        while (isPaused) await new Promise(r => { resumeResolve = r; });
+        resolve();
+      }, ms);
+    });
+  }
+  async function typeInto(target, text, dur) {
+    const step = Math.max(16, dur / text.length);
+    target.textContent = ''; target.classList.add('filled');
+    const c = el('span', 'ph-caret'); target.appendChild(c);
+    for (let i = 0; i < text.length; i++) {
+      target.insertBefore(document.createTextNode(text[i]), c);
+      await wait(step);
+    }
+  }
+  function aiCardHTML(body) {
+    return `<div class="ph-card-ai-head"><span class="ph-logo"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 2 L18 12 L28 10 L20 16 L28 22 L18 20 L16 30 L14 20 L4 22 L12 16 L4 10 L14 12 Z"/></svg></span>IntellCluster <span class="sep">&middot;</span> <span class="sub">Phronesis</span></div><div class="ph-card-ai-body">${body}</div>`;
+  }
+  function scrollDown() { phBody.scrollTo({ top: phBody.scrollHeight, behavior: 'smooth' }); }
+
+  function litOff() { activePanels.forEach(p => p && p.classList.remove('lit')); }
+  function litOnly(panel) { activePanels.forEach(p => p && (p === panel ? p.classList.add('lit') : p.classList.remove('lit'))); }
+
+  function applyContext(s) {
+    refs.funcText.innerHTML = s.funcText;
+    refs.score.textContent = '—';
+    refs.name.textContent = s.ctx.name;
+    refs.domain.textContent = s.ctx.domain;
+    refs.budget.textContent = s.ctx.budget;
+    refs.options.textContent = s.ctx.options;
+    refs.criteria.textContent = s.ctx.criteria;
+    refs.a1.innerHTML = s.agents[0].name; refs.a1s.textContent = s.agents[0].score;
+    refs.a2.innerHTML = s.agents[1].name; refs.a2s.textContent = s.agents[1].score;
+    refs.a3.innerHTML = s.agents[2].name; refs.a3s.textContent = s.agents[2].score;
+    refs.spread.textContent = s.agents[3].score;
+    refs.chain.innerHTML = '';
+    for (const step of s.chain) {
+      const li = document.createElement('li');
+      li.textContent = step;
+      refs.chain.appendChild(li);
+    }
+  }
+
+  async function runScenario(idx) {
+    const s = scenarios[idx];
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    applyContext(s);
+    litOff();
+
+    phInput.classList.remove('active');
+    phSend.classList.remove('active');
+    phPlace.classList.remove('filled');
+    phPlace.textContent = 'Ask Phronesis to rank your options…';
+
+    await wait(T.typeStart);
+
+    phInput.classList.add('active');
+    litOnly(document.getElementById('hbFunction'));
+    await typeInto(phPlace, s.user, T.typeDuration);
+    await wait(T.sendDelay);
+    phSend.classList.add('active');
+
+    phInput.classList.remove('active');
+    phSend.classList.remove('active');
+    phPlace.classList.remove('filled');
+    phPlace.textContent = 'Ask Phronesis to rank your options…';
+    const ub = el('div', 'ph-bubble-user');
+    ub.textContent = s.user;
+    phBody.appendChild(ub);
+    scrollDown();
+    litOnly(document.getElementById('hbContext'));
+    await wait(T.aiTypingAt);
+
+    const td = el('div', 'ph-typing');
+    td.appendChild(el('span')); td.appendChild(el('span')); td.appendChild(el('span'));
+    phBody.appendChild(td);
+    scrollDown();
+    litOnly(document.getElementById('hbRegistry'));
+    await wait(600);
+
+    litOnly(document.getElementById('hbLatency'));
+    await wait(500);
+
+    litOnly(document.getElementById('hbQuality'));
+    await wait(500);
+
+    litOnly(document.getElementById('hbChain'));
+    await wait(Math.max(0, T.aiTypingHold - 1600));
+
+    td.remove();
+    const card = el('div', 'ph-card-ai');
+    card.innerHTML = aiCardHTML(s.ai);
+    phBody.appendChild(card);
+    scrollDown();
+    refs.score.textContent = s.score;
+
+    litOnly(document.getElementById('hbCompare'));
+    await wait(1200);
+
+    litOnly(document.getElementById('hbFlow'));
+    await wait(1100);
+
+    litOnly(document.getElementById('hbTimeline'));
+    await wait(900);
+
+    litOff();
+    await wait(400);
+  }
+
+  async function resetChat() {
+    phBody.classList.add('reset');
+    await wait(700);
+    phBody.innerHTML = '';
+    phBody.classList.remove('reset');
+    await wait(300);
+  }
+
+  (async function loop() {
+    while (true) {
+      for (let i = 0; i < scenarios.length; i++) await runScenario(i);
+      await resetChat();
+    }
+  })();
+})();
+</script>

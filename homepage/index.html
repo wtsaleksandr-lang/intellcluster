@@ -5,92 +5,58 @@
 {% block og_desc %}Phronesis ranks options. Synthesis runs deep research. Both powered by 5 frontier AI models working in parallel.{% endblock %}
 
 {% block content %}
-<div style="max-width:880px;margin:0 auto;padding:0 20px;">
 
-<section style="padding:80px 0 60px;text-align:center;" class="rv">
-  <div class="fig-label" style="margin-bottom:16px;">INTELLCLUSTER <span>·</span> MULTI-MODEL INTELLIGENCE</div>
-  <h1 class="t-display" style="font-size:clamp(36px,6vw,56px);font-weight:600;color:var(--text);line-height:1.1;letter-spacing:-0.8px;max-width:720px;margin:0 auto;">
-    Two tools.<br>One research lab.
-  </h1>
-  <p style="margin-top:20px;color:var(--text-muted);font-size:16px;max-width:540px;margin-left:auto;margin-right:auto;line-height:1.6;">
-    Multi-model AI intelligence, applied two ways. Run deep research that combines five frontier models, or compare your options with independent analyst consensus.
+{% include "partials/_hero_bento.html" %}
+
+{% include "partials/_pipeline_phronesis.html" %}
+
+<!-- ════════ WHY MULTI-MODEL ════════ -->
+<section style="padding: 100px 24px 80px; max-width: 1100px; margin: 0 auto;">
+  <div style="text-align: center; margin-bottom: 56px;">
+    <span class="fin-label">Why multi-model</span>
+    <h2 class="t-display" style="margin-top: 20px; font-size: clamp(32px, 4.5vw, 56px); line-height: 1.05; letter-spacing: -1px; max-width: 760px; margin-left: auto; margin-right: auto;">
+      <span style="color: rgba(255,255,255,0.45);">A single model has</span> <em style="color: var(--accent); font-style: italic;">blind spots</em>. <span style="color: rgba(255,255,255,0.45);">A jury of three doesn't.</span>
+    </h2>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px;" class="grid-3">
+    <div>
+      <div class="t-mono" style="font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">01 · Bias</div>
+      <h3 class="t-display" style="font-size: 22px; line-height: 1.2; margin-bottom: 10px;">Single models reflect one lens.</h3>
+      <p style="font-size: 13px; color: var(--text-tertiary); line-height: 1.7;">
+        Every frontier model has training biases and cultural blind spots. One answer from ChatGPT or Claude is one perspective dressed as a verdict.
+      </p>
+    </div>
+    <div>
+      <div class="t-mono" style="font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">02 · Consensus</div>
+      <h3 class="t-display" style="font-size: 22px; line-height: 1.2; margin-bottom: 10px;">Agreement is the signal.</h3>
+      <p style="font-size: 13px; color: var(--text-tertiary); line-height: 1.7;">
+        When three independent analysts converge, confidence is earned. When they diverge, you see exactly where the real uncertainty lies — instead of a confident hallucination.
+      </p>
+    </div>
+    <div>
+      <div class="t-mono" style="font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">03 · Synthesis</div>
+      <h3 class="t-display" style="font-size: 22px; line-height: 1.2; margin-bottom: 10px;">Reasoning, not averaging.</h3>
+      <p style="font-size: 13px; color: var(--text-tertiary); line-height: 1.7;">
+        IntellCluster doesn't average outputs. A strategist layer evaluates the reasoning itself — keeping strong signals, filtering weak ones, writing a single coherent answer.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CLOSING CTA ════════ -->
+<section style="padding: 100px 24px 120px; text-align: center; position: relative;">
+  <span class="fin-label">Get started</span>
+  <h2 class="t-display" style="margin-top: 20px; font-size: clamp(36px, 6vw, 72px); line-height: 1; letter-spacing: -1.5px; max-width: 880px; margin-left: auto; margin-right: auto;">
+    <span style="color: rgba(255,255,255,0.45);">Run your next decision with</span> <em style="color: var(--accent); font-style: italic;">three minds</em>, <span style="color: rgba(255,255,255,0.45);">not one.</span>
+  </h2>
+  <p style="margin-top: 22px; color: var(--text-tertiary); font-size: 15px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.65;">
+    Free tier includes 20 decisions a month. No credit card required.
   </p>
-</section>
-
-<section style="padding:20px 0 80px;">
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;" class="grid-3 rv rv1">
-
-    <!-- Phronesis Card -->
-    <a href="/phronesis" style="display:block;text-decoration:none;color:inherit;">
-      <div class="panel" style="padding:32px 28px;height:100%;transition:border-color 0.2s,box-shadow 0.2s;cursor:pointer;position:relative;"
-           onmouseover="this.style.borderColor='var(--accent-border)';this.style.boxShadow='0 0 0 1px var(--accent-border)'"
-           onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
-        <div class="fig-label" style="margin-bottom:14px;">TOOL <span>01</span></div>
-        <h2 class="t-display" style="font-size:28px;font-weight:600;color:var(--text);margin-bottom:12px;letter-spacing:-0.3px;">Phronesis</h2>
-        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;">
-          Practical wisdom for every decision. Describe your options in plain language — three independent AI analysts evaluate them blindly and rank them by weighted criteria.
-        </p>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
-          <span class="bdg bdg-muted">Compare options</span>
-          <span class="bdg bdg-muted">Blind evaluation</span>
-          <span class="bdg bdg-muted">Ranked output</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:500;">
-          Open Phronesis
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </div>
-      </div>
-    </a>
-
-    <!-- Synthesis Card -->
-    <a href="/synthesis" style="display:block;text-decoration:none;color:inherit;">
-      <div class="panel" style="padding:32px 28px;height:100%;transition:border-color 0.2s,box-shadow 0.2s;cursor:pointer;position:relative;"
-           onmouseover="this.style.borderColor='var(--accent-border)';this.style.boxShadow='0 0 0 1px var(--accent-border)'"
-           onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
-        <div class="fig-label" style="margin-bottom:14px;">TOOL <span>02</span></div>
-        <h2 class="t-display" style="font-size:28px;font-weight:600;color:var(--text);margin-bottom:12px;letter-spacing:-0.3px;">Synthesis</h2>
-        <p style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;">
-          Deep multi-model research. Ask one question — five frontier AI models research it in parallel, the strategist layer filters weak signals, and you get one synthesized answer.
-        </p>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
-          <span class="bdg bdg-muted">Multi-model</span>
-          <span class="bdg bdg-muted">Deep research</span>
-          <span class="bdg bdg-muted">Synthesized</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;font-weight:500;">
-          Open Synthesis
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </div>
-      </div>
-    </a>
-
+  <div style="margin-top: 30px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <a href="/phronesis" style="padding: 13px 26px; border-radius: 6px; background: var(--accent); color: #fff; font-weight: 500; font-size: 14px; text-decoration: none; letter-spacing: -0.01em;">Try Phronesis →</a>
+    <a href="/templates" style="padding: 13px 26px; border-radius: 6px; background: transparent; color: var(--text-primary); border: 1px solid var(--border-decor); font-weight: 500; font-size: 14px; text-decoration: none; letter-spacing: -0.01em;">Browse templates</a>
   </div>
 </section>
 
-<!-- Why multi-model -->
-<section style="padding:40px 0 80px;border-top:1px solid var(--border-subtle);" class="rv rv2">
-  <div class="fig-label" style="margin-bottom:20px;">FIG <span>A</span> — WHY MULTI-MODEL</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px;" class="grid-3">
-    <div>
-      <h3 style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;">Single models have bias</h3>
-      <p style="font-size:13px;color:var(--text-muted);line-height:1.6;">
-        Every AI model has training biases and blind spots. A single answer from ChatGPT or Claude reflects one perspective.
-      </p>
-    </div>
-    <div>
-      <h3 style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;">Consensus reveals truth</h3>
-      <p style="font-size:13px;color:var(--text-muted);line-height:1.6;">
-        When multiple independent models converge on the same answer, confidence increases. When they disagree, you see where the real uncertainty lies.
-      </p>
-    </div>
-    <div>
-      <h3 style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;">Synthesis beats averaging</h3>
-      <p style="font-size:13px;color:var(--text-muted);line-height:1.6;">
-        IntellCluster doesn't average outputs — a strategist layer evaluates the reasoning itself, keeping strong signals and filtering weak ones.
-      </p>
-    </div>
-  </div>
-</section>
-
-</div>
 {% endblock %}
