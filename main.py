@@ -47,6 +47,38 @@ app = FastAPI(title="IntellCluster", version="0.1.0")
 from shared.rate_limit import rate_limit_middleware
 app.middleware("http")(rate_limit_middleware)
 
+
+# ─── Branded 500 handler ───
+
+from fastapi import Request as _FastAPIRequest
+from starlette.exceptions import HTTPException as _StarletteHTTPException
+
+
+@app.exception_handler(500)
+async def server_error_handler(request: _FastAPIRequest, exc: Exception):
+    """Render a branded 500 page instead of the default FastAPI trace."""
+    import traceback
+    import uuid as _uuid_err
+    ref = _uuid_err.uuid4().hex[:8]
+    print(f"[500] ref={ref} path={request.url.path}\n{''.join(traceback.format_exception(type(exc), exc, exc.__traceback__))}")
+    try:
+        return templates.TemplateResponse(
+            request, "500.html", {"request_id": ref}, status_code=500,
+        )
+    except Exception:
+        return HTMLResponse(
+            content=f"<h1>500</h1><p>Something broke (ref: {ref}).</p><p><a href='/'>Home</a></p>",
+            status_code=500,
+        )
+
+
+@app.exception_handler(_StarletteHTTPException)
+async def http_exception_handler(request: _FastAPIRequest, exc: _StarletteHTTPException):
+    # 404 gets a branded template; pass everything else through as JSON.
+    if exc.status_code == 404:
+        return templates.TemplateResponse(request, "404.html", status_code=404)
+    return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+
 # Analytics
 from shared.analytics import log_event, get_plausible_domain
 

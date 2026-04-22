@@ -121,14 +121,16 @@ body.tool-phronesis {
   --accent-soft:    rgba(255,86,0,0.08);
 }
 
-/* Synthesis — cool cyan for differentiation */
+/* Synthesis — sky blue for research/analysis (distinct from Phronesis orange) */
 body.tool-synthesis {
-  --accent:         #4dd0c8;
-  --accent-dim:     rgba(77,208,200,0.12);
-  --accent-border:  rgba(77,208,200,0.32);
-  --accent-glow:    rgba(77,208,200,0.35);
-  --accent-soft:    rgba(77,208,200,0.08);
+  --accent:         #38bdf8;
+  --accent-dim:     rgba(56,189,248,0.12);
+  --accent-border:  rgba(56,189,248,0.32);
+  --accent-glow:    rgba(56,189,248,0.35);
+  --accent-soft:    rgba(56,189,248,0.08);
 }
+/* Nav CTA on Synthesis pages takes sky-blue to stay consistent in-tool */
+body.tool-synthesis .ic-nav-cta { background: var(--accent); }
 
 /* ═══════════════════════════════════════════════════════════
    BASE

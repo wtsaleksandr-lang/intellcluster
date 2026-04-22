@@ -20,6 +20,7 @@
     <button type="button" class="hist-filter" data-v="phronesis" style="padding:6px 14px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;">Phronesis</button>
     <button type="button" class="hist-filter" data-v="synthesis" style="padding:6px 14px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;">Synthesis</button>
     <div style="flex:1;"></div>
+    <button type="button" id="exportBtn" class="t-mono" style="padding:6px 12px;font-size:10px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;letter-spacing:0.3px;">EXPORT JSON</button>
     <button type="button" id="clearBtn" class="t-mono" style="padding:6px 12px;font-size:10px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-dim);cursor:pointer;letter-spacing:0.3px;">CLEAR HISTORY</button>
   </div>
 
@@ -121,6 +122,26 @@ document.getElementById('clearBtn').onclick = () => {
     localStorage.removeItem(KEY);
     render();
   }
+};
+
+document.getElementById('exportBtn').onclick = () => {
+  const list = loadHistory();
+  if (!list.length) {
+    alert('No history to export yet. Run a decision or research first.');
+    return;
+  }
+  const payload = {
+    exported_at: new Date().toISOString(),
+    source: 'intellcluster.com',
+    count: list.length,
+    entries: list,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'intellcluster-history-' + new Date().toISOString().slice(0, 10) + '.json';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 };
 
 render();

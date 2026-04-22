@@ -52,6 +52,29 @@
     .md-output th { background: var(--surface2); font-weight: 600; }
   </style>
 
+  {% with share_url=(request.url|string), share_text='Synthesis research: ' + result.prompt[:120], show_download_md=True %}
+  {% include "partials/_share_actions.html" %}
+  {% endwith %}
+
+  <script>
+  (function() {
+    var mdBtn = document.getElementById('saDownloadMdBtn');
+    if (!mdBtn) return;
+    mdBtn.addEventListener('click', function() {
+      var text = {{ result.output | tojson }};
+      var prompt = {{ result.prompt | tojson }};
+      var runId = {{ (result.run_id or '') | tojson }};
+      var body = '# Synthesis Research\n\n> ' + (prompt || '').replace(/\n/g, '\n> ') + '\n\n---\n\n' + text + '\n';
+      var blob = new Blob([body], { type: 'text/markdown;charset=utf-8' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'synthesis-' + (runId || 'research') + '.md';
+      link.click();
+      setTimeout(function(){ URL.revokeObjectURL(link.href); }, 1000);
+    });
+  })();
+  </script>
+
   {% if result.strategist_outputs %}
   <div class="rv rv1">
     <div class="fig-label">FIG <span>2</span> — PER-PHASE STRATEGIST SYNTHESIS</div>

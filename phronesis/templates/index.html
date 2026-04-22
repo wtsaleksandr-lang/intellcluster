@@ -154,17 +154,321 @@
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- PROGRESS                                   -->
+<!-- PROGRESS — premium orchestration            -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="PS" style="display:none;">
-  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 180px);padding:24px 0;margin-top:-20px;">
-    <div class="prog-circle" style="margin-bottom:24px;">
-      <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15.5"/><circle class="fill" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4" id="pFill"/></svg>
-      <div class="pct" id="pPct">0%</div>
+  <style>
+    .proc-wrap {
+      max-width: 1080px; margin: 0 auto;
+      padding: 40px 24px 60px;
+      display: flex; flex-direction: column; gap: 32px;
+      min-height: calc(100vh - 180px);
+    }
+    .proc-head { text-align: center; }
+    .proc-head .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase;
+      color: var(--text-tertiary);
+      display: inline-flex; align-items: center; gap: 10px;
+      margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-decor);
+    }
+    .proc-head .eyebrow::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+      animation: procDotPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes procDotPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.9); } }
+    .proc-head h2 {
+      font-family: 'Instrument Serif', ui-serif, Georgia, serif;
+      font-weight: 300; font-size: clamp(28px, 4.4vw, 52px);
+      line-height: 1.04; letter-spacing: -1px; margin: 0 auto; max-width: 720px;
+    }
+    .proc-head h2 .muted { color: rgba(255,255,255,0.45); }
+    .proc-head h2 em { color: var(--accent); font-style: italic; }
+    .proc-head .sub { margin-top: 12px; font-size: 13px; color: var(--text-tertiary); }
+
+    /* 3 analyst cards */
+    .proc-jury {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .proc-analyst {
+      position: relative;
+      padding: 20px 18px 18px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      min-height: 180px;
+      display: flex; flex-direction: column;
+      transition: border-color 0.5s var(--ease-quart), box-shadow 0.5s var(--ease-quart);
+      overflow: hidden;
+    }
+    .proc-analyst[data-state="thinking"] {
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 1px var(--accent-border), 0 20px 50px -20px var(--accent-glow);
+    }
+    .proc-analyst[data-state="done"] {
+      border-color: rgba(63,185,80,0.35);
+    }
+    .proc-analyst .pa-top {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .proc-analyst .pa-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border-decor);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-weight: 300; font-size: 18px;
+      color: var(--text-secondary); letter-spacing: -0.5px;
+      flex-shrink: 0;
+      transition: all 0.5s var(--ease-quart);
+    }
+    .proc-analyst[data-state="thinking"] .pa-avatar {
+      background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent);
+      animation: paAvatarPulse 1.8s ease-in-out infinite;
+    }
+    .proc-analyst[data-state="done"] .pa-avatar {
+      background: rgba(63,185,80,0.08); border-color: rgba(63,185,80,0.30); color: var(--green);
+    }
+    @keyframes paAvatarPulse {
+      0%,100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+      50%     { box-shadow: 0 0 0 8px transparent; }
+    }
+    .proc-analyst .pa-meta { flex: 1; min-width: 0; }
+    .proc-analyst .pa-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+      letter-spacing: -0.1px;
+    }
+    .proc-analyst .pa-spec {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--text-tertiary); margin-top: 2px;
+    }
+    .proc-analyst .pa-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 1.3px; text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+      min-height: 14px;
+    }
+    .proc-analyst[data-state="thinking"] .pa-status { color: var(--accent); }
+    .proc-analyst[data-state="done"]     .pa-status { color: var(--green); }
+    .proc-analyst .pa-status .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+    }
+    .proc-analyst[data-state="thinking"] .pa-status .dot { animation: paDot 1.2s infinite ease-in-out; }
+    @keyframes paDot { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+    .proc-analyst .pa-bar {
+      height: 6px; width: 100%;
+      background: rgba(255,255,255,0.06); border-radius: 3px;
+      overflow: hidden; position: relative;
+    }
+    .proc-analyst .pa-bar::after {
+      content: ''; position: absolute; inset: 0;
+      background: var(--accent);
+      transform: scaleX(var(--p, 0)); transform-origin: left;
+      transition: transform 0.35s linear;
+    }
+    .proc-analyst[data-state="done"] .pa-bar::after { background: var(--green); }
+    .proc-analyst .pa-pct {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.8px;
+      color: var(--text-tertiary);
+    }
+    .proc-analyst .pa-pct .v {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-weight: 300; font-size: 18px; letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+    .proc-analyst[data-state="thinking"] .pa-pct .v { color: var(--accent); }
+    .proc-analyst[data-state="done"]     .pa-pct .v { color: var(--green); }
+
+    /* Convergence section */
+    .proc-converge {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 28px;
+      padding: 26px 28px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      align-items: center;
+    }
+    .proc-gauge-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .proc-gauge {
+      position: relative; width: 180px; height: 180px;
+    }
+    .proc-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .proc-gauge .track { stroke: rgba(255,255,255,0.08); }
+    .proc-gauge .fill { stroke: var(--accent); transition: stroke-dashoffset 0.5s var(--ease-quart); filter: drop-shadow(0 0 10px var(--accent-glow)); }
+    .proc-gauge .pct {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px;
+    }
+    .proc-gauge .pct .big {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-weight: 300; font-size: 44px; letter-spacing: -2px;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .proc-gauge .pct .lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    .proc-gauge-cap {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .proc-meta {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .proc-meta-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 60px;
+      gap: 14px; align-items: center;
+    }
+    .proc-meta-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+    .proc-meta-bar {
+      height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; position: relative;
+    }
+    .proc-meta-bar::after {
+      content: ''; position: absolute; inset: 0;
+      background: var(--accent);
+      transform: scaleX(var(--p, 0)); transform-origin: left;
+      transition: transform 0.5s var(--ease-quart);
+    }
+    .proc-meta-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 500; color: var(--text-primary);
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+
+    /* Step log (real backend events) */
+    .proc-log {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; letter-spacing: 0.8px;
+      color: var(--text-tertiary);
+      max-height: 120px;
+      overflow: hidden;
+      display: flex; flex-direction: column; gap: 3px;
+      padding: 14px 18px;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+    .proc-log .row { display: flex; gap: 8px; align-items: center; opacity: 0; animation: procLogIn 0.4s forwards; }
+    @keyframes procLogIn { to { opacity: 1; } }
+    .proc-log .row .d { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    @media (max-width: 860px) {
+      .proc-jury { grid-template-columns: 1fr; }
+      .proc-converge { grid-template-columns: 1fr; padding: 20px; gap: 20px; }
+      .proc-gauge { width: 140px; height: 140px; }
+      .proc-gauge .pct .big { font-size: 34px; }
+      .proc-meta-row { grid-template-columns: 90px 1fr 50px; gap: 10px; }
+    }
+  </style>
+
+  <div class="proc-wrap">
+    <div class="proc-head">
+      <span class="eyebrow" id="procEyebrow">Jury deliberating</span>
+      <h2 id="procTitle">
+        <span class="muted">The jury is</span> <em>deliberating</em>.
+      </h2>
+      <p class="sub">3 analysts evaluating &middot; blind &middot; independent &middot; typically 10–20 seconds</p>
     </div>
-    <p class="t-display" style="font-size:22px;font-weight:500;color:var(--text);" id="pTitle">Preparing analysis</p>
-    <p class="t-mono" style="font-size:10px;color:var(--text-dim);margin-top:8px;letter-spacing:0.5px;">TYPICALLY 10-20 SECONDS</p>
-    <div id="SL" style="margin-top:28px;width:100%;max-width:340px;"></div>
+
+    <div class="proc-jury">
+      <div class="proc-analyst" data-state="idle" data-analyst="1">
+        <div class="pa-top">
+          <div class="pa-avatar">1</div>
+          <div class="pa-meta">
+            <div class="pa-name">Analyst 1</div>
+            <div class="pa-spec">General</div>
+          </div>
+        </div>
+        <div class="pa-status"><span class="dot"></span><span class="lbl">Waiting</span></div>
+        <div class="pa-bar"></div>
+        <div class="pa-pct"><span>PROGRESS</span><span class="v">0%</span></div>
+      </div>
+      <div class="proc-analyst" data-state="idle" data-analyst="2">
+        <div class="pa-top">
+          <div class="pa-avatar">2</div>
+          <div class="pa-meta">
+            <div class="pa-name">Analyst 2</div>
+            <div class="pa-spec">Skeptic</div>
+          </div>
+        </div>
+        <div class="pa-status"><span class="dot"></span><span class="lbl">Waiting</span></div>
+        <div class="pa-bar"></div>
+        <div class="pa-pct"><span>PROGRESS</span><span class="v">0%</span></div>
+      </div>
+      <div class="proc-analyst" data-state="idle" data-analyst="3">
+        <div class="pa-top">
+          <div class="pa-avatar">3</div>
+          <div class="pa-meta">
+            <div class="pa-name">Analyst 3</div>
+            <div class="pa-spec">Pragmatist</div>
+          </div>
+        </div>
+        <div class="pa-status"><span class="dot"></span><span class="lbl">Waiting</span></div>
+        <div class="pa-bar"></div>
+        <div class="pa-pct"><span>PROGRESS</span><span class="v">0%</span></div>
+      </div>
+    </div>
+
+    <div class="proc-converge">
+      <div class="proc-gauge-wrap">
+        <div class="proc-gauge">
+          <svg viewBox="0 0 36 36">
+            <circle class="track" cx="18" cy="18" r="15.5" fill="none" stroke-width="1.4"/>
+            <circle class="fill" id="pFill" cx="18" cy="18" r="15.5" fill="none" stroke-width="1.6"
+                    stroke-dasharray="97.4" stroke-dashoffset="97.4" stroke-linecap="round"/>
+          </svg>
+          <div class="pct">
+            <div class="big" id="pPct">0%</div>
+            <div class="lbl">Overall</div>
+          </div>
+        </div>
+        <div class="proc-gauge-cap" id="pTitle">Preparing analysis</div>
+      </div>
+      <div class="proc-meta">
+        <div class="proc-meta-row">
+          <div class="proc-meta-lbl">Analyst Agreement</div>
+          <div class="proc-meta-bar" id="pAgreeBar"></div>
+          <div class="proc-meta-val"><span id="pAgreeVal">—</span></div>
+        </div>
+        <div class="proc-meta-row">
+          <div class="proc-meta-lbl">Score Spread</div>
+          <div class="proc-meta-bar" id="pSpreadBar"></div>
+          <div class="proc-meta-val"><span id="pSpreadVal">—</span></div>
+        </div>
+        <div class="proc-meta-row">
+          <div class="proc-meta-lbl">Confidence</div>
+          <div class="proc-meta-bar" id="pConfBar"></div>
+          <div class="proc-meta-val"><span id="pConfVal">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="proc-log" id="SL"></div>
   </div>
 </div>
 
@@ -401,7 +705,68 @@ document.getElementById('goBtn').onclick=async()=>{
 
 /* Pipeline */
 let stepsDone=0;const TOTAL=7;
-function setProg(pct,title){pFill.style.strokeDashoffset=CIRC*(1-pct/100);pPct.textContent=Math.round(pct)+'%';pTitle.textContent=title;}
+
+/* Analyst-cards orchestration — progress bands drive which analyst is active/done */
+const analystEls = document.querySelectorAll('.proc-analyst');
+const pAgreeBar  = document.getElementById('pAgreeBar');
+const pAgreeVal  = document.getElementById('pAgreeVal');
+const pSpreadBar = document.getElementById('pSpreadBar');
+const pSpreadVal = document.getElementById('pSpreadVal');
+const pConfBar   = document.getElementById('pConfBar');
+const pConfVal   = document.getElementById('pConfVal');
+const procTitle  = document.getElementById('procTitle');
+
+function setAnalyst(idx, state, pct) {
+  const el = analystEls[idx - 1];
+  if (!el) return;
+  el.dataset.state = state;
+  const bar = el.querySelector('.pa-bar');
+  const v = el.querySelector('.pa-pct .v');
+  const lbl = el.querySelector('.pa-status .lbl');
+  if (bar) bar.style.setProperty('--p', Math.max(0, Math.min(1, pct)).toFixed(3));
+  if (v) v.textContent = Math.round(pct * 100) + '%';
+  if (lbl) lbl.textContent = state === 'thinking' ? 'Scoring' : state === 'done' ? 'Done' : 'Waiting';
+}
+
+function setProg(pct, title) {
+  pFill.style.strokeDashoffset = CIRC * (1 - pct / 100);
+  pPct.textContent = Math.round(pct) + '%';
+  if (title) {
+    // Gauge caption
+    pTitle.textContent = title;
+    // Headline swap — stays calm until high progress flips to "verdict forming"
+    if (pct >= 88) {
+      procTitle.innerHTML = '<span class="muted">The jury has reached a</span> <em>verdict</em>.';
+    } else if (pct >= 55) {
+      procTitle.innerHTML = '<span class="muted">Scores are</span> <em>converging</em>.';
+    } else if (pct >= 15) {
+      procTitle.innerHTML = '<span class="muted">Analysts are</span> <em>evaluating</em>.';
+    } else {
+      procTitle.innerHTML = '<span class="muted">The jury is</span> <em>deliberating</em>.';
+    }
+  }
+
+  // Drive 3 analyst cards staggered across the progress band.
+  const p = pct / 100;
+  const t1 = Math.max(0, Math.min(1, p / 0.40));
+  const t2 = Math.max(0, Math.min(1, (p - 0.20) / 0.45));
+  const t3 = Math.max(0, Math.min(1, (p - 0.40) / 0.50));
+  setAnalyst(1, p >= 0.40 ? 'done' : (p > 0 ? 'thinking' : 'idle'), t1);
+  setAnalyst(2, p >= 0.65 ? 'done' : (p > 0.20 ? 'thinking' : 'idle'), t2);
+  setAnalyst(3, p >= 0.90 ? 'done' : (p > 0.40 ? 'thinking' : 'idle'), t3);
+
+  // Convergence meta rails (agreement / spread / confidence build up as jury nears verdict)
+  const agree = Math.max(0, Math.min(1, (p - 0.30) / 0.65));
+  pAgreeBar.style.setProperty('--p', agree.toFixed(3));
+  pAgreeVal.textContent = agree > 0 ? Math.round(agree * 100) + '%' : '—';
+  const spread = Math.max(0, Math.min(1, (p - 0.50) / 0.45));
+  pSpreadBar.style.setProperty('--p', (spread * 0.4 + 0.6 * (spread > 0 ? 1 : 0)).toFixed(3));
+  pSpreadVal.textContent = spread > 0 ? (1.0 - spread * 0.6).toFixed(1) + ' pts' : '—';
+  const conf = Math.max(0, Math.min(1, (p - 0.55) / 0.45));
+  pConfBar.style.setProperty('--p', conf.toFixed(3));
+  pConfVal.textContent = conf > 0 ? Math.round(conf * 92) + '%' : '—';
+}
+
 async function runPipeline(payload){
   inputSection.style.display='none';belowFold.style.display='none';
   PS.style.display='block';ES.style.display='none';RS.style.display='none';
@@ -416,10 +781,11 @@ async function runPipeline(payload){
         for(const l of lines){const tr=l.trim();if(!tr.startsWith('data: '))continue;
           try{const d=JSON.parse(tr.slice(6));
             if(d.step){stepsDone++;setProg(Math.min(Math.round(stepsDone/TOTAL*100),95),d.detail||d.step);
-              const el=document.createElement('div');el.style.cssText='display:flex;align-items:center;gap:10px;padding:4px 0;opacity:0;animation:stepIn 0.3s ease forwards;';
-              el.innerHTML=`<div class="step-dot step-done"></div><span class="t-mono" style="font-size:10px;color:var(--text-muted);letter-spacing:0.3px;">${esc(d.detail||d.step)}</span>`;
-              SL.appendChild(el);}
-            else if(d.run_id){setProg(100,'Analysis complete');pFill.classList.add('done');setTimeout(()=>{PS.style.display='none';renderResults(d);},500);}
+              const row=document.createElement('div');row.className='row';
+              row.innerHTML=`<div class="d"></div><span>${esc(d.detail||d.step)}</span>`;
+              SL.insertBefore(row, SL.firstChild);
+              while (SL.childElementCount > 8) SL.removeChild(SL.lastChild);}
+            else if(d.run_id){setProg(100,'Analysis complete');pFill.classList.add('done');setTimeout(()=>{PS.style.display='none';renderResults(d);},650);}
             else if(d.error)throw new Error(d.error);
           }catch(pe){if(!pe.message.includes('JSON'))throw pe;}}}
     }else{const d=await r.json();PS.style.display='none';renderResults(d);}

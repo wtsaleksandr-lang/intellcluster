@@ -56,6 +56,10 @@
     </div>
   </div>
 
+  {% with share_url=(request.url|string), share_text='Phronesis ranked this: ' + result.winner, show_download_json=True %}
+  {% include "partials/_share_actions.html" %}
+  {% endwith %}
+
   <!-- Outcome capture -->
   <div id="outcomeBlock" class="rv" style="margin:40px 0;padding:22px 24px;background:var(--surface);border:1px dashed var(--border2);border-radius:12px;">
     <div class="fig-label" style="margin-bottom:10px;">FIG <span>B</span> — HOW DID IT GO?</div>
@@ -89,6 +93,20 @@
 </div>
 
 <script>
+(function() {
+  // JSON download — snapshot the decision payload
+  var jsonBtn = document.getElementById('saDownloadJsonBtn');
+  if (jsonBtn) jsonBtn.addEventListener('click', function() {
+    var data = {{ result | tojson }};
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'phronesis-' + (data.run_id || 'decision') + '.json';
+    link.click();
+    setTimeout(function(){ URL.revokeObjectURL(link.href); }, 1000);
+  });
+})();
+
 (function() {
   var rating = null;
   var btns = document.querySelectorAll('.rating-btn');

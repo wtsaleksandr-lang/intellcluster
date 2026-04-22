@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Something broke — IntellCluster{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<div style="max-width:620px;margin:0 auto;padding:120px 24px;text-align:center;">
+  <span class="fin-label">Error &middot; 500</span>
+  <h1 class="t-display" style="margin-top:24px;font-size:clamp(34px,5vw,56px);line-height:1.05;letter-spacing:-1px;">
+    <span style="color:rgba(255,255,255,0.45);">Something broke</span> <em style="color:var(--accent);font-style:italic;">on our side</em>.
+  </h1>
+  <p style="margin-top:18px;font-size:14px;line-height:1.7;color:var(--text-tertiary);">
+    The engine hit an unexpected condition. We've logged it and will look into it. Try again — if the issue persists, it's on us, not you.
+  </p>
+  {% if request_id %}
+  <p class="t-mono" style="margin-top:14px;font-size:10px;letter-spacing:1.2px;color:var(--text-dim);">REF &middot; {{ request_id }}</p>
+  {% endif %}
+  <div style="margin-top:32px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+    <a href="javascript:history.back()" style="padding:11px 22px;background:var(--accent);color:#fff;font-weight:500;border-radius:6px;font-size:13px;text-decoration:none;">← Go back</a>
+    <a href="/" style="padding:11px 22px;background:transparent;color:var(--text-primary);border:1px solid var(--border-decor);font-weight:500;border-radius:6px;font-size:13px;text-decoration:none;">Home</a>
+  </div>
+</div>
+{% endblock %}
