@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}{{ template.title }} — Decision Template{% endblock %}
+{% block meta_desc %}{{ template.description }} Pre-built Phronesis decision framework with {{ template.options|length }} options and {{ template.criteria|length }} weighted criteria.{% endblock %}
+{% block og_title %}{{ template.title }} — Decision Template{% endblock %}
+{% block og_desc %}{{ template.description }}{% endblock %}
+{% block og_image %}/og/template/{{ template.slug }}.png{% endblock %}
+
+{% block structured_data %}
+{{ super() }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "IntellCluster", "item": "https://intellcluster.com/"},
+    {"@type": "ListItem", "position": 2, "name": "Templates",    "item": "https://intellcluster.com/templates"},
+    {"@type": "ListItem", "position": 3, "name": {{ template.title | tojson }}}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": {{ template.title | tojson }},
+  "description": {{ template.description | tojson }},
+  "step": [
+    {% for opt in template.options %}
+    {"@type": "HowToStep", "position": {{ loop.index }}, "name": "Consider " + {{ opt | tojson }}}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": {{ template.title | tojson }},
+  "itemListElement": [
+    {% for opt in template.options %}
+    {"@type": "ListItem", "position": {{ loop.index }}, "name": {{ opt | tojson }}}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:820px;margin:0 auto;padding:0 20px;">
+
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-tertiary);letter-spacing:0.3px;" class="t-mono">
+    <a href="/" style="color:var(--text-tertiary);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 6px;">/</span>
+    <a href="/templates" style="color:var(--text-tertiary);text-decoration:none;">Templates</a>
+    <span style="margin:0 6px;">/</span>
+    <span style="color:var(--text-secondary);">{{ template.category }}</span>
+  </nav>
+
+  <section style="padding:36px 0 28px;" class="rv">
+    <span class="fin-label" style="margin-bottom:22px;">IntellCluster <span>·</span> Template</span>
+    <h1 class="t-display" style="margin-top:14px;font-size:clamp(30px,4.5vw,48px);font-weight:300;letter-spacing:-1px;line-height:1.08;">
+      {{ template.title }}
+    </h1>
+    <p style="margin-top:16px;font-size:15px;line-height:1.7;color:var(--text-tertiary);">{{ template.description }}</p>
+  </section>
+
+  <!-- Options -->
+  <section class="rv rv1" style="padding:8px 0 28px;">
+    <div class="fig-label">FIG <span>1</span> — OPTIONS TO RANK</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;" class="grid-3">
+      {% for opt in template.options %}
+      <div class="panel" style="padding:16px;">
+        <div class="t-mono" style="font-size:10px;color:var(--text-tertiary);margin-bottom:6px;letter-spacing:1px;">{{ '%02d'|format(loop.index) }}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary);">{{ opt }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Criteria -->
+  <section class="rv rv2" style="padding:8px 0 28px;">
+    <div class="fig-label">FIG <span>2</span> — DEFAULT CRITERIA &amp; WEIGHTS</div>
+    <div class="panel" style="padding:18px 22px;">
+      <div style="display:grid;grid-template-columns:1fr auto 120px;gap:10px 16px;font-size:13px;align-items:center;">
+        {% for c in template.criteria %}
+        <div style="color:var(--text-primary);">{{ c.name }}</div>
+        <div class="t-mono" style="color:var(--text-tertiary);font-size:11px;text-align:right;">{{ c.weight }}/10</div>
+        <div style="position:relative;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX({{ c.weight / 10 }});"></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- What happens next -->
+  <section class="rv rv3" style="padding:8px 0 28px;">
+    <div class="fig-label">FIG <span>3</span> — WHAT HAPPENS WHEN YOU RUN THIS</div>
+    <div class="panel accent-bar" style="padding:22px 24px 22px 20px;">
+      <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;">
+        <li style="display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          <span class="t-mono" style="color:var(--accent);font-size:10px;padding-top:3px;letter-spacing:1px;">01</span>
+          Phronesis anonymises your options as A, B, C so the analysts can't recognise a brand or anchor on it.
+        </li>
+        <li style="display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          <span class="t-mono" style="color:var(--accent);font-size:10px;padding-top:3px;letter-spacing:1px;">02</span>
+          Three independent analysts (General, Skeptic, Pragmatist) score each option against your weighted criteria.
+        </li>
+        <li style="display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          <span class="t-mono" style="color:var(--accent);font-size:10px;padding-top:3px;letter-spacing:1px;">03</span>
+          Scores are cross-checked; we measure analyst agreement and compute a confidence level before surfacing a verdict.
+        </li>
+        <li style="display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:13px;color:var(--text-secondary);line-height:1.6;">
+          <span class="t-mono" style="color:var(--accent);font-size:10px;padding-top:3px;letter-spacing:1px;">04</span>
+          You get a ranked list with strengths and weaknesses per option, plus a shareable URL + PDF download.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="rv" style="padding:16px 0 48px;text-align:center;">
+    <h2 class="t-display" style="font-size:clamp(24px,3.2vw,34px);font-weight:300;line-height:1.1;letter-spacing:-0.8px;margin-bottom:10px;">
+      <span style="color:rgba(255,255,255,0.45);">Run this decision</span> <em style="color:var(--accent);font-style:italic;">now</em>.
+    </h2>
+    <p style="color:var(--text-tertiary);font-size:13px;margin-bottom:22px;max-width:440px;margin-left:auto;margin-right:auto;">
+      We'll pre-fill the composer. Tweak the weights before analysing — takes about 15 seconds end-to-end.
+    </p>
+    <a href="/phronesis?template={{ template.slug }}" style="display:inline-block;padding:12px 28px;background:var(--accent);color:#fff;font-weight:500;border-radius:6px;font-size:14px;text-decoration:none;letter-spacing:-0.01em;">Open in Phronesis →</a>
+    <div style="margin-top:16px;">
+      <a href="/templates" class="t-mono" style="font-size:10px;color:var(--text-dim);text-decoration:none;letter-spacing:1px;">← ALL TEMPLATES</a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

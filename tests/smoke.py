@@ -59,6 +59,8 @@ PUBLIC_ROUTES = [
     ("/og/compare/hubspot-vs-salesforce-vs-pipedrive.svg", 200),
     ("/og/compare/hubspot-vs-salesforce-vs-pipedrive.png", 200),
     ("/og/homepage.png", 200),
+    ("/templates/choose-laptop", 200),
+    ("/og/template/choose-laptop.png", 200),
     # 404 path returns a templated 404 with status 404
     ("/compare/definitely-does-not-exist", 404),
     # Legacy redirects

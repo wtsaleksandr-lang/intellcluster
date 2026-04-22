@@ -117,11 +117,12 @@ async def robots():
 
 @app.get("/sitemap.xml", include_in_schema=False)
 async def sitemap():
-    """Dynamic sitemap — includes static pages + all /compare/{slug} programmatic pages."""
+    """Dynamic sitemap — static pages + /compare/{slug} + /templates/{slug}."""
     from fastapi.responses import Response
     from shared.seo_pages import all_compare_slugs
+    from shared.templates_library import load_templates
 
-    base = "https://intellcluster.com"
+    base = os.environ.get("SITE_URL", "https://intellcluster.com").rstrip("/")
     static_urls = [
         ("/", "1.0", "weekly"),
         ("/phronesis", "0.9", "weekly"),
@@ -138,6 +139,10 @@ async def sitemap():
         lines.append(f'  <url><loc>{base}{path}</loc><priority>{priority}</priority><changefreq>{freq}</changefreq></url>')
     for slug in all_compare_slugs():
         lines.append(f'  <url><loc>{base}/compare/{slug}</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>')
+    for t in load_templates():
+        slug = t.get("slug", "")
+        if slug:
+            lines.append(f'  <url><loc>{base}/templates/{slug}</loc><priority>0.65</priority><changefreq>monthly</changefreq></url>')
     lines.append('</urlset>')
     return Response(content="\n".join(lines), media_type="application/xml")
 
@@ -356,6 +361,38 @@ async def templates_index(request: Request):
     })
 
 
+@app.get("/templates/{slug}", response_class=HTMLResponse)
+async def template_detail(request: Request, slug: str):
+    """Per-template landing page — indexable, shareable, one-click launch into Phronesis."""
+    from shared.templates_library import get_template
+    t = get_template(slug)
+    if not t:
+        return templates.TemplateResponse(request, "404.html", status_code=404)
+    return templates.TemplateResponse(request, "template_detail.html", {"template": t})
+
+
+@app.get("/og/template/{slug}.png", include_in_schema=False)
+async def og_template_png(slug: str):
+    """Per-template OG card using the compare-style PNG renderer."""
+    from fastapi.responses import Response
+    from shared.exporters.og_png import compare_og_png, homepage_og_png
+    from shared.templates_library import get_template
+    t = get_template(slug)
+    if not t:
+        png = homepage_og_png()
+    else:
+        png = compare_og_png(
+            title=t.get("title", ""),
+            options=t.get("options", []),
+            category=t.get("category", ""),
+        )
+    return Response(
+        content=png,
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
 @app.get("/api/template/{slug}")
 async def template_lookup(slug: str):
     from shared.templates_library import get_template
@@ -367,6 +404,13 @@ async def template_lookup(slug: str):
         "options": t.get("options", []),
         "criteria": t.get("criteria", []),
     }
+
+
+@app.get("/api/templates")
+async def templates_list():
+    """Public API: list all decision templates (for third-party integration)."""
+    from shared.templates_library import load_templates
+    return {"templates": load_templates()}
 
 
 @app.get("/history", response_class=HTMLResponse)
