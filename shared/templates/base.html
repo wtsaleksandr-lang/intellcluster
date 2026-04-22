@@ -17,7 +17,7 @@
 
 <meta name="twitter:title" content="{% block twitter_title %}{{ self.og_title() }}{% endblock %}">
 <meta name="twitter:description" content="{% block twitter_desc %}{{ self.og_desc() }}{% endblock %}">
-<meta name="theme-color" content="#0d1117">
+<meta name="theme-color" content="#020917">
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -44,168 +44,286 @@
 <link rel="apple-touch-icon" href="/static/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Dark theme is the default */
+/* ═══════════════════════════════════════════════════════════
+   FIN-INSPIRED DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════ */
 :root, html[data-theme="dark"] {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --surface2: #1c2129;
-  --border: #30363d;
-  --border-subtle: rgba(255,255,255,0.06);
+  /* Backgrounds */
+  --bg:             #020917;
+  --bg-deep:        #010612;
+  --surface:        rgba(8, 15, 30, 0.55);
+  --surface2:       rgba(12, 22, 40, 0.72);
+  --surface-solid:  #0a1122;
 
-  --text: #e6edf3;
-  --text-muted: #8b949e;
-  --text-dim: #484f58;
+  /* Borders */
+  --border:         rgba(255,255,255,0.10);
+  --border-subtle:  rgba(255,255,255,0.05);
+  --border-decor:   rgba(255,255,255,0.20);
+  --border-strong:  rgba(255,255,255,0.30);
 
-  /* Parent brand accent (warm orange — IntellCluster identity) */
-  --accent: #ff6a3d;
-  --accent-dim: rgba(255,106,61,0.10);
-  --accent-border: rgba(255,106,61,0.25);
-  --accent-glow: rgba(255,106,61,0.06);
+  /* Content (Fin semantic naming) */
+  --text:           #ffffff;
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255,255,255,0.72);
+  --text-muted:     rgba(255,255,255,0.55);
+  --text-tertiary:  rgba(255,255,255,0.40);
+  --text-dim:       rgba(255,255,255,0.28);
+  --text-ghost:     rgba(255,255,255,0.18);
 
-  --green: #3fb950;
-  --green-dim: rgba(63,185,80,0.10);
-  --red: #f85149;
-  --red-dim: rgba(248,81,73,0.08);
-  --amber: #d29922;
-  --amber-dim: rgba(210,153,34,0.10);
+  /* Accent — Fin orange */
+  --accent:         #FF5600;
+  --accent-dim:     rgba(255,86,0,0.12);
+  --accent-border:  rgba(255,86,0,0.32);
+  --accent-glow:    rgba(255,86,0,0.35);
+  --accent-soft:    rgba(255,86,0,0.08);
+
+  /* Status */
+  --green:          #3fb950;
+  --green-dim:      rgba(63,185,80,0.12);
+  --red:            #f85149;
+  --red-dim:        rgba(248,81,73,0.10);
+  --amber:          #d29922;
+  --amber-dim:      rgba(210,153,34,0.12);
+
+  /* Motion */
+  --ease-quart:     cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out:       cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Light theme */
+/* Light theme (cream, à la Fin's alt theme) */
 html[data-theme="light"] {
-  --bg: #fafaf7;
-  --surface: #ffffff;
-  --surface2: #f4f3ef;
-  --border: #e2e0d9;
-  --border-subtle: rgba(0,0,0,0.05);
-
-  --text: #1a1a1a;
-  --text-muted: #5a5a5a;
-  --text-dim: #9a9a9a;
+  --bg:             #fafaf7;
+  --bg-deep:        #f4f3ef;
+  --surface:        #ffffff;
+  --surface2:       #f4f3ef;
+  --surface-solid:  #ffffff;
+  --border:         rgba(0,0,0,0.10);
+  --border-subtle:  rgba(0,0,0,0.05);
+  --border-decor:   rgba(0,0,0,0.20);
+  --border-strong:  rgba(0,0,0,0.30);
+  --text:           #1a1a1a;
+  --text-primary:   #1a1a1a;
+  --text-secondary: rgba(0,0,0,0.72);
+  --text-muted:     rgba(0,0,0,0.55);
+  --text-tertiary:  rgba(0,0,0,0.40);
+  --text-dim:       rgba(0,0,0,0.28);
+  --text-ghost:     rgba(0,0,0,0.18);
 }
 
-/* Phronesis uses the warm orange (decision warmth) — default */
+/* Phronesis — Fin orange (default accent) */
 body.tool-phronesis {
-  --accent: #ff6a3d;
-  --accent-dim: rgba(255,106,61,0.10);
-  --accent-border: rgba(255,106,61,0.25);
-  --accent-glow: rgba(255,106,61,0.06);
+  --accent:         #FF5600;
+  --accent-dim:     rgba(255,86,0,0.12);
+  --accent-border:  rgba(255,86,0,0.32);
+  --accent-glow:    rgba(255,86,0,0.35);
+  --accent-soft:    rgba(255,86,0,0.08);
 }
 
-/* Synthesis uses cool cyan-teal (research clarity) — distinct but related */
+/* Synthesis — cool cyan for differentiation */
 body.tool-synthesis {
-  --accent: #4dd0c8;
-  --accent-dim: rgba(77,208,200,0.10);
-  --accent-border: rgba(77,208,200,0.25);
-  --accent-glow: rgba(77,208,200,0.06);
+  --accent:         #4dd0c8;
+  --accent-dim:     rgba(77,208,200,0.12);
+  --accent-border:  rgba(77,208,200,0.32);
+  --accent-glow:    rgba(77,208,200,0.35);
+  --accent-soft:    rgba(77,208,200,0.08);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { height: 100%; -webkit-font-smoothing: antialiased; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.55;
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  letter-spacing: -0.01em;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255,86,0,0.05) 0%, transparent 45%),
+    radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: auto, 22px 22px;
+  background-attachment: fixed;
+}
+html[data-theme="light"] body {
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255,86,0,0.05) 0%, transparent 45%),
+    radial-gradient(rgba(0,0,0,0.035) 1px, transparent 1px);
+  background-size: auto, 22px 22px;
 }
 
-/* Typography classes */
-.t-display { font-family: 'Newsreader', Georgia, serif; }
-.t-mono { font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', Consolas, monospace; }
+/* ═══════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════ */
+.t-display { font-family: 'Instrument Serif', ui-serif, Georgia, serif; font-weight: 300; letter-spacing: -0.02em; }
+.t-sans    { font-family: 'DM Sans', system-ui, -apple-system, sans-serif; }
+.t-mono    { font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', Consolas, monospace; }
 
-/* Figure labels — scientific paper style */
+/* Figure labels — scientific paper style (kept for backward compat) */
 .fig-label {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: var(--text-tertiary);
   margin-bottom: 16px;
   display: block;
 }
 .fig-label span { color: var(--accent); }
 
-/* Panel — navy surface card */
+/* ── Fin section label (dot + mono + underline) ── */
+.fin-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-decor);
+}
+.fin-label::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIN UTILITY PATTERNS
+   ═══════════════════════════════════════════════════════════ */
+
+/* Corner brackets — the Fin signature frame */
+.fin-brackets { position: absolute; inset: 12px; pointer-events: none; z-index: 2; }
+.fin-brackets > span {
+  position: absolute; width: 22px; height: 22px;
+  border-color: var(--border-decor); border-style: solid; border-width: 0;
+}
+.fin-brackets .tl { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+.fin-brackets .tr { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+.fin-brackets .bl { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+.fin-brackets .br { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* Dot grid — for media containers */
+.fin-dot-grid {
+  background-image: radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Animated underline link */
+.fin-underline {
+  background: linear-gradient(currentColor, currentColor) no-repeat;
+  background-size: 100% 1px;
+  background-position: 0% 100%;
+  transition: background-size 220ms var(--ease-out), background-position 220ms var(--ease-out);
+  padding-bottom: 2px;
+  text-decoration: none;
+}
+.fin-underline:hover {
+  background-size: 0% 1px;
+  background-position: 100% 100%;
+}
+
+/* ScaleX progress bar */
+.fin-progress {
+  height: 1px; width: 100%; overflow: hidden;
+  background: var(--border-subtle);
+}
+.fin-progress > span {
+  display: block; height: 100%; width: 100%;
+  background: var(--accent);
+  transform: scaleX(var(--p, 0)); transform-origin: left;
+  transition: transform 300ms linear;
+}
+
+/* Dashed footer/section divider (Fin style) */
+.fin-divider-dashed {
+  height: 1px; width: 100%;
+  background: linear-gradient(to right, var(--border-decor) 5px, transparent 5px);
+  background-size: 10px 1px; background-repeat: repeat-x;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEGACY PANEL + BADGE STYLES (kept for existing pages)
+   ═══════════════════════════════════════════════════════════ */
+
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 20px;
+  backdrop-filter: blur(6px);
 }
-
-/* Accent bar — orange left border highlight */
 .accent-bar {
-  border-left: 3px solid var(--accent);
+  border-left: 2px solid var(--accent);
   padding-left: 16px;
 }
-
-/* Badges */
 .bdg {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-weight: 500;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; padding: 3px 10px; border-radius: 4px;
+  font-weight: 500; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.6px;
 }
 .bdg-accent { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
-.bdg-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(63,185,80,0.20); }
-.bdg-red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,81,73,0.15); }
-.bdg-muted { background: rgba(139,148,158,0.08); color: var(--text-muted); border: 1px solid var(--border); }
+.bdg-green  { background: var(--green-dim); color: var(--green); border: 1px solid rgba(63,185,80,0.22); }
+.bdg-red    { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,81,73,0.18); }
+.bdg-muted  { background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--border); }
 
-/* Score bars */
 .score-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
-.score-fill { height: 100%; border-radius: 2px; width: 0; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.score-fill { height: 100%; border-radius: 2px; width: 0; transition: width 1.2s var(--ease-out); }
 
-/* Metric cards */
 .metric { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
-.metric-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+.metric-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
 .metric-bar { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
-.metric-fill { height: 100%; border-radius: 2px; width: 0; transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.2s; }
+.metric-fill { height: 100%; border-radius: 2px; width: 0; transition: width 1.4s var(--ease-out) 0.2s; }
 .metric-value { font-size: 16px; font-weight: 600; }
 
-/* Progress circle */
 .prog-circle { width: 64px; height: 64px; position: relative; }
 .prog-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .prog-circle .track { fill: none; stroke: var(--border); stroke-width: 2.5; }
-.prog-circle .fill { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.22,1,0.36,1); }
+.prog-circle .fill { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 0.6s var(--ease-out); }
 .prog-circle .fill.done { stroke: var(--green); }
 .prog-circle .pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--text); }
 
-/* Step indicator */
 .step-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .step-active { background: var(--accent); animation: stepPulse 1.5s infinite; }
 .step-done { background: var(--green); }
 @keyframes stepPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
 /* Reveal animations */
-.rv { opacity: 0; transform: translateY(14px); animation: rvUp 0.6s ease-out forwards; }
+.rv { opacity: 0; transform: translateY(14px); animation: rvUp 0.7s var(--ease-out) forwards; }
 .rv1 { animation-delay: 0.1s; } .rv2 { animation-delay: 0.2s; } .rv3 { animation-delay: 0.3s; }
 @keyframes rvUp { to { opacity: 1; transform: translateY(0); } }
 
-/* Chip/pill */
+/* Chips */
 .chip {
   display: inline-block;
   font-size: 12px;
   padding: 6px 14px;
-  border-radius: 6px;
+  border-radius: 999px;
   background: var(--surface);
   color: var(--text-muted);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s var(--ease-out);
   white-space: nowrap;
+  font-family: inherit;
 }
-.chip:hover { border-color: var(--accent-border); color: var(--text); background: var(--surface2); }
+.chip:hover { border-color: var(--border-decor); color: var(--text); background: var(--surface2); }
 
-/* Range slider */
+/* Range */
 input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; height: 20px; }
 input[type=range]::-webkit-slider-track { height: 3px; background: var(--border); border-radius: 2px; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); margin-top: -5.5px; border: 2px solid var(--bg); }
@@ -216,82 +334,210 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 details summary { cursor: pointer; list-style: none; }
 details summary::-webkit-details-marker { display: none; }
 details[open] .chv { transform: rotate(180deg); }
-.chv { transition: transform 0.2s ease; }
+.chv { transition: transform 0.2s var(--ease-out); }
 
 /* Focus */
 input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-glow); }
 
-/* Responsive */
+/* ═══════════════════════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════════════════════ */
+.ic-nav {
+  position: sticky; top: 0; z-index: 100;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(2, 9, 23, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+html[data-theme="light"] .ic-nav { background: rgba(250, 250, 247, 0.78); }
+.ic-nav-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 28px;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.ic-brand {
+  text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+.ic-brand .brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+}
+.ic-brand .brand-name {
+  font-family: 'Instrument Serif', ui-serif, Georgia, serif;
+  font-weight: 400; font-size: 22px; letter-spacing: -0.5px;
+  line-height: 1;
+}
+.ic-nav-links {
+  display: flex; align-items: center; gap: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.nav-tool {
+  text-decoration: none;
+  color: var(--text-tertiary);
+  padding: 8px 14px;
+  border-radius: 4px;
+  transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+.nav-tool:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+.nav-tool.active { color: var(--accent); }
+html[data-theme="light"] .nav-tool:hover { background: rgba(0,0,0,0.04); }
+
+.ic-nav-cta {
+  margin-left: 10px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 500;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  transition: filter 0.2s var(--ease-out);
+}
+.ic-nav-cta:hover { filter: brightness(1.1); }
+
+.theme-toggle {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; border-radius: 4px;
+  cursor: pointer; color: var(--text-tertiary);
+  transition: all 0.2s var(--ease-out);
+  margin-left: 6px;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+html[data-theme="light"] .theme-toggle:hover { background: rgba(0,0,0,0.04); }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════ */
+.ic-footer {
+  margin-top: 100px;
+  border-top: 1px solid var(--border-subtle);
+}
+.ic-footer-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+}
+.ic-footer-brand {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+.ic-footer-brand .fb-name {
+  font-family: 'Instrument Serif', ui-serif, Georgia, serif;
+  font-weight: 400; font-size: 16px;
+}
+.ic-footer-links {
+  display: flex; gap: 22px; flex-wrap: wrap;
+}
+.ic-footer-links a {
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+.ic-footer-links a:hover { color: var(--text-primary); }
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .ic-nav-inner { padding: 0 18px; height: 56px; }
+  .ic-nav-links { gap: 0; }
+  .nav-tool { padding: 7px 10px; }
+  .ic-nav-cta { margin-left: 6px; padding: 7px 12px; }
+}
 @media (max-width: 768px) {
   .grid-3 { grid-template-columns: 1fr !important; }
   .hide-mobile { display: none !important; }
   body { font-size: 13px; }
-  /* Settings popover full-width on mobile */
   #settingsPop { width: calc(100vw - 32px) !important; left: 8px !important; right: 8px !important; }
 }
 @media (max-width: 480px) {
   .panel { padding: 14px; }
-  nav > div { padding: 0 14px !important; }
+  .ic-nav-inner { padding: 0 14px; }
+  .ic-footer-inner { padding: 22px 16px; flex-direction: column; align-items: flex-start; }
 }
-/* Touch targets minimum 44px */
 button, a.nav-tool, .chip { min-height: 36px; }
 
-/* Handoff banner flex on mobile */
 #handoffBanner { flex-wrap: wrap; }
 @media (max-width: 640px) {
   #handoffBanner a { width: 100%; text-align: center; }
+}
+
+/* Motion reduce */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 </style>
 {% block head %}{% endblock %}
 </head>
 <body{% if tool %} class="tool-{{ tool }}"{% endif %}>
 
-<!-- Nav -->
-<nav style="border-bottom: 1px solid var(--border-subtle); position: sticky; top: 0; z-index: 50; background: rgba(13,17,23,0.92); backdrop-filter: blur(12px);">
-  <div style="max-width: 760px; margin: 0 auto; padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-    <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-      <span class="t-display" style="font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.2px;">IntellCluster</span>
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="ic-nav">
+  <div class="ic-nav-inner">
+    <a href="/" class="ic-brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">IntellCluster</span>
     </a>
-    <div style="display: flex; align-items: center; gap: 4px; font-size: 12px;">
-      <a href="/phronesis" data-tool="phronesis" class="nav-tool" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Phronesis</a>
-      <a href="/synthesis" data-tool="synthesis" class="nav-tool" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Synthesis</a>
-      <a href="/templates" class="nav-tool hide-mobile" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Templates</a>
-      <a href="/history" class="nav-tool hide-mobile" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">History</a>
-      <a href="/pricing" class="nav-tool hide-mobile" style="text-decoration: none; color: var(--text-muted); padding: 6px 12px; border-radius: 6px; transition: all 0.15s;">Pricing</a>
-      <button id="themeToggle" title="Toggle theme" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:none;border-radius:6px;cursor:pointer;color:var(--text-muted);transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='none'">
-        <svg id="themeIconMoon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg id="themeIconSun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    <div class="ic-nav-links">
+      <a href="/phronesis" data-tool="phronesis" class="nav-tool">Phronesis</a>
+      <a href="/synthesis" data-tool="synthesis" class="nav-tool">Synthesis</a>
+      <a href="/templates" class="nav-tool hide-mobile">Templates</a>
+      <a href="/history" class="nav-tool hide-mobile">History</a>
+      <a href="/pricing" class="nav-tool hide-mobile">Pricing</a>
+      <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+        <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
       </button>
+      <a href="/pricing" class="ic-nav-cta">Get started</a>
     </div>
   </div>
 </nav>
 
 <main style="flex: 1;">{% block content %}{% endblock %}</main>
 
-<!-- Footer -->
-<footer style="border-top: 1px solid var(--border-subtle); margin-top: 80px;">
-  <div style="max-width: 760px; margin: 0 auto; padding: 24px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 11px; color: var(--text-dim); flex-wrap: wrap;">
-    <div>
-      <span class="t-display" style="font-size: 13px; color: var(--text-muted); font-weight: 600;">IntellCluster</span>
-      <span style="margin-left: 8px;">&copy; 2026</span>
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="ic-footer">
+  <div class="ic-footer-inner">
+    <div class="ic-footer-brand">
+      <span class="brand-dot" style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
+      <span class="fb-name">IntellCluster</span>
+      <span style="color: var(--text-dim); margin-left: 4px;">&copy; 2026</span>
     </div>
-    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-      <a href="/phronesis" style="color: var(--text-dim); text-decoration: none;">Phronesis</a>
-      <a href="/synthesis" style="color: var(--text-dim); text-decoration: none;">Synthesis</a>
-      <a href="/templates" style="color: var(--text-dim); text-decoration: none;">Templates</a>
-      <a href="/history" style="color: var(--text-dim); text-decoration: none;">History</a>
-      <a href="/pricing" style="color: var(--text-dim); text-decoration: none;">Pricing</a>
-      <a href="/privacy" style="color: var(--text-dim); text-decoration: none;">Privacy</a>
-      <a href="/terms" style="color: var(--text-dim); text-decoration: none;">Terms</a>
+    <div class="ic-footer-links">
+      <a href="/phronesis">Phronesis</a>
+      <a href="/synthesis">Synthesis</a>
+      <a href="/templates">Templates</a>
+      <a href="/history">History</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
     </div>
   </div>
 </footer>
 
-<style>
-.nav-tool:hover { color: var(--text) !important; background: rgba(255,255,255,0.04); }
-.nav-tool.active { color: var(--accent) !important; background: var(--accent-dim); }
-html[data-theme="light"] .nav-tool:hover { background: rgba(0,0,0,0.04); }
-</style>
 <script>
 (function() {
   // Theme init
@@ -318,7 +564,7 @@ html[data-theme="light"] .nav-tool:hover { background: rgba(0,0,0,0.04); }
     });
   });
 
-  // Active tool highlight in nav
+  // Active tool highlight
   var path = window.location.pathname;
   var tool = path.startsWith('/synthesis') ? 'synthesis' : path.startsWith('/phronesis') ? 'phronesis' : null;
   if (tool) document.querySelectorAll('.nav-tool[data-tool="' + tool + '"]').forEach(function(el) { el.classList.add('active'); });

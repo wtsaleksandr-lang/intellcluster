@@ -12,9 +12,14 @@ Usage:
 
 from __future__ import annotations
 
+import io
 import os
 import sys
 from pathlib import Path
+
+# Force UTF-8 stdout so arrow glyphs in output don't crash on Windows cp1252.
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 # Make `main` importable from repo root
 REPO_ROOT = Path(__file__).resolve().parent.parent
