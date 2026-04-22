@@ -3,6 +3,7 @@
 {% block meta_desc %}AI analysis: {{ result.question[:120] }}. Winner: {{ result.winner }}.{% endblock %}
 {% block og_title %}{{ result.winner }} — Best choice: {{ result.question[:80] }}{% endblock %}
 {% block og_desc %}Ranked {{ result.ranked_options|length }} options with {{ result.judge_count }} independent analysts.{% endblock %}
+{% block og_image %}/og/phronesis/{{ result.run_id }}.png{% endblock %}
 
 {% block content %}
 {% set cM = {'high':{'cls':'bdg-green','dot':'var(--green)'},'moderate':{'cls':'bdg-accent','dot':'var(--accent)'},'low':{'cls':'bdg-red','dot':'var(--red)'}} %}
@@ -56,7 +57,7 @@
     </div>
   </div>
 
-  {% with share_url=(request.url|string), share_text='Phronesis ranked this: ' + result.winner, show_download_json=True %}
+  {% with share_url=(request.url|string), share_text='Phronesis ranked this: ' + result.winner, show_download_json=True, pdf_url='/phronesis/result/' + result.run_id + '.pdf', png_url='/og/phronesis/' + result.run_id + '.png' %}
   {% include "partials/_share_actions.html" %}
   {% endwith %}
 

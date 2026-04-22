@@ -57,6 +57,8 @@ PUBLIC_ROUTES = [
     # A specific compare page (must exist in data/compare_pages.json)
     ("/compare/hubspot-vs-salesforce-vs-pipedrive", 200),
     ("/og/compare/hubspot-vs-salesforce-vs-pipedrive.svg", 200),
+    ("/og/compare/hubspot-vs-salesforce-vs-pipedrive.png", 200),
+    ("/og/homepage.png", 200),
     # 404 path returns a templated 404 with status 404
     ("/compare/definitely-does-not-exist", 404),
     # Legacy redirects

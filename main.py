@@ -243,6 +243,79 @@ async def og_homepage():
     )
 
 
+@app.get("/og/homepage.png", include_in_schema=False)
+async def og_homepage_png():
+    from fastapi.responses import Response
+    from shared.exporters.og_png import homepage_og_png
+    return Response(
+        content=homepage_og_png(),
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+@app.get("/og/compare/{slug}.png", include_in_schema=False)
+async def og_compare_png(slug: str):
+    from fastapi.responses import Response
+    from shared.exporters.og_png import compare_og_png, homepage_og_png
+    from shared.seo_pages import get_compare_page
+    page = get_compare_page(slug)
+    if not page:
+        png = homepage_og_png()
+    else:
+        png = compare_og_png(
+            title=page.get("title", ""),
+            options=page.get("options", []),
+            category=page.get("category", ""),
+        )
+    return Response(
+        content=png,
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+@app.get("/og/phronesis/{run_id}.png", include_in_schema=False)
+async def og_phronesis_decision_png(run_id: str):
+    """Per-decision OG card — unique social preview for every shared decision."""
+    from fastapi.responses import Response
+    from shared.exporters.og_png import decision_og_png
+    decision = get_decision_by_run_id(run_id)
+    if not decision:
+        return JSONResponse(status_code=404, content={"error": "Decision not found"})
+    png = decision_og_png(
+        question=decision.get("question", ""),
+        winner=decision.get("winner", ""),
+        confidence=int(decision.get("confidence_score") or 0) or None,
+        agree=bool(decision.get("judges_agree")),
+    )
+    return Response(
+        content=png,
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+
+@app.get("/phronesis/result/{run_id}.pdf", include_in_schema=False)
+async def phronesis_decision_pdf(run_id: str):
+    """Download a Phronesis decision as a branded PDF."""
+    from fastapi.responses import Response
+    from shared.exporters.decision_pdf import build_decision_pdf
+    decision = get_decision_by_run_id(run_id)
+    if not decision:
+        return JSONResponse(status_code=404, content={"error": "Decision not found"})
+    pdf = build_decision_pdf(decision)
+    filename = f"phronesis-{run_id}.pdf"
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "private, max-age=3600",
+        },
+    )
+
+
 @app.get("/compare", response_class=HTMLResponse)
 async def compare_index(request: Request):
     from shared.seo_pages import load_compare_pages, page_slug
