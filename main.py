@@ -117,10 +117,11 @@ async def robots():
 
 @app.get("/sitemap.xml", include_in_schema=False)
 async def sitemap():
-    """Dynamic sitemap — static pages + /compare/{slug} + /templates/{slug}."""
+    """Dynamic sitemap — static pages + /compare/{slug} + /templates/{slug} + /blog/{slug}."""
     from fastapi.responses import Response
     from shared.seo_pages import all_compare_slugs
     from shared.templates_library import load_templates
+    from shared.blog import list_published as _list_blog
 
     base = os.environ.get("SITE_URL", "https://intellcluster.com").rstrip("/")
     static_urls = [
@@ -130,6 +131,7 @@ async def sitemap():
         ("/pricing", "0.7", "monthly"),
         ("/templates", "0.8", "weekly"),
         ("/compare", "0.8", "weekly"),
+        ("/blog", "0.8", "weekly"),
         ("/privacy", "0.3", "yearly"),
         ("/terms", "0.3", "yearly"),
     ]
@@ -143,6 +145,10 @@ async def sitemap():
         slug = t.get("slug", "")
         if slug:
             lines.append(f'  <url><loc>{base}/templates/{slug}</loc><priority>0.65</priority><changefreq>monthly</changefreq></url>')
+    for p in _list_blog():
+        lastmod = (p.get("updated_date") or p.get("publish_date"))
+        lastmod_str = f"<lastmod>{lastmod}</lastmod>" if lastmod else ""
+        lines.append(f'  <url><loc>{base}/blog/{p["slug"]}</loc>{lastmod_str}<priority>0.7</priority><changefreq>monthly</changefreq></url>')
     lines.append('</urlset>')
     return Response(content="\n".join(lines), media_type="application/xml")
 
@@ -411,6 +417,106 @@ async def templates_list():
     """Public API: list all decision templates (for third-party integration)."""
     from shared.templates_library import load_templates
     return {"templates": load_templates()}
+
+
+# ─── Blog / Field Notes ───
+
+@app.get("/blog", response_class=HTMLResponse)
+async def blog_index(request: Request):
+    from shared.blog import list_published
+    return templates.TemplateResponse(request, "blog/index.html", {
+        "posts": list_published(),
+    })
+
+
+@app.get("/blog/{slug}", response_class=HTMLResponse)
+async def blog_detail(request: Request, slug: str):
+    from shared.blog import get_post, list_published
+    post = get_post(slug)
+    if not post:
+        return templates.TemplateResponse(request, "404.html", status_code=404)
+    # Related — prefer same tool_focus, then newest.
+    related = [
+        p for p in list_published()
+        if p["slug"] != slug and (
+            p.get("tool_focus") == post.get("tool_focus")
+            or set(p.get("tags", [])) & set(post.get("tags", []))
+        )
+    ][:3]
+    return templates.TemplateResponse(request, "blog/detail.html", {
+        "post": post,
+        "related": related,
+    })
+
+
+@app.get("/blog.xml", include_in_schema=False)
+async def blog_rss():
+    """RSS 2.0 feed of published field notes."""
+    from fastapi.responses import Response
+    from shared.blog import list_published
+    from email.utils import format_datetime
+    from datetime import datetime, time, timezone
+
+    base = os.environ.get("SITE_URL", "https://intellcluster.com").rstrip("/")
+    posts = list_published()
+    last_build = posts[0]["publish_date"] if posts else None
+
+    def _rss_date(d):
+        if not d:
+            return ""
+        return format_datetime(datetime.combine(d, time(12, 0), tzinfo=timezone.utc))
+
+    def _esc(s):
+        return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    items = []
+    for p in posts:
+        items.append(f"""    <item>
+      <title>{_esc(p['title'])}</title>
+      <link>{base}/blog/{p['slug']}</link>
+      <guid isPermaLink="true">{base}/blog/{p['slug']}</guid>
+      <pubDate>{_rss_date(p['publish_date'])}</pubDate>
+      <description>{_esc(p['meta_desc'])}</description>
+      {''.join(f'<category>{_esc(t)}</category>' for t in p.get('tags', []))}
+    </item>""")
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>IntellCluster Field Notes</title>
+    <link>{base}/blog</link>
+    <atom:link href="{base}/blog.xml" rel="self" type="application/rss+xml"/>
+    <description>Essays on decision science and multi-model AI research from IntellCluster.</description>
+    <language>en-us</language>
+    <lastBuildDate>{_rss_date(last_build)}</lastBuildDate>
+{chr(10).join(items)}
+  </channel>
+</rss>"""
+    return Response(content=xml, media_type="application/rss+xml")
+
+
+@app.get("/og/blog/{slug}.png", include_in_schema=False)
+async def og_blog_png(slug: str):
+    """Per-article OG hero card."""
+    from fastapi.responses import Response
+    from shared.blog import get_post
+    from shared.exporters.blog_og import blog_hero_og_png
+    from shared.exporters.og_png import homepage_og_png
+    post = get_post(slug)
+    if not post:
+        return Response(content=homepage_og_png(), media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=3600"})
+    png = blog_hero_og_png(
+        title=post["title"],
+        tool_focus=post.get("tool_focus", "both"),
+        hero_keywords=post.get("hero_keywords", []),
+        hero_tag=post.get("hero_tag", "FIELD NOTE"),
+    )
+    return Response(
+        content=png,
+        media_type="image/png",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 
 @app.get("/history", response_class=HTMLResponse)

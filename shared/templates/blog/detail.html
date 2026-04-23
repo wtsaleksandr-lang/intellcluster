@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block meta_desc %}{{ post.meta_desc }}{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_desc %}{{ post.meta_desc }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}{{ site_url }}/og/blog/{{ post.slug }}.png{% endblock %}
+{% block canonical %}{{ site_url }}/blog/{{ post.slug }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title | tojson }},
+  "description": {{ post.meta_desc | tojson }},
+  "datePublished": "{{ post.publish_date }}",
+  {% if post.updated_date %}"dateModified": "{{ post.updated_date }}",{% endif %}
+  "author": {"@type": "Organization", "name": "IntellCluster", "url": "{{ site_url }}"},
+  "publisher": {
+    "@type": "Organization",
+    "name": "IntellCluster",
+    "logo": {"@type": "ImageObject", "url": "{{ site_url }}/static/favicon.svg"}
+  },
+  "image": "{{ site_url }}/og/blog/{{ post.slug }}.png",
+  "mainEntityOfPage": {"@type": "WebPage", "@id": "{{ site_url }}/blog/{{ post.slug }}"},
+  "keywords": {{ (post.tags + post.hero_keywords) | tojson }}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "IntellCluster", "item": "{{ site_url }}"},
+    {"@type": "ListItem", "position": 2, "name": "Field Notes", "item": "{{ site_url }}/blog"},
+    {"@type": "ListItem", "position": 3, "name": {{ post.title | tojson }}, "item": "{{ site_url }}/blog/{{ post.slug }}"}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block head %}
+<style>
+  .blog-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+    font-size: 16.5px;
+    line-height: 1.72;
+    color: var(--text-secondary);
+  }
+  .blog-article > h2, .blog-article > h3 {
+    font-family: 'Instrument Serif', ui-serif, Georgia, serif;
+    font-weight: 400;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .blog-article > h2 {
+    font-size: 30px;
+    margin: 56px 0 16px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .blog-article > h3 {
+    font-size: 22px;
+    margin: 32px 0 10px;
+  }
+  .blog-article > p { margin: 0 0 20px; }
+  .blog-article a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-border);
+    transition: background 0.2s var(--ease-out);
+  }
+  .blog-article a:hover { background: var(--accent-dim); }
+  .blog-article ul, .blog-article ol { margin: 0 0 22px 22px; padding: 0; }
+  .blog-article li { margin-bottom: 8px; }
+  .blog-article blockquote {
+    margin: 28px 0; padding: 14px 22px;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    color: var(--text-primary);
+    font-family: 'Instrument Serif', serif;
+    font-size: 19px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .blog-article blockquote p:last-child { margin-bottom: 0; }
+  .blog-article code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .blog-article pre {
+    background: var(--surface-solid);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 0 0 24px;
+  }
+  .blog-article pre code { background: transparent; border: 0; padding: 0; font-size: 13px; }
+  .blog-article hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, var(--border-decor) 5px, transparent 5px);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    margin: 40px 0;
+  }
+  .blog-article table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 0 24px;
+    font-size: 14px;
+  }
+  .blog-article th, .blog-article td {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    text-align: left;
+  }
+  .blog-article th { background: var(--surface); font-weight: 600; color: var(--text-primary); }
+  .blog-article strong { color: var(--text-primary); font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<article style="max-width:960px;margin:0 auto;padding:0 24px;">
+
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <a href="/blog" style="color:var(--text-dim);text-decoration:none;">Field Notes</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">{{ post.slug }}</span>
+  </nav>
+
+  <header class="rv" style="max-width:720px;margin:44px auto 36px;padding:0 24px;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:22px;">
+      <time datetime="{{ post.publish_date }}" class="t-mono" style="font-size:11px;color:var(--text-tertiary);letter-spacing:1px;text-transform:uppercase;">
+        {{ post.publish_date.strftime('%b %d, %Y') }}
+      </time>
+      <span style="color:var(--text-dim);">·</span>
+      <span class="t-mono" style="font-size:11px;color:var(--text-tertiary);letter-spacing:1px;text-transform:uppercase;">{{ post.reading_time }} min read</span>
+      {% if post.tool_focus == 'phronesis' %}
+      <span style="color:var(--text-dim);">·</span>
+      <span class="t-mono" style="font-size:11px;color:#FF5600;letter-spacing:1px;text-transform:uppercase;">Phronesis</span>
+      {% elif post.tool_focus == 'synthesis' %}
+      <span style="color:var(--text-dim);">·</span>
+      <span class="t-mono" style="font-size:11px;color:#38bdf8;letter-spacing:1px;text-transform:uppercase;">Synthesis</span>
+      {% endif %}
+    </div>
+    <h1 class="t-display" style="font-size:clamp(34px,5.5vw,56px);line-height:1.08;letter-spacing:-0.02em;margin:0 0 20px;">{{ post.title }}</h1>
+    <p style="font-size:18px;color:var(--text-muted);line-height:1.55;margin:0;">{{ post.meta_desc }}</p>
+  </header>
+
+  <figure class="rv rv1" style="max-width:960px;margin:0 auto 44px;position:relative;">
+    <div class="fin-dot-grid" style="position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;aspect-ratio:1200/630;background:var(--surface-solid);">
+      <img src="/og/blog/{{ post.slug }}.png" alt="Cover art for {{ post.title }}" style="width:100%;height:100%;display:block;object-fit:cover;" loading="eager" decoding="async">
+      <div class="fin-brackets" aria-hidden="true"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+    </div>
+  </figure>
+
+  <div class="blog-article rv rv2">
+    {{ post.body_html | safe }}
+  </div>
+
+  <section style="max-width:720px;margin:56px auto 0;padding:0 24px;">
+    <div class="fin-divider-dashed"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 0;">
+      {% for tag in post.tags %}
+      <span class="t-mono" style="font-size:11px;color:var(--text-tertiary);background:var(--surface);border:1px solid var(--border-subtle);padding:4px 10px;border-radius:3px;letter-spacing:0.6px;text-transform:uppercase;">#{{ tag }}</span>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section style="max-width:720px;margin:48px auto 0;padding:0 24px;">
+    {% with share_url = site_url + '/blog/' + post.slug, share_text = post.title %}
+    {% include "partials/_share_actions.html" %}
+    {% endwith %}
+  </section>
+
+  <section style="max-width:720px;margin:64px auto 96px;padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:12px;">
+    <span class="fin-label">RUN IT YOURSELF</span>
+    {% if post.tool_focus == 'synthesis' %}
+    <h3 class="t-display" style="font-size:26px;margin:18px 0 10px;letter-spacing:-0.01em;">Turn this into a Synthesis run.</h3>
+    <p style="color:var(--text-muted);font-size:14.5px;margin-bottom:22px;line-height:1.6;">Synthesis orchestrates five models in parallel and merges their output into a single research brief.</p>
+    <a href="/synthesis" class="ic-nav-cta" style="display:inline-block;">Open Synthesis →</a>
+    {% elif post.tool_focus == 'phronesis' %}
+    <h3 class="t-display" style="font-size:26px;margin:18px 0 10px;letter-spacing:-0.01em;">Score a decision with Phronesis.</h3>
+    <p style="color:var(--text-muted);font-size:14.5px;margin-bottom:22px;line-height:1.6;">Three blind AI analysts rank your options on weighted criteria. See agreement, confidence, and per-dimension scores.</p>
+    <a href="/phronesis" class="ic-nav-cta" style="display:inline-block;">Open Phronesis →</a>
+    {% else %}
+    <h3 class="t-display" style="font-size:26px;margin:18px 0 10px;letter-spacing:-0.01em;">Both tools are one click away.</h3>
+    <p style="color:var(--text-muted);font-size:14.5px;margin-bottom:22px;line-height:1.6;">Phronesis ranks options. Synthesis runs deep research. Pick the one that matches your question.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="/phronesis" class="ic-nav-cta" style="display:inline-block;">Phronesis →</a>
+      <a href="/synthesis" class="ic-nav-cta" style="display:inline-block;background:#38bdf8;">Synthesis →</a>
+    </div>
+    {% endif %}
+  </section>
+
+  {% if related %}
+  <section style="max-width:960px;margin:0 auto 96px;padding:0 24px;">
+    <span class="fin-label" style="margin-bottom:22px;">RELATED FIELD NOTES</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:18px;">
+      {% for r in related %}
+      <a href="/blog/{{ r.slug }}" class="panel" style="text-decoration:none;color:inherit;display:block;border-radius:10px;transition:border-color 0.2s var(--ease-out), transform 0.2s var(--ease-out);" onmouseover="this.style.borderColor='var(--accent-border)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none'">
+        <time class="t-mono" style="font-size:10px;color:var(--text-tertiary);letter-spacing:1px;text-transform:uppercase;">{{ r.publish_date.strftime('%b %d, %Y') }}</time>
+        <h4 class="t-display" style="font-size:18px;margin:8px 0 8px;letter-spacing:-0.01em;line-height:1.3;color:var(--text-primary);font-weight:400;">{{ r.title }}</h4>
+        <p style="color:var(--text-muted);font-size:13px;line-height:1.55;margin:0;">{{ r.meta_desc[:120] }}{% if r.meta_desc|length > 120 %}…{% endif %}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</article>
+{% endblock %}

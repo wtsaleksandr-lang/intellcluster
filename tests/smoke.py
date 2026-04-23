@@ -61,6 +61,10 @@ PUBLIC_ROUTES = [
     ("/og/homepage.png", 200),
     ("/templates/choose-laptop", 200),
     ("/og/template/choose-laptop.png", 200),
+    # Blog foundation — works with zero posts, renders empty state
+    ("/blog", 200),
+    ("/blog.xml", 200),
+    ("/blog/does-not-exist", 404),
     # 404 path returns a templated 404 with status 404
     ("/compare/definitely-does-not-exist", 404),
     # Legacy redirects
