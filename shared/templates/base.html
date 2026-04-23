@@ -320,6 +320,58 @@ html[data-theme="light"] body {
 .rv1 { animation-delay: 0.1s; } .rv2 { animation-delay: 0.2s; } .rv3 { animation-delay: 0.3s; }
 @keyframes rvUp { to { opacity: 1; transform: translateY(0); } }
 
+/* Scroll reveal — fires when element enters viewport. Apply [data-reveal] */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+  will-change: opacity, transform;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-reveal-delay="1"].is-visible { transition-delay: 0.08s; }
+[data-reveal-delay="2"].is-visible { transition-delay: 0.16s; }
+[data-reveal-delay="3"].is-visible { transition-delay: 0.24s; }
+[data-reveal-delay="4"].is-visible { transition-delay: 0.32s; }
+
+/* Button press feedback — applies to all ic-nav-cta / sa-btn / chip interactions */
+.ic-nav-cta, .sa-btn, .chip, button[type="submit"] {
+  transition: filter 0.15s var(--ease-out), transform 0.12s var(--ease-out),
+              border-color 0.2s var(--ease-out), background 0.2s var(--ease-out),
+              color 0.2s var(--ease-out);
+}
+.ic-nav-cta:active, .sa-btn:active, .chip:active, button[type="submit"]:active {
+  transform: translateY(1px);
+  filter: brightness(0.92);
+}
+
+/* Loading spinner utility — add .ic-spinner to any inline/block element */
+.ic-spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: icSpin 0.7s linear infinite;
+  vertical-align: middle;
+}
+@keyframes icSpin { to { transform: rotate(360deg); } }
+
+/* Success checkmark draw-in — apply .ic-check + SVG path */
+@keyframes icCheckDraw {
+  0% { stroke-dashoffset: 50; }
+  100% { stroke-dashoffset: 0; }
+}
+.ic-check path {
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  animation: icCheckDraw 0.45s 0.05s var(--ease-out) forwards;
+}
+
+/* Link shimmer on hover — subtle brighten on every link */
+a { transition: color 0.18s var(--ease-out); }
+
 /* Chips */
 .chip {
   display: inline-block;
@@ -628,6 +680,31 @@ summary:focus-visible {
   var path = window.location.pathname;
   var tool = path.startsWith('/synthesis') ? 'synthesis' : path.startsWith('/phronesis') ? 'phronesis' : null;
   if (tool) document.querySelectorAll('.nav-tool[data-tool="' + tool + '"]').forEach(function(el) { el.classList.add('active'); });
+
+  // Scroll-reveal observer — wires [data-reveal] elements to .is-visible
+  // when they enter the viewport. Honors prefers-reduced-motion automatically
+  // via the CSS transition rules we already cut to 0.01ms in that media query.
+  function initReveal() {
+    var els = document.querySelectorAll('[data-reveal]');
+    if (!els.length || typeof IntersectionObserver === 'undefined') {
+      els.forEach(function(el){ el.classList.add('is-visible'); });
+      return;
+    }
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function(el){ io.observe(el); });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initReveal);
+  } else {
+    initReveal();
+  }
 })();
 </script>
 
