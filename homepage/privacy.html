@@ -1,47 +1,138 @@
 {% extends "base.html" %}
 {% block title %}Privacy — IntellCluster{% endblock %}
-{% block meta_desc %}IntellCluster privacy policy.{% endblock %}
+{% block meta_desc %}How IntellCluster handles your data — decision inputs, research prompts, user accounts, email, analytics, and payment records. Plain language, no tracking scripts except privacy-friendly Plausible.{% endblock %}
 {% block robots %}index, follow{% endblock %}
+{% block canonical %}{{ site_url }}/privacy{% endblock %}
 
 {% block content %}
-<div style="max-width:760px;margin:0 auto;padding:60px 20px;">
-  <div class="fig-label">INTELLCLUSTER <span>·</span> PRIVACY</div>
-  <h1 class="t-display" style="font-size:32px;font-weight:600;margin-bottom:32px;">Privacy Policy</h1>
+<div style="max-width:760px;margin:0 auto;padding:0 24px;">
 
-  <div style="color:var(--text-muted);line-height:1.75;font-size:14.5px;">
-    <p style="margin-bottom:16px;"><strong style="color:var(--text);">Last updated:</strong> April 2026</p>
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">Privacy</span>
+  </nav>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">What we collect</h2>
-    <p style="margin-bottom:16px;">
-      <strong style="color:var(--text);">Decision and research inputs:</strong> The questions, options, criteria, and prompts you submit through Phronesis and Synthesis. We store these to deliver results and enable shareable history.
-    </p>
-    <p style="margin-bottom:16px;">
-      <strong style="color:var(--text);">Usage data:</strong> Run IDs, timestamps, model selection, latency, and cost metrics. No personally identifying information is required to use the tools anonymously.
-    </p>
-    <p style="margin-bottom:16px;">
-      <strong style="color:var(--text);">Waitlist email:</strong> If you join a Pro or Team waitlist, your email is stored to notify you when billing opens.
-    </p>
+  <header class="rv" style="padding:48px 0 24px;">
+    <span class="fin-label">PRIVACY <span>·</span> PLAIN LANGUAGE</span>
+    <h1 class="t-display" style="margin-top:18px;font-size:clamp(34px,5.5vw,50px);line-height:1.06;letter-spacing:-0.02em;">Privacy policy.</h1>
+    <p style="margin-top:14px;color:var(--text-muted);font-size:14.5px;">Last updated: April&nbsp;23,&nbsp;2026 · <a href="/contact" class="fin-underline" style="color:var(--accent);">Questions? Contact us.</a></p>
+  </header>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">How we use it</h2>
-    <p style="margin-bottom:16px;">
-      Your inputs are sent to the AI providers we use (OpenAI, Anthropic, Google, DeepSeek, xAI) solely to generate your results. Those providers have their own privacy policies and retention rules.
-    </p>
-    <p style="margin-bottom:16px;">
-      We do not sell your data. We do not share your decision content with third parties beyond the AI providers required to generate results.
-    </p>
+  <div class="fin-divider-dashed" style="margin:12px 0 32px;"></div>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Retention</h2>
-    <p style="margin-bottom:16px;">
-      Free tier: decisions and research runs are retained for 90 days. Pro/Team: retained indefinitely until you delete them or your account. Anonymous visitors' data is retained for 30 days.
-    </p>
+  <div style="color:var(--text-secondary);line-height:1.75;font-size:15px;">
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Your rights</h2>
-    <p style="margin-bottom:16px;">
-      You can request deletion of your data at any time. Because the tools currently operate anonymously, you can also simply stop using the service.
+    <section class="rv rv1" style="margin-bottom:32px;padding:20px 22px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;">
+      <p style="margin:0;color:var(--text-primary);font-size:14.5px;line-height:1.7;">
+        <strong>The short version:</strong> We collect the minimum needed to make Phronesis and Synthesis work. Decision inputs are sent to AI providers to produce results and then stored against your run ID so you can share a link. Signed-in users have an email on file and a thin purchase ledger if they've paid. Analytics is cookieless. You can export or delete everything anytime from your account page.
+      </p>
+    </section>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">What we collect</h2>
+
+    <h3 style="font-size:16px;color:var(--text-primary);margin:22px 0 8px;font-weight:600;">Decision and research content</h3>
+    <p style="margin-bottom:14px;">
+      Questions, options, weighted criteria, and prompts you submit through <a href="/phronesis" class="fin-underline" style="color:var(--accent);">Phronesis</a> and <a href="/synthesis" class="fin-underline" style="color:var(--accent);">Synthesis</a>, plus the generated outputs (rankings, scores, research briefs, strategist phase outputs). Stored in server-side JSONL files keyed by a short run ID so you can share a result URL with teammates.
     </p>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Contact</h2>
-    <p style="margin-bottom:16px;">For privacy questions, reach out via the waitlist form.</p>
+    <h3 style="font-size:16px;color:var(--text-primary);margin:22px 0 8px;font-weight:600;">Account data (signed-in users only)</h3>
+    <p style="margin-bottom:14px;">
+      If you sign in with a magic link, we store your email address, the date you first signed in, the timestamp of your last login, and your current plan (<code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">free</code> / <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">starter</code> / <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">pro</code> / <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">team</code>). We do not store passwords because there are none. Auth is a signed, time-limited token in a first-party session cookie.
+    </p>
+
+    <h3 style="font-size:16px;color:var(--text-primary);margin:22px 0 8px;font-weight:600;">Purchase records (paying customers only)</h3>
+    <p style="margin-bottom:14px;">
+      If you complete a Stripe Checkout, we record the event ID, your email, the amount paid, the plan or credit pack purchased, and the Stripe customer/subscription IDs. Payment card details never touch our servers — Stripe handles all of that under their own security framework.
+    </p>
+
+    <h3 style="font-size:16px;color:var(--text-primary);margin:22px 0 8px;font-weight:600;">Analytics</h3>
+    <p style="margin-bottom:14px;">
+      We use <a href="https://plausible.io/data-policy" target="_blank" rel="noopener" class="fin-underline" style="color:var(--accent);">Plausible</a>, a privacy-friendly analytics service that runs without cookies, doesn't collect personal data, and doesn't fingerprint you. We track page views and a handful of named conversion events (<code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">plan_clicked</code>, <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">blog_read</code>, <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">phronesis_result_viewed</code>, <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">synthesis_result_viewed</code>, <code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">auth_verified</code>). No profiling, no cross-site tracking.
+    </p>
+
+    <h3 style="font-size:16px;color:var(--text-primary);margin:22px 0 8px;font-weight:600;">Contact form submissions</h3>
+    <p style="margin-bottom:14px;">
+      If you use <a href="/contact" class="fin-underline" style="color:var(--accent);">/contact</a>, we store your name, email, reason, and message in an append-only log that our team reads to reply.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">How we use it</h2>
+
+    <p style="margin-bottom:14px;">
+      <strong style="color:var(--text-primary);">To run your requests.</strong> Your inputs are passed to the AI providers we orchestrate — OpenAI, Anthropic, Google, DeepSeek, and xAI — solely to generate the result you asked for. Each provider has its own privacy policy and retention rules; we call them under their enterprise / zero-retention terms where available.
+    </p>
+    <p style="margin-bottom:14px;">
+      <strong style="color:var(--text-primary);">To operate the product.</strong> We read your run history to show it on <a href="/account" class="fin-underline" style="color:var(--accent);">your account page</a>, on <a href="/admin" class="fin-underline" style="color:var(--accent);">admin dashboards</a> (support and fraud prevention), and to enable shareable result URLs.
+    </p>
+    <p style="margin-bottom:14px;">
+      <strong style="color:var(--text-primary);">To send email.</strong> We may email you (1) a magic sign-in link when you request one, (2) a welcome email the first time you sign in, (3) a receipt after a purchase, (4) an outcome-reminder email roughly 14 days after a Phronesis decision so you can rate how the outcome turned out, and (5) responses to contact-form submissions. That's the full list. No newsletter, no marketing, no drip campaigns.
+    </p>
+    <p style="margin-bottom:14px;">
+      <strong style="color:var(--text-primary);">We do not sell your data.</strong> We do not share decision content with anyone outside the AI providers required to generate your result.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Cookies and local storage</h2>
+    <p style="margin-bottom:14px;">
+      We set exactly two first-party cookies, both authentication-essential under GDPR article 5(3) (no consent banner required):
+    </p>
+    <ul style="padding-left:24px;margin:0 0 14px;">
+      <li style="margin-bottom:8px;"><code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">intellcluster_user</code> — your signed session, HMAC-signed, expires in 30 days</li>
+      <li><code style="background:var(--surface);padding:1px 6px;border-radius:4px;font-size:13px;">intellcluster_admin</code> — admin session for us, HMAC-signed, expires in 24 hours</li>
+    </ul>
+    <p style="margin-bottom:14px;">
+      We also use browser <strong style="color:var(--text-primary);">localStorage</strong> to store your anonymous decision history (so it persists across visits without an account) and your theme preference. This is stored only on your device; we never read it from our servers.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Retention</h2>
+    <ul style="padding-left:24px;margin:0 0 14px;">
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Anonymous runs:</strong> up to 90 days from creation, then purged.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Signed-in user runs:</strong> retained for as long as your account exists. Delete your account to wipe.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Account rows:</strong> retained until you delete.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Purchase records:</strong> retained for at least 7 years to meet financial recordkeeping obligations (independent of account deletion — required by law in most jurisdictions we operate in).</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Outcome-reminder send log:</strong> retained 90 days.</li>
+      <li><strong style="color:var(--text-primary);">Contact-form submissions:</strong> retained 2 years so we can reference prior conversations.</li>
+    </ul>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Your rights</h2>
+    <p style="margin-bottom:14px;">If you're in the EU, UK, California, or anywhere with meaningful data-protection law, you have the right to:</p>
+    <ul style="padding-left:24px;margin:0 0 14px;">
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Access</strong> — download everything we have on you. Signed-in users: one click on <a href="/account" class="fin-underline" style="color:var(--accent);">/account</a>. Anonymous users: your data is already in your browser's localStorage.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Delete</strong> — remove your account and all linked data. One click on <a href="/account" class="fin-underline" style="color:var(--accent);">/account</a>. Purchase records are retained for legal reasons above.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Correct</strong> — email us to update anything wrong.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Object</strong> — unsubscribe from outcome-reminder emails (there will be an opt-out link in every reminder we send).</li>
+      <li><strong style="color:var(--text-primary);">Complain</strong> — contact your local data-protection authority if you believe we've mishandled your data.</li>
+    </ul>
+    <p style="margin-bottom:14px;">Requests honored within 7 days for account actions, 30 days for anything more complex.</p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Sub-processors</h2>
+    <p style="margin-bottom:14px;">The services we route your data through:</p>
+    <ul style="padding-left:24px;margin:0 0 14px;">
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">AI model providers:</strong> OpenAI, Anthropic, Google (Gemini), DeepSeek, xAI (Grok). Decision and research inputs only.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Stripe</strong> — payment processing. Card details never reach us.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Resend / SMTP provider</strong> — outbound email. Receives your email address and the email body only when we send you mail.</li>
+      <li style="margin-bottom:8px;"><strong style="color:var(--text-primary);">Plausible</strong> — cookieless analytics. Receives aggregated page-view data, no personal data.</li>
+      <li><strong style="color:var(--text-primary);">Replit</strong> — our hosting provider. Receives everything we store.</li>
+    </ul>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Security</h2>
+    <p style="margin-bottom:14px;">All traffic is over HTTPS with HSTS. Session cookies are HMAC-signed and set with SameSite=Lax + Secure + HttpOnly. Admin auth and user auth use independent secrets. We log API errors without the content payload.</p>
+    <p style="margin-bottom:14px;">We will notify affected users within 72 hours of discovering a breach involving personal data.</p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Children</h2>
+    <p style="margin-bottom:14px;">IntellCluster is not intended for anyone under 16. We don't knowingly collect data from children.</p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Changes to this policy</h2>
+    <p style="margin-bottom:14px;">If we make material changes, we'll update the "Last updated" date above and — for signed-in users — email you before the change takes effect.</p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">Contact</h2>
+    <p style="margin-bottom:14px;">
+      Privacy questions: <a href="mailto:security@intellcluster.com" class="fin-underline" style="color:var(--accent);">security@intellcluster.com</a> or via <a href="/contact" class="fin-underline" style="color:var(--accent);">/contact</a>.
+    </p>
   </div>
+
+  <div style="margin:64px 0 80px;padding:22px;border:1px dashed var(--border-decor);border-radius:10px;text-align:center;">
+    <p style="margin:0;color:var(--text-muted);font-size:13px;">See also: <a href="/terms" class="fin-underline" style="color:var(--accent);">Terms of Service</a> · <a href="/faq" class="fin-underline" style="color:var(--accent);">FAQ</a></p>
+  </div>
+
 </div>
 {% endblock %}

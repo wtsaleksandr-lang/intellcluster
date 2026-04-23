@@ -1,44 +1,143 @@
 {% extends "base.html" %}
-{% block title %}Terms — IntellCluster{% endblock %}
-{% block meta_desc %}IntellCluster terms of service.{% endblock %}
+{% block title %}Terms of Service — IntellCluster{% endblock %}
+{% block meta_desc %}Terms governing use of IntellCluster's Phronesis and Synthesis AI tools. Covers accounts, payment, acceptable use, AI output limitations, and liability.{% endblock %}
+{% block robots %}index, follow{% endblock %}
+{% block canonical %}{{ site_url }}/terms{% endblock %}
 
 {% block content %}
-<div style="max-width:760px;margin:0 auto;padding:60px 20px;">
-  <div class="fig-label">INTELLCLUSTER <span>·</span> TERMS</div>
-  <h1 class="t-display" style="font-size:32px;font-weight:600;margin-bottom:32px;">Terms of Service</h1>
+<div style="max-width:760px;margin:0 auto;padding:0 24px;">
 
-  <div style="color:var(--text-muted);line-height:1.75;font-size:14.5px;">
-    <p style="margin-bottom:16px;"><strong style="color:var(--text);">Last updated:</strong> April 2026</p>
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">Terms</span>
+  </nav>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Use of the service</h2>
-    <p style="margin-bottom:16px;">
-      IntellCluster provides AI-assisted decision and research tools (Phronesis and Synthesis). You may use them for any lawful purpose. You are responsible for your own inputs and how you act on the outputs.
+  <header class="rv" style="padding:48px 0 24px;">
+    <span class="fin-label">TERMS <span>·</span> PLAIN ENGLISH</span>
+    <h1 class="t-display" style="margin-top:18px;font-size:clamp(34px,5.5vw,50px);line-height:1.06;letter-spacing:-0.02em;">Terms of Service.</h1>
+    <p style="margin-top:14px;color:var(--text-muted);font-size:14.5px;">Last updated: April&nbsp;23,&nbsp;2026 · <a href="/contact" class="fin-underline" style="color:var(--accent);">Questions? Contact us.</a></p>
+  </header>
+
+  <div class="fin-divider-dashed" style="margin:12px 0 32px;"></div>
+
+  <div style="color:var(--text-secondary);line-height:1.75;font-size:15px;">
+
+    <section class="rv rv1" style="margin-bottom:32px;padding:20px 22px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;">
+      <p style="margin:0;color:var(--text-primary);font-size:14.5px;line-height:1.7;">
+        <strong>The short version:</strong> Use it for any legal purpose. AI outputs are advisory — validate anything consequential before acting. Paid plans are month-to-month or annual, cancel anytime. Don't do anything abusive or illegal, and we won't be liable for what you do with the outputs.
+      </p>
+    </section>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">1. Accepting these terms</h2>
+    <p style="margin-bottom:14px;">
+      By using IntellCluster — including <a href="/phronesis" class="fin-underline" style="color:var(--accent);">Phronesis</a>, <a href="/synthesis" class="fin-underline" style="color:var(--accent);">Synthesis</a>, the API endpoints, the blog, or any other feature — you agree to these Terms and to our <a href="/privacy" class="fin-underline" style="color:var(--accent);">Privacy Policy</a>. If you don't agree, don't use the service.
+    </p>
+    <p style="margin-bottom:14px;">
+      You must be at least 16 years old. If you're using IntellCluster on behalf of an organization, you confirm you have authority to bind that organization to these Terms.
     </p>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">AI outputs are advisory</h2>
-    <p style="margin-bottom:16px;">
-      Results are AI-generated and may contain inaccuracies. IntellCluster does not provide legal, medical, financial, or professional advice. Validate critical outputs independently before acting on them.
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">2. Accounts</h2>
+    <p style="margin-bottom:14px;">
+      You can use Phronesis and Synthesis anonymously — no account required. To unlock shared history, purchases, and paid limits, you'll sign in with a passwordless magic link sent to your email. You're responsible for keeping that email secure. Don't share your magic-link URL; anyone with it can sign in as you within its 15-minute window.
+    </p>
+    <p style="margin-bottom:14px;">
+      We may suspend or terminate an account that violates these Terms or that creates material risk to the service or other users. Where possible we'll reach out first.
     </p>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Acceptable use</h2>
-    <p style="margin-bottom:16px;">
-      Do not submit content that is illegal, harmful, infringing, or intended to deceive or manipulate others. Do not attempt to reverse-engineer, overload, or abuse the service. We may suspend access that violates these rules.
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">3. AI outputs are advisory</h2>
+    <p style="margin-bottom:14px;">
+      Phronesis rankings and Synthesis research briefs are generated by large language models orchestrated by our software. <strong style="color:var(--text-primary);">They may contain errors, hallucinated facts, or systematic biases</strong>. We surface confidence and analyst-agreement signals to help you calibrate — use them.
+    </p>
+    <p style="margin-bottom:14px;">
+      IntellCluster does not provide legal, medical, financial, tax, or other professional advice. <strong style="color:var(--text-primary);">Validate anything consequential against primary sources or a qualified professional before acting on it.</strong>
     </p>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Availability</h2>
-    <p style="margin-bottom:16px;">
-      The service is provided "as is" during public beta. We may modify, limit, or discontinue features without notice.
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">4. Acceptable use</h2>
+    <p style="margin-bottom:14px;">You won't use IntellCluster to:</p>
+    <ul style="padding-left:24px;margin:0 0 14px;">
+      <li style="margin-bottom:6px;">Generate content that is illegal, defamatory, harassing, or designed to harm a specific person.</li>
+      <li style="margin-bottom:6px;">Produce sexual content involving minors, or content that depicts real people in non-consensual sexual scenarios.</li>
+      <li style="margin-bottom:6px;">Plan or facilitate violence, illegal weapons, or credible threats.</li>
+      <li style="margin-bottom:6px;">Impersonate a person or organization in a way designed to deceive.</li>
+      <li style="margin-bottom:6px;">Scrape, reverse-engineer, or systematically overload the service beyond our published rate limits (see <a href="/faq" class="fin-underline" style="color:var(--accent);">FAQ</a>).</li>
+      <li style="margin-bottom:6px;">Use outputs to train a competing AI product (you can use them for your own work, just not to train models).</li>
+      <li>Violate applicable export controls or sanctions.</li>
+    </ul>
+    <p style="margin-bottom:14px;">Our underlying model providers (OpenAI, Anthropic, Google, DeepSeek, xAI) have their own usage policies. Prompts that violate those may be refused at the model level even if they don't violate ours.</p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">5. Your content</h2>
+    <p style="margin-bottom:14px;">
+      You retain ownership of what you submit. By submitting a prompt, you grant us a license to process it through our AI providers for the sole purpose of returning your result. We don't train models on your inputs. Outputs are yours to use under the terms of the underlying model providers (most allow commercial use; check the provider's policy for edge cases).
     </p>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Billing (Pro / Team)</h2>
-    <p style="margin-bottom:16px;">
-      Paid plans will be billed through a third-party payment processor when billing goes live. You'll be notified before any charge. Cancellations take effect at the end of the current billing period.
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">6. Plans, billing, and credits</h2>
+    <p style="margin-bottom:14px;">
+      The <strong style="color:var(--text-primary);">Free</strong> plan includes a limited monthly quota of Phronesis decisions and Synthesis briefs at standard model tier. <strong style="color:var(--text-primary);">Starter</strong>, <strong style="color:var(--text-primary);">Pro</strong>, and <strong style="color:var(--text-primary);">Team</strong> plans raise those limits and unlock expert-tier models. Current pricing is at <a href="/pricing" class="fin-underline" style="color:var(--accent);">/pricing</a>.
+    </p>
+    <p style="margin-bottom:14px;">
+      <strong style="color:var(--text-primary);">Billing:</strong> Stripe processes all payments. Paid plans auto-renew at the end of each billing period until you cancel. Cancellations take effect at the end of the current period; paid access remains until then. No refunds for unused time on monthly plans. Annual plans may be refunded within 14 days of the first charge if less than 50% of the annual credit allocation has been consumed.
+    </p>
+    <p style="margin-bottom:14px;">
+      <strong style="color:var(--text-primary);">Credit packs</strong> are one-time purchases. Credits from packs never expire. Credits from subscriptions reset each billing period and don't roll over.
+    </p>
+    <p style="margin-bottom:14px;">
+      <strong style="color:var(--text-primary);">Receipts</strong> are emailed for every successful payment. Manage billing or download invoices from the Stripe customer portal linked in any receipt email.
+    </p>
+    <p style="margin-bottom:14px;">
+      We may change pricing with 30 days' notice for existing subscribers. Your current plan continues at the old price through the end of your then-current billing period.
     </p>
 
-    <h2 class="t-display" style="font-size:20px;color:var(--text);margin:32px 0 12px;">Limitation of liability</h2>
-    <p style="margin-bottom:16px;">
-      To the maximum extent permitted by law, IntellCluster is not liable for indirect, incidental, or consequential damages arising from your use of the service.
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">7. Availability</h2>
+    <p style="margin-bottom:14px;">
+      We aim for high availability but don't guarantee specific uptime. AI provider outages, rate limits, or degraded performance on their side can affect us directly. We may modify, pause, or discontinue features with reasonable notice. Material changes that break signed-in users' workflows will be communicated by email.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">8. Third-party services</h2>
+    <p style="margin-bottom:14px;">
+      Your use of IntellCluster involves third-party services — Stripe for payments, our AI model providers for generation, Plausible for analytics, our hosting provider, and our email provider. Their terms also apply to the parts of the flow they control. We pick these vendors carefully and pass through their enterprise / zero-retention terms where available, but we're not responsible for their independent policies or failures.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">9. Intellectual property</h2>
+    <p style="margin-bottom:14px;">
+      The IntellCluster name, logo, UI design, code, and blog content are ours. You may share and quote blog posts with attribution. You may not copy our design or brand in a way that implies affiliation.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">10. Disclaimers and limitation of liability</h2>
+    <p style="margin-bottom:14px;">
+      The service is provided <strong style="color:var(--text-primary);">"as is" and "as available"</strong>. We disclaim all warranties, express or implied, to the maximum extent permitted by law, including merchantability, fitness for a particular purpose, and non-infringement.
+    </p>
+    <p style="margin-bottom:14px;">
+      To the maximum extent permitted by law, IntellCluster and its operators are <strong style="color:var(--text-primary);">not liable for any indirect, incidental, special, consequential, or punitive damages</strong>, or for lost profits, revenues, data, or business opportunities arising from your use of the service, even if we were advised of the possibility.
+    </p>
+    <p style="margin-bottom:14px;">
+      Our aggregate liability for any claim under these Terms is capped at the greater of (a) the amount you paid IntellCluster in the 12 months preceding the claim or (b) USD 100.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">11. Indemnification</h2>
+    <p style="margin-bottom:14px;">
+      You agree to indemnify us against claims arising from your violation of these Terms, your use of outputs in a way that infringes someone else's rights, or your breach of applicable law.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">12. Governing law</h2>
+    <p style="margin-bottom:14px;">
+      These Terms are governed by the laws of the jurisdiction where IntellCluster's operator is established. Disputes will be resolved in the courts of that jurisdiction unless local consumer-protection law requires otherwise for your country.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">13. Changes to these Terms</h2>
+    <p style="margin-bottom:14px;">
+      If we make material changes, we'll update the "Last updated" date above and — for signed-in users — email you at least 14 days before the change takes effect. Continued use after that counts as acceptance.
+    </p>
+
+    <h2 class="t-display" style="font-size:24px;color:var(--text-primary);margin:36px 0 14px;letter-spacing:-0.01em;">14. Contact</h2>
+    <p style="margin-bottom:14px;">
+      Legal / Terms questions: <a href="/contact" class="fin-underline" style="color:var(--accent);">/contact</a> (reason: Legal) or <a href="mailto:support@intellcluster.com" class="fin-underline" style="color:var(--accent);">support@intellcluster.com</a>.
     </p>
   </div>
+
+  <div style="margin:64px 0 80px;padding:22px;border:1px dashed var(--border-decor);border-radius:10px;text-align:center;">
+    <p style="margin:0;color:var(--text-muted);font-size:13px;">See also: <a href="/privacy" class="fin-underline" style="color:var(--accent);">Privacy Policy</a> · <a href="/faq" class="fin-underline" style="color:var(--accent);">FAQ</a></p>
+  </div>
+
 </div>
 {% endblock %}
