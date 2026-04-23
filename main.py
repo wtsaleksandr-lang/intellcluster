@@ -42,7 +42,32 @@ from synthesis.orchestrator.pipeline import run_pipeline as run_synthesis_pipeli
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-app = FastAPI(title="IntellCluster", version="0.1.0")
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def _lifespan(_app):
+    """Start background jobs on boot. Currently: outcome reminder loop."""
+    tasks = []
+    try:
+        from shared.jobs import outcome_reminder_loop
+        tasks.append(asyncio.create_task(outcome_reminder_loop()))
+        print("[lifespan] outcome reminder loop started")
+    except Exception as e:
+        print(f"[lifespan] failed to start background jobs: {e}")
+    try:
+        yield
+    finally:
+        for t in tasks:
+            t.cancel()
+        for t in tasks:
+            try:
+                await t
+            except (asyncio.CancelledError, Exception):
+                pass
+
+
+app = FastAPI(title="IntellCluster", version="0.1.0", lifespan=_lifespan)
 
 # Rate limiting middleware
 from shared.rate_limit import rate_limit_middleware
@@ -643,6 +668,17 @@ async def upgrade_submit(
     return templates.TemplateResponse(request, "upgrade.html", {"plan": plan, "submitted": True})
 
 
+@app.post("/admin/api/run-reminders", include_in_schema=False)
+async def admin_run_reminders(request: Request):
+    """Manually trigger the outcome-reminder sweep. Admin-only."""
+    from shared.admin import is_admin
+    if not is_admin(request):
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+    from shared.jobs import send_due_outcome_reminders
+    result = await asyncio.to_thread(send_due_outcome_reminders)
+    return result
+
+
 @app.get("/api/health")
 async def health():
     return {
@@ -711,6 +747,7 @@ async def phronesis_decide(req_body: DecisionRequest, req: Request):
     if not settings.has_any_api_key():
         return JSONResponse(status_code=503, content={"error": "No AI judge API keys configured."})
 
+    _user = _current_user(req)
     input_data = DecisionInput(
         question=req_body.question,
         options=req_body.options,
@@ -722,6 +759,7 @@ async def phronesis_decide(req_body: DecisionRequest, req: Request):
             web_search=req_body.settings.web_search,
         ),
         attachments=req_body.attachments,
+        user_email=(_user.get("email") if _user else None),
     )
 
     accept = req.headers.get("accept", "")
@@ -917,13 +955,13 @@ async def synthesis_run(req_body: SynthesisRequest, req: Request):
         admin_overrides = {"force_tier": "standard", "force_web_search": False}
 
     return StreamingResponse(
-        _stream_synthesis(run_id, req_body.prompt, req_body.category, req_body.mode, models, admin_overrides, req_body.quick_mode),
+        _stream_synthesis(run_id, req_body.prompt, req_body.category, req_body.mode, models, admin_overrides, req_body.quick_mode, (_current_user(req) or {}).get("email")),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
     )
 
 
-async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, models: list, admin_overrides: dict, quick_mode: bool = False):
+async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, models: list, admin_overrides: dict, quick_mode: bool = False, user_email: str | None = None):
     from shared.tracking.synthesis_history import save_synthesis_run
 
     queue = asyncio.Queue()
@@ -987,6 +1025,7 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
         try:
             save_synthesis_run({
                 "run_id": run_id,
+                "user_email": user_email,
                 "prompt": prompt,
                 "category": category,
                 "mode": mode,

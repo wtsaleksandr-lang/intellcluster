@@ -242,6 +242,7 @@ async def run_decision_pipeline(
     emit("saving", "Saving results...")
     save_decision({
         "run_id": run_id,
+        "user_email": input_data.user_email,
         "question": question,
         "options": options,
         "criteria": criteria,

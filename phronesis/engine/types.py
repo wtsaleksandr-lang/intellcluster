@@ -22,6 +22,7 @@ class DecisionInput:
     criteria: list[dict]         # [{"name": "Cost", "weight": 8}, ...]
     settings: AnalysisSettings = field(default_factory=AnalysisSettings)
     attachments: list[str] = field(default_factory=list)  # filenames (context only for now)
+    user_email: str | None = None  # set when a signed-in user runs the decision
 
 
 @dataclass
