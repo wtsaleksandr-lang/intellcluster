@@ -43,14 +43,14 @@
     <div style="font-size:13px;color:var(--text-muted);">Your previous input has been pre-filled below.</div>
   </div>
 
-  <div id="composer" class="rv rv1" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:border-color 0.25s,box-shadow 0.3s;">
+  <div id="composer" class="ic-composer rv rv1">
     <textarea id="inp" rows="4" maxlength="4000" data-typing="synthesis"
       placeholder="Ask a deep research question. Example: 'What's the most effective pricing strategy for a B2B SaaS targeting enterprise customers in 2026, considering recent AI-driven cost pressures?'"
-      style="width:100%;background:transparent;border:none;padding:20px 20px 10px;font-size:15px;color:var(--text);font-family:inherit;resize:none;outline:none;line-height:1.6;min-height:110px;"></textarea>
+      style="width:100%;background:transparent;border:none;padding:22px 22px 12px;font-size:15px;color:var(--text);font-family:inherit;resize:none;outline:none;line-height:1.6;min-height:110px;"></textarea>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border-subtle);position:relative;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <select id="category" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;font-size:12px;font-family:inherit;outline:none;cursor:pointer;">
+    <div class="ic-composer-toolbar" style="position:relative;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <select id="category" style="background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-secondary);padding:6px 10px;border-radius:8px;font-size:12px;font-family:inherit;outline:none;cursor:pointer;">
           <option value="deep_research">Deep Research</option>
           <option value="decision_strategy">Decision &amp; Strategy</option>
           <option value="competitor_market_research">Competitor &amp; Market</option>
@@ -59,12 +59,14 @@
           <option value="comparison_evaluation">Comparison</option>
           <option value="ai_systems_automation">AI Systems</option>
         </select>
-        <button id="settingsBtn" type="button" title="Research settings" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:none;border:none;border-radius:6px;cursor:pointer;color:var(--text-dim);transition:color 0.15s;" onmouseover="this.style.color='var(--text-muted)'" onmouseout="this.style.color='var(--text-dim)'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        <button id="settingsBtn" type="button" class="ic-composer-icon" title="Research settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/></svg>
         </button>
-        <span id="settingsSummary" class="t-mono hide-mobile" style="font-size:10px;color:var(--text-dim);letter-spacing:0.3px;">STANDARD &middot; BALANCED &middot; STANDARD</span>
+        <span id="settingsSummary" class="t-mono hide-mobile" style="font-size:10px;color:var(--text-dim);letter-spacing:0.6px;text-transform:uppercase;">Standard &middot; Balanced &middot; Standard</span>
       </div>
-      <button id="goBtn" style="padding:8px 24px;background:var(--accent);color:#fff;font-weight:600;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;">Synthesize</button>
+      <button id="goBtn" class="ic-composer-send" title="Synthesize" aria-label="Synthesize">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+      </button>
     </div>
 
     <!-- SETTINGS POPOVER -->
@@ -172,8 +174,7 @@ const pFill = document.getElementById('pFill'), pPct = document.getElementById('
 const CIRC = 97.4;
 
 const composer = document.getElementById('composer');
-inp.addEventListener('focus', () => { composer.style.borderColor='var(--accent-border)'; composer.style.boxShadow='0 0 0 3px var(--accent-glow)'; });
-inp.addEventListener('blur', () => { composer.style.borderColor='var(--border)'; composer.style.boxShadow='none'; });
+/* Focus state is handled by .ic-composer:focus-within in base.html */
 
 // Settings popover — show / hide with scrim on mobile
 const settingsPop = document.getElementById('settingsPop');

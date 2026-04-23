@@ -30,52 +30,72 @@
 </section>
 
 <!-- Subscription plans -->
-<section style="padding:0 0 40px;">
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;" class="grid-3 rv rv2">
+<section style="padding:0 0 48px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;" class="grid-3 rv rv2">
 
     {% for plan_id, plan in plans.items() %}
-    <div class="pricing-card{% if plan.highlighted %} pricing-highlight{% endif %}" data-plan-id="{{ plan_id }}" style="background:var(--surface);border:1px solid {% if plan.highlighted %}var(--accent-border){% else %}var(--border){% endif %};border-radius:14px;padding:30px 26px;display:flex;flex-direction:column;position:relative;transition:transform 0.25s cubic-bezier(0.22,1,0.36,1), border-color 0.25s, box-shadow 0.3s;{% if plan.highlighted %}box-shadow:0 0 0 1px var(--accent-border), 0 20px 50px -20px rgba(255,106,61,0.15);{% endif %}">
+    <div class="ic-plan{% if plan.highlighted %} is-featured{% endif %}" data-plan-id="{{ plan_id }}">
 
       {% if plan.highlighted %}
-      <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);padding:4px 12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:0.8px;border-radius:5px;text-transform:uppercase;">Most popular</div>
+      <span class="ic-plan-badge">Most popular</span>
       {% endif %}
 
-      <div class="fig-label" style="margin-bottom:6px;{% if plan.highlighted %}color:var(--accent);{% endif %}">{{ plan.name|upper }}</div>
-      <h2 class="t-display" style="font-size:26px;font-weight:600;letter-spacing:-0.3px;">{{ plan.tagline }}</h2>
+      <div class="ic-plan-name">{{ plan.name }}</div>
+      <div class="ic-plan-tagline">{{ plan.tagline }}</div>
 
-      <div style="margin-top:22px;min-height:60px;">
-        {% if plan.monthly_price == 0 %}
-          <span class="t-display" style="font-size:44px;font-weight:600;">$0</span>
-          <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Forever</div>
-        {% else %}
-          <div class="plan-price-monthly" style="display:block;">
-            <span class="t-display" style="font-size:44px;font-weight:600;">${{ plan.monthly_price }}</span>
-            <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
+      {% if plan.monthly_price == 0 %}
+        <div class="ic-plan-price">
+          <span class="ic-plan-price-num">$0</span>
+          <span class="ic-plan-price-unit">forever</span>
+        </div>
+        <div class="ic-plan-price-sub">No credit card</div>
+      {% else %}
+        <div class="plan-price-monthly">
+          <div class="ic-plan-price">
+            <span class="ic-plan-price-num">${{ plan.monthly_price }}</span>
+            <span class="ic-plan-price-unit">/ month</span>
           </div>
-          <div class="plan-price-annual" style="display:none;">
-            <span class="t-display" style="font-size:44px;font-weight:600;">${{ (plan.annual_price / 12)|round(0, 'floor')|int }}</span>
-            <span style="color:var(--text-muted);font-size:14px;margin-left:4px;">/ month</span>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">${{ plan.annual_price }} billed annually · save {{ plan.annual_discount_pct }}%</div>
+          <div class="ic-plan-price-sub">Billed monthly · cancel anytime</div>
+        </div>
+        <div class="plan-price-annual" style="display:none;">
+          <div class="ic-plan-price">
+            <span class="ic-plan-price-num">${{ (plan.annual_price / 12)|round(0, 'floor')|int }}</span>
+            <span class="ic-plan-price-unit">/ month</span>
           </div>
-        {% endif %}
+          <div class="ic-plan-price-sub">${{ plan.annual_price }}/yr · save {{ plan.annual_discount_pct }}%</div>
+        </div>
+      {% endif %}
+
+      <div class="ic-plan-credits">
+        <strong>{{ plan.credits_per_month }}</strong> credits per month
       </div>
 
-      <div style="margin-top:14px;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text-muted);">
-        <strong style="color:var(--text);">{{ plan.credits_per_month }}</strong> credits / month
-      </div>
-
-      <ul style="list-style:none;margin:24px 0 0;padding:0;font-size:13px;color:var(--text-muted);line-height:2;">
-        {% for f in plan.features %}<li>✓ {{ f }}</li>{% endfor %}
-        {% for l in plan.limitations %}<li style="color:var(--text-dim);">&mdash; {{ l }}</li>{% endfor %}
+      <ul class="ic-plan-features">
+        {% for f in plan.features %}
+        <li>
+          <svg class="ic-check-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 6.5 11.5 13 5"/></svg>
+          <span>{{ f }}</span>
+        </li>
+        {% endfor %}
+        {% for l in plan.limitations %}
+        <li class="is-excluded">
+          <svg class="ic-check-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="8" x2="12" y2="8"/></svg>
+          <span>{{ l }}</span>
+        </li>
+        {% endfor %}
       </ul>
 
       <div style="flex:1;"></div>
 
       {% if plan.monthly_price == 0 %}
-        <a href="/phronesis" style="margin-top:26px;display:block;text-align:center;padding:11px;background:var(--surface2);color:var(--text);font-weight:600;border:1px solid var(--border);border-radius:9px;font-size:13px;text-decoration:none;transition:border-color 0.15s;">Start free</a>
+        <a href="/phronesis" class="ic-plan-cta ghost">
+          Start free
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
       {% else %}
-        <button class="plan-cta plausible-event-name=plan_clicked plausible-event-plan={{ plan_id }}" data-plan="{{ plan_id }}" style="margin-top:26px;padding:11px;background:{% if plan.highlighted %}var(--accent);color:#fff;{% else %}var(--surface2);color:var(--text);border:1px solid var(--border);{% endif %}font-weight:600;border:{% if not plan.highlighted %}1px solid var(--border){% else %}none{% endif %};border-radius:9px;font-size:13px;cursor:pointer;transition:opacity 0.15s;">
-          {% if stripe_live %}Start 7-day free trial{% else %}Join {{ plan.name }} waitlist{% endif %}
+        <button class="plan-cta ic-plan-cta {% if plan.highlighted %}primary{% else %}ghost{% endif %} plausible-event-name=plan_clicked plausible-event-plan={{ plan_id }}" data-plan="{{ plan_id }}">
+          {% if stripe_live %}Start 7-day trial{% else %}Join {{ plan.name }} waitlist{% endif %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       {% endif %}
     </div>
@@ -162,16 +182,9 @@
 </div>
 
 <style>
-  /* Hover lift */
-  .pricing-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--accent-border);
-  }
-  .pricing-highlight:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 0 0 1px var(--accent-border), 0 28px 60px -20px rgba(255,106,61,0.22);
-  }
-  .plan-cta:hover, .pack-cta:hover { opacity: 0.88; }
+  /* Credit-pack card: keep existing .pricing-card hover for the packs row */
+  .pricing-card:hover { transform: translateY(-3px); border-color: var(--accent-border); }
+  .pack-cta:hover { filter: brightness(1.08); }
   details[open] .chv { transform: rotate(180deg); }
   .chv { transition: transform 0.2s; }
   .bill-btn.active { background: var(--accent) !important; color: #fff !important; }
