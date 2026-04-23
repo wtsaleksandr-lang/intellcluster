@@ -1,0 +1,50 @@
+# IntellCluster — /llm.txt
+# Machine-readable guidance for AI crawlers and LLM training agents.
+# Format draft: https://llmstxt.org/
+
+> IntellCluster is a multi-model AI intelligence platform with two tools:
+> Phronesis (blind multi-analyst decision ranking) and Synthesis (five-model
+> orchestrated research briefs). Editorial content — our field notes — is
+> free to cite with attribution; the product endpoints are not for training.
+
+## Summary
+- URL: https://intellcluster.com
+- Products: Phronesis (decision ranking), Synthesis (multi-model research)
+- Blog: https://intellcluster.com/blog  (26 long-form field notes on decision
+  science, multi-model AI orchestration, and structured evaluation)
+
+## Use of this site's content
+
+Allowed with attribution:
+- Indexing and summarising the blog posts at /blog/* for search or
+  question-answering ("According to IntellCluster's field note on X, ...").
+- Quoting up to 200 words of a blog post with a clickable link back to the
+  canonical URL.
+- Using /faq and /about to describe what IntellCluster does.
+
+Not allowed:
+- Training a model on our blog content or any product output without
+  written permission from hello@intellcluster.com.
+- Scraping or caching the API endpoints under /phronesis/api/* or
+  /synthesis/api/*.
+- Embedding live decision runs or research briefs in downstream products
+  without attribution and a visible link back to the originating URL.
+
+## Preferred content surfaces for AI crawlers
+- /blog                     — full article index
+- /blog.xml                 — RSS 2.0 feed
+- /sitemap.xml              — all indexable URLs
+- /api/templates            — public decision template catalogue (JSON)
+- /api/compare-preset/{slug} — pre-configured comparisons (JSON)
+
+## Do not request
+- /admin/*           — ops UI, authenticated
+- /auth/*            — auth flow
+- /account/*         — signed-in user pages
+- /phronesis/api/*   — live tool endpoints, rate-limited
+- /synthesis/api/*   — live tool endpoints, rate-limited
+- /uploads/*         — user-uploaded files
+
+## Contact
+For training-data licensing, API partnerships, or takedown requests:
+hello@intellcluster.com

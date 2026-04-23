@@ -196,6 +196,13 @@ async def robots():
     return FileResponse("shared/static/robots.txt", media_type="text/plain")
 
 
+@app.get("/llm.txt", include_in_schema=False)
+async def llm_txt():
+    """Machine-readable guidance for AI crawlers. See https://llmstxt.org/"""
+    from fastapi.responses import FileResponse
+    return FileResponse("shared/static/llm.txt", media_type="text/plain")
+
+
 @app.get("/sitemap.xml", include_in_schema=False)
 async def sitemap():
     """Dynamic sitemap — static pages + /compare/{slug} + /templates/{slug} + /blog/{slug}."""

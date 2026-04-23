@@ -1,9 +1,93 @@
+# IntellCluster — https://intellcluster.com
+# See also /llm.txt for AI-crawler usage guidance.
+
+# Default policy for search crawlers — allow indexing of marketing,
+# product, and blog surfaces. Disallow authenticated / API / upload paths.
 User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /phronesis/api/
 Disallow: /synthesis/api/
 Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
 Disallow: /uploads/
+Disallow: /og/
+
+# AI training crawlers — same path restrictions as above, plus we do NOT
+# want live tool endpoints indexed as training data at all. The blog is
+# fine to index for search / question-answering with attribution (see
+# /llm.txt), but we block training via these user-agents since most of
+# them honour robots and we'd rather they read llm.txt instead.
+User-agent: GPTBot
+Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+Disallow: /uploads/
+
+User-agent: ClaudeBot
+Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+Disallow: /uploads/
+
+User-agent: Claude-Web
+Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+Disallow: /uploads/
+
+User-agent: Google-Extended
+Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+
+User-agent: PerplexityBot
+Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+
+User-agent: CCBot
+Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+Disallow: /uploads/
+
+User-agent: anthropic-ai
+Disallow: /api/
+Disallow: /phronesis/api/
+Disallow: /synthesis/api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /account/
+
+# Commercial SEO scrapers — blocked entirely. They provide no upside
+# to the site and their crawl traffic eats rate-limit budget.
+User-agent: SemrushBot
+Disallow: /
+User-agent: AhrefsBot
+Disallow: /
+User-agent: MJ12bot
+Disallow: /
+User-agent: DotBot
+Disallow: /
 
 Sitemap: https://intellcluster.com/sitemap.xml

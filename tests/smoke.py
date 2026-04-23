@@ -49,6 +49,7 @@ PUBLIC_ROUTES = [
     ("/privacy", 200),
     ("/terms", 200),
     ("/robots.txt", 200),
+    ("/llm.txt", 200),
     ("/sitemap.xml", 200),
     ("/favicon.svg", 200),
     ("/og/homepage.svg", 200),
