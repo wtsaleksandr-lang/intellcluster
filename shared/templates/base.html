@@ -151,7 +151,7 @@ body.tool-synthesis .ic-nav-cta { background: var(--accent); }
    BASE
    ═══════════════════════════════════════════════════════════ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { height: 100%; -webkit-font-smoothing: antialiased; }
+html { height: 100%; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -162,6 +162,8 @@ body {
   display: flex;
   flex-direction: column;
   letter-spacing: -0.01em;
+  overflow-x: hidden;
+  max-width: 100vw;
   background-image:
     radial-gradient(circle at 50% 0%, rgba(255,86,0,0.05) 0%, transparent 45%),
     radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
@@ -899,15 +901,118 @@ html[data-theme="light"] .ic-nav { background: var(--bg); }
 .ic-nav-cta:active { transform: translateY(1px); }
 
 .theme-toggle {
-  width: 32px; height: 32px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  background: none; border: none; border-radius: 4px;
+  background: none; border: none; border-radius: 6px;
   cursor: pointer; color: var(--text-tertiary);
   transition: all 0.2s var(--ease-out);
   margin-left: 6px;
+  flex-shrink: 0;
 }
 .theme-toggle:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
 html[data-theme="light"] .theme-toggle:hover { background: rgba(0,0,0,0.04); }
+
+/* Mobile-only: hamburger + its drawer. Hidden on desktop. */
+.ic-nav-mobile {
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+.ic-hamburger {
+  width: 40px; height: 40px;
+  display: inline-flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 5px;
+  background: none; border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background 0.15s var(--ease-out);
+}
+.ic-hamburger:hover { background: rgba(255,255,255,0.05); }
+html[data-theme="light"] .ic-hamburger:hover { background: rgba(0,0,0,0.05); }
+.ic-hamburger span {
+  display: block;
+  width: 18px; height: 1.5px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: transform 0.25s var(--ease-out), opacity 0.2s var(--ease-out);
+}
+.ic-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.ic-hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.ic-hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* Drawer — full-screen overlay from top, below the nav */
+.ic-nav-drawer {
+  position: fixed;
+  top: 60px; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  z-index: 99;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.22s var(--ease-out), transform 0.22s var(--ease-out), visibility 0s 0.22s;
+  overflow-y: auto;
+  padding: 28px 24px calc(28px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+.ic-nav-drawer.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity 0.22s var(--ease-out), transform 0.22s var(--ease-out), visibility 0s 0s;
+}
+.ic-nav-drawer a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 4px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  transition: color 0.15s var(--ease-out);
+}
+.ic-nav-drawer a::after {
+  content: '→';
+  color: var(--text-tertiary);
+  font-size: 15px;
+  transition: transform 0.15s var(--ease-out);
+}
+.ic-nav-drawer a:hover::after { transform: translateX(2px); color: var(--accent); }
+.ic-nav-drawer .drawer-section {
+  margin-top: 28px;
+}
+.ic-nav-drawer .drawer-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+.ic-nav-drawer .drawer-cta {
+  margin-top: 24px;
+  padding: 14px 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  display: block;
+  border-bottom: 0;
+}
+.ic-nav-drawer .drawer-cta::after { display: none; }
+
+/* Lock body scroll when drawer is open */
+body.ic-nav-lock { overflow: hidden; }
 
 /* ═══════════════════════════════════════════════════════════
    FOOTER
@@ -1029,12 +1134,16 @@ html[data-theme="light"] .ic-footer-social a:hover { background: rgba(0,0,0,0.03
 /* ═══════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════ */
-@media (max-width: 900px) {
+/* Desktop nav narrows a bit on medium viewports */
+@media (max-width: 1024px) {
+  .ic-nav-inner { padding: 0 20px; }
+}
+/* Below 820px the inline nav doesn't fit — collapse to hamburger */
+@media (max-width: 820px) {
   .ic-nav-inner { padding: 0 18px; height: 60px; }
-  .ic-nav-links { gap: 2px; }
-  .nav-tool { padding: 7px 10px; font-size: 13.5px; }
-  .ic-nav-cta { margin-left: 6px; padding: 8px 14px; font-size: 13px; }
-  .nav-tool.active::after { display: none; }  /* save vertical space */
+  .ic-nav-links { display: none !important; }
+  .ic-nav-mobile { display: flex; }
+  .ic-nav-drawer { top: 60px; }
 }
 @media (max-width: 768px) {
   .grid-3 { grid-template-columns: 1fr !important; }
@@ -1113,11 +1222,13 @@ summary:focus-visible {
       <span class="brand-dot" aria-hidden="true"></span>
       <span class="brand-name">IntellCluster</span>
     </a>
+
+    <!-- Desktop nav — hidden below 820px -->
     <div class="ic-nav-links">
       <a href="/phronesis" data-tool="phronesis" class="nav-tool">Phronesis</a>
       <a href="/synthesis" data-tool="synthesis" class="nav-tool">Synthesis</a>
-      <a href="/pricing" class="nav-tool hide-mobile">Pricing</a>
-      <a href="/blog" class="nav-tool hide-mobile">Blog</a>
+      <a href="/pricing" class="nav-tool">Pricing</a>
+      <a href="/blog" class="nav-tool">Blog</a>
       <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle light/dark theme">
         <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -1126,13 +1237,51 @@ summary:focus-visible {
       {% if request.state and request.state.user %}
       <a href="/account" class="nav-tool" title="Your account" aria-label="Account" style="display:flex;align-items:center;gap:8px;">
         <span style="width:26px;height:26px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;text-transform:uppercase;">{{ request.state.user.email[0] }}</span>
-        <span class="hide-mobile">Account</span>
+        <span>Account</span>
       </a>
       {% else %}
       <a href="/login" class="nav-tool">Sign in</a>
       <a href="/pricing" class="ic-nav-cta">Get started</a>
       {% endif %}
     </div>
+
+    <!-- Mobile row — shown ≤820px: theme toggle + hamburger only -->
+    <div class="ic-nav-mobile">
+      <button id="themeToggleMobile" class="theme-toggle" title="Toggle theme" aria-label="Toggle light/dark theme">
+        <svg id="themeIconMoonM" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="themeIconSunM" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <button id="navHamburger" class="ic-hamburger" aria-label="Open menu" aria-controls="icNavDrawer" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Full-screen mobile drawer -->
+  <div class="ic-nav-drawer" id="icNavDrawer" role="dialog" aria-modal="true" aria-label="Site navigation">
+    <a href="/phronesis">Phronesis</a>
+    <a href="/synthesis">Synthesis</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/blog">Blog</a>
+    <a href="/templates">Templates</a>
+    <a href="/faq">FAQ</a>
+    <a href="/docs">API docs</a>
+    <a href="/about">About</a>
+    <a href="/contact">Contact</a>
+
+    {% if request.state and request.state.user %}
+    <div class="drawer-section">
+      <div class="drawer-section-label">Account</div>
+      <a href="/account">{{ request.state.user.email }}</a>
+      <a href="/history">Run history</a>
+    </div>
+    {% else %}
+    <div class="drawer-section">
+      <div class="drawer-section-label">Account</div>
+      <a href="/login">Sign in</a>
+      <a href="/pricing" class="drawer-cta">Get started →</a>
+    </div>
+    {% endif %}
   </div>
 </nav>
 
@@ -1223,21 +1372,60 @@ summary:focus-visible {
   }
   function updateThemeIcons() {
     var theme = document.documentElement.getAttribute('data-theme') || 'dark';
-    var moon = document.getElementById('themeIconMoon'), sun = document.getElementById('themeIconSun');
-    if (!moon || !sun) return;
-    moon.style.display = theme === 'dark' ? 'block' : 'none';
-    sun.style.display = theme === 'light' ? 'block' : 'none';
+    ['Moon','MoonM','Sun','SunM'].forEach(function(s){
+      var el = document.getElementById('themeIcon' + s);
+      if (!el) return;
+      var isSun = s.indexOf('Sun') === 0;
+      el.style.display = (isSun ? theme === 'light' : theme === 'dark') ? 'block' : 'none';
+    });
   }
-  document.addEventListener('DOMContentLoaded', function() {
-    updateThemeIcons();
-    var btn = document.getElementById('themeToggle');
-    if (btn) btn.addEventListener('click', function() {
+  function bindThemeToggle(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function() {
       var cur = document.documentElement.getAttribute('data-theme') || 'dark';
       var next = cur === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('intellcluster_theme', next);
       updateThemeIcons();
     });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    updateThemeIcons();
+    bindThemeToggle('themeToggle');
+    bindThemeToggle('themeToggleMobile');
+
+    // Hamburger drawer
+    var hb = document.getElementById('navHamburger');
+    var drawer = document.getElementById('icNavDrawer');
+    if (hb && drawer) {
+      var close = function() {
+        drawer.classList.remove('is-open');
+        hb.setAttribute('aria-expanded', 'false');
+        hb.setAttribute('aria-label', 'Open menu');
+        document.body.classList.remove('ic-nav-lock');
+      };
+      var open = function() {
+        drawer.classList.add('is-open');
+        hb.setAttribute('aria-expanded', 'true');
+        hb.setAttribute('aria-label', 'Close menu');
+        document.body.classList.add('ic-nav-lock');
+      };
+      hb.addEventListener('click', function() {
+        (drawer.classList.contains('is-open') ? close : open)();
+      });
+      // Close when any drawer link is tapped (same-page navigation is fine too)
+      drawer.querySelectorAll('a').forEach(function(a){
+        a.addEventListener('click', close);
+      });
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && drawer.classList.contains('is-open')) close();
+      });
+      // Close on resize up past the breakpoint
+      window.addEventListener('resize', function(){
+        if (window.innerWidth > 820 && drawer.classList.contains('is-open')) close();
+      });
+    }
   });
 
   // Active tool highlight
