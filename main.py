@@ -69,6 +69,45 @@ async def _lifespan(_app):
 
 app = FastAPI(title="IntellCluster", version="0.1.0", lifespan=_lifespan)
 
+# Security headers — conservative CSP that allows our known third parties:
+# fonts.bunny.net (fonts), plausible.io (analytics), stripe.com (checkout),
+# cdn.jsdelivr.net (marked.js on synthesis result page). Nothing else is
+# allowed to load scripts, frame this site, or send data upstream.
+_CSP = "; ".join([
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' https://plausible.io https://*.plausible.io https://cdn.jsdelivr.net https://js.stripe.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.bunny.net",
+    "font-src 'self' https://fonts.bunny.net data:",
+    "img-src 'self' data: blob: https:",
+    "connect-src 'self' https://plausible.io https://*.plausible.io https://api.stripe.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+    "frame-ancestors 'none'",
+    "form-action 'self' https://checkout.stripe.com",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "upgrade-insecure-requests",
+])
+
+_SECURITY_HEADERS = {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(self), microphone=(self), geolocation=(), payment=(self), usb=(), accelerometer=(), gyroscope=()",
+    "Content-Security-Policy": _CSP,
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "X-Permitted-Cross-Domain-Policies": "none",
+}
+
+
+@app.middleware("http")
+async def _security_headers(request: Request, call_next):
+    resp = await call_next(request)
+    for k, v in _SECURITY_HEADERS.items():
+        resp.headers.setdefault(k, v)
+    return resp
+
+
 # Rate limiting middleware
 from shared.rate_limit import rate_limit_middleware
 app.middleware("http")(rate_limit_middleware)
