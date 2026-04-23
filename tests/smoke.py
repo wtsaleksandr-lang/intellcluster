@@ -65,6 +65,11 @@ PUBLIC_ROUTES = [
     ("/blog", 200),
     ("/blog.xml", 200),
     ("/blog/does-not-exist", 404),
+    # First live field note — published 2026-04-22
+    ("/blog/blind-multi-analyst-scoring", 200),
+    ("/og/blog/blind-multi-analyst-scoring.png", 200),
+    # Scheduled posts remain 404 until their publish_date
+    ("/blog/multi-model-research-vs-single-llm", 404),
     # 404 path returns a templated 404 with status 404
     ("/compare/definitely-does-not-exist", 404),
     # Legacy redirects
