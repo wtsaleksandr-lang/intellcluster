@@ -265,6 +265,177 @@ ANALYTICS_HTML = """{% extends "base.html" %}
 {% endblock %}"""
 
 
+USERS_HTML = """{% extends "base.html" %}
+{% block title %}Admin — Users{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block content %}
+<div style="max-width:960px;margin:0 auto;padding:40px 20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:12px;flex-wrap:wrap;">
+    <div>
+      <div class="fig-label" style="margin-bottom:4px;">INTELLCLUSTER <span>·</span> ADMIN</div>
+      <h1 class="t-display" style="font-size:26px;font-weight:600;">Users</h1>
+    </div>
+    <a href="/admin" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">← DASHBOARD</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:24px;">
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">TOTAL</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.total }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">NEW &lt;7D</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.last_7d }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">PAID</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.paid }}</div></div>
+  </div>
+
+  <div class="fig-label">FIG <span>1</span> — BY PLAN</div>
+  <div class="panel" style="padding:14px 18px;margin-bottom:24px;">
+    {% if stats.by_plan %}
+      {% for plan, count in stats.by_plan.items() %}
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;">
+        <span style="color:var(--text);text-transform:capitalize;">{{ plan }}</span>
+        <span class="t-mono" style="color:var(--text-muted);">{{ count }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="color:var(--text-dim);font-size:13px;">No users yet.</div>
+    {% endif %}
+  </div>
+
+  <div class="fig-label">FIG <span>2</span> — RECENT USERS</div>
+  {% if rows %}
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="background:var(--surface2);">
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">EMAIL</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">PLAN</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">SIGNED UP</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">LAST LOGIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in rows %}
+          <tr style="border-top:1px solid var(--border-subtle);">
+            <td style="padding:10px 14px;color:var(--text);">{{ u.email }}</td>
+            <td style="padding:10px 14px;"><span class="bdg bdg-accent" style="text-transform:capitalize;">{{ u.plan or 'free' }}</span></td>
+            <td class="t-mono" style="padding:10px 14px;color:var(--text-dim);font-size:11px;white-space:nowrap;">{{ (u.created_at or '')[:10] }}</td>
+            <td class="t-mono" style="padding:10px 14px;color:var(--text-dim);font-size:11px;white-space:nowrap;">{{ (u.last_login or '')[:16] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="panel" style="padding:18px;color:var(--text-dim);font-size:13px;text-align:center;">No users yet.</div>
+  {% endif %}
+</div>
+{% endblock %}"""
+
+
+CONTACT_HTML = """{% extends "base.html" %}
+{% block title %}Admin — Contact{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block content %}
+<div style="max-width:960px;margin:0 auto;padding:40px 20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:12px;flex-wrap:wrap;">
+    <div>
+      <div class="fig-label" style="margin-bottom:4px;">INTELLCLUSTER <span>·</span> ADMIN</div>
+      <h1 class="t-display" style="font-size:26px;font-weight:600;">Contact submissions</h1>
+    </div>
+    <a href="/admin" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">← DASHBOARD</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:24px;">
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">TOTAL</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.total }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">LAST 7D</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.last_7d }}</div></div>
+  </div>
+
+  <div class="fig-label">FIG <span>1</span> — BY REASON</div>
+  <div class="panel" style="padding:14px 18px;margin-bottom:24px;">
+    {% if stats.by_reason %}
+      {% for reason, count in stats.by_reason.items() %}
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;">
+        <span style="color:var(--text);text-transform:capitalize;">{{ reason }}</span>
+        <span class="t-mono" style="color:var(--text-muted);">{{ count }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="color:var(--text-dim);font-size:13px;">No submissions yet.</div>
+    {% endif %}
+  </div>
+
+  <div class="fig-label">FIG <span>2</span> — RECENT SUBMISSIONS</div>
+  {% if rows %}
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      {% for r in rows %}
+      <div class="panel" style="padding:14px 18px;">
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+          <span class="bdg bdg-accent" style="text-transform:capitalize;">{{ r.reason }}</span>
+          <span style="color:var(--text);font-weight:600;font-size:13px;">{{ r.name }}</span>
+          <a href="mailto:{{ r.email }}" style="color:var(--accent);font-size:12px;text-decoration:none;">{{ r.email }}</a>
+          <span class="t-mono" style="margin-left:auto;font-size:10px;color:var(--text-dim);">{{ r.timestamp[:19] }}</span>
+        </div>
+        <div style="color:var(--text-muted);font-size:13px;line-height:1.6;white-space:pre-wrap;">{{ r.message }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="panel" style="padding:18px;color:var(--text-dim);font-size:13px;text-align:center;">No submissions yet.</div>
+  {% endif %}
+</div>
+{% endblock %}"""
+
+
+PURCHASES_HTML = """{% extends "base.html" %}
+{% block title %}Admin — Purchases{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block content %}
+<div style="max-width:960px;margin:0 auto;padding:40px 20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:12px;flex-wrap:wrap;">
+    <div>
+      <div class="fig-label" style="margin-bottom:4px;">INTELLCLUSTER <span>·</span> ADMIN</div>
+      <h1 class="t-display" style="font-size:26px;font-weight:600;">Purchases</h1>
+    </div>
+    <a href="/admin" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">← DASHBOARD</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:24px;">
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">TOTAL REVENUE</div><div class="t-display" style="font-size:26px;font-weight:600;">${{ '%.2f' | format(stats.revenue_usd) }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">PURCHASES</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.total }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">SUBS</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.subscriptions }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">PACKS</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.packs }}</div></div>
+  </div>
+
+  <div class="fig-label">FIG <span>1</span> — RECENT PURCHASES</div>
+  {% if rows %}
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="background:var(--surface2);">
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">WHEN</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">EMAIL</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">KIND</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">PLAN / PACK</th>
+            <th style="text-align:right;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">AMOUNT</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in rows %}
+          <tr style="border-top:1px solid var(--border-subtle);">
+            <td class="t-mono" style="padding:10px 14px;color:var(--text-dim);font-size:11px;white-space:nowrap;">{{ (p.timestamp or '')[:19] }}</td>
+            <td style="padding:10px 14px;color:var(--text);">{{ p.email or '—' }}</td>
+            <td style="padding:10px 14px;"><span class="bdg {% if p.kind == 'subscription' %}bdg-accent{% else %}bdg-muted{% endif %}" style="text-transform:capitalize;">{{ p.kind }}</span></td>
+            <td style="padding:10px 14px;color:var(--text);text-transform:capitalize;">{{ p.plan_id or p.pack_id or '—' }}{% if p.credits %} ({{ p.credits }} cr){% endif %}</td>
+            <td class="t-mono" style="padding:10px 14px;text-align:right;color:var(--text);">${{ '%.2f' | format((p.amount or 0)/100) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="panel" style="padding:18px;color:var(--text-dim);font-size:13px;text-align:center;">No purchases yet.</div>
+  {% endif %}
+</div>
+{% endblock %}"""
+
+
 DASHBOARD_HTML = """{% extends "base.html" %}
 {% block title %}Admin Dashboard{% endblock %}
 {% block robots %}noindex, nofollow{% endblock %}
@@ -282,12 +453,25 @@ DASHBOARD_HTML = """{% extends "base.html" %}
 
   <!-- Quick links -->
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+    <a href="/admin/users" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">USERS →</a>
+    <a href="/admin/contact" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">CONTACT →</a>
+    <a href="/admin/purchases" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">PURCHASES →</a>
     <a href="/admin/waitlist" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">WAITLIST →</a>
     <a href="/admin/analytics" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">ANALYTICS →</a>
   </div>
 
   <!-- Stats overview -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:32px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:32px;">
+    <div class="panel">
+      <div class="fig-label" style="margin-bottom:4px;">USERS</div>
+      <div class="t-display" style="font-size:28px;font-weight:600;">{{ stats.user_count }}</div>
+      <div style="font-size:11px;color:var(--text-muted);">signed in, all time</div>
+    </div>
+    <div class="panel">
+      <div class="fig-label" style="margin-bottom:4px;">REVENUE</div>
+      <div class="t-display" style="font-size:28px;font-weight:600;">${{ '%.2f' | format(stats.revenue_usd) }}</div>
+      <div style="font-size:11px;color:var(--text-muted);">{{ stats.purchase_count }} purchase{{ '' if stats.purchase_count == 1 else 's' }}</div>
+    </div>
     <div class="panel">
       <div class="fig-label" style="margin-bottom:4px;">PHRONESIS</div>
       <div class="t-display" style="font-size:28px;font-weight:600;">{{ stats.phronesis_count }}</div>
@@ -297,6 +481,11 @@ DASHBOARD_HTML = """{% extends "base.html" %}
       <div class="fig-label" style="margin-bottom:4px;">SYNTHESIS</div>
       <div class="t-display" style="font-size:28px;font-weight:600;">{{ stats.synthesis_count }}</div>
       <div style="font-size:11px;color:var(--text-muted);">research runs</div>
+    </div>
+    <div class="panel">
+      <div class="fig-label" style="margin-bottom:4px;">CONTACT</div>
+      <div class="t-display" style="font-size:28px;font-weight:600;">{{ stats.contact_count }}</div>
+      <div style="font-size:11px;color:var(--text-muted);">submissions</div>
     </div>
     <div class="panel">
       <div class="fig-label" style="margin-bottom:4px;">PROVIDERS</div>
@@ -374,6 +563,9 @@ _admin_templates.env.loader = ChoiceLoader([
         "_admin_dashboard.html": DASHBOARD_HTML,
         "_admin_waitlist.html": WAITLIST_HTML,
         "_admin_analytics.html": ANALYTICS_HTML,
+        "_admin_users.html": USERS_HTML,
+        "_admin_contact.html": CONTACT_HTML,
+        "_admin_purchases.html": PURCHASES_HTML,
     }),
     FileSystemLoader("shared/templates"),
 ])
@@ -388,17 +580,27 @@ async def admin_home(request: Request):
     # Gather stats
     from shared.tracking.history import get_recent_decisions
     from shared.tracking.synthesis_history import get_recent_synthesis_runs
+    from shared.tracking.contact import list_recent as _list_contact
+    from shared.tracking.purchases import list_recent as _list_purchases
+    from shared.auth.users import list_users, user_count
     from config import settings as app_settings
 
     recent_phronesis = get_recent_decisions(limit=10)
     recent_synthesis = get_recent_synthesis_runs(limit=10)
     providers = app_settings.available_judges()
 
+    purchases = _list_purchases(limit=500)
+    revenue_cents = sum(int(p.get("amount") or 0) for p in purchases)
+
     stats = {
-        "phronesis_count": len(recent_phronesis),  # approximate; better to count all
-        "synthesis_count": len(recent_synthesis),
+        "phronesis_count": len(get_recent_decisions(limit=2000)),
+        "synthesis_count": len(get_recent_synthesis_runs(limit=2000)),
         "provider_count": len(providers),
         "providers": providers,
+        "user_count": user_count(),
+        "contact_count": len(_list_contact(limit=2000)),
+        "purchase_count": len(purchases),
+        "revenue_usd": revenue_cents / 100.0,
     }
 
     return _admin_templates.TemplateResponse(
@@ -572,4 +774,93 @@ async def admin_analytics(request: Request):
             "counts_all": counts_all_sorted,
             "recent": recent,
         },
+    )
+
+
+# ─── Users, Contact, Purchases ───
+
+def _days_ago(iso_ts: str, days: int) -> bool:
+    """True if iso_ts is within the last `days` days."""
+    from datetime import datetime as _dt, timezone as _tz
+    if not iso_ts:
+        return False
+    try:
+        dt = _dt.fromisoformat(iso_ts.replace("Z", "+00:00"))
+    except Exception:
+        return False
+    age = (_dt.now(_tz.utc) - dt).total_seconds() / 86400.0
+    return age <= days
+
+
+@admin_router.get("/admin/users", response_class=HTMLResponse)
+async def admin_users(request: Request):
+    if not is_admin(request):
+        return RedirectResponse(url="/admin/login", status_code=302)
+    from shared.auth.users import list_users
+
+    rows = list_users(limit=200)
+    by_plan: dict[str, int] = {}
+    last_7d = 0
+    paid = 0
+    for u in rows:
+        plan = u.get("plan", "free")
+        by_plan[plan] = by_plan.get(plan, 0) + 1
+        if _days_ago(u.get("created_at", ""), 7):
+            last_7d += 1
+        if plan and plan != "free":
+            paid += 1
+    stats = {
+        "total": len(rows),
+        "by_plan": dict(sorted(by_plan.items(), key=lambda kv: -kv[1])),
+        "last_7d": last_7d,
+        "paid": paid,
+    }
+    return _admin_templates.TemplateResponse(
+        "_admin_users.html",
+        {"request": request, "rows": rows, "stats": stats},
+    )
+
+
+@admin_router.get("/admin/contact", response_class=HTMLResponse)
+async def admin_contact(request: Request):
+    if not is_admin(request):
+        return RedirectResponse(url="/admin/login", status_code=302)
+    from shared.tracking.contact import list_recent
+    rows = list_recent(limit=200)
+    by_reason: dict[str, int] = {}
+    last_7d = 0
+    for r in rows:
+        rs = r.get("reason", "other")
+        by_reason[rs] = by_reason.get(rs, 0) + 1
+        if _days_ago(r.get("timestamp", ""), 7):
+            last_7d += 1
+    stats = {
+        "total": len(rows),
+        "by_reason": dict(sorted(by_reason.items(), key=lambda kv: -kv[1])),
+        "last_7d": last_7d,
+    }
+    return _admin_templates.TemplateResponse(
+        "_admin_contact.html",
+        {"request": request, "rows": rows, "stats": stats},
+    )
+
+
+@admin_router.get("/admin/purchases", response_class=HTMLResponse)
+async def admin_purchases(request: Request):
+    if not is_admin(request):
+        return RedirectResponse(url="/admin/login", status_code=302)
+    from shared.tracking.purchases import list_recent
+    rows = list_recent(limit=200)
+    subs = sum(1 for r in rows if r.get("kind") == "subscription")
+    packs = sum(1 for r in rows if r.get("kind") == "credit_pack")
+    revenue_cents = sum(int(r.get("amount") or 0) for r in rows)
+    stats = {
+        "total": len(rows),
+        "subscriptions": subs,
+        "packs": packs,
+        "revenue_usd": revenue_cents / 100.0,
+    }
+    return _admin_templates.TemplateResponse(
+        "_admin_purchases.html",
+        {"request": request, "rows": rows, "stats": stats},
     )
