@@ -22,6 +22,10 @@
 <meta name="theme-color" content="#020917" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
 
+{# Search Console / Webmaster verification — env-driven, only rendered if set. #}
+{% if google_site_verification %}<meta name="google-site-verification" content="{{ google_site_verification }}">{% endif %}
+{% if bing_site_verification %}<meta name="msvalidate.01" content="{{ bing_site_verification }}">{% endif %}
+
 <!-- Apply stored theme before CSS parses, prevents FOUC on repeat visits. -->
 <script>(function(){try{var t=localStorage.getItem('intellcluster_theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 
@@ -591,9 +595,13 @@ summary:focus-visible {
 </style>
 {% block head %}{% endblock %}
 
-{# Plausible analytics — only loaded if PLAUSIBLE_DOMAIN env var is set #}
+{# Plausible analytics — only loaded if PLAUSIBLE_DOMAIN env var is set.
+   We load the tagged-events + outbound-links + file-downloads variant so
+   we can fire named conversion events via window.plausible() and also
+   get automatic tracking on CTA clicks. #}
 {% if plausible_domain %}
-<script defer data-domain="{{ plausible_domain }}" src="https://plausible.io/js/script.js"></script>
+<script defer data-domain="{{ plausible_domain }}" src="https://plausible.io/js/script.tagged-events.outbound-links.file-downloads.js"></script>
+<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 {% endif %}
 </head>
 <body{% if tool %} class="tool-{{ tool }}"{% endif %}>

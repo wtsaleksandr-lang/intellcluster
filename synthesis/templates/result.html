@@ -105,4 +105,14 @@
   </style>
 
 </div>
+
+<script>
+  if (window.plausible) {
+    window.plausible('synthesis_result_viewed', { props: {
+      category: {{ (result.category or 'deep_research') | tojson }},
+      mode: {{ (result.mode or 'standard') | tojson }},
+      model_count: {{ result.model_count or 5 }}
+    }});
+  }
+</script>
 {% endblock %}

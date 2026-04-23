@@ -74,7 +74,7 @@
       {% if plan.monthly_price == 0 %}
         <a href="/phronesis" style="margin-top:26px;display:block;text-align:center;padding:11px;background:var(--surface2);color:var(--text);font-weight:600;border:1px solid var(--border);border-radius:9px;font-size:13px;text-decoration:none;transition:border-color 0.15s;">Start free</a>
       {% else %}
-        <button class="plan-cta" data-plan="{{ plan_id }}" style="margin-top:26px;padding:11px;background:{% if plan.highlighted %}var(--accent);color:#fff;{% else %}var(--surface2);color:var(--text);border:1px solid var(--border);{% endif %}font-weight:600;border:{% if not plan.highlighted %}1px solid var(--border){% else %}none{% endif %};border-radius:9px;font-size:13px;cursor:pointer;transition:opacity 0.15s;">
+        <button class="plan-cta plausible-event-name=plan_clicked plausible-event-plan={{ plan_id }}" data-plan="{{ plan_id }}" style="margin-top:26px;padding:11px;background:{% if plan.highlighted %}var(--accent);color:#fff;{% else %}var(--surface2);color:var(--text);border:1px solid var(--border);{% endif %}font-weight:600;border:{% if not plan.highlighted %}1px solid var(--border){% else %}none{% endif %};border-radius:9px;font-size:13px;cursor:pointer;transition:opacity 0.15s;">
           {% if stripe_live %}Start 7-day free trial{% else %}Join {{ plan.name }} waitlist{% endif %}
         </button>
       {% endif %}
@@ -103,7 +103,7 @@
       <div class="t-display" style="font-size:36px;font-weight:600;margin-top:8px;">${{ pack.price_usd }}</div>
       <div style="font-size:14px;color:var(--accent);font-weight:600;margin-top:4px;">{{ pack.credits }} credits</div>
       <div class="t-mono" style="font-size:10px;color:var(--text-dim);margin-top:4px;">${{ "%.3f"|format(pack.price_per_credit) }} / credit</div>
-      <button class="pack-cta" data-pack="{{ pack_id }}" style="margin-top:18px;width:100%;padding:9px;background:{% if pack.highlighted %}var(--accent);color:#fff;border:none;{% else %}transparent;color:var(--text);border:1px solid var(--border);{% endif %}font-weight:600;border-radius:8px;font-size:12px;cursor:pointer;">
+      <button class="pack-cta plausible-event-name=pack_clicked plausible-event-pack={{ pack_id }}" data-pack="{{ pack_id }}" style="margin-top:18px;width:100%;padding:9px;background:{% if pack.highlighted %}var(--accent);color:#fff;border:none;{% else %}transparent;color:var(--text);border:1px solid var(--border);{% endif %}font-weight:600;border-radius:8px;font-size:12px;cursor:pointer;">
         {% if stripe_live %}Buy credits{% else %}Join waitlist{% endif %}
       </button>
     </div>

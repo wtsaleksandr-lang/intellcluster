@@ -221,4 +221,22 @@
   {% endif %}
 
 </article>
+
+<script>
+  // Fire a Plausible custom event 8s into the read (long-dwell signal).
+  (function(){
+    if (!window.plausible) return;
+    var fired = false;
+    function fire() {
+      if (fired) return;
+      fired = true;
+      window.plausible('blog_read', { props: {
+        slug: {{ post.slug | tojson }},
+        tool_focus: {{ post.tool_focus | tojson }}
+      }});
+    }
+    setTimeout(fire, 8000);
+    window.addEventListener('beforeunload', fire);
+  })();
+</script>
 {% endblock %}

@@ -97,6 +97,23 @@
   </section>
   {% endif %}
 
+  <script>
+    // Fire a "signup" event on first arrival to /account after verify.
+    // Gate by a session-storage flag so we don't fire on every visit.
+    (function(){
+      if (!window.plausible) return;
+      try {
+        if (!sessionStorage.getItem('ic_signup_tracked')) {
+          sessionStorage.setItem('ic_signup_tracked', '1');
+          var ref = document.referrer || '';
+          if (ref.indexOf('/auth/verify') !== -1) {
+            window.plausible('auth_verified', { props: { plan: {{ user.plan | tojson }} } });
+          }
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <section class="rv" style="padding:16px 0 80px;">
     <form method="POST" action="/auth/logout" style="display:inline-block;">
       <button type="submit" style="padding:10px 18px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;cursor:pointer;transition:border-color 0.2s,color 0.2s;"

@@ -142,4 +142,13 @@
   });
 })();
 </script>
+<script>
+  if (window.plausible) {
+    window.plausible('phronesis_result_viewed', { props: {
+      confidence: {{ result.confidence_level | tojson }},
+      agree: {{ (result.judges_agree|string) | lower | tojson }},
+      options: {{ result.ranked_options|length }}
+    }});
+  }
+</script>
 {% endblock %}

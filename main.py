@@ -134,6 +134,8 @@ templates = Jinja2Templates(directory=[
 # Site-wide Jinja globals (available on every render without per-route wiring)
 templates.env.globals["plausible_domain"] = os.environ.get("PLAUSIBLE_DOMAIN") or ""
 templates.env.globals["site_url"] = os.environ.get("SITE_URL", "https://intellcluster.com")
+templates.env.globals["google_site_verification"] = os.environ.get("GOOGLE_SITE_VERIFICATION") or ""
+templates.env.globals["bing_site_verification"] = os.environ.get("BING_SITE_VERIFICATION") or ""
 
 
 # ═══════════════════════════════════════════════════════
