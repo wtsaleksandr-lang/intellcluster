@@ -144,7 +144,9 @@ templates.env.globals["bing_site_verification"] = os.environ.get("BING_SITE_VERI
 
 @app.get("/", response_class=HTMLResponse)
 async def homepage(request: Request):
-    return templates.TemplateResponse(request, "index.html")
+    # Explicitly use the unique filename — otherwise Jinja's search-order
+    # picks up phronesis/templates/index.html first. Renamed 2026-04-23.
+    return templates.TemplateResponse(request, "home.html")
 
 
 # ─── SEO: robots.txt + sitemap.xml at root ───

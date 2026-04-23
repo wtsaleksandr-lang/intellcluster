@@ -303,16 +303,35 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
   .hb-stage { transform: scale(0.68); margin-bottom: -250px; }
 }
 @media (max-width: 860px) {
-  .ic-hero-wrap { min-height: 0; padding-top: 40px; }
+  .ic-hero-wrap { min-height: 0; padding: 40px 16px 24px; }
   .hb-stage {
     transform: none;
-    grid-template-columns: 340px;
+    grid-template-columns: 1fr;
     grid-template-rows: auto;
-    width: 340px; height: auto;
+    width: 100%; height: auto;
+    max-width: 340px;
     gap: 0;
+    margin: 0 auto;
   }
   .hb-stage > .hbp { display: none; }
-  .hb-phone-wrap { grid-column: 1; grid-row: 1; }
+  .hb-phone-wrap {
+    grid-column: 1; grid-row: 1;
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* Very narrow — iPhone SE / Android small. Shrink phone proportionally
+   so it always fits with page padding on both sides. */
+@media (max-width: 420px) {
+  .ic-hero-wrap { padding: 32px 12px 20px; }
+  .ph-phone { width: 300px; height: 570px; border-radius: 26px; }
+  .ph-header { padding: 14px 14px 12px; }
+  .ph-body { padding: 12px 14px 14px; gap: 12px; }
+  .ph-input { margin: 0 12px 12px; padding: 8px 4px 8px 14px; }
+  .ic-hero-caption { margin-top: 20px; padding: 0 4px; }
+}
+@media (max-width: 340px) {
+  .ph-phone { width: 280px; height: 540px; }
 }
 </style>
 
