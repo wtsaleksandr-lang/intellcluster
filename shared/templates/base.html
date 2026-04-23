@@ -376,6 +376,216 @@ html[data-theme="light"] body {
 /* Link shimmer on hover — subtle brighten on every link */
 a { transition: color 0.18s var(--ease-out); }
 
+/* ═══════════════════════════════════════════════════════════
+   SETTINGS POPOVER — premium opaque surface, mobile bottom-sheet
+   ═══════════════════════════════════════════════════════════ */
+
+/* Backdrop scrim — only shown when popover is open on mobile */
+.ic-pop-scrim {
+  position: fixed; inset: 0; z-index: 58;
+  background: rgba(0, 0, 0, 0.48);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s var(--ease-out);
+}
+.ic-pop-scrim.open { opacity: 1; pointer-events: auto; }
+@media (min-width: 641px) {
+  .ic-pop-scrim { display: none; }
+}
+
+/* The popover itself — desktop: floating card near composer; mobile: bottom sheet */
+.ic-settings-pop {
+  position: absolute;
+  bottom: 64px; left: 8px;
+  width: 360px;
+  background: var(--surface-solid);   /* fully opaque, not rgba */
+  border: 1px solid var(--border-decor);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  z-index: 60;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 24px 60px -18px rgba(0, 0, 0, 0.78),
+    0 8px 20px -8px rgba(0, 0, 0, 0.60);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  transform-origin: bottom left;
+  animation: icPopIn 0.18s var(--ease-out);
+}
+html[data-theme="light"] .ic-settings-pop {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.03) inset,
+    0 24px 60px -18px rgba(0, 0, 0, 0.18),
+    0 8px 20px -8px rgba(0, 0, 0, 0.10);
+}
+@keyframes icPopIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Any <button> inside inherits the right typography */
+.ic-settings-pop button,
+.ic-settings-pop input,
+.ic-settings-pop select,
+.ic-settings-pop textarea {
+  font-family: inherit;
+  letter-spacing: -0.01em;
+}
+
+/* Mobile bottom-sheet behaviour (<=640px) */
+@media (max-width: 640px) {
+  .ic-settings-pop {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 16px 18px calc(16px + env(safe-area-inset-bottom)) 18px;
+    transform-origin: center bottom;
+    animation: icPopSheetIn 0.24s var(--ease-out);
+    max-height: 82vh;
+    overflow-y: auto;
+    border-bottom: none;
+  }
+  @keyframes icPopSheetIn {
+    from { opacity: 0; transform: translateY(100%); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* Grab handle at the top of the sheet */
+  .ic-settings-pop::before {
+    content: '';
+    display: block;
+    width: 40px; height: 4px;
+    margin: 0 auto 10px;
+    background: rgba(255,255,255,0.22);
+    border-radius: 2px;
+  }
+  html[data-theme="light"] .ic-settings-pop::before {
+    background: rgba(0,0,0,0.18);
+  }
+}
+
+/* The three-option button groups inside the popover */
+.ic-set-group { margin-bottom: 14px; }
+.ic-set-group:last-of-type { margin-bottom: 6px; }
+.ic-set-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+.ic-set-row {
+  display: flex; gap: 6px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9px;
+  padding: 4px;
+}
+html[data-theme="light"] .ic-set-row {
+  background: rgba(0,0,0,0.03);
+}
+.ic-set-btn {
+  flex: 1;
+  padding: 8px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+  font-family: inherit;
+  letter-spacing: -0.01em;
+}
+.ic-set-btn:hover { color: var(--text-primary); }
+.ic-set-btn.active {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+.ic-set-btn.active:hover { color: #ffffff; filter: brightness(1.04); }
+
+.ic-set-desc {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.ic-set-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ic-set-title {
+  font-family: 'Instrument Serif', ui-serif, Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+.ic-set-close {
+  width: 28px; height: 28px;
+  background: none; border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out);
+  font-family: inherit;
+}
+.ic-set-close:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+html[data-theme="light"] .ic-set-close:hover { background: rgba(0,0,0,0.06); }
+
+/* Web-search toggle row (Phronesis only) */
+.ic-set-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+}
+.ic-set-toggle-label { font-size: 12.5px; color: var(--text-primary); font-weight: 500; }
+.ic-set-toggle-sub { font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
+.ic-set-switch {
+  position: relative;
+  width: 38px; height: 22px;
+  flex-shrink: 0; cursor: pointer;
+}
+.ic-set-switch input { opacity: 0; width: 0; height: 0; }
+.ic-set-switch-track {
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  transition: background 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.ic-set-switch input:checked ~ .ic-set-switch-track {
+  background: var(--accent-dim);
+  border-color: var(--accent-border);
+}
+.ic-set-switch-dot {
+  position: absolute; top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: transform 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+.ic-set-switch input:checked ~ .ic-set-switch-dot {
+  transform: translateX(16px);
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+
 /* Chips */
 .chip {
   display: inline-block;
@@ -540,7 +750,6 @@ html[data-theme="light"] .theme-toggle:hover { background: rgba(0,0,0,0.04); }
   .grid-3 { grid-template-columns: 1fr !important; }
   .hide-mobile { display: none !important; }
   body { font-size: 13px; }
-  #settingsPop { width: calc(100vw - 32px) !important; left: 8px !important; right: 8px !important; }
 }
 @media (max-width: 480px) {
   .panel { padding: 14px; }

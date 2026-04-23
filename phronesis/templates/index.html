@@ -97,52 +97,52 @@
     </div>
 
     <!-- SETTINGS POPOVER -->
-    <div id="settingsPop" style="display:none;position:absolute;bottom:56px;left:8px;width:340px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;z-index:60;box-shadow:0 12px 40px rgba(0,0,0,0.5);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <span style="font-size:13px;font-weight:600;color:var(--text);">Analysis Settings</span>
-        <button onclick="document.getElementById('settingsPop').style.display='none'" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;">&times;</button>
+    <div class="ic-pop-scrim" id="settingsScrim"></div>
+    <div id="settingsPop" class="ic-settings-pop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" style="display:none;">
+      <div class="ic-set-header">
+        <span id="settingsTitle" class="ic-set-title">Analysis settings</span>
+        <button type="button" class="ic-set-close" onclick="document.getElementById('settingsBtn').click();" aria-label="Close settings">&times;</button>
       </div>
 
-      <!-- Depth -->
-      <div style="margin-bottom:16px;">
-        <div class="fig-label" style="margin-bottom:8px;">DEPTH</div>
-        <div style="display:flex;gap:4px;">
-          <button class="depth-btn" data-v="quick" data-desc="1 analyst, fastest. Good for simple A-vs-B. ~5s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Quick</button>
-          <button class="depth-btn" data-v="standard" data-desc="3 analysts evaluate blindly. Best balance. ~15s." style="flex:1;padding:8px;font-size:11px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
-          <button class="depth-btn" data-v="deep" data-desc="3 analysts, stronger models, deeper rubric. ~30s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Deep</button>
+      <div class="ic-set-group">
+        <div class="ic-set-label">Depth</div>
+        <div class="ic-set-row">
+          <button type="button" class="ic-set-btn depth-btn" data-v="quick" data-desc="1 analyst, fastest. Good for simple A-vs-B. ~5s.">Quick</button>
+          <button type="button" class="ic-set-btn depth-btn active" data-v="standard" data-desc="3 analysts evaluate blindly. Best balance. ~15s.">Standard</button>
+          <button type="button" class="ic-set-btn depth-btn" data-v="deep" data-desc="3 analysts, stronger models, deeper rubric. ~30s.">Deep</button>
         </div>
-        <p id="depthDesc" style="margin-top:6px;font-size:11px;color:var(--text-dim);line-height:1.5;">3 analysts evaluate blindly. Best balance. ~15s.</p>
+        <p id="depthDesc" class="ic-set-desc">3 analysts evaluate blindly. Best balance. ~15s.</p>
       </div>
 
-      <!-- Focus -->
-      <div style="margin-bottom:16px;">
-        <div class="fig-label" style="margin-bottom:8px;">FOCUS</div>
-        <div style="display:flex;gap:4px;">
-          <button class="focus-btn" data-v="balanced" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Balanced</button>
-          <button class="focus-btn" data-v="risks" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Risk-focused</button>
-          <button class="focus-btn" data-v="practical" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Practical</button>
-        </div>
-      </div>
-
-      <!-- Length -->
-      <div style="margin-bottom:16px;">
-        <div class="fig-label" style="margin-bottom:8px;">RESPONSE LENGTH</div>
-        <div style="display:flex;gap:4px;">
-          <button class="len-btn" data-v="concise" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Concise</button>
-          <button class="len-btn" data-v="standard" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
-          <button class="len-btn" data-v="detailed" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Detailed</button>
+      <div class="ic-set-group">
+        <div class="ic-set-label">Focus</div>
+        <div class="ic-set-row">
+          <button type="button" class="ic-set-btn focus-btn active" data-v="balanced">Balanced</button>
+          <button type="button" class="ic-set-btn focus-btn" data-v="risks">Risks</button>
+          <button type="button" class="ic-set-btn focus-btn" data-v="practical">Practical</button>
         </div>
       </div>
 
-      <!-- Web search -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);">
-        <div><div style="font-size:12px;color:var(--text);">Web search</div><div style="font-size:10px;color:var(--text-dim);">Fetch current prices &amp; data</div></div>
-        <label style="position:relative;width:36px;height:20px;cursor:pointer;">
-          <input type="checkbox" id="webSearch" style="opacity:0;width:0;height:0;">
-          <span style="position:absolute;inset:0;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:background 0.2s;"></span>
-          <span id="toggleDot" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--text-dim);border-radius:50%;transition:transform 0.2s,background 0.2s;"></span>
-        </label>
+      <div class="ic-set-group">
+        <div class="ic-set-label">Response length</div>
+        <div class="ic-set-row">
+          <button type="button" class="ic-set-btn len-btn" data-v="concise">Concise</button>
+          <button type="button" class="ic-set-btn len-btn active" data-v="standard">Standard</button>
+          <button type="button" class="ic-set-btn len-btn" data-v="detailed">Detailed</button>
+        </div>
       </div>
+
+      <label class="ic-set-toggle-row" for="webSearch">
+        <div>
+          <div class="ic-set-toggle-label">Web search</div>
+          <div class="ic-set-toggle-sub">Fetch current prices &amp; data</div>
+        </div>
+        <span class="ic-set-switch">
+          <input type="checkbox" id="webSearch">
+          <span class="ic-set-switch-track"></span>
+          <span class="ic-set-switch-dot" id="toggleDot"></span>
+        </span>
+      </label>
     </div>
   </div>
 
@@ -557,28 +557,32 @@ inp.addEventListener('blur',()=>{
 });
 inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,300)+'px';});
 
-/* Settings popover */
-document.getElementById('settingsBtn').onclick=e=>{e.stopPropagation();settingsPop.style.display=settingsPop.style.display==='block'?'none':'block';};
-document.addEventListener('click',e=>{if(!settingsPop.contains(e.target)&&e.target!==document.getElementById('settingsBtn'))settingsPop.style.display='none';});
+/* Settings popover — show / hide with scrim on mobile */
+const settingsScrim=document.getElementById('settingsScrim');
+function openSettings(){settingsPop.style.display='block';settingsScrim.classList.add('open');}
+function closeSettings(){settingsPop.style.display='none';settingsScrim.classList.remove('open');}
+document.getElementById('settingsBtn').onclick=e=>{
+  e.stopPropagation();
+  settingsPop.style.display==='block'?closeSettings():openSettings();
+};
+settingsScrim.onclick=closeSettings;
+document.addEventListener('click',e=>{
+  if(settingsPop.style.display!=='block')return;
+  if(!settingsPop.contains(e.target)&&e.target!==document.getElementById('settingsBtn'))closeSettings();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&settingsPop.style.display==='block')closeSettings();});
 
-/* Toggle groups */
+/* Toggle groups — active state via .active class */
 function setupToggle(cls){
   document.querySelectorAll('.'+cls).forEach(b=>{
     b.onclick=()=>{
-      document.querySelectorAll('.'+cls).forEach(x=>{x.style.background='var(--bg)';x.style.borderColor='var(--border)';x.style.color='var(--text-muted)';x.style.fontWeight='400';});
-      b.style.background='var(--accent-dim)';b.style.borderColor='var(--accent-border)';b.style.color='var(--accent)';b.style.fontWeight='600';
-      if(b.dataset.desc)document.getElementById('depthDesc').textContent=b.dataset.desc;
+      document.querySelectorAll('.'+cls).forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      if(b.dataset.desc){const d=document.getElementById('depthDesc');if(d)d.textContent=b.dataset.desc;}
     };
   });
 }
 setupToggle('depth-btn');setupToggle('focus-btn');setupToggle('len-btn');
-
-/* Web search toggle */
-document.getElementById('webSearch').onchange=function(){
-  const d=document.getElementById('toggleDot');
-  if(this.checked){d.style.transform='translateX(16px)';d.style.background='var(--accent)';}
-  else{d.style.transform='translateX(0)';d.style.background='var(--text-dim)';}
-};
 
 /* Files */
 document.getElementById('attachBtn').onclick=()=>document.getElementById('fileInput')?.click();
@@ -689,10 +693,15 @@ async function checkIntent(){
 async function triggerExtract(){const t=inp.value.trim();if(t.length<15)return;try{const r=await fetch('/phronesis/api/extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});if(!r.ok)return;extractedData=await r.json();document.getElementById('exQ').textContent=extractedData.question||'';document.getElementById('exO').textContent=(extractedData.options||[]).join('  \u2022  ');document.getElementById('exC').textContent=(extractedData.criteria||[]).map(c=>c.name).join(', ');exPrev.style.display='block';chipArea.innerHTML='';chipArea.style.padding='0 16px';}catch(e){}}
 document.getElementById('clearEx').onclick=()=>{exPrev.style.display='none';extractedData=null;};
 
-/* Settings reader */
+/* Settings reader — reads active state from .active class */
 function getSettings(){
-  const getActive=cls=>{let v='standard';document.querySelectorAll('.'+cls).forEach(b=>{if(b.style.fontWeight==='600')v=b.dataset.v;});return v;};
-  return{depth:getActive('depth-btn'),focus:getActive('focus-btn'),length:getActive('len-btn'),web_search:document.getElementById('webSearch')?.checked||false};
+  const getActive=(cls,fallback)=>{const a=document.querySelector('.'+cls+'.active');return a?a.dataset.v:fallback;};
+  return{
+    depth:getActive('depth-btn','standard'),
+    focus:getActive('focus-btn','balanced'),
+    length:getActive('len-btn','standard'),
+    web_search:document.getElementById('webSearch')?.checked||false,
+  };
 }
 
 /* Analyze */

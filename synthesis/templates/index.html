@@ -68,34 +68,38 @@
     </div>
 
     <!-- SETTINGS POPOVER -->
-    <div id="settingsPop" style="display:none;position:absolute;bottom:56px;left:8px;width:340px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;z-index:60;box-shadow:0 12px 40px rgba(0,0,0,0.5);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <span style="font-size:13px;font-weight:600;color:var(--text);">Research Settings</span>
-        <button type="button" onclick="document.getElementById('settingsPop').style.display='none'" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;">&times;</button>
+    <div class="ic-pop-scrim" id="settingsScrim"></div>
+    <div id="settingsPop" class="ic-settings-pop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" style="display:none;">
+      <div class="ic-set-header">
+        <span id="settingsTitle" class="ic-set-title">Research settings</span>
+        <button type="button" class="ic-set-close" onclick="document.getElementById('settingsBtn').click();" aria-label="Close settings">&times;</button>
       </div>
-      <div style="margin-bottom:16px;">
-        <div class="fig-label" style="margin-bottom:8px;">DEPTH</div>
-        <div style="display:flex;gap:4px;">
-          <button type="button" class="depth-btn" data-v="quick" data-desc="Single-phase, fast. Good for simple questions. ~30s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Quick</button>
-          <button type="button" class="depth-btn" data-v="standard" data-desc="5 models, one research phase. ~60s." style="flex:1;padding:8px;font-size:11px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
-          <button type="button" class="depth-btn" data-v="expert" data-desc="5 stronger models, multi-phase research. ~120s." style="flex:1;padding:8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Expert</button>
+
+      <div class="ic-set-group">
+        <div class="ic-set-label">Depth</div>
+        <div class="ic-set-row">
+          <button type="button" class="ic-set-btn depth-btn" data-v="quick" data-desc="Single-phase, fast. Good for simple questions. ~30s.">Quick</button>
+          <button type="button" class="ic-set-btn depth-btn active" data-v="standard" data-desc="5 models, one research phase. ~60s.">Standard</button>
+          <button type="button" class="ic-set-btn depth-btn" data-v="expert" data-desc="5 stronger models, multi-phase research. ~120s.">Expert</button>
         </div>
-        <p id="depthDesc" style="margin-top:6px;font-size:11px;color:var(--text-dim);line-height:1.5;">5 models, one research phase. ~60s.</p>
+        <p id="depthDesc" class="ic-set-desc">5 models, one research phase. ~60s.</p>
       </div>
-      <div style="margin-bottom:16px;">
-        <div class="fig-label" style="margin-bottom:8px;">FOCUS</div>
-        <div style="display:flex;gap:4px;">
-          <button type="button" class="focus-btn" data-v="balanced" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Balanced</button>
-          <button type="button" class="focus-btn" data-v="skeptical" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Skeptical</button>
-          <button type="button" class="focus-btn" data-v="exploratory" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Exploratory</button>
+
+      <div class="ic-set-group">
+        <div class="ic-set-label">Focus</div>
+        <div class="ic-set-row">
+          <button type="button" class="ic-set-btn focus-btn active" data-v="balanced">Balanced</button>
+          <button type="button" class="ic-set-btn focus-btn" data-v="skeptical">Skeptical</button>
+          <button type="button" class="ic-set-btn focus-btn" data-v="exploratory">Exploratory</button>
         </div>
       </div>
-      <div style="margin-bottom:4px;">
-        <div class="fig-label" style="margin-bottom:8px;">RESPONSE LENGTH</div>
-        <div style="display:flex;gap:4px;">
-          <button type="button" class="len-btn" data-v="concise" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Concise</button>
-          <button type="button" class="len-btn" data-v="standard" style="flex:1;padding:7px;font-size:10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:6px;color:var(--accent);cursor:pointer;font-weight:600;transition:all 0.15s;">Standard</button>
-          <button type="button" class="len-btn" data-v="detailed" style="flex:1;padding:7px;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;">Detailed</button>
+
+      <div class="ic-set-group">
+        <div class="ic-set-label">Response length</div>
+        <div class="ic-set-row">
+          <button type="button" class="ic-set-btn len-btn" data-v="concise">Concise</button>
+          <button type="button" class="ic-set-btn len-btn active" data-v="standard">Standard</button>
+          <button type="button" class="ic-set-btn len-btn" data-v="detailed">Detailed</button>
         </div>
       </div>
     </div>
@@ -171,30 +175,37 @@ const composer = document.getElementById('composer');
 inp.addEventListener('focus', () => { composer.style.borderColor='var(--accent-border)'; composer.style.boxShadow='0 0 0 3px var(--accent-glow)'; });
 inp.addEventListener('blur', () => { composer.style.borderColor='var(--border)'; composer.style.boxShadow='none'; });
 
-// Settings popover
+// Settings popover — show / hide with scrim on mobile
 const settingsPop = document.getElementById('settingsPop');
-document.getElementById('settingsBtn').onclick = (e) => { e.stopPropagation(); settingsPop.style.display = settingsPop.style.display === 'block' ? 'none' : 'block'; };
-document.addEventListener('click', (e) => { if (!settingsPop.contains(e.target) && e.target !== document.getElementById('settingsBtn')) settingsPop.style.display = 'none'; });
+const settingsScrim = document.getElementById('settingsScrim');
+function openSettings(){settingsPop.style.display='block';settingsScrim.classList.add('open');}
+function closeSettings(){settingsPop.style.display='none';settingsScrim.classList.remove('open');}
+document.getElementById('settingsBtn').onclick = (e) => {
+  e.stopPropagation();
+  settingsPop.style.display === 'block' ? closeSettings() : openSettings();
+};
+settingsScrim.onclick = closeSettings;
+document.addEventListener('click', (e) => {
+  if (settingsPop.style.display !== 'block') return;
+  if (!settingsPop.contains(e.target) && e.target !== document.getElementById('settingsBtn')) closeSettings();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && settingsPop.style.display === 'block') closeSettings(); });
+
 function setupToggle(cls) {
   document.querySelectorAll('.'+cls).forEach(b => b.onclick = () => {
-    document.querySelectorAll('.'+cls).forEach(x => {
-      x.style.background = 'var(--bg)';
-      x.style.borderColor = 'var(--border)';
-      x.style.color = 'var(--text-muted)';
-      x.style.fontWeight = '400';
-    });
-    b.style.background = 'var(--accent-dim)';
-    b.style.borderColor = 'var(--accent-border)';
-    b.style.color = 'var(--accent)';
-    b.style.fontWeight = '600';
-    if (b.dataset.desc) document.getElementById('depthDesc').textContent = b.dataset.desc;
+    document.querySelectorAll('.'+cls).forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    if (b.dataset.desc) {
+      const d = document.getElementById('depthDesc');
+      if (d) d.textContent = b.dataset.desc;
+    }
     updateSettingsSummary();
   });
 }
 setupToggle('depth-btn'); setupToggle('focus-btn'); setupToggle('len-btn');
 
 function getActive(cls) {
-  const active = [...document.querySelectorAll('.'+cls)].find(b => b.style.fontWeight === '600');
+  const active = document.querySelector('.'+cls+'.active');
   return active ? active.dataset.v : cls === 'depth-btn' ? 'standard' : (cls === 'focus-btn' ? 'balanced' : 'standard');
 }
 function updateSettingsSummary() {
