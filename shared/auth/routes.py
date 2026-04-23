@@ -154,6 +154,50 @@ async def logout(request: Request):
     return resp
 
 
+@user_router.get("/account/export", include_in_schema=False)
+async def account_export(request: Request):
+    """GDPR article 20 — download everything we have on this user as JSON."""
+    from fastapi.responses import Response
+    import json as _json
+    user = current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    from .users import export_user as _export
+    data = _export(user["email"])
+    filename = f"intellcluster-export-{user['email'].replace('@', '-at-')}.json"
+    from shared.analytics import log_event
+    log_event("account_exported", {"email_hash": hash(user["email"]) % (10**10)})
+    return Response(
+        content=_json.dumps(data, indent=2, ensure_ascii=False),
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "private, no-store",
+        },
+    )
+
+
+@user_router.post("/account/delete", include_in_schema=False)
+async def account_delete(request: Request):
+    """GDPR article 17 — wipe the user row, every run they made, and contact
+    submissions under their email. Purchase records are retained for 7-year
+    financial recordkeeping but their email field is redacted."""
+    user = current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    from .users import delete_user as _delete
+    counts = _delete(user["email"])
+    from shared.analytics import log_event
+    log_event("account_deleted", {
+        "email_hash": hash(user["email"]) % (10**10),
+        "decisions_removed": counts.get("decisions", 0),
+        "synthesis_removed": counts.get("synthesis_runs", 0),
+    })
+    resp = RedirectResponse(url="/?deleted=1", status_code=302)
+    resp.delete_cookie(SESSION_COOKIE, path="/")
+    return resp
+
+
 @user_router.get("/account", response_class=HTMLResponse)
 async def account_page(request: Request):
     user = current_user(request)

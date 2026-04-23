@@ -116,3 +116,124 @@ def update_user_plan(email: str, plan: str) -> dict[str, Any] | None:
 
 def user_count() -> int:
     return len(_snapshot())
+
+
+def delete_user(email: str) -> dict[str, Any]:
+    """
+    GDPR art. 17 — delete the user's row and all their runs / contact rows.
+
+    Purchase records are retained (financial-recordkeeping obligation,
+    7 years, called out in /privacy) but their `email` field is wiped
+    to 'deleted@redacted.local' so they can't be used to re-identify.
+
+    Returns counts of what was removed, so we can surface it on /account.
+    """
+    import json as _json
+    from pathlib import Path as _Path
+
+    email = _norm(email)
+    if not email:
+        return {"removed": 0}
+
+    counts = {
+        "users": 0,
+        "decisions": 0,
+        "synthesis_runs": 0,
+        "contact_submissions": 0,
+        "purchase_records_redacted": 0,
+        "outcome_reminders_cleared": 0,
+    }
+
+    def _filter_jsonl(path: _Path, match_key: str) -> int:
+        if not path.exists():
+            return 0
+        kept, removed = [], 0
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = _json.loads(line)
+                except Exception:
+                    kept.append(line)
+                    continue
+                if (rec.get(match_key) or "").strip().lower() == email:
+                    removed += 1
+                else:
+                    kept.append(_json.dumps(rec, ensure_ascii=False))
+        if removed:
+            path.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
+        return removed
+
+    def _redact_purchases(path: _Path) -> int:
+        if not path.exists():
+            return 0
+        rewritten, redacted = [], 0
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = _json.loads(line)
+                except Exception:
+                    rewritten.append(line)
+                    continue
+                if (rec.get("email") or "").strip().lower() == email:
+                    rec["email"] = "deleted@redacted.local"
+                    redacted += 1
+                rewritten.append(_json.dumps(rec, ensure_ascii=False))
+        if redacted:
+            path.write_text("\n".join(rewritten) + "\n", encoding="utf-8")
+        return redacted
+
+    counts["users"] = _filter_jsonl(_FILE, "email")
+    counts["decisions"] = _filter_jsonl(_Path("history/decisions.jsonl"), "user_email")
+    counts["synthesis_runs"] = _filter_jsonl(_Path("history/synthesis_runs.jsonl"), "user_email")
+    counts["contact_submissions"] = _filter_jsonl(_Path("history/contact.jsonl"), "email")
+    counts["outcome_reminders_cleared"] = _filter_jsonl(_Path("history/outcome_reminders_sent.jsonl"), "email")
+    counts["purchase_records_redacted"] = _redact_purchases(_Path("history/purchases.jsonl"))
+
+    return counts
+
+
+def export_user(email: str) -> dict[str, Any]:
+    """GDPR art. 20 — return everything we have on this email as a dict."""
+    import json as _json
+    from pathlib import Path as _Path
+
+    email = _norm(email)
+    out: dict[str, Any] = {
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "email": email,
+        "account": get_user(email),
+        "phronesis_runs": [],
+        "synthesis_runs": [],
+        "contact_submissions": [],
+        "purchases": [],
+    }
+
+    def _read_matching(path: _Path, match_key: str) -> list[dict[str, Any]]:
+        if not path.exists():
+            return []
+        rows: list[dict[str, Any]] = []
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = _json.loads(line)
+                except Exception:
+                    continue
+                if (rec.get(match_key) or "").strip().lower() == email:
+                    rows.append(rec)
+        return rows
+
+    out["phronesis_runs"] = _read_matching(_Path("history/decisions.jsonl"), "user_email")
+    out["synthesis_runs"] = _read_matching(_Path("history/synthesis_runs.jsonl"), "user_email")
+    out["contact_submissions"] = _read_matching(_Path("history/contact.jsonl"), "email")
+    out["purchases"] = _read_matching(_Path("history/purchases.jsonl"), "email")
+
+    return out

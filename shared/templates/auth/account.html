@@ -114,7 +114,27 @@
     })();
   </script>
 
-  <section class="rv" style="padding:16px 0 80px;">
+  <section class="rv" style="padding-bottom:32px;">
+    <span class="fin-label" style="margin-bottom:14px;">YOUR DATA</span>
+    <p style="color:var(--text-muted);font-size:14px;line-height:1.6;margin:16px 0 18px;max-width:620px;">
+      Under GDPR article 20, you can download everything we have on you as a single JSON file. Under article 17, you can wipe your account and all linked runs. Purchase records are retained for 7&nbsp;years per financial recordkeeping law — see the <a href="/privacy" class="fin-underline" style="color:var(--accent);">privacy policy</a>.
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="/account/export" class="sa-btn" style="padding:10px 18px;font-size:13px;border:1px solid var(--border);border-radius:6px;text-decoration:none;color:var(--text-primary);background:var(--surface);display:inline-flex;align-items:center;gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download my data (.json)
+      </a>
+      <button type="button" id="deleteAccountBtn" style="padding:10px 18px;font-size:13px;border:1px solid rgba(248,81,73,0.32);border-radius:6px;color:var(--red);background:rgba(248,81,73,0.06);font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;"
+              onmouseover="this.style.background='rgba(248,81,73,0.12)'"
+              onmouseout="this.style.background='rgba(248,81,73,0.06)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        Delete account
+      </button>
+    </div>
+    <form id="deleteAccountForm" method="POST" action="/account/delete" style="display:none;"></form>
+  </section>
+
+  <section class="rv" style="padding:16px 0 80px;border-top:1px solid var(--border-subtle);">
     <form method="POST" action="/auth/logout" style="display:inline-block;">
       <button type="submit" style="padding:10px 18px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;cursor:pointer;transition:border-color 0.2s,color 0.2s;"
               onmouseover="this.style.borderColor='var(--border-decor)';this.style.color='var(--text-primary)'"
@@ -123,6 +143,20 @@
       </button>
     </form>
   </section>
+
+  <script>
+    document.getElementById('deleteAccountBtn')?.addEventListener('click', function(){
+      var confirmed = window.prompt(
+        'This deletes your account and wipes every Phronesis decision, Synthesis run, and contact message linked to this email.\n\n' +
+        'Purchase records stay for 7 years (required by law) but your email will be redacted on them.\n\n' +
+        'This cannot be undone.\n\n' +
+        'Type DELETE to confirm:'
+      );
+      if ((confirmed || '').trim().toUpperCase() === 'DELETE') {
+        document.getElementById('deleteAccountForm').submit();
+      }
+    });
+  </script>
 
 </div>
 {% endblock %}
