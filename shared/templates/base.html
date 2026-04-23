@@ -828,18 +828,18 @@ html[data-theme="light"] .ic-plan-credits { border-bottom-color: rgba(0, 0, 0, 0
    ═══════════════════════════════════════════════════════════ */
 .ic-nav {
   position: sticky; top: 0; z-index: 100;
-  border-bottom: 1px solid var(--border-subtle);
-  background: rgba(2, 9, 23, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: var(--bg);                 /* solid, not translucent */
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s var(--ease-out);
 }
-html[data-theme="light"] .ic-nav { background: rgba(250, 250, 247, 0.78); }
+.ic-nav.is-scrolled { border-bottom-color: var(--border-subtle); }
+html[data-theme="light"] .ic-nav { background: var(--bg); }
 .ic-nav-inner {
-  max-width: 1440px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 28px;
-  height: 60px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 0 24px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
 }
 .ic-brand {
   text-decoration: none;
@@ -857,37 +857,46 @@ html[data-theme="light"] .ic-nav { background: rgba(250, 250, 247, 0.78); }
   line-height: 1;
 }
 .ic-nav-links {
-  display: flex; align-items: center; gap: 2px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  display: flex; align-items: center; gap: 4px;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 .nav-tool {
   text-decoration: none;
-  color: var(--text-tertiary);
-  padding: 8px 14px;
-  border-radius: 4px;
-  transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: color 0.2s var(--ease-out);
 }
-.nav-tool:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
-.nav-tool.active { color: var(--accent); }
-html[data-theme="light"] .nav-tool:hover { background: rgba(0,0,0,0.04); }
+.nav-tool:hover { color: var(--text-primary); }
+.nav-tool.active { color: var(--text-primary); }
+.nav-tool.active::after {
+  content: '';
+  display: block;
+  height: 1.5px;
+  background: var(--accent);
+  margin-top: 6px;
+  border-radius: 2px;
+}
 
 .ic-nav-cta {
-  margin-left: 10px;
-  padding: 8px 16px;
+  margin-left: 8px;
+  padding: 9px 18px;
   background: var(--accent);
   color: #fff;
-  border-radius: 4px;
+  border-radius: 8px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 500;
+  font-size: 14px; font-weight: 500;
   text-decoration: none;
   letter-spacing: -0.01em;
   text-transform: none;
-  transition: filter 0.2s var(--ease-out);
+  transition: filter 0.2s var(--ease-out), transform 0.12s var(--ease-out);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
-.ic-nav-cta:hover { filter: brightness(1.1); }
+.ic-nav-cta:hover { filter: brightness(1.08); }
+.ic-nav-cta:active { transform: translateY(1px); }
 
 .theme-toggle {
   width: 32px; height: 32px;
@@ -904,52 +913,128 @@ html[data-theme="light"] .theme-toggle:hover { background: rgba(0,0,0,0.04); }
    FOOTER
    ═══════════════════════════════════════════════════════════ */
 .ic-footer {
-  margin-top: 100px;
+  margin-top: 120px;
   border-top: 1px solid var(--border-subtle);
+  background: var(--bg-deep);
 }
 .ic-footer-inner {
-  max-width: 1440px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  padding: 72px 24px 40px;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--text-muted);
+}
+.ic-footer-top {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 48px;
+  margin-bottom: 56px;
+}
+.ic-footer-brand-col .fb-wordmark {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--text-primary);
+  text-decoration: none;
+  margin-bottom: 18px;
+}
+.ic-footer-brand-col .fb-wordmark .brand-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+}
+.ic-footer-brand-col .fb-wordmark .fb-name {
+  font-family: 'Instrument Serif', ui-serif, Georgia, serif;
+  font-weight: 400; font-size: 22px;
+  letter-spacing: -0.03em; line-height: 1;
+}
+.ic-footer-brand-col .fb-tag {
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 260px;
+  margin-bottom: 18px;
+}
+.ic-footer-social {
+  display: flex; gap: 10px; margin-top: 6px;
+}
+.ic-footer-social a {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  transition: color 0.15s var(--ease-out), border-color 0.15s var(--ease-out), background 0.15s var(--ease-out);
+}
+.ic-footer-social a:hover {
+  color: var(--text-primary);
+  border-color: var(--border-decor);
+  background: rgba(255,255,255,0.03);
+}
+html[data-theme="light"] .ic-footer-social a:hover { background: rgba(0,0,0,0.03); }
+.ic-footer-social svg { width: 14px; height: 14px; }
+
+.ic-footer-col h4 {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 1.2px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.4px;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  flex-wrap: wrap;
+  margin: 0 0 18px 0;
 }
-.ic-footer-brand {
-  display: flex; align-items: center; gap: 10px;
-  color: var(--text-secondary);
-  text-transform: none;
-  letter-spacing: -0.01em;
+.ic-footer-col ul {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex; flex-direction: column;
+  gap: 12px;
 }
-.ic-footer-brand .fb-name {
-  font-family: 'Instrument Serif', ui-serif, Georgia, serif;
-  font-weight: 400; font-size: 16px;
-}
-.ic-footer-links {
-  display: flex; gap: 22px; flex-wrap: wrap;
-}
-.ic-footer-links a {
-  color: var(--text-tertiary);
+.ic-footer-col a {
   text-decoration: none;
-  transition: color 0.2s var(--ease-out);
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  transition: color 0.15s var(--ease-out);
 }
-.ic-footer-links a:hover { color: var(--text-primary); }
+.ic-footer-col a:hover { color: var(--text-primary); }
+
+.ic-footer-bottom {
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.ic-footer-bottom .ic-footer-meta a {
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.15s var(--ease-out);
+}
+.ic-footer-bottom .ic-footer-meta a:hover { color: var(--text-primary); }
+.ic-footer-bottom .ic-footer-meta {
+  display: flex; gap: 18px; align-items: center;
+}
+
+@media (max-width: 960px) {
+  .ic-footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+  .ic-footer-brand-col { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .ic-footer-inner { padding: 56px 20px 28px; }
+  .ic-footer-top { grid-template-columns: 1fr 1fr; gap: 32px 24px; margin-bottom: 40px; }
+  .ic-footer-bottom { font-size: 12px; }
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  .ic-nav-inner { padding: 0 18px; height: 56px; }
-  .ic-nav-links { gap: 0; }
-  .nav-tool { padding: 7px 10px; }
-  .ic-nav-cta { margin-left: 6px; padding: 7px 12px; }
+  .ic-nav-inner { padding: 0 18px; height: 60px; }
+  .ic-nav-links { gap: 2px; }
+  .nav-tool { padding: 7px 10px; font-size: 13.5px; }
+  .ic-nav-cta { margin-left: 6px; padding: 8px 14px; font-size: 13px; }
+  .nav-tool.active::after { display: none; }  /* save vertical space */
 }
 @media (max-width: 768px) {
   .grid-3 { grid-template-columns: 1fr !important; }
@@ -959,7 +1044,6 @@ html[data-theme="light"] .theme-toggle:hover { background: rgba(0,0,0,0.04); }
 @media (max-width: 480px) {
   .panel { padding: 14px; }
   .ic-nav-inner { padding: 0 14px; }
-  .ic-footer-inner { padding: 22px 16px; flex-direction: column; align-items: flex-start; }
 }
 button, a.nav-tool, .chip { min-height: 36px; }
 
@@ -1023,7 +1107,7 @@ summary:focus-visible {
 <a href="#ic-main" class="skip-link">Skip to content</a>
 
 <!-- ═══════════ NAV ═══════════ -->
-<nav class="ic-nav" aria-label="Primary">
+<nav class="ic-nav" id="icNav" aria-label="Primary">
   <div class="ic-nav-inner">
     <a href="/" class="ic-brand" aria-label="IntellCluster home">
       <span class="brand-dot" aria-hidden="true"></span>
@@ -1032,19 +1116,17 @@ summary:focus-visible {
     <div class="ic-nav-links">
       <a href="/phronesis" data-tool="phronesis" class="nav-tool">Phronesis</a>
       <a href="/synthesis" data-tool="synthesis" class="nav-tool">Synthesis</a>
-      <a href="/templates" class="nav-tool hide-mobile">Templates</a>
-      <a href="/blog" class="nav-tool hide-mobile">Blog</a>
-      <a href="/history" class="nav-tool hide-mobile">History</a>
       <a href="/pricing" class="nav-tool hide-mobile">Pricing</a>
+      <a href="/blog" class="nav-tool hide-mobile">Blog</a>
       <button id="themeToggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle light/dark theme">
         <svg id="themeIconMoon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <span class="sr-only">Toggle theme</span>
       </button>
       {% if request.state and request.state.user %}
-      <a href="/account" class="nav-tool" title="Your account" aria-label="Account" style="display:flex;align-items:center;gap:8px;color:var(--text-secondary);">
+      <a href="/account" class="nav-tool" title="Your account" aria-label="Account" style="display:flex;align-items:center;gap:8px;">
         <span style="width:26px;height:26px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;text-transform:uppercase;">{{ request.state.user.email[0] }}</span>
-        <span class="hide-mobile" style="text-transform:none;letter-spacing:-0.01em;font-family:'DM Sans',sans-serif;font-size:12px;">Account</span>
+        <span class="hide-mobile">Account</span>
       </a>
       {% else %}
       <a href="/login" class="nav-tool">Sign in</a>
@@ -1059,24 +1141,75 @@ summary:focus-visible {
 <!-- ═══════════ FOOTER ═══════════ -->
 <footer class="ic-footer" role="contentinfo" aria-label="Site links">
   <div class="ic-footer-inner">
-    <div class="ic-footer-brand">
-      <span class="brand-dot" style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
-      <span class="fb-name">IntellCluster</span>
-      <span style="color: var(--text-dim); margin-left: 4px;">&copy; 2026</span>
+    <div class="ic-footer-top">
+      <div class="ic-footer-brand-col">
+        <a href="/" class="fb-wordmark">
+          <span class="brand-dot" aria-hidden="true"></span>
+          <span class="fb-name">IntellCluster</span>
+        </a>
+        <p class="fb-tag">Two AI tools, one standard of rigor. Phronesis ranks your options. Synthesis runs deep research.</p>
+        <div class="ic-footer-social" aria-label="Social">
+          <a href="https://x.com/intellcluster" target="_blank" rel="noopener" aria-label="IntellCluster on X">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/company/intellcluster" target="_blank" rel="noopener" aria-label="IntellCluster on LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="/blog.xml" aria-label="RSS feed" title="RSS feed">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.18 17.82a2.18 2.18 0 11-2.18-2.18 2.18 2.18 0 012.18 2.18zM4 4.44v2.83c7.03 0 12.73 5.7 12.73 12.73h2.83C19.56 11.45 12.55 4.44 4 4.44zm0 5.66v2.83a6.91 6.91 0 016.9 6.9h2.83A9.73 9.73 0 004 10.1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="ic-footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/phronesis">Phronesis</a></li>
+          <li><a href="/synthesis">Synthesis</a></li>
+          <li><a href="/templates">Templates</a></li>
+          <li><a href="/compare">Compare</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/docs">API docs</a></li>
+        </ul>
+      </div>
+
+      <div class="ic-footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/about">About</a></li>
+          <li><a href="/blog">Field notes</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="mailto:press@intellcluster.com">Press</a></li>
+        </ul>
+      </div>
+
+      <div class="ic-footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/history">Run history</a></li>
+          <li><a href="/llm.txt">llm.txt</a></li>
+          <li><a href="/blog.xml">RSS feed</a></li>
+        </ul>
+      </div>
+
+      <div class="ic-footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+          <li><a href="mailto:security@intellcluster.com">Security</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="ic-footer-links">
-      <a href="/phronesis">Phronesis</a>
-      <a href="/synthesis">Synthesis</a>
-      <a href="/templates">Templates</a>
-      <a href="/blog">Blog</a>
-      <a href="/history">History</a>
-      <a href="/pricing">Pricing</a>
-      <a href="/about">About</a>
-      <a href="/faq">FAQ</a>
-      <a href="/docs">Docs</a>
-      <a href="/contact">Contact</a>
-      <a href="/privacy">Privacy</a>
-      <a href="/terms">Terms</a>
+
+    <div class="ic-footer-bottom">
+      <div>&copy; 2026 IntellCluster. All rights reserved.</div>
+      <div class="ic-footer-meta">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/contact">Contact</a>
+      </div>
     </div>
   </div>
 </footer>
@@ -1111,6 +1244,20 @@ summary:focus-visible {
   var path = window.location.pathname;
   var tool = path.startsWith('/synthesis') ? 'synthesis' : path.startsWith('/phronesis') ? 'phronesis' : null;
   if (tool) document.querySelectorAll('.nav-tool[data-tool="' + tool + '"]').forEach(function(el) { el.classList.add('active'); });
+
+  // Nav scroll-border — reveals the bottom hairline only after the page
+  // has scrolled past its top. Matches Fin's behaviour where the nav has
+  // no border at the top of a hero and gains one when content sits behind it.
+  (function(){
+    var nav = document.getElementById('icNav');
+    if (!nav) return;
+    var update = function(){
+      if (window.scrollY > 6) nav.classList.add('is-scrolled');
+      else nav.classList.remove('is-scrolled');
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+  })();
 
   // Scroll-reveal observer — wires [data-reveal] elements to .is-visible
   // when they enter the viewport. Honors prefers-reduced-motion automatically
