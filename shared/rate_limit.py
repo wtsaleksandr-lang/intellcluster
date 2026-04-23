@@ -1,22 +1,49 @@
 """
-Simple in-memory rate limiter — per-IP sliding window.
-For production with multiple workers, swap to Redis.
+Sliding-window rate limiter with per-plan tiers.
+
+Two big changes from the IP-only baseline:
+
+  1. Identity resolution — we prefer session cookie → user email as the
+     bucket key when a user is signed in, falling back to IP when they
+     aren't. This means paid users aren't penalised by being behind the
+     same NAT as free users.
+  2. Per-plan caps — the limit is selected from PLAN_LIMITS by the
+     user's plan (free / starter / pro / team). Anonymous traffic uses
+     the free cap. Override per-env via RATE_LIMIT_PER_MINUTE (applies to
+     anon + free tier only — paid tiers stay on the hardcoded table).
+
+For a multi-worker deployment, swap the in-process dict for Redis; the
+function signatures stay the same.
 """
+
+from __future__ import annotations
 
 import os
 import time
 from collections import defaultdict, deque
-from fastapi import Request, HTTPException
+
+from fastapi import Request
 from fastapi.responses import JSONResponse
 
 
-# IP -> deque of recent request timestamps
-_buckets: dict[str, deque] = defaultdict(lambda: deque(maxlen=200))
+# key (ip|user:email) -> deque of recent timestamps
+_buckets: dict[str, deque] = defaultdict(lambda: deque(maxlen=400))
+
+
+# Hardcoded plan caps (requests/minute). Intentionally NOT env-configurable
+# past the free tier so an over-eager env change can't accidentally rate-
+# limit paid users.
+PLAN_LIMITS: dict[str, int] = {
+    "free":    30,
+    "starter": 120,
+    "pro":     300,
+    "team":    600,
+    "admin":   2000,
+}
 
 
 def _client_ip(request: Request) -> str:
-    """Get client IP, respecting proxy headers."""
-    # Railway/Render/Fly set X-Forwarded-For
+    """Respect proxy headers for Railway / Replit / Fly."""
     forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
     if forwarded:
         return forwarded
@@ -29,33 +56,74 @@ def _enabled() -> bool:
     return os.environ.get("RATE_LIMIT_ENABLED", "true").lower() == "true"
 
 
-def _limit() -> int:
+def _free_tier_override() -> int | None:
+    """Env override for the free-tier ceiling. Ignored for paid plans."""
+    v = os.environ.get("RATE_LIMIT_PER_MINUTE")
+    if not v:
+        return None
     try:
-        return int(os.environ.get("RATE_LIMIT_PER_MINUTE", "30"))
+        return int(v)
     except ValueError:
-        return 30
+        return None
+
+
+def _resolve_identity(request: Request) -> tuple[str, str, int]:
+    """
+    Decide (bucket_key, plan, limit) for this request.
+
+    We look up the signed-in user via the session cookie (handled upstream
+    by main.py's _attach_user middleware — the result is on request.state.
+    If not available yet, we decode the cookie directly here so this module
+    can run before that middleware in the chain too.)
+    """
+    user = getattr(request.state, "user", None) if hasattr(request, "state") else None
+    if user is None:
+        try:
+            from shared.auth.magic import verify_session_cookie, SESSION_COOKIE
+            from shared.auth.users import get_user
+            email = verify_session_cookie(request.cookies.get(SESSION_COOKIE))
+            user = get_user(email) if email else None
+        except Exception:
+            user = None
+
+    # Admin cookie = unlimited-ish tier
+    try:
+        from shared.admin import is_admin
+        if is_admin(request):
+            return f"admin:{_client_ip(request)}", "admin", PLAN_LIMITS["admin"]
+    except Exception:
+        pass
+
+    if user and user.get("email"):
+        plan = (user.get("plan") or "free").lower()
+        limit = PLAN_LIMITS.get(plan, PLAN_LIMITS["free"])
+        if plan == "free":
+            limit = _free_tier_override() or limit
+        return f"user:{user['email']}", plan, limit
+
+    plan = "anon"
+    limit = _free_tier_override() or PLAN_LIMITS["free"]
+    return f"ip:{_client_ip(request)}", plan, limit
 
 
 async def rate_limit_middleware(request: Request, call_next):
-    """Rate limit middleware. Applies per-IP sliding window of 60s."""
+    """Applies per-identity sliding window of 60s to API routes only."""
     if not _enabled():
         return await call_next(request)
 
     path = request.url.path
-    # Only rate-limit API endpoints (HTML pages are fine)
-    if not path.startswith("/api/") and not (path.startswith("/phronesis/api/") or path.startswith("/synthesis/api/")):
+    if not (path.startswith("/api/")
+            or path.startswith("/phronesis/api/")
+            or path.startswith("/synthesis/api/")):
         return await call_next(request)
-    # Allow health unconditionally
     if path == "/api/health":
         return await call_next(request)
 
-    ip = _client_ip(request)
+    key, plan, limit = _resolve_identity(request)
     now = time.time()
-    bucket = _buckets[ip]
+    bucket = _buckets[key]
     window = 60.0
-    limit = _limit()
 
-    # Drop old entries
     while bucket and bucket[0] < now - window:
         bucket.popleft()
 
@@ -69,8 +137,13 @@ async def rate_limit_middleware(request: Request, call_next):
                 "X-RateLimit-Limit": str(limit),
                 "X-RateLimit-Remaining": "0",
                 "X-RateLimit-Reset": str(reset_at),
+                "X-RateLimit-Tier": plan,
             },
-            content={"error": "Rate limit exceeded. Try again in a few seconds.", "retry_after_seconds": retry_after},
+            content={
+                "error": "Rate limit exceeded. Try again in a few seconds.",
+                "retry_after_seconds": retry_after,
+                "tier": plan,
+            },
         )
 
     bucket.append(now)
@@ -78,8 +151,8 @@ async def rate_limit_middleware(request: Request, call_next):
     reset_at = int(bucket[0] + window) if bucket else int(now + window)
 
     response = await call_next(request)
-    # Expose rate-limit state so clients can show usage without a round trip.
     response.headers["X-RateLimit-Limit"] = str(limit)
     response.headers["X-RateLimit-Remaining"] = str(remaining)
     response.headers["X-RateLimit-Reset"] = str(reset_at)
+    response.headers["X-RateLimit-Tier"] = plan
     return response
