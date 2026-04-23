@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Sign in — IntellCluster{% endblock %}
+{% block meta_desc %}Sign in to IntellCluster with a magic link. No password. No account setup. One email to unlock Phronesis and Synthesis.{% endblock %}
+{% block og_title %}Sign in to IntellCluster{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<div style="max-width:480px;margin:0 auto;padding:clamp(72px,12vw,120px) 24px;">
+
+  <header class="rv" style="text-align:center;margin-bottom:32px;">
+    <span class="fin-label" style="margin:0 auto 18px;display:inline-flex;">SIGN IN <span>·</span> MAGIC LINK</span>
+    <h1 class="t-display" style="font-size:clamp(34px,5vw,46px);line-height:1.08;letter-spacing:-0.02em;margin-bottom:12px;">
+      {% if sent %}
+        <span style="color:rgba(255,255,255,0.55);">Check your</span> <em style="color:var(--accent);font-style:italic;">inbox</em>.
+      {% else %}
+        No password.<br>Just an <em style="color:var(--accent);font-style:italic;">email</em>.
+      {% endif %}
+    </h1>
+    <p style="color:var(--text-muted);font-size:15px;line-height:1.6;max-width:380px;margin:0 auto;">
+      {% if sent %}
+        We sent a 15-minute sign-in link to <strong style="color:var(--text-primary);">{{ email }}</strong>. Click it from any device to land back here signed in.
+      {% else %}
+        Drop your email and we'll send a one-time sign-in link. No password to forget, no account form to fill.
+      {% endif %}
+    </p>
+  </header>
+
+  {% if sent %}
+  <section class="rv rv1 panel" style="padding:28px;text-align:center;border-color:var(--accent-border);background:var(--accent-soft);">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;border:1px solid var(--accent-border);">
+      <svg class="ic-check" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 L9 17 L4 12"/></svg>
+    </div>
+    <p style="color:var(--text-primary);font-size:15px;margin:0 0 10px;">Link on its way. It'll arrive in a few seconds.</p>
+    <p style="color:var(--text-muted);font-size:13px;margin:0 0 0;">Didn't see it? Check spam or <a href="/login" class="fin-underline" style="color:var(--accent);">request another</a>.</p>
+  </section>
+  {% else %}
+  <section class="rv rv1 panel" style="padding:28px;">
+    <form method="POST" action="/auth/request-link" style="display:flex;flex-direction:column;gap:14px;">
+
+      {% if error %}
+      <div style="padding:12px 14px;background:rgba(248,81,73,0.08);border:1px solid rgba(248,81,73,0.28);border-radius:8px;color:#f85149;font-size:13px;line-height:1.5;">
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <div>
+        <label for="email" class="sr-only">Email</label>
+        <input type="email" id="email" name="email" required autofocus maxlength="200"
+               autocomplete="email"
+               placeholder="you@company.com"
+               value="{{ email or '' }}"
+               style="width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:15px;">
+      </div>
+
+      <button type="submit" class="ic-nav-cta" style="padding:13px 22px;font-size:14px;cursor:pointer;border:none;text-align:center;">
+        Send magic link →
+      </button>
+    </form>
+
+    <p class="t-mono" style="margin:16px 0 0;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);text-align:center;">
+      Valid for 15 minutes · One-time use
+    </p>
+  </section>
+  {% endif %}
+
+  <p style="margin-top:24px;text-align:center;font-size:13px;color:var(--text-muted);">
+    New here? The same form creates your account automatically.<br>
+    No payment info required. <a href="/pricing" class="fin-underline" style="color:var(--accent);">See pricing →</a>
+  </p>
+
+</div>
+{% endblock %}

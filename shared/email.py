@@ -338,6 +338,41 @@ Any questions? Just reply — a human answers.
 
 
 # ══════════════════════════════════════════════════════════════════════
+# Auth — magic link
+# ══════════════════════════════════════════════════════════════════════
+
+
+def magic_link(email: str, link: str) -> bool:
+    """Send a passwordless sign-in link. Valid for 15 minutes."""
+    site = _site_url()
+    subject = "Your IntellCluster sign-in link"
+    body = f"""Hi,
+
+Click the link below to sign in to IntellCluster. It's valid for 15 minutes
+and can only be used once from the device that requested it.
+
+  {link}
+
+If you didn't request this, ignore the email — no account is created.
+
+— The IntellCluster team
+"""
+    inner = f"""
+<p style="margin:0 0 14px;font-size:18px;color:#ffffff;">Sign in to IntellCluster</p>
+<p style="margin:0 0 14px;">Click the button below to sign in. The link is valid for <strong style="color:#ffffff;">15 minutes</strong>.</p>
+<p style="margin:14px 0 10px;font-size:13px;color:rgba(255,255,255,0.55);">If you didn't request this, just ignore it — no account gets created.</p>
+<p style="margin:0 0 4px;font-family:'JetBrains Mono',Consolas,monospace;font-size:11px;color:rgba(255,255,255,0.40);word-break:break-all;">Or paste this URL into your browser:<br><span style="color:rgba(255,255,255,0.55);">{link}</span></p>
+"""
+    html = _html_shell(
+        preheader="Your 15-minute sign-in link for IntellCluster.",
+        inner_html=inner,
+        cta_label="Sign in →",
+        cta_url=link,
+    )
+    return send_email(email, subject, body, html=html)
+
+
+# ══════════════════════════════════════════════════════════════════════
 # Admin notification templates
 # ══════════════════════════════════════════════════════════════════════
 

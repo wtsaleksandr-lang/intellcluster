@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Account — IntellCluster{% endblock %}
+{% block meta_desc %}Your IntellCluster account — plan, recent runs, purchased credits, sign out.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<div style="max-width:880px;margin:0 auto;padding:0 24px;">
+
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">Account</span>
+  </nav>
+
+  <header class="rv" style="padding:48px 0 28px;">
+    <span class="fin-label">ACCOUNT <span>·</span> {{ user.plan|upper }}</span>
+    <h1 class="t-display" style="margin-top:18px;font-size:clamp(34px,5vw,46px);line-height:1.06;letter-spacing:-0.02em;">
+      Hi, <em style="color:var(--accent);font-style:italic;">{{ user.email.split('@')[0] }}</em>.
+    </h1>
+    <p style="margin-top:12px;color:var(--text-muted);font-size:15px;">Signed in as <span style="color:var(--text-primary);">{{ user.email }}</span>.</p>
+  </header>
+
+  <div class="fin-divider-dashed" style="margin:16px 0 32px;"></div>
+
+  <section class="rv rv1" style="padding-bottom:32px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
+      <div class="panel" style="padding:18px 20px;">
+        <div class="t-mono" style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:6px;">CURRENT PLAN</div>
+        <div style="font-size:22px;font-weight:600;color:var(--text-primary);text-transform:capitalize;">{{ user.plan }}</div>
+        {% if user.plan == 'free' %}
+        <a href="/pricing" class="fin-underline" style="color:var(--accent);font-size:12px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;">Upgrade →</a>
+        {% else %}
+        <a href="/pricing" class="fin-underline" style="color:var(--text-tertiary);font-size:12px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;">Manage →</a>
+        {% endif %}
+      </div>
+      <div class="panel" style="padding:18px 20px;">
+        <div class="t-mono" style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:6px;">CREDITS PURCHASED</div>
+        <div style="font-size:22px;font-weight:600;color:var(--text-primary);">{{ credits_purchased or 0 }}</div>
+        <div class="t-mono" style="font-size:10px;letter-spacing:0.8px;color:var(--text-dim);">Never expire</div>
+      </div>
+      <div class="panel" style="padding:18px 20px;">
+        <div class="t-mono" style="font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:6px;">MEMBER SINCE</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text-primary);">{{ (user.created_at or '')[:10] }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rv rv2" style="padding-bottom:32px;">
+    <span class="fin-label" style="margin-bottom:14px;">TOOLS</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px;">
+      <a href="/phronesis" class="panel" style="padding:20px 22px;text-decoration:none;color:inherit;display:block;border-radius:10px;transition:border-color 0.2s var(--ease-out);" onmouseover="this.style.borderColor='rgba(255,86,0,0.35)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#FF5600;box-shadow:0 0 10px rgba(255,86,0,0.35);"></span>
+          <span class="t-mono" style="font-size:10px;color:#FF5600;letter-spacing:1.2px;text-transform:uppercase;">Phronesis</span>
+        </div>
+        <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">Rank a decision →</div>
+        <p style="color:var(--text-muted);font-size:13px;line-height:1.55;margin:0;">Three blind AI analysts, weighted criteria, confidence + agreement.</p>
+      </a>
+      <a href="/synthesis" class="panel" style="padding:20px 22px;text-decoration:none;color:inherit;display:block;border-radius:10px;transition:border-color 0.2s var(--ease-out);" onmouseover="this.style.borderColor='rgba(56,189,248,0.35)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,0.35);"></span>
+          <span class="t-mono" style="font-size:10px;color:#38bdf8;letter-spacing:1.2px;text-transform:uppercase;">Synthesis</span>
+        </div>
+        <div style="font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">Run research →</div>
+        <p style="color:var(--text-muted);font-size:13px;line-height:1.55;margin:0;">Five models in parallel, merged into one research brief.</p>
+      </a>
+    </div>
+  </section>
+
+  {% if phronesis_recent or synthesis_recent %}
+  <section class="rv rv2" style="padding-bottom:32px;">
+    <span class="fin-label" style="margin-bottom:14px;">RECENT ACTIVITY</span>
+    <ul style="list-style:none;padding:0;margin:14px 0 0;">
+      {% for d in phronesis_recent %}
+      <li><a href="/phronesis/result/{{ d.run_id }}" style="display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--border-subtle);text-decoration:none;color:inherit;">
+        <div style="min-width:0;flex:1;">
+          <div class="t-mono" style="font-size:10px;color:#FF5600;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;">Phronesis</div>
+          <div style="color:var(--text-primary);font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ d.question }}</div>
+        </div>
+        <span class="t-mono" style="font-size:10px;color:var(--text-tertiary);letter-spacing:1px;white-space:nowrap;">{{ (d.timestamp or '')[:10] }}</span>
+      </a></li>
+      {% endfor %}
+      {% for r in synthesis_recent %}
+      <li><a href="/synthesis/result/{{ r.run_id }}" style="display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--border-subtle);text-decoration:none;color:inherit;">
+        <div style="min-width:0;flex:1;">
+          <div class="t-mono" style="font-size:10px;color:#38bdf8;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;">Synthesis</div>
+          <div style="color:var(--text-primary);font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.prompt[:120] }}</div>
+        </div>
+        <span class="t-mono" style="font-size:10px;color:var(--text-tertiary);letter-spacing:1px;white-space:nowrap;">{{ (r.timestamp or '')[:10] }}</span>
+      </a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% else %}
+  <section class="rv rv2 panel" style="padding:28px;text-align:center;margin-bottom:32px;">
+    <p style="color:var(--text-muted);font-size:14.5px;margin:0;">No runs yet. <a href="/phronesis" class="fin-underline" style="color:var(--accent);">Start with Phronesis</a> or <a href="/synthesis" class="fin-underline" style="color:var(--accent);">try Synthesis</a>.</p>
+  </section>
+  {% endif %}
+
+  <section class="rv" style="padding:16px 0 80px;">
+    <form method="POST" action="/auth/logout" style="display:inline-block;">
+      <button type="submit" style="padding:10px 18px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;cursor:pointer;transition:border-color 0.2s,color 0.2s;"
+              onmouseover="this.style.borderColor='var(--border-decor)';this.style.color='var(--text-primary)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+        Sign out
+      </button>
+    </form>
+  </section>
+
+</div>
+{% endblock %}

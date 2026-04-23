@@ -34,6 +34,7 @@ from phronesis.engine.pipeline import run_decision_pipeline
 from phronesis.engine.extractor import extract_decision, suggest_chips
 from shared.tracking.history import get_recent_decisions, get_decision_by_run_id
 from shared.admin import admin_router
+from shared.auth import user_router, current_user as _current_user
 
 # Synthesis imports
 from synthesis.orchestrator.pipeline import run_pipeline as run_synthesis_pipeline
@@ -46,6 +47,16 @@ app = FastAPI(title="IntellCluster", version="0.1.0")
 # Rate limiting middleware
 from shared.rate_limit import rate_limit_middleware
 app.middleware("http")(rate_limit_middleware)
+
+
+# Attach signed-in user to request.state so every template can render nav state
+@app.middleware("http")
+async def _attach_user(request: Request, call_next):
+    try:
+        request.state.user = _current_user(request)
+    except Exception:
+        request.state.user = None
+    return await call_next(request)
 
 
 # ─── Branded 500 handler ───
@@ -84,6 +95,8 @@ from shared.analytics import log_event, get_plausible_domain
 
 # Mount admin routes (/admin, /admin/login, /admin/logout)
 app.include_router(admin_router)
+# Mount user auth routes (/login, /auth/*, /account)
+app.include_router(user_router)
 
 # Templates — search multiple directories (Jinja2 searches in order)
 templates = Jinja2Templates(directory=[

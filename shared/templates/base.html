@@ -619,7 +619,15 @@ summary:focus-visible {
         <svg id="themeIconSun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none;" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <span class="sr-only">Toggle theme</span>
       </button>
+      {% if request.state and request.state.user %}
+      <a href="/account" class="nav-tool" title="Your account" aria-label="Account" style="display:flex;align-items:center;gap:8px;color:var(--text-secondary);">
+        <span style="width:26px;height:26px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;text-transform:uppercase;">{{ request.state.user.email[0] }}</span>
+        <span class="hide-mobile" style="text-transform:none;letter-spacing:-0.01em;font-family:'DM Sans',sans-serif;font-size:12px;">Account</span>
+      </a>
+      {% else %}
+      <a href="/login" class="nav-tool">Sign in</a>
       <a href="/pricing" class="ic-nav-cta">Get started</a>
+      {% endif %}
     </div>
   </div>
 </nav>

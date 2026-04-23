@@ -65,6 +65,10 @@ PUBLIC_ROUTES = [
     ("/about", 200),
     ("/contact", 200),
     ("/faq", 200),
+    # Magic-link auth
+    ("/login", 200),
+    ("/account", 302),  # redirects to /login when unauthenticated
+    ("/auth/verify?token=garbage", 400),
     # Blog foundation — works with zero posts, renders empty state
     ("/blog", 200),
     ("/blog.xml", 200),
