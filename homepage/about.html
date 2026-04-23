@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}About — IntellCluster{% endblock %}
+{% block meta_desc %}IntellCluster builds structured AI tools for decisions and deep research. Phronesis ranks options with a blind analyst jury. Synthesis orchestrates five models into one brief.{% endblock %}
+{% block og_title %}About IntellCluster{% endblock %}
+{% block og_desc %}Two AI tools. One ecosystem. Built for people who need the answer to be right, not just confident.{% endblock %}
+{% block canonical %}{{ site_url }}/about{% endblock %}
+
+{% block content %}
+<div style="max-width:960px;margin:0 auto;padding:0 24px;">
+
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">About</span>
+  </nav>
+
+  <header class="rv" style="padding:64px 0 32px;max-width:720px;">
+    <span class="fin-label">ABOUT <span>·</span> INTELLCLUSTER</span>
+    <h1 class="t-display" style="margin-top:22px;font-size:clamp(40px,6vw,68px);line-height:1.02;letter-spacing:-0.02em;">
+      Two AI tools.<br>One standard of rigor.
+    </h1>
+    <p style="margin-top:22px;color:var(--text-muted);font-size:18px;max-width:640px;line-height:1.6;">
+      IntellCluster is built for people who need an AI answer to be <em>right</em>, not just confident. We run multiple models in parallel, surface their disagreements honestly, and produce structured outputs you can defend in a meeting — or an audit.
+    </p>
+  </header>
+
+  <div class="fin-divider-dashed" style="margin:24px 0 48px;"></div>
+
+  <section class="rv rv1" style="max-width:720px;padding:24px 0 48px;">
+    <span class="fin-label">THE PROBLEM</span>
+    <h2 class="t-display" style="margin-top:16px;font-size:30px;letter-spacing:-0.01em;line-height:1.2;">Single-model AI is confidently wrong more often than anyone admits.</h2>
+    <p style="margin-top:18px;color:var(--text-secondary);font-size:16px;line-height:1.72;">
+      Every frontier model has blind spots shaped by its training data. Ask one model to compare three CRMs, and you get one prior's answer. Ask five models and merge them, and you get coverage of the answer space no single model can produce alone. That's the thesis IntellCluster is built on.
+    </p>
+  </section>
+
+  <section class="rv rv1" style="padding:0 0 48px;">
+    <span class="fin-label">WHAT WE SHIP</span>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:22px;">
+      <article class="panel" style="padding:24px;position:relative;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:#FF5600;box-shadow:0 0 12px rgba(255,86,0,0.35);"></span>
+          <span class="t-mono" style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#FF5600;">Phronesis</span>
+        </div>
+        <h3 class="t-display" style="font-size:24px;letter-spacing:-0.01em;margin:0 0 10px;font-weight:400;">Decision intelligence</h3>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.65;margin:0 0 18px;">Three blind AI analysts rank your options on weighted criteria. You see the winner, the per-dimension scores, and — critically — where the analysts disagreed.</p>
+        <a href="/phronesis" class="fin-underline" style="font-size:13px;color:#FF5600;font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;">Open Phronesis →</a>
+      </article>
+      <article class="panel" style="padding:24px;position:relative;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:#38bdf8;box-shadow:0 0 12px rgba(56,189,248,0.35);"></span>
+          <span class="t-mono" style="font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#38bdf8;">Synthesis</span>
+        </div>
+        <h3 class="t-display" style="font-size:24px;letter-spacing:-0.01em;margin:0 0 10px;font-weight:400;">Multi-model research</h3>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.65;margin:0 0 18px;">Five frontier models run your research prompt in parallel. A strategist layer merges their outputs into one coherent brief — with contradictions and divergences surfaced, not smoothed away.</p>
+        <a href="/synthesis" class="fin-underline" style="font-size:13px;color:#38bdf8;font-family:'JetBrains Mono',monospace;letter-spacing:1px;text-transform:uppercase;">Open Synthesis →</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="rv rv2" style="max-width:720px;padding:32px 0 56px;">
+    <span class="fin-label">THE PRINCIPLES</span>
+    <h2 class="t-display" style="margin-top:16px;font-size:30px;letter-spacing:-0.01em;line-height:1.2;">What we believe about AI and decisions.</h2>
+    <ol style="margin-top:24px;padding-left:0;list-style:none;counter-reset:principles;">
+      <li style="counter-increment:principles;position:relative;padding:18px 0 18px 52px;border-bottom:1px solid var(--border-subtle);">
+        <span class="t-mono" style="position:absolute;left:0;top:18px;font-size:11px;letter-spacing:1.4px;color:var(--accent);">0{{1}}</span>
+        <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Honest uncertainty beats confident fiction.</strong>
+        <span style="color:var(--text-muted);font-size:14.5px;line-height:1.65;">A tool that tells you it's 55% confident is more useful than one that hides its doubts.</span>
+      </li>
+      <li style="counter-increment:principles;position:relative;padding:18px 0 18px 52px;border-bottom:1px solid var(--border-subtle);">
+        <span class="t-mono" style="position:absolute;left:0;top:18px;font-size:11px;letter-spacing:1.4px;color:var(--accent);">02</span>
+        <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Disagreement is signal, not noise.</strong>
+        <span style="color:var(--text-muted);font-size:14.5px;line-height:1.65;">When our analysts split, we show you the split. When five models produce different framings, we preserve them.</span>
+      </li>
+      <li style="counter-increment:principles;position:relative;padding:18px 0 18px 52px;border-bottom:1px solid var(--border-subtle);">
+        <span class="t-mono" style="position:absolute;left:0;top:18px;font-size:11px;letter-spacing:1.4px;color:var(--accent);">03</span>
+        <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Structured output is the product.</strong>
+        <span style="color:var(--text-muted);font-size:14.5px;line-height:1.65;">Chat is for conversation. Decisions and research deserve documents — portable, auditable, shareable.</span>
+      </li>
+      <li style="counter-increment:principles;position:relative;padding:18px 0 18px 52px;border-bottom:1px solid var(--border-subtle);">
+        <span class="t-mono" style="position:absolute;left:0;top:18px;font-size:11px;letter-spacing:1.4px;color:var(--accent);">04</span>
+        <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Your data stays yours.</strong>
+        <span style="color:var(--text-muted);font-size:14.5px;line-height:1.65;">History lives in your browser's localStorage. We don't need an account to let you run a decision. We don't keep one without your consent.</span>
+      </li>
+      <li style="counter-increment:principles;position:relative;padding:18px 0 18px 52px;">
+        <span class="t-mono" style="position:absolute;left:0;top:18px;font-size:11px;letter-spacing:1.4px;color:var(--accent);">05</span>
+        <strong style="color:var(--text-primary);display:block;margin-bottom:4px;">Calibration over theatre.</strong>
+        <span style="color:var(--text-muted);font-size:14.5px;line-height:1.65;">We'd rather ship a tool that's measurably honest about its limits than one that demos beautifully and quietly misleads.</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="rv rv2" style="max-width:720px;padding:16px 0 56px;">
+    <span class="fin-label">HOW WE WORK</span>
+    <p style="margin-top:18px;color:var(--text-secondary);font-size:16px;line-height:1.72;">
+      IntellCluster is developed openly and shipped continuously. Every Wednesday a new <a href="/blog" class="fin-underline" style="color:var(--accent);">field note</a> goes live. Every month we rerun our internal benchmarks and publish the deltas. Every quarter we revisit the pricing and move it only if the numbers support it.
+    </p>
+    <p style="margin-top:14px;color:var(--text-secondary);font-size:16px;line-height:1.72;">
+      We're a small team. If you've run into a bug, have a benchmark question, or want to propose a decision template we should seed, <a href="/contact" class="fin-underline" style="color:var(--accent);">get in touch</a> — a human answers.
+    </p>
+  </section>
+
+  <section class="rv" style="max-width:720px;margin:48px 0 96px;padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:12px;">
+    <span class="fin-label">TRY IT</span>
+    <h2 class="t-display" style="margin-top:14px;font-size:28px;letter-spacing:-0.01em;">Run a decision or a research brief. Free for a week.</h2>
+    <p style="color:var(--text-muted);font-size:14.5px;margin:12px 0 22px;line-height:1.65;">Five Phronesis runs and five Synthesis briefs on the free plan. No credit card.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="/phronesis" class="ic-nav-cta" style="display:inline-block;">Open Phronesis →</a>
+      <a href="/synthesis" class="ic-nav-cta" style="display:inline-block;background:#38bdf8;">Open Synthesis →</a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

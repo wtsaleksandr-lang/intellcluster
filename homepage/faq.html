@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}FAQ — IntellCluster{% endblock %}
+{% block meta_desc %}Frequently asked questions about Phronesis, Synthesis, pricing, data privacy, AI model selection, and how IntellCluster's multi-model orchestration works.{% endblock %}
+{% block og_title %}IntellCluster FAQ{% endblock %}
+{% block og_desc %}Answers about Phronesis, Synthesis, pricing, data privacy, and multi-model AI.{% endblock %}
+{% block canonical %}{{ site_url }}/faq{% endblock %}
+
+{% block structured_data %}
+{{ super() }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What's the difference between Phronesis and Synthesis?", "acceptedAnswer": {"@type": "Answer", "text": "Phronesis ranks options when you already know your choices. Synthesis does deep research when you don't. Phronesis output is a structured ranking with confidence and agreement signals. Synthesis output is a research brief merging five models' perspectives."}},
+    {"@type": "Question", "name": "Which AI models does Synthesis use?", "acceptedAnswer": {"@type": "Answer", "text": "Synthesis runs five models in parallel: GPT-4o-mini (or 4o in expert mode), Claude Haiku (or Sonnet), Gemini 2.5 Flash, DeepSeek Chat, and Grok-3. The strategist layer that merges outputs is Claude Sonnet."}},
+    {"@type": "Question", "name": "Is my data private?", "acceptedAnswer": {"@type": "Answer", "text": "Your decision and research history lives in your browser's localStorage, not on our servers. We do log aggregated anonymous analytics events to improve the product but we never store your decision inputs beyond the run lifecycle."}},
+    {"@type": "Question", "name": "How accurate is Phronesis?", "acceptedAnswer": {"@type": "Answer", "text": "In our benchmark against 20 expert-labeled decisions, Phronesis scored 7.3/10 overall with winner-accuracy at 7.7/10. When all three analysts agreed, human experts agreed 84% of the time; when analysts split, experts split 71% of the time. Disagreement is a feature."}},
+    {"@type": "Question", "name": "Can I cancel my subscription?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, at any time from the billing portal. No long-term contracts, no cancellation fees. Your paid features stay active until the end of the billing period."}},
+    {"@type": "Question", "name": "Do you offer team plans?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — the Team plan includes 5 seats, shared decision history, SSO, and priority support. Contact us for enterprise volume pricing."}}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:840px;margin:0 auto;padding:0 24px;">
+
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">FAQ</span>
+  </nav>
+
+  <header class="rv" style="padding:56px 0 32px;max-width:640px;">
+    <span class="fin-label">FAQ <span>·</span> FIELD ANSWERS</span>
+    <h1 class="t-display" style="margin-top:22px;font-size:clamp(36px,5.5vw,54px);line-height:1.06;letter-spacing:-0.02em;">
+      Questions we get.<br>Honest answers.
+    </h1>
+    <p style="margin-top:18px;color:var(--text-muted);font-size:17px;max-width:560px;line-height:1.6;">
+      If your question isn't here, <a href="/contact" class="fin-underline" style="color:var(--accent);">ask us directly</a> — we add it when it shows up twice.
+    </p>
+  </header>
+
+  <div class="fin-divider-dashed" style="margin:24px 0 32px;"></div>
+
+  <section class="rv rv1" style="padding:24px 0 48px;">
+    <span class="fin-label">PRODUCT</span>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          What's the difference between Phronesis and Synthesis?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Different shapes of question, different tools. <strong>Phronesis</strong> is for when you have options and need to rank them — "Which of these three CRMs should we pick?" It runs three blind analyst models and returns a weighted ranking with confidence and per-dimension scores. <strong>Synthesis</strong> is for when you need a research brief — "What are the strategic tradeoffs of entering this market?" It runs five models in parallel and merges their output into a single structured brief.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Which AI models do you use?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Synthesis runs GPT-4o-mini, Claude Haiku, Gemini 2.5 Flash, DeepSeek Chat, and Grok-3 in parallel. Expert mode swaps in the flagship tier (GPT-4o, Claude Sonnet 4.6). The merge/strategist layer is Claude Sonnet. Phronesis uses three different models (from the same pool) as its blind analyst jury, selected based on the depth you choose (quick/standard/deep).
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          How accurate is Phronesis?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          In our internal benchmark across 20 expert-labeled decisions, Phronesis scored 7.3/10 overall with winner accuracy at 7.7/10. More usefully: when the three analysts agreed, human experts agreed 84% of the time; when analysts split, experts split 71% of the time. The agreement signal is genuinely predictive of decision quality. <a href="/blog/blind-multi-analyst-scoring" class="fin-underline" style="color:var(--accent);">Full methodology here</a>.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Why five models instead of one good one?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Diversity of priors. A single frontier model has one training-shaped view of a question. Five models from different vendors have five different priors — and the union of their coverage beats any single model's output on genuinely open questions. <a href="/blog/multi-model-research-vs-single-llm" class="fin-underline" style="color:var(--accent);">Our head-to-head benchmark found a 65% win rate for orchestration over single-Claude</a>.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          How long does a run take?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Phronesis: 15–90 seconds depending on depth (quick / standard / deep). Synthesis: 30–90 seconds in standard mode, up to several minutes in expert mode. We stream progress events live so you always know which phase is running.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Can I use my own API keys?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Not via the hosted product — we use our own keys so pricing stays simple and predictable. If you want BYOK for compliance or cost reasons, the codebase is designed to support it and we can talk about a self-hosted tier. <a href="/contact" class="fin-underline" style="color:var(--accent);">Get in touch</a>.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="rv rv1" style="padding:24px 0 48px;">
+    <span class="fin-label">PRIVACY & DATA</span>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Is my decision data private?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Your run history lives in your browser's localStorage, not on our servers. We store completed runs temporarily so you can share a result URL, but we don't associate them with a user account (there are no user accounts on the free tier). Paid tiers can opt in to server-side history. See the <a href="/privacy" class="fin-underline" style="color:var(--accent);">full privacy policy</a>.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Do you train models on my inputs?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          No. We pass your inputs through to the underlying model providers (OpenAI, Anthropic, Google, etc.) under their zero-retention enterprise terms where available. We do not train any of our own models. We do not retain inputs beyond the run lifecycle.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Can I export or delete my data?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Yes. Every decision and research brief can be exported as PDF, JSON, or Markdown. Your localStorage history can be cleared from the <a href="/history" class="fin-underline" style="color:var(--accent);">History page</a> or from your browser's settings. For server-side data (paid tier), email <a href="mailto:security@intellcluster.com" class="fin-underline" style="color:var(--accent);">security@intellcluster.com</a> and we'll honor deletion within 7 days.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Are you GDPR compliant?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          We follow GDPR principles: local-first data where possible, right-to-delete on request, fonts served from EU-friendly providers (fonts.bunny.net), and no third-party trackers loaded unless you're on a paid account that opts in.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="rv rv2" style="padding:24px 0 48px;">
+    <span class="fin-label">BILLING</span>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Can I try it free?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Yes. The free plan includes five Phronesis runs and five Synthesis briefs per month. No credit card. Upgrade when you outgrow it.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          What if I run out of credits?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Buy a top-up credit pack (5, 15, or 30 credits) or wait until your next monthly reset. Credits from top-ups never expire.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Can I cancel anytime?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Yes. Cancel from the Stripe billing portal. Paid features stay active until the end of your billing period. No cancellation fees, no long-term contracts.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Do you offer team or enterprise plans?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          The Team plan covers 5 seats with shared history, SSO, and priority support. For larger deployments, on-prem, BYOK, or custom SLAs — <a href="/contact" class="fin-underline" style="color:var(--accent);">talk to us</a>.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="rv rv2" style="padding:24px 0 48px;">
+    <span class="fin-label">TECHNICAL</span>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Is there an API?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Yes. The <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-size:13px;">/phronesis/api/decide</code> and <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-size:13px;">/synthesis/api/run</code> endpoints accept the same inputs as the web UI and return structured JSON (or streaming SSE). Full API docs are on the roadmap; in the meantime <a href="/contact" class="fin-underline" style="color:var(--accent);">email us</a> and we'll share the current spec.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          Can I self-host?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          Not supported publicly yet, but the codebase is designed to run anywhere a FastAPI monolith can. If self-hosting is a hard requirement for compliance, <a href="/contact" class="fin-underline" style="color:var(--accent);">get in touch</a>.
+        </p>
+      </details>
+
+      <details class="panel" style="padding:20px 22px;">
+        <summary style="font-size:16px;font-weight:600;color:var(--text-primary);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+          What's the rate limit?
+          <span class="chv" style="color:var(--text-tertiary);font-size:18px;">▾</span>
+        </summary>
+        <p style="color:var(--text-muted);font-size:14.5px;line-height:1.7;margin:14px 0 0;">
+          30 API requests per minute per IP by default. We return standard <code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-size:13px;">X-RateLimit-*</code> headers so clients can back off cleanly. Paid tiers get higher limits.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <section class="rv" style="margin:48px 0 96px;padding:36px;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center;">
+    <span class="fin-label" style="margin:0 auto 16px;display:inline-flex;">STILL STUCK?</span>
+    <h2 class="t-display" style="font-size:26px;letter-spacing:-0.01em;margin:10px 0 12px;">We'd rather answer than have you guess.</h2>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:22px;">A human on our team replies within one business day.</p>
+    <a href="/contact" class="ic-nav-cta" style="display:inline-block;">Ask us directly →</a>
+  </section>
+
+</div>
+{% endblock %}

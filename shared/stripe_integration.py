@@ -148,31 +148,74 @@ def verify_webhook_signature(payload: bytes, sig_header: str) -> Optional[dict]:
 
 
 def handle_webhook_event(event: dict) -> None:
-    """Process a validated webhook event. Grants credits, updates subscriptions."""
-    from shared.analytics import log_event
+    """Process a validated webhook event.
 
+    Idempotent by design — `record_purchase` dedupes on Stripe event.id so
+    webhook retries can't double-credit. Sends a branded receipt email once
+    per unique event.
+    """
+    from shared.analytics import log_event
+    from shared.tracking.purchases import record_purchase
+    from shared.email import receipt as _send_receipt
+
+    event_id = event.get("id", "")
     event_type = event.get("type", "")
     data = event.get("data", {}).get("object", {})
 
     if event_type == "checkout.session.completed":
         mode = data.get("mode")
         email = (data.get("customer_details") or {}).get("email") or data.get("customer_email")
+        amount = int(data.get("amount_total") or 0)
+        currency = data.get("currency") or "usd"
+        metadata = data.get("metadata") or {}
 
         if mode == "subscription":
+            plan_id = metadata.get("plan_id") or metadata.get("plan")
             log_event("stripe_subscription_started", {
                 "email": email,
                 "subscription_id": data.get("subscription"),
                 "customer": data.get("customer"),
+                "plan_id": plan_id,
             })
+            entry = record_purchase(
+                event_id=event_id,
+                email=email,
+                kind="subscription",
+                amount=amount,
+                currency=currency,
+                plan_id=plan_id,
+                stripe_customer=data.get("customer"),
+                stripe_subscription=data.get("subscription"),
+            )
+            if entry and email:
+                try:
+                    _send_receipt(email, "subscription", amount, currency, plan_id=plan_id)
+                except Exception as e:
+                    print(f"[stripe] receipt email failed: {e}")
+
         elif mode == "payment":
-            metadata = data.get("metadata") or {}
-            credits = int(metadata.get("credits", 0))
+            credits = int(metadata.get("credits", 0) or 0)
+            pack_id = metadata.get("pack_id")
             log_event("stripe_credits_purchased", {
                 "email": email,
                 "credits": credits,
-                "pack_id": metadata.get("pack_id"),
+                "pack_id": pack_id,
             })
-            # TODO: credit the user account once auth is wired end-to-end
+            entry = record_purchase(
+                event_id=event_id,
+                email=email,
+                kind="credit_pack",
+                amount=amount,
+                currency=currency,
+                credits=credits,
+                pack_id=pack_id,
+                stripe_customer=data.get("customer"),
+            )
+            if entry and email:
+                try:
+                    _send_receipt(email, "credit_pack", amount, currency, credits=credits, pack_id=pack_id)
+                except Exception as e:
+                    print(f"[stripe] receipt email failed: {e}")
 
     elif event_type == "customer.subscription.updated":
         log_event("stripe_subscription_updated", {"subscription_id": data.get("id")})

@@ -132,6 +132,9 @@ async def sitemap():
         ("/templates", "0.8", "weekly"),
         ("/compare", "0.8", "weekly"),
         ("/blog", "0.8", "weekly"),
+        ("/about", "0.6", "monthly"),
+        ("/contact", "0.5", "monthly"),
+        ("/faq", "0.6", "monthly"),
         ("/privacy", "0.3", "yearly"),
         ("/terms", "0.3", "yearly"),
     ]
@@ -417,6 +420,60 @@ async def templates_list():
     """Public API: list all decision templates (for third-party integration)."""
     from shared.templates_library import load_templates
     return {"templates": load_templates()}
+
+
+# ─── About / Contact / FAQ ───
+
+@app.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request):
+    return templates.TemplateResponse(request, "about.html")
+
+
+@app.get("/faq", response_class=HTMLResponse)
+async def faq_page(request: Request):
+    return templates.TemplateResponse(request, "faq.html")
+
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact_get(request: Request):
+    return templates.TemplateResponse(request, "contact.html", {"submitted": False})
+
+
+@app.post("/contact", response_class=HTMLResponse)
+async def contact_post(
+    request: Request,
+    name: str = FastAPIForm(...),
+    email: str = FastAPIForm(...),
+    reason: str = FastAPIForm(...),
+    message: str = FastAPIForm(...),
+    website: str = FastAPIForm(""),  # honeypot
+):
+    # Silent drop for bots that fill the hidden honeypot field.
+    if website.strip():
+        log_event("contact_honeypot_trip", {"reason": reason})
+        return templates.TemplateResponse(
+            request, "contact.html",
+            {"submitted": True, "email": email.strip().lower()[:200]},
+        )
+
+    from shared.tracking.contact import record_contact
+    from shared.email import admin_contact_notification
+
+    entry = record_contact(
+        name=name, email=email, reason=reason, message=message,
+        meta={"ip": (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+                     or (request.client.host if request.client else "unknown"))[:64]},
+    )
+    try:
+        admin_contact_notification(entry["name"], entry["email"], entry["reason"], entry["message"])
+    except Exception as e:
+        print(f"[contact] admin notify failed: {e}")
+    log_event("contact_submission", {"reason": reason, "email_hash": hash(entry["email"]) % (10**10)})
+
+    return templates.TemplateResponse(
+        request, "contact.html",
+        {"submitted": True, "email": entry["email"]},
+    )
 
 
 # ─── Blog / Field Notes ───
