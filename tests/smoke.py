@@ -77,6 +77,9 @@ PUBLIC_ROUTES = [
     # First live field note — published 2026-04-22
     ("/blog/blind-multi-analyst-scoring", 200),
     ("/og/blog/blind-multi-analyst-scoring.png", 200),
+    # Tag page for the live article's tags
+    ("/blog/tag/methodology", 200),
+    ("/blog/tag/does-not-exist", 404),
     # Scheduled posts remain 404 until their publish_date
     ("/blog/multi-model-research-vs-single-llm", 404),
     # 404 path returns a templated 404 with status 404

@@ -79,7 +79,22 @@
   </section>
   {% endif %}
 
-  <section class="rv rv2" style="margin:72px 0 96px;padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center;">
+  {% if all_tags %}
+  <section class="rv rv2" style="margin:56px 0 0;">
+    <span class="fin-label">BROWSE BY TAG</span>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;">
+      {% for t, count in all_tags %}
+      <a href="/blog/tag/{{ t }}" class="t-mono" style="font-size:11px;padding:5px 10px;background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:3px;letter-spacing:0.6px;text-transform:uppercase;text-decoration:none;transition:color 0.15s var(--ease-out), border-color 0.15s var(--ease-out);"
+         onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent-border)'"
+         onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-subtle)'">
+        #{{ t }} <span style="color:var(--text-dim);margin-left:3px;">{{ count }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="rv rv2" style="margin:56px 0 96px;padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center;">
     <span class="fin-label" style="margin:0 auto 18px;display:inline-flex;">ONE EMAIL · WEEKLY · NO FLUFF</span>
     <h2 class="t-display" style="font-size:28px;letter-spacing:-0.01em;margin:10px 0 14px;">Get new field notes in your inbox.</h2>
     <p style="color:var(--text-muted);font-size:14px;margin-bottom:22px;">We ship one piece a week on decision science, multi-model AI, and the protocols our tools run under the hood.</p>

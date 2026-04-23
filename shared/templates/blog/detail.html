@@ -174,7 +174,9 @@
     <div class="fin-divider-dashed"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 0;">
       {% for tag in post.tags %}
-      <span class="t-mono" style="font-size:11px;color:var(--text-tertiary);background:var(--surface);border:1px solid var(--border-subtle);padding:4px 10px;border-radius:3px;letter-spacing:0.6px;text-transform:uppercase;">#{{ tag }}</span>
+      <a href="/blog/tag/{{ tag }}" class="t-mono" style="font-size:11px;color:var(--text-tertiary);background:var(--surface);border:1px solid var(--border-subtle);padding:4px 10px;border-radius:3px;letter-spacing:0.6px;text-transform:uppercase;text-decoration:none;transition:color 0.15s var(--ease-out), border-color 0.15s var(--ease-out);"
+         onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent-border)'"
+         onmouseout="this.style.color='var(--text-tertiary)';this.style.borderColor='var(--border-subtle)'">#{{ tag }}</a>
       {% endfor %}
     </div>
   </section>

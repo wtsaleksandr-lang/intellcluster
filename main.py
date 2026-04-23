@@ -240,6 +240,9 @@ async def sitemap():
         lastmod = (p.get("updated_date") or p.get("publish_date"))
         lastmod_str = f"<lastmod>{lastmod}</lastmod>" if lastmod else ""
         lines.append(f'  <url><loc>{base}/blog/{p["slug"]}</loc>{lastmod_str}<priority>0.7</priority><changefreq>monthly</changefreq></url>')
+    from shared.blog import all_tags as _blog_tags
+    for tag, _count in _blog_tags():
+        lines.append(f'  <url><loc>{base}/blog/tag/{tag}</loc><priority>0.55</priority><changefreq>weekly</changefreq></url>')
     lines.append('</urlset>')
     return Response(content="\n".join(lines), media_type="application/xml")
 
@@ -568,9 +571,24 @@ async def contact_post(
 
 @app.get("/blog", response_class=HTMLResponse)
 async def blog_index(request: Request):
-    from shared.blog import list_published
+    from shared.blog import list_published, all_tags
     return templates.TemplateResponse(request, "blog/index.html", {
         "posts": list_published(),
+        "all_tags": all_tags(),
+    })
+
+
+@app.get("/blog/tag/{tag}", response_class=HTMLResponse)
+async def blog_tag(request: Request, tag: str):
+    """Filtered listing of all posts with a given tag."""
+    from shared.blog import list_by_tag, all_tags
+    posts = list_by_tag(tag)
+    if not posts:
+        return templates.TemplateResponse(request, "404.html", status_code=404)
+    return templates.TemplateResponse(request, "blog/tag.html", {
+        "tag": tag,
+        "posts": posts,
+        "all_tags": all_tags(),
     })
 
 
