@@ -223,6 +223,7 @@ async def sitemap():
         ("/about", "0.6", "monthly"),
         ("/contact", "0.5", "monthly"),
         ("/faq", "0.6", "monthly"),
+        ("/docs", "0.7", "monthly"),
         ("/privacy", "0.3", "yearly"),
         ("/terms", "0.3", "yearly"),
     ]
@@ -518,6 +519,11 @@ async def templates_list():
 @app.get("/about", response_class=HTMLResponse)
 async def about_page(request: Request):
     return templates.TemplateResponse(request, "about.html")
+
+
+@app.get("/docs", response_class=HTMLResponse)
+async def docs_page(request: Request):
+    return templates.TemplateResponse(request, "docs.html")
 
 
 @app.get("/faq", response_class=HTMLResponse)

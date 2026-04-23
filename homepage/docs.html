@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block title %}API Docs — IntellCluster{% endblock %}
+{% block meta_desc %}IntellCluster API reference. Programmatic access to Phronesis decision ranking and Synthesis multi-model research. JSON + SSE. Rate limits per plan.{% endblock %}
+{% block og_title %}IntellCluster API Docs{% endblock %}
+{% block og_desc %}JSON + SSE endpoints for Phronesis decisions and Synthesis research briefs.{% endblock %}
+{% block canonical %}{{ site_url }}/docs{% endblock %}
+
+{% block head %}
+<style>
+  .docs-wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; color: var(--text-secondary); }
+  .docs-wrap h2.t-display { font-size: clamp(28px, 4vw, 36px); color: var(--text-primary); margin: 48px 0 18px; letter-spacing: -0.01em; line-height: 1.1; padding-top: 28px; border-top: 1px solid var(--border-subtle); }
+  .docs-wrap h2.t-display:first-of-type { border-top: none; padding-top: 0; }
+  .docs-wrap h3 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 22px; color: var(--text-primary); margin: 32px 0 12px; letter-spacing: -0.01em; }
+  .docs-wrap p { margin: 0 0 14px; line-height: 1.7; font-size: 15px; }
+  .docs-wrap ul { padding-left: 22px; margin: 0 0 18px; }
+  .docs-wrap li { margin-bottom: 8px; line-height: 1.65; }
+  .docs-wrap code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); border: 1px solid var(--border-subtle); }
+  .docs-wrap pre { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; overflow-x: auto; margin: 0 0 20px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.65; color: var(--text-primary); }
+  .docs-wrap pre code { background: transparent; border: none; padding: 0; font-size: 12.5px; color: inherit; }
+  .method-row { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-family: 'JetBrains Mono', monospace; flex-wrap: wrap; }
+  .method-badge { padding: 4px 9px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; }
+  .method-badge.post { background: rgba(255,86,0,0.14); color: var(--accent); border: 1px solid var(--accent-border); }
+  .method-badge.get  { background: rgba(56,189,248,0.14); color: #38bdf8; border: 1px solid rgba(56,189,248,0.32); }
+  .method-url { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+  .docs-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 20px; }
+  .docs-wrap th, .docs-wrap td { border: 1px solid var(--border-subtle); padding: 9px 12px; text-align: left; vertical-align: top; }
+  .docs-wrap th { background: var(--surface); color: var(--text-primary); font-weight: 600; letter-spacing: -0.01em; }
+  .docs-wrap a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-border); transition: background 0.15s; }
+  .docs-wrap a:hover { background: var(--accent-soft); }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin: 0 0 40px; }
+  .toc h4 { margin: 0 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-tertiary); font-weight: 500; }
+  .toc ol { padding-left: 20px; margin: 0; columns: 2; column-gap: 32px; font-size: 14px; }
+  .toc li { margin-bottom: 4px; break-inside: avoid; }
+  .toc a { border-bottom: none; }
+  @media (max-width: 560px) { .toc ol { columns: 1; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="docs-wrap">
+
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;border:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">Docs</span>
+  </nav>
+
+  <header class="rv" style="padding:48px 0 24px;">
+    <span class="fin-label">API <span>·</span> REFERENCE</span>
+    <h1 class="t-display" style="margin-top:18px;font-size:clamp(40px,6vw,60px);line-height:1.04;letter-spacing:-0.02em;">
+      Docs for builders.
+    </h1>
+    <p style="margin-top:14px;color:var(--text-muted);font-size:17px;line-height:1.6;max-width:620px;">
+      Programmatic access to Phronesis (decision ranking) and Synthesis (multi-model research). JSON requests, SSE streaming, per-plan rate limits. Everything you need to embed IntellCluster in your own stack.
+    </p>
+  </header>
+
+  <div class="fin-divider-dashed" style="margin:24px 0 32px;"></div>
+
+  <nav class="toc" aria-label="Table of contents">
+    <h4>On this page</h4>
+    <ol>
+      <li><a href="#auth">Authentication</a></li>
+      <li><a href="#limits">Rate limits</a></li>
+      <li><a href="#phronesis">Phronesis: /api/decide</a></li>
+      <li><a href="#extract">Phronesis: /api/extract</a></li>
+      <li><a href="#synthesis">Synthesis: /api/run</a></li>
+      <li><a href="#templates">Templates catalogue</a></li>
+      <li><a href="#compare">Compare presets</a></li>
+      <li><a href="#health">Health check</a></li>
+      <li><a href="#errors">Error model</a></li>
+      <li><a href="#sse">SSE streaming format</a></li>
+    </ol>
+  </nav>
+
+  <h2 class="t-display" id="auth">Authentication</h2>
+  <p>
+    The public API currently operates under the same session model as the web UI. Sign in at <a href="/login">/login</a> — the magic link drops a <code>intellcluster_user</code> cookie that your client can then attach on subsequent requests. For server-to-server integrations, bearer-token auth is on the roadmap; <a href="/contact">contact us</a> for early access.
+  </p>
+  <p>
+    Anonymous requests are supported for experimentation but rate-limited tighter and cannot access history. Signed-in users see run history on <a href="/account">/account</a>.
+  </p>
+
+  <h2 class="t-display" id="limits">Rate limits</h2>
+  <p>Sliding 60-second window, per bucket. Bucket key is user email when signed in, IP address otherwise. Every response carries the limit state in headers:</p>
+  <pre><code>X-RateLimit-Tier:      pro
+X-RateLimit-Limit:     300
+X-RateLimit-Remaining: 287
+X-RateLimit-Reset:     1745424180</code></pre>
+  <table>
+    <thead><tr><th>Tier</th><th>Requests / minute</th></tr></thead>
+    <tbody>
+      <tr><td><code>anon</code> / <code>free</code></td><td>30</td></tr>
+      <tr><td><code>starter</code></td><td>120</td></tr>
+      <tr><td><code>pro</code></td><td>300</td></tr>
+      <tr><td><code>team</code></td><td>600</td></tr>
+    </tbody>
+  </table>
+  <p>On 429, we return <code>Retry-After</code> in seconds. Back off linearly; never tight-loop.</p>
+
+  <h2 class="t-display" id="phronesis">Phronesis — <code>POST /phronesis/api/decide</code></h2>
+  <div class="method-row">
+    <span class="method-badge post">POST</span>
+    <span class="method-url">/phronesis/api/decide</span>
+  </div>
+  <p>Rank a set of options against weighted criteria using three blind analyst models. Returns ranked options, confidence, agreement, and per-dimension scores. Supports SSE streaming via <code>Accept: text/event-stream</code>; otherwise returns JSON when done.</p>
+
+  <h3>Request body</h3>
+  <pre><code>{
+  "question":   "Which CRM should a 15-seat SaaS team pick?",
+  "options":    ["HubSpot", "Salesforce", "Pipedrive"],
+  "criteria": [
+    { "name": "Lead capture",    "weight": 20 },
+    { "name": "Reporting depth", "weight": 15 },
+    { "name": "Total cost (12m)","weight": 15 },
+    { "name": "Ease of admin",   "weight": 10 }
+  ],
+  "settings": {
+    "depth":      "standard",
+    "focus":      "balanced",
+    "length":     "standard",
+    "web_search": false
+  },
+  "attachments": []
+}</code></pre>
+  <p>Field constraints: <code>question</code> 5–500 chars. <code>options</code> 2–10. <code>criteria[].weight</code> 1–10. <code>settings.depth</code> is one of <code>quick</code>/<code>standard</code>/<code>deep</code>; <code>focus</code> is <code>balanced</code>/<code>risks</code>/<code>practical</code>; <code>length</code> is <code>concise</code>/<code>standard</code>/<code>detailed</code>.</p>
+
+  <h3>Response body (JSON mode)</h3>
+  <pre><code>{
+  "run_id":           "a1b2c3d4",
+  "question":         "...",
+  "winner":           "HubSpot",
+  "why_winner_won":   "...",
+  "judges_agree":     true,
+  "judge_count":      3,
+  "confidence_level": "moderate",
+  "confidence_score": 72.0,
+  "total_cost_usd":   0.0423,
+  "latency_ms":       14890,
+  "ranked_options": [
+    {
+      "option":            "HubSpot",
+      "rank":              1,
+      "final_score":       7.84,
+      "dimension_scores":  { "Lead capture": 8.3, "Reporting depth": 7.1, ... },
+      "strengths":         [ "...", "..." ],
+      "weaknesses":        [ "...", "..." ],
+      "rank_points":       6
+    },
+    ...
+  ]
+}</code></pre>
+  <p>Use the returned <code>run_id</code> to link to a shareable result at <code>/phronesis/result/{run_id}</code>, download a PDF at <code>/phronesis/result/{run_id}.pdf</code>, or fetch the per-decision OG card at <code>/og/phronesis/{run_id}.png</code>.</p>
+
+  <h2 class="t-display" id="extract">Phronesis — <code>POST /phronesis/api/extract</code></h2>
+  <div class="method-row">
+    <span class="method-badge post">POST</span>
+    <span class="method-url">/phronesis/api/extract</span>
+  </div>
+  <p>Natural-language → structured input extractor. Pass free-form text, get back <code>{question, options, criteria}</code> suitable for posting to <code>/decide</code>.</p>
+  <pre><code>Request:  { "text": "I can't decide between HubSpot and Salesforce for our 15-person sales team..." }
+Response: { "question": "...", "options": [...], "criteria": [...] }</code></pre>
+  <p>Returns 422 if the text couldn't be parsed into a valid decision shape.</p>
+
+  <h2 class="t-display" id="synthesis">Synthesis — <code>POST /synthesis/api/run</code></h2>
+  <div class="method-row">
+    <span class="method-badge post">POST</span>
+    <span class="method-url">/synthesis/api/run</span>
+  </div>
+  <p>Five-model orchestrated research brief. Always returns SSE — the response streams progress events, per-model status, strategist extractions, and the final merged brief. See <a href="#sse">SSE format</a> below.</p>
+
+  <h3>Request body</h3>
+  <pre><code>{
+  "prompt":     "Compare RAG vs domain-specific fine-tuning for a 10M-doc startup.",
+  "category":   "architecture",
+  "mode":       "standard",
+  "quick_mode": false
+}</code></pre>
+  <p><code>prompt</code> 10–8000 chars. <code>category</code> drives orchestration shape — valid values: <code>deep_research</code>, <code>architecture</code>, <code>strategy</code>, <code>competitive</code>, <code>risk</code>, and a handful more listed in <a href="/faq">the FAQ</a>. <code>mode</code> is <code>standard</code> (five mid-tier models) or <code>expert</code> (five flagship models, roughly 3× the cost). <code>quick_mode</code> runs a single research phase instead of the full pipeline.</p>
+
+  <h3>Response — SSE events</h3>
+  <ul>
+    <li><code>phases_info</code> — the phase names the strategist will run through</li>
+    <li><code>model_start</code> / <code>model_end</code> — per-model lifecycle with latency</li>
+    <li><code>strategist</code> — intermediate outputs per phase</li>
+    <li><code>decision</code> — the final merged brief (includes <code>run_id</code>)</li>
+    <li><code>done</code> — pipeline complete</li>
+    <li><code>error</code> — terminal, stream ends</li>
+  </ul>
+  <p>Final brief URL: <code>/synthesis/result/{run_id}</code>. Use it to share or re-render.</p>
+
+  <h2 class="t-display" id="templates">Templates — <code>GET /api/templates</code></h2>
+  <div class="method-row">
+    <span class="method-badge get">GET</span>
+    <span class="method-url">/api/templates</span>
+  </div>
+  <p>List every decision template we've seeded. Each row has a <code>slug</code> you can fetch individually at <code>/api/template/{slug}</code>. The landing page is <a href="/templates">/templates</a>.</p>
+  <pre><code>GET /api/templates
+→ { "templates": [ { "slug": "choose-laptop", "title": "...", "options": [...], "criteria": [...] }, ... ] }</code></pre>
+
+  <h2 class="t-display" id="compare">Compare presets — <code>GET /api/compare-preset/{slug}</code></h2>
+  <div class="method-row">
+    <span class="method-badge get">GET</span>
+    <span class="method-url">/api/compare-preset/{slug}</span>
+  </div>
+  <p>Returns a pre-configured Phronesis input for a known comparison (e.g. <code>hubspot-vs-salesforce-vs-pipedrive</code>). Feed the returned payload straight into <code>/decide</code>.</p>
+
+  <h2 class="t-display" id="health">Health — <code>GET /api/health</code></h2>
+  <div class="method-row">
+    <span class="method-badge get">GET</span>
+    <span class="method-url">/api/health</span>
+  </div>
+  <p>Liveness + provider status. Bypasses the rate limiter so you can poll it for uptime monitoring.</p>
+  <pre><code>{
+  "status":        "ok",
+  "tools":         ["phronesis", "synthesis"],
+  "providers":     ["openai", "anthropic", "google", "deepseek", "xai"],
+  "has_api_keys":  true
+}</code></pre>
+
+  <h2 class="t-display" id="errors">Error model</h2>
+  <p>Every error response is JSON with <code>error</code> set to a short string. For rate limits, we also include <code>retry_after_seconds</code> and <code>tier</code>.</p>
+  <table>
+    <thead><tr><th>Status</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td><code>400</code></td><td>Malformed request body</td></tr>
+      <tr><td><code>413</code></td><td>File upload exceeds 5 MB</td></tr>
+      <tr><td><code>422</code></td><td>Input couldn't be parsed (e.g. extractor)</td></tr>
+      <tr><td><code>429</code></td><td>Rate limit exceeded. Inspect <code>Retry-After</code>.</td></tr>
+      <tr><td><code>500</code></td><td>Upstream model failure. Branded with a <code>ref</code> ID.</td></tr>
+      <tr><td><code>503</code></td><td>No provider API keys configured server-side</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="t-display" id="sse">SSE streaming format</h2>
+  <p>All streaming endpoints emit standard Server-Sent Events with named event types. Each frame is <code>event: &lt;name&gt;\ndata: &lt;json&gt;\n\n</code>. Your client should listen by event name, not by order. A typical Synthesis run emits ~30–80 frames.</p>
+  <pre><code>event: phases_info
+data: {"names":["Frame extraction","Reconciliation","Brief"]}
+
+event: model_start
+data: {"model":"gpt-4o-mini","phase":1}
+
+event: strategist
+data: {"phase":1,"result":"..."}
+
+event: decision
+data: {"run_id":"a1b2c3d4","result":"..."}
+
+event: done
+data: {}</code></pre>
+  <p>In Python, <a href="https://pypi.org/project/httpx-sse/">httpx-sse</a> or the built-in <code>aiter_sse()</code> from httpx both work. In JS, <code>EventSource</code> is simplest but doesn't let you set <code>Accept</code> — use <code>fetch</code> with a manual reader instead (our web UI does this in <a href="/phronesis">/phronesis</a>).</p>
+
+  <div class="fin-divider-dashed" style="margin:56px 0 24px;"></div>
+  <p style="text-align:center;color:var(--text-muted);font-size:14px;margin-bottom:80px;">
+    Something unclear or wrong? <a href="/contact">Tell us</a> and we'll fix the docs same day.
+  </p>
+
+</div>
+{% endblock %}

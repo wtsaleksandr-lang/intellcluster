@@ -66,6 +66,7 @@ PUBLIC_ROUTES = [
     ("/about", 200),
     ("/contact", 200),
     ("/faq", 200),
+    ("/docs", 200),
     # Magic-link auth
     ("/login", 200),
     ("/account", 302),  # redirects to /login when unauthenticated
