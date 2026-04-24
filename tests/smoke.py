@@ -100,6 +100,7 @@ ADMIN_GATE_ROUTES = [
     "/admin/waitlist",
     "/admin/analytics",
     "/admin/users",
+    "/admin/advisory",
     "/admin/contact",
     "/admin/purchases",
 ]

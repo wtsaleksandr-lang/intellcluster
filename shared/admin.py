@@ -454,6 +454,7 @@ DASHBOARD_HTML = """{% extends "base.html" %}
   <!-- Quick links -->
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
     <a href="/admin/users" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">USERS →</a>
+    <a href="/admin/advisory" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--accent-dim);border:1px solid var(--accent-border);color:var(--accent);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">ADVISORY →</a>
     <a href="/admin/contact" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">CONTACT →</a>
     <a href="/admin/purchases" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">PURCHASES →</a>
     <a href="/admin/waitlist" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">WAITLIST →</a>
@@ -557,6 +558,83 @@ from fastapi.templating import Jinja2Templates as _JT
 _admin_templates = _JT(directory=["shared/templates"])
 # Register inline templates
 from jinja2 import DictLoader, ChoiceLoader, FileSystemLoader
+ADVISORY_HTML = """{% extends "base.html" %}
+{% block title %}Admin — Advisory{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block content %}
+<div style="max-width:960px;margin:0 auto;padding:40px 20px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:12px;flex-wrap:wrap;">
+    <div>
+      <div class="fig-label" style="margin-bottom:4px;">INTELLCLUSTER <span>·</span> ADMIN</div>
+      <h1 class="t-display" style="font-size:26px;font-weight:600;">Advisory sessions</h1>
+    </div>
+    <a href="/admin" class="t-mono" style="font-size:10px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:6px;text-decoration:none;letter-spacing:0.3px;">← DASHBOARD</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:24px;">
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">TOTAL</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.total }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">COMPLETED</div><div class="t-display" style="font-size:26px;font-weight:600;">{{ stats.completed }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">ERRORED</div><div class="t-display" style="font-size:26px;font-weight:600;color:{% if stats.errored %}var(--red){% else %}var(--text-primary){% endif %};">{{ stats.errored }}</div></div>
+    <div class="panel"><div class="fig-label" style="margin-bottom:4px;">COST</div><div class="t-display" style="font-size:26px;font-weight:600;">${{ '%.2f' | format(stats.total_cost_usd) }}</div></div>
+  </div>
+
+  <div class="fig-label">FIG <span>1</span> — BY CATEGORY</div>
+  <div class="panel" style="padding:14px 18px;margin-bottom:24px;">
+    {% if stats.by_category %}
+      {% for cat, count in stats.by_category.items() %}
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;">
+        <span style="color:var(--text);text-transform:capitalize;">{{ cat }}</span>
+        <span class="t-mono" style="color:var(--text-muted);">{{ count }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="color:var(--text-dim);font-size:13px;">No sessions yet.</div>
+    {% endif %}
+  </div>
+
+  <div class="fig-label">FIG <span>2</span> — RECENT SESSIONS</div>
+  {% if sessions %}
+    <div class="panel" style="padding:0;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="background:var(--surface2);">
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">CREATED</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">USER</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">CATEGORY</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">QUESTION</th>
+            <th style="text-align:left;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">STAGE</th>
+            <th style="text-align:right;padding:10px 14px;font-weight:500;color:var(--text-dim);font-size:10px;letter-spacing:1px;">COST</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions %}
+          <tr style="border-top:1px solid var(--border-subtle);">
+            <td class="t-mono" style="padding:10px 14px;color:var(--text-dim);font-size:11px;white-space:nowrap;">{{ (s.created_at or '')[:19] }}</td>
+            <td style="padding:10px 14px;color:var(--text);">{{ s.user_email or '—' }}</td>
+            <td style="padding:10px 14px;"><span class="bdg bdg-accent" style="text-transform:capitalize;">{{ s.category or 'exploratory' }}</span></td>
+            <td style="padding:10px 14px;color:var(--text);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              {% if s.report %}
+                <a href="/advisory/result/{{ s.run_id }}" style="color:var(--accent);text-decoration:none;">{{ (s.intake.advisory_question if s.intake else s.raw_input)[:60] }}</a>
+              {% else %}
+                {{ (s.intake.advisory_question if s.intake else s.raw_input)[:60] }}
+              {% endif %}
+            </td>
+            <td style="padding:10px 14px;">
+              <span class="bdg {% if s.stage == 'done' %}bdg-green{% elif s.stage == 'error' %}bdg-red{% else %}bdg-muted{% endif %}">{{ s.stage }}</span>
+            </td>
+            <td class="t-mono" style="padding:10px 14px;text-align:right;color:var(--text-muted);">${{ '%.4f' | format(s.total_cost_usd or 0) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="panel" style="padding:18px;color:var(--text-dim);font-size:13px;text-align:center;">No advisory sessions yet.</div>
+  {% endif %}
+</div>
+{% endblock %}"""
+
+
 _admin_templates.env.loader = ChoiceLoader([
     DictLoader({
         "_admin_login.html": LOGIN_HTML,
@@ -566,6 +644,7 @@ _admin_templates.env.loader = ChoiceLoader([
         "_admin_users.html": USERS_HTML,
         "_admin_contact.html": CONTACT_HTML,
         "_admin_purchases.html": PURCHASES_HTML,
+        "_admin_advisory.html": ADVISORY_HTML,
     }),
     FileSystemLoader("shared/templates"),
 ])
@@ -842,6 +921,33 @@ async def admin_contact(request: Request):
     return _admin_templates.TemplateResponse(
         "_admin_contact.html",
         {"request": request, "rows": rows, "stats": stats},
+    )
+
+
+@admin_router.get("/admin/advisory", response_class=HTMLResponse)
+async def admin_advisory(request: Request):
+    """Recent Phronesis OS advisory sessions."""
+    if not is_admin(request):
+        return RedirectResponse(url="/admin/login", status_code=302)
+    from phronesis.advisory.session import list_recent
+    sessions = list_recent(limit=100)
+    completed = sum(1 for s in sessions if s.stage == "done")
+    errored = sum(1 for s in sessions if s.stage == "error")
+    total_cost = sum(s.total_cost_usd or 0 for s in sessions)
+    by_cat: dict[str, int] = {}
+    for s in sessions:
+        c = s.category or "exploratory"
+        by_cat[c] = by_cat.get(c, 0) + 1
+    stats = {
+        "total": len(sessions),
+        "completed": completed,
+        "errored": errored,
+        "total_cost_usd": total_cost,
+        "by_category": dict(sorted(by_cat.items(), key=lambda kv: -kv[1])),
+    }
+    return _admin_templates.TemplateResponse(
+        "_admin_advisory.html",
+        {"request": request, "sessions": sessions, "stats": stats},
     )
 
 
