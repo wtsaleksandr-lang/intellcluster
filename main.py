@@ -954,6 +954,64 @@ async def advisory_api_session(run_id: str):
     return asdict(session)
 
 
+class AdvisoryRatingRequest(BaseModel):
+    run_id: str = Field(min_length=4, max_length=32)
+    rating: int = Field(ge=1, le=5)
+    outcome_note: str = Field(default="", max_length=1000)
+
+
+@app.post("/advisory/api/rate")
+async def advisory_api_rate(req_body: AdvisoryRatingRequest, req: Request):
+    """Record how an advisory outcome actually turned out. Feeds calibration."""
+    from phronesis.advisory import get_session
+    from phronesis.advisory.calibration import record_rating
+
+    session = get_session(req_body.run_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found."})
+    if not session.report:
+        return JSONResponse(status_code=422, content={"error": "Session has no completed report to rate."})
+
+    # Parse confidence_range like "72-80%" to a best-effort midpoint
+    conf_pct = None
+    rng = (session.report.confidence_range or "")
+    try:
+        import re as _re
+        nums = _re.findall(r"(\d+)", rng)
+        if len(nums) >= 2:
+            conf_pct = (int(nums[0]) + int(nums[1])) / 2.0
+        elif len(nums) == 1:
+            conf_pct = float(nums[0])
+    except Exception:
+        conf_pct = None
+
+    row = record_rating(
+        run_id=req_body.run_id,
+        user_email=session.user_email,
+        rating=req_body.rating,
+        outcome_note=req_body.outcome_note,
+        stated_confidence=session.report.confidence_level,
+        stated_confidence_pct=conf_pct,
+    )
+    log_event("advisory_rated", {
+        "run_id": req_body.run_id,
+        "rating": req_body.rating,
+        "stated_confidence": session.report.confidence_level,
+        "has_user": bool(session.user_email),
+    })
+    return {"ok": True, "rated_at": row["rated_at"]}
+
+
+@app.get("/advisory/api/rating/{run_id}")
+async def advisory_api_rating(run_id: str):
+    """Fetch the latest rating for an advisory, if any."""
+    from phronesis.advisory.calibration import get_latest_rating
+    row = get_latest_rating(run_id)
+    if not row:
+        return JSONResponse(status_code=404, content={"error": "No rating yet."})
+    return row
+
+
 @app.get("/phronesis/result/{run_id}", response_class=HTMLResponse)
 async def phronesis_result(request: Request, run_id: str):
     decision = get_decision_by_run_id(run_id)

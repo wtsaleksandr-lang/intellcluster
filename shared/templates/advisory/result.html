@@ -431,6 +431,46 @@
   {% endif %}
 
   {# ─── Share / download bar ─── #}
+  {# ─── Outcome rating widget ─── #}
+  <section class="rv" style="margin-top:40px;">
+    <div class="sec-head">
+      <h2>How did this work out?</h2>
+      <span class="fig">RATE</span>
+    </div>
+    <div id="rateCard" style="padding:22px 24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;">
+      <p style="margin:0 0 16px;color:var(--text-muted);font-size:13.5px;line-height:1.55;">
+        Two weeks from now, come back and rate how this advice actually worked out. Every rating improves the confidence calibration for your future advisory runs — and for the wider user base.
+      </p>
+      <div id="rateButtons" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <button type="button" class="rate-btn" data-rating="1" title="Much worse than expected">① Worse</button>
+        <button type="button" class="rate-btn" data-rating="2" title="Somewhat worse">②</button>
+        <button type="button" class="rate-btn" data-rating="3" title="About as expected">③ As expected</button>
+        <button type="button" class="rate-btn" data-rating="4" title="Somewhat better">④</button>
+        <button type="button" class="rate-btn" data-rating="5" title="Much better than expected">⑤ Better</button>
+      </div>
+      <textarea id="rateNote" rows="2" maxlength="1000"
+        placeholder="Optional: what actually happened? (this stays with your run history only)"
+        style="width:100%;padding:10px 14px;background:var(--bg-deep);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-family:inherit;font-size:13.5px;line-height:1.5;resize:vertical;min-height:52px;outline:none;"></textarea>
+      <button type="button" id="rateSubmit" disabled style="margin-top:12px;padding:10px 18px;background:var(--accent);color:#fff;border:0;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer;transition:filter 0.15s var(--ease-out),opacity 0.15s var(--ease-out);opacity:0.45;">Submit rating</button>
+      <div id="rateOk" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(63,185,80,0.08);border:1px solid rgba(63,185,80,0.28);border-radius:8px;color:var(--green);font-size:13px;">
+        Thanks — recorded. This will influence your future advisory calibration.
+      </div>
+    </div>
+    <style>
+      .rate-btn {
+        padding: 10px 14px; background: var(--bg-deep);
+        border: 1px solid var(--border); color: var(--text-secondary);
+        border-radius: 8px; font-family: inherit; font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s var(--ease-out);
+      }
+      .rate-btn:hover { border-color: var(--accent-border); color: var(--accent); }
+      .rate-btn.selected {
+        background: var(--accent); color: #fff; border-color: var(--accent);
+      }
+    </style>
+  </section>
+
   <div class="share-bar rv">
     <span class="lbl">Share</span>
     <button type="button" class="share-btn" id="copyLinkBtn">Copy link</button>
@@ -459,5 +499,71 @@
       setTimeout(() => { this.textContent = 'Copy link'; }, 1600);
     } catch (e) { /* ignore */ }
   });
+
+  // ─── Outcome rating ───
+  (function() {
+    const runId = {{ session.run_id | tojson }};
+    const btns = document.querySelectorAll('.rate-btn');
+    const submit = document.getElementById('rateSubmit');
+    const note = document.getElementById('rateNote');
+    const ok = document.getElementById('rateOk');
+    const card = document.getElementById('rateCard');
+    let selected = null;
+
+    // If already rated, show the state immediately.
+    fetch('/advisory/api/rating/' + encodeURIComponent(runId))
+      .then(r => r.ok ? r.json() : null)
+      .then(r => {
+        if (r && r.rating) {
+          btns.forEach(b => {
+            if (parseInt(b.dataset.rating, 10) === r.rating) b.classList.add('selected');
+            b.disabled = true;
+          });
+          note.value = r.outcome_note || '';
+          note.disabled = true;
+          submit.style.display = 'none';
+          ok.style.display = 'block';
+          ok.textContent = 'Rated ' + (r.rated_at || '').slice(0, 10) + ' — thanks.';
+        }
+      })
+      .catch(() => {});
+
+    btns.forEach(b => b.addEventListener('click', () => {
+      btns.forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      selected = parseInt(b.dataset.rating, 10);
+      submit.disabled = false;
+      submit.style.opacity = '1';
+    }));
+
+    submit.addEventListener('click', async () => {
+      if (!selected) return;
+      submit.disabled = true;
+      submit.textContent = 'Submitting…';
+      try {
+        const r = await fetch('/advisory/api/rate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            run_id: runId,
+            rating: selected,
+            outcome_note: note.value.trim().slice(0, 1000),
+          }),
+        });
+        if (!r.ok) {
+          const d = await r.json().catch(() => ({}));
+          throw new Error(d.error || 'Request failed');
+        }
+        submit.style.display = 'none';
+        ok.style.display = 'block';
+        btns.forEach(x => x.disabled = true);
+        note.disabled = true;
+      } catch (e) {
+        submit.disabled = false;
+        submit.textContent = 'Submit rating';
+        alert('Could not submit rating: ' + (e.message || 'unknown'));
+      }
+    });
+  })();
 </script>
 {% endblock %}

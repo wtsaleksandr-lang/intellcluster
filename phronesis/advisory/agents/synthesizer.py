@@ -103,11 +103,21 @@ PRODUCE the final JSON:
             "criteria": criteria,
             "analyst_outputs": by_agent,
         }
-        return (
-            "Everything the council produced:\n\n"
-            f"{json.dumps(payload, indent=2, default=str)}\n\n"
-            "Now write the final advisory. Return JSON."
-        )
+
+        # Calibration hint — derived from this user's past rated outcomes,
+        # with global fallback. Empty string until we have enough data.
+        from ..calibration import calibration_hint
+        hint = calibration_hint(session.user_email)
+
+        parts = [
+            "Everything the council produced:",
+            "",
+            json.dumps(payload, indent=2, default=str),
+        ]
+        if hint:
+            parts.extend(["", hint])
+        parts.extend(["", "Now write the final advisory. Return JSON."])
+        return "\n".join(parts)
 
     def parse(self, data: dict[str, Any], **_) -> AgentOutput:
         rec = data.get("recommended_best_move") or ""
