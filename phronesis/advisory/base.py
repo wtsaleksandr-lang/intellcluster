@@ -14,7 +14,9 @@ and a parse function:
 
 from __future__ import annotations
 
+import asyncio
 import json
+import random
 import re
 import time
 from typing import Any
@@ -32,6 +34,30 @@ MODEL_TIERS = {
     "nuanced": ["claude-sonnet-4-6", "gpt-4o", "claude-haiku-4-5-20251001"],
     "writer":  ["claude-sonnet-4-6", "gpt-4o"],
 }
+
+
+# Retry policy — 2 attempts total (1 retry after initial failure).
+# We only retry on transient failures (timeouts, 5xx, network) — not on JSON
+# parse errors or auth failures, which won't recover from a retry.
+RETRY_ATTEMPTS = 2
+RETRY_BASE_DELAY = 0.5      # seconds
+RETRY_MAX_DELAY = 4.0
+TRANSIENT_MARKERS = (
+    "timeout", "timed out", "read timeout", "connection",
+    "temporarily unavailable", "rate limit", "429", "500", "502", "503", "504",
+    "service unavailable", "gateway", "overloaded",
+)
+
+
+def _is_transient(error_text: str) -> bool:
+    e = (error_text or "").lower()
+    return any(m in e for m in TRANSIENT_MARKERS)
+
+
+def _retry_delay(attempt: int) -> float:
+    """Exponential backoff with full jitter, capped at RETRY_MAX_DELAY."""
+    raw = RETRY_BASE_DELAY * (2 ** attempt)
+    return min(RETRY_MAX_DELAY, random.uniform(0, raw))
 
 
 def _extract_json(raw: str) -> dict[str, Any] | None:
@@ -129,29 +155,44 @@ class Agent:
                 error=f"Provider for {model} unavailable (circuit open or key missing).",
             )
 
-        try:
-            result = await provider.complete(
-                prompt=user_msg,
-                system=self.system_prompt,
-            )
-        except Exception as e:
-            return AgentOutput(
-                agent=self.name,
-                status="error",
-                error=f"Provider call failed: {str(e)[:200]}",
-                model=model,
-                latency_ms=int((time.time() - start) * 1000),
-            )
+        # ─── Retry loop: up to RETRY_ATTEMPTS total on transient failures ───
+        last_error: str | None = None
+        result = None
+        retries_used = 0
+        for attempt in range(RETRY_ATTEMPTS):
+            try:
+                result = await provider.complete(
+                    prompt=user_msg,
+                    system=self.system_prompt,
+                )
+                call_error = None if result.status == "success" else (result.error or result.status)
+            except Exception as e:
+                result = None
+                call_error = f"exception: {str(e)[:200]}"
+
+            if result is not None and result.status == "success":
+                break
+
+            last_error = call_error
+            # Don't retry on the final attempt, or on non-transient failures
+            if attempt == RETRY_ATTEMPTS - 1 or not _is_transient(call_error or ""):
+                break
+
+            retries_used += 1
+            await asyncio.sleep(_retry_delay(attempt))
 
         latency_ms = int((time.time() - start) * 1000)
 
-        if result.status != "success":
+        if result is None or result.status != "success":
             return AgentOutput(
                 agent=self.name,
                 status="error",
-                error=result.error or f"{result.status}",
+                error=(last_error or "unknown")[:240] + (
+                    f" (after {retries_used} retry)" if retries_used else ""
+                ),
                 model=model,
                 latency_ms=latency_ms,
+                raw={"retries_used": retries_used},
             )
 
         raw_text = result.response_content or ""

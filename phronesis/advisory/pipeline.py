@@ -24,6 +24,7 @@ from typing import Any, Awaitable, Callable
 
 from .agents import (
     CriteriaArchitectAgent,
+    DomainExpertAgent,
     EvidenceAgent,
     OptimizerAgent,
     PragmatistAgent,
@@ -125,25 +126,28 @@ async def run_council(session: AdvisorySession, emit: EmitFn) -> AdvisorySession
         })
         save_session(session)
 
-        # ─── Optimizer + Skeptic + Pragmatist in parallel ───
+        # ─── Optimizer + Skeptic + Pragmatist + Domain Expert in parallel ───
         session.stage = AdvisoryStage.OPTIMIZER.value
         _emit("stage_start", {"stage": "council"})
 
-        # Fire all three in parallel; no cross-dependency between them.
+        # Fire all four in parallel; no cross-dependency between them.
         opt_task = OptimizerAgent().run(session=session)
         prag_task = PragmatistAgent().run(session=session)
         # Skeptic knows about the Optimizer's lean only if Optimizer finishes
         # first — it's fine to pass None (prompt handles that case).
         skep_task = SkepticAgent().run(session=session, optimizer_lean=None)
+        # Domain Expert persona is routed by session.category inside the agent.
+        de_task = DomainExpertAgent().run(session=session)
 
-        opt_out, skep_out, prag_out = await asyncio.gather(
-            opt_task, skep_task, prag_task, return_exceptions=True
+        opt_out, skep_out, prag_out, de_out = await asyncio.gather(
+            opt_task, skep_task, prag_task, de_task, return_exceptions=True
         )
 
         for out, label in (
             (opt_out, "optimizer"),
             (skep_out, "skeptic"),
             (prag_out, "pragmatist"),
+            (de_out, "domain_expert"),
         ):
             if isinstance(out, Exception):
                 # Keep the pipeline alive; record a skipped slot.

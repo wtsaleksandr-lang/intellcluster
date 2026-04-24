@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from ..base import Agent
+from ..category_hints import hint_block_for
 from ..types import AgentOutput
 
 
@@ -77,9 +78,12 @@ Respond ONLY with JSON:
             a["question"] = q_by_id.get(a["question_id"], "")
         return (
             f"Category: {category}\n\n"
+            f"{hint_block_for(category)}\n\n"
             f"Intake:\n{json.dumps(intake_dict, indent=2)}\n\n"
             f"User MCQ answers:\n{json.dumps(answers, indent=2)}\n\n"
-            "Produce the JSON criteria array now — 4-7 specific, weighted criteria."
+            "Produce the JSON criteria array now — 4-7 specific, weighted criteria. "
+            "Adapt the hint starter kit to THIS user's specific question; do not "
+            "output the hint list verbatim."
         )
 
     def parse(self, data: dict[str, Any], **_) -> AgentOutput:

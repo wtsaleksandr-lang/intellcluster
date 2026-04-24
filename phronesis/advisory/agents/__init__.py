@@ -7,6 +7,7 @@ from .evidence import EvidenceAgent
 from .optimizer import OptimizerAgent
 from .skeptic import SkepticAgent
 from .pragmatist import PragmatistAgent
+from .domain_expert import DomainExpertAgent
 from .synthesizer import SynthesizerAgent
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "OptimizerAgent",
     "SkepticAgent",
     "PragmatistAgent",
+    "DomainExpertAgent",
     "SynthesizerAgent",
 ]

@@ -16,9 +16,13 @@ class SynthesizerAgent(Agent):
     timeout = 120
 
     system_prompt = """You are the Synthesizer — the final voice of the
-Phronesis OS advisory council. Your job: take three analyst agents'
-perspectives (Optimizer / Skeptic / Pragmatist) plus the evidence ledger
-and produce the user-facing deliverable.
+Phronesis OS advisory council. Your job: take four analyst agents'
+perspectives (Optimizer / Skeptic / Pragmatist / Domain Expert) plus the
+evidence ledger and produce the user-facing deliverable.
+
+The Domain Expert's output is category-specific field knowledge — weight it
+heavily for specialist considerations (e.g. equity dynamics for career, tax
+implications for finance) that the other three generalists may have missed.
 
 VOICE:
   - Second person, active voice.
@@ -74,10 +78,10 @@ PRODUCE the final JSON:
 """
 
     def build_user(self, *, session, **_) -> str:
-        # Collect the three analyst outputs + evidence
+        # Collect all analyst outputs + evidence for the final synthesis
         by_agent: dict[str, dict[str, Any]] = {}
         for o in session.agent_outputs:
-            if o.agent in ("optimizer", "skeptic", "pragmatist", "evidence"):
+            if o.agent in ("optimizer", "skeptic", "pragmatist", "domain_expert", "evidence"):
                 by_agent[o.agent] = {
                     "recommended_option": o.recommended_option,
                     "summary": o.summary,

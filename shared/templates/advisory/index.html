@@ -391,8 +391,13 @@
         <span class="pipe-label">Pragmatist<span class="sub">Execution + reversibility</span></span>
         <div class="pipe-body"><span class="idle">Waiting…</span></div>
       </div>
-      <div class="pipe-station" data-stage="synthesis" data-state="idle">
+      <div class="pipe-station" data-stage="domain_expert" data-state="idle">
         <span class="pipe-num">07</span>
+        <span class="pipe-label">Domain Expert<span class="sub">Category specialist</span></span>
+        <div class="pipe-body"><span class="idle">Waiting…</span></div>
+      </div>
+      <div class="pipe-station" data-stage="synthesis" data-state="idle">
+        <span class="pipe-num">08</span>
         <span class="pipe-label">Synthesis<span class="sub">Final recommendation</span></span>
         <div class="pipe-body"><span class="idle">Waiting…</span></div>
       </div>
@@ -647,7 +652,7 @@
         synthesis: 'Composing final advisory…',
       }[s];
       if (s === 'council') {
-        ['optimizer', 'skeptic', 'pragmatist'].forEach(k => setStationState(k, 'running', 'Analyzing…'));
+        ['optimizer', 'skeptic', 'pragmatist', 'domain_expert'].forEach(k => setStationState(k, 'running', 'Analyzing…'));
       } else {
         setStationState(s, 'running', label || 'running…');
       }
@@ -666,7 +671,7 @@
       if (counts.missing)         b.push(`${counts.missing} missing critical`);
       setStationState('evidence', 'done',
         `Evidence quality: ${payload.quality || 'moderate'}`, b);
-    } else if (['optimizer', 'skeptic', 'pragmatist'].includes(stage)) {
+    } else if (['optimizer', 'skeptic', 'pragmatist', 'domain_expert'].includes(stage)) {
       const out = payload.output || {};
       setStationState(stage, out.status === 'error' ? 'error' : 'done',
         out.summary || `${stage} complete`, (out.bullets || []).slice(0, 2));
