@@ -96,25 +96,33 @@ async def run_council(session: AdvisorySession, emit: EmitFn) -> AdvisorySession
             raise RuntimeError("Criteria Architect returned no criteria")
 
         # ─── Evidence Agent ───
+        # The agent calls its provider with web_search=True. Native search
+        # runs inside the provider call (Claude's web_search_20250305 tool,
+        # OpenAI's -search-preview model variants, Gemini's google_search
+        # grounding). Providers without native support (DeepSeek, xAI) ignore
+        # the flag and the agent falls back to its strict anti-hallucination
+        # mode (flag missing facts, don't fabricate).
+        #
+        # Optional Tavily-based PRE-search is still supported as a fallback:
+        # when TAVILY_API_KEY is set, a pre-search runs here and stashes the
+        # formatted block on session._web_search_block for the Evidence
+        # Agent's build_user() to include. Users who want deterministic
+        # control (vs model-driven native search) opt in this way.
         session.stage = AdvisoryStage.EVIDENCE.value
         _emit("stage_start", {"stage": "evidence"})
 
-        # Optional web search — runs only if TAVILY_API_KEY is set. Results
-        # are stashed on session._web_search_block so the Evidence Agent's
-        # (sync) build_user can read them. When unconfigured, this is a
-        # no-op.
         try:
             from .web_search import (
-                is_configured as _search_configured,
+                is_configured as _tavily_configured,
                 infer_search_queries,
-                search as _run_search,
+                search as _tavily_search,
                 format_for_prompt,
             )
-            if _search_configured():
+            if _tavily_configured():
                 queries = infer_search_queries(session)
                 if queries:
                     result_lists = await asyncio.gather(
-                        *[_run_search(q, max_results=4) for q in queries[:2]],
+                        *[_tavily_search(q, max_results=4) for q in queries[:2]],
                         return_exceptions=True,
                     )
                     combined = []
@@ -122,10 +130,9 @@ async def run_council(session: AdvisorySession, emit: EmitFn) -> AdvisorySession
                         if isinstance(lst, list):
                             combined.extend(lst)
                     session._web_search_block = format_for_prompt(combined[:8])
-                    _emit("web_search", {"queries": queries, "n_results": len(combined)})
+                    _emit("web_search", {"queries": queries, "n_results": len(combined), "provider": "tavily"})
         except Exception as e:
-            print(f"[pipeline] web search pre-step failed: {e}")
-            session._web_search_block = ""
+            print(f"[pipeline] Tavily pre-search failed (non-fatal, native search still runs): {e}")
 
         evidence_out = await EvidenceAgent().run(session=session)
         session.agent_outputs.append(evidence_out)

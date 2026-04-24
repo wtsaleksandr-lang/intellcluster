@@ -18,6 +18,17 @@ class AnthropicProvider(BaseProvider):
         if system:
             body["system"] = system
 
+        # Native web search via Anthropic's server-executed tool. Claude decides
+        # whether to search; Anthropic runs the search and feeds results back
+        # to the model within the same API call. Single round-trip — simpler
+        # than an external search service.
+        if web_search:
+            body["tools"] = [{
+                "type": "web_search_20250305",
+                "name": "web_search",
+                "max_uses": 3,
+            }]
+
         try:
             async with httpx.AsyncClient(timeout=self.httpx_timeout) as client:
                 resp = await client.post(
@@ -32,7 +43,21 @@ class AnthropicProvider(BaseProvider):
                 resp.raise_for_status()
                 data = resp.json()
                 try:
-                    content = data["content"][0]["text"]
+                    # When web_search runs, content includes server_tool_use +
+                    # web_search_tool_result blocks alongside text. Concatenate
+                    # ONLY text blocks for the final answer.
+                    text_parts = [
+                        block.get("text", "")
+                        for block in (data.get("content") or [])
+                        if block.get("type") == "text"
+                    ]
+                    content = "".join(text_parts).strip()
+                    if not content:
+                        return self._make_result(
+                            "error",
+                            error=f"Claude response had no text blocks (stop_reason={data.get('stop_reason')})",
+                            start_time=start,
+                        )
                 except (KeyError, IndexError, TypeError) as e:
                     return self._make_result("error", error=f"Unexpected response format: {e}", start_time=start)
                 return self._make_result("success", response_content=content, start_time=start)

@@ -92,6 +92,10 @@ class Agent:
       user_template: f-string with `{...}` placeholders filled by build_user()
       json_mode:     if True, parse response as JSON and populate AgentOutput.raw
       temperature:   override default (0.3)
+      web_search:    if True, ask the provider to run native web search
+                     (Claude: web_search_20250305 tool; OpenAI: swap to
+                     -search-preview model variant; Gemini: google_search
+                     tool. Providers without native support ignore this.)
 
     Override:
       build_user(session, **kwargs) → str
@@ -105,6 +109,7 @@ class Agent:
     json_mode: bool = True
     temperature: float = 0.3
     timeout: int = 90
+    web_search: bool = False
 
     def __init__(self):
         self.model_name: str | None = None
@@ -164,6 +169,7 @@ class Agent:
                 result = await provider.complete(
                     prompt=user_msg,
                     system=self.system_prompt,
+                    web_search=self.web_search,
                 )
                 call_error = None if result.status == "success" else (result.error or result.status)
             except Exception as e:

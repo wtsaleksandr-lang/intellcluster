@@ -14,6 +14,13 @@ class EvidenceAgent(Agent):
     tier = "balanced"
     temperature = 0.2
 
+    # Ask the provider for native web search. Claude executes
+    # web_search_20250305 server-side, OpenAI swaps to a -search-preview
+    # model, Gemini uses google_search grounding. Providers without native
+    # support ignore this flag — the Agent falls back to its strict
+    # anti-hallucination default behaviour (flag missing facts, don't fabricate).
+    web_search = True
+
     system_prompt = """You are the Evidence / Assumption Agent. Given an
 advisory question and its structured intake, produce a crisp ledger that
 separates:
@@ -23,19 +30,21 @@ separates:
                               given the context (label clearly as assumption)
   3. missing_critical       — information that, if known, would materially
                               change the recommendation
-  4. external_reference     — well-known prior knowledge (e.g. "Apple's M3
-                              chip released late 2024") — ONLY include if you
-                              are >95% confident and it's directly relevant.
-                              NEVER invent statistics. NEVER cite sources
-                              you can't verify from training.
+  4. external_reference     — verifiable external facts. You have native web
+                              search available: use it to ground specific
+                              claims (current prices, product specs, market
+                              stats, recent events). When you do, include the
+                              URL in the `source` field. If you cannot verify
+                              a would-be reference, move it to missing_critical
+                              instead of fabricating.
 
-DO NOT:
-  - Fabricate statistics, prices, success rates, market data, or URLs.
-  - Cite web pages, papers, or reports by title unless you are certain.
-  - Speculate about future outcomes — that's the Optimizer/Skeptic's job.
-
-If you would need to fabricate something to answer usefully, put the claim
-in missing_critical instead.
+RULES:
+  - Prefer real web search results over prior-training knowledge for anything
+    that might be stale (prices, product specs, current events, regulations).
+  - For every external_reference you include, put the source URL in `source`.
+  - NEVER invent statistics or URLs. If search didn't return something, flag
+    the unknown in missing_critical.
+  - Speculation about future outcomes belongs in the Optimizer/Skeptic — not here.
 
 Also produce evidence_quality, a one-word verdict: strong | moderate | thin.
 
