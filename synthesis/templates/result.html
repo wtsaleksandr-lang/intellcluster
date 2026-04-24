@@ -2,22 +2,360 @@
 {% block title %}Research Analysis — Synthesis{% endblock %}
 {% block meta_desc %}{{ result.prompt[:150] }}{% endblock %}
 {% block og_title %}Synthesis research: {{ result.prompt[:80] }}{% endblock %}
-{% block og_desc %}Multi-model research output from IntellCluster Synthesis.{% endblock %}
+{% block og_desc %}Multi-model grounded research output from IntellCluster Synthesis.{% endblock %}
 
 {% block content %}
-<div style="max-width:760px;margin:0 auto;padding:40px 20px;">
+{% set report = result.structured_report %}
+{% set sources = result.sources or [] %}
+{% set source_quality = result.source_quality or {} %}
+{% set scope = result.scope or {} %}
+{% set scope_has_any = scope and (scope.get('timeframe') or scope.get('region') or scope.get('audience') or scope.get('decision_intent')) %}
+
+<div style="max-width:780px;margin:0 auto;padding:40px 20px;">
 
   <div class="fig-label">SYNTHESIS <span>·</span> RESEARCH OUTPUT</div>
   <h1 class="t-display" style="font-size:22px;font-weight:500;color:var(--text);margin-bottom:12px;line-height:1.4;">{{ result.prompt[:300] }}</h1>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-bottom:36px;">
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-bottom:32px;">
     <span>{{ result.run_id }}</span>
     <span>·</span>
     <span>{{ result.mode|upper }}</span>
     <span>·</span>
     <span>{{ result.model_count|default(5) }} MODELS</span>
+    {% if sources %}
+    <span>·</span>
+    <span>{{ sources|length }} SOURCES</span>
+    {% endif %}
+    {% if report and report.confidence %}
+    <span>·</span>
+    {% set band = report.confidence.band %}
+    {% set band_color = {
+        'low':           '#ef4444',
+        'moderate':      '#eab308',
+        'moderate-high': '#22c55e',
+        'high':          '#10b981'
+    }[band] %}
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid {{ band_color }};color:{{ band_color }};border-radius:999px;letter-spacing:0.6px;">
+      <span style="width:6px;height:6px;border-radius:999px;background:{{ band_color }};"></span>
+      CONFIDENCE: {{ band|upper }}
+    </span>
+    {% endif %}
   </div>
 
-  <!-- Synthesized answer -->
+  {% if scope_has_any %}
+  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:28px;">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.6px;margin-right:4px;">SCOPE</span>
+    {% if scope.get('audience') %}
+    <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;font-size:11px;color:var(--text);">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:0.5px;">AUDIENCE</span>
+      {{ scope.audience }}
+    </span>
+    {% endif %}
+    {% if scope.get('decision_intent') %}
+    <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;font-size:11px;color:var(--text);">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:0.5px;">INTENT</span>
+      {{ scope.decision_intent }}
+    </span>
+    {% endif %}
+    {% if scope.get('timeframe') %}
+    <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;font-size:11px;color:var(--text);">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:0.5px;">WHEN</span>
+      {{ scope.timeframe }}
+    </span>
+    {% endif %}
+    {% if scope.get('region') %}
+    <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;font-size:11px;color:var(--text);">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:0.5px;">WHERE</span>
+      {{ scope.region }}
+    </span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if report %}
+  {# ────────── STRUCTURED REPORT ────────── #}
+
+  {# FIG 1 — Executive Summary #}
+  {% if report.executive_summary %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>1</span> — EXECUTIVE SUMMARY</div>
+    <div class="panel accent-bar" style="padding:22px 24px;margin-bottom:28px;font-size:15px;line-height:1.7;color:var(--text);">
+      {{ report.executive_summary }}
+    </div>
+  </div>
+  {% endif %}
+
+  {# FIG 2 — Key Findings #}
+  {% if report.key_findings %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>2</span> — KEY FINDINGS</div>
+    <div class="panel" style="padding:20px 24px;margin-bottom:28px;">
+      {% for f in report.key_findings %}
+      <div style="display:flex;gap:14px;padding:12px 0;{% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">
+        <div style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:2px;width:44px;letter-spacing:0.5px;">
+          {{ '%02d'|format(loop.index) }}
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:14px;line-height:1.65;color:var(--text);">{{ f.finding }}</div>
+          <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;">
+            {% set s_color = {'strong':'#10b981','moderate':'#eab308','weak':'#94a3b8'}[f.strength] %}
+            <span style="color:{{ s_color }};letter-spacing:0.5px;">{{ f.strength|upper }}</span>
+            {% if f.citations %}
+            <span style="color:var(--text-dim);">·</span>
+            {% for cid in f.citations %}
+            <a href="#src-{{ cid }}" style="color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:4px;padding:1px 6px;">[{{ cid }}]</a>
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# FIG 3 — Evidence Table #}
+  {% if report.evidence_table %}
+  {% set any_verified = report.evidence_table | selectattr("verification") | list | length > 0 %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>3</span> — EVIDENCE TABLE</div>
+    <div class="panel" style="padding:0;margin-bottom:28px;overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="background:var(--surface2);color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.5px;">
+            <th style="padding:10px 14px;text-align:left;font-weight:500;">CLAIM</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:500;width:90px;">STRENGTH</th>
+            {% if any_verified %}
+            <th style="padding:10px 14px;text-align:left;font-weight:500;width:110px;">VERIFIED</th>
+            {% endif %}
+            <th style="padding:10px 14px;text-align:left;font-weight:500;width:120px;">SOURCES</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for row in report.evidence_table %}
+          <tr style="border-top:1px solid var(--border);">
+            <td style="padding:12px 14px;color:var(--text);line-height:1.55;">
+              {{ row.claim }}
+              {% if row.note %}
+              <div style="margin-top:4px;font-size:12px;color:var(--text-muted);">{{ row.note }}</div>
+              {% endif %}
+            </td>
+            <td style="padding:12px 14px;vertical-align:top;">
+              {% set s_color = {'strong':'#10b981','moderate':'#eab308','weak':'#94a3b8'}[row.strength] %}
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ s_color }};letter-spacing:0.5px;">{{ row.strength|upper }}</span>
+            </td>
+            {% if any_verified %}
+            <td style="padding:12px 14px;vertical-align:top;">
+              {% if row.verification %}
+              {% set v_color = {'supported':'#10b981','partial':'#eab308','unsupported':'#ef4444'}[row.verification] %}
+              {% set v_label = {'supported':'SUPPORTED','partial':'PARTIAL','unsupported':'UNSUPPORTED'}[row.verification] %}
+              <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border:1px solid {{ v_color }};color:{{ v_color }};border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.5px;">
+                <span style="width:5px;height:5px;border-radius:999px;background:{{ v_color }};"></span>
+                {{ v_label }}
+              </span>
+              {% else %}
+              <span style="color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;">—</span>
+              {% endif %}
+            </td>
+            {% endif %}
+            <td style="padding:12px 14px;vertical-align:top;">
+              {% for cid in row.citations %}
+              <a href="#src-{{ cid }}" style="display:inline-block;margin:1px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;">[{{ cid }}]</a>
+              {% else %}
+              <span style="color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:10px;">—</span>
+              {% endfor %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  {# FIG 4 — Source Confidence (components + rationale) #}
+  <div class="rv">
+    <div class="fig-label">FIG <span>4</span> — SOURCE CONFIDENCE</div>
+    <div class="panel" style="padding:20px 24px;margin-bottom:28px;">
+      {% if report.confidence.rationale %}
+      <div style="font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:14px;">
+        {{ report.confidence.rationale }}
+      </div>
+      {% endif %}
+      {% if report.source_confidence_note %}
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:14px;">
+        {{ report.source_confidence_note }}
+      </div>
+      {% endif %}
+      {% set labels = {
+        'source_quality':     'source quality',
+        'evidence_quantity':  'evidence quantity',
+        'source_agreement':   'source agreement',
+        'freshness':          'freshness',
+        'contradiction_penalty': 'contradictions',
+        'model_consensus':    'model consensus'
+      } %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+        {% for key, label in labels.items() %}
+        {% set val = report.confidence.components.get(key, 0) %}
+        {% set is_penalty = (key == 'contradiction_penalty') %}
+        {% set pct = (val * 100)|round(0)|int %}
+        <div style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.5px;">{{ label|upper }}</div>
+          <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+            <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:{{ pct }}%;background:{% if is_penalty %}#ef4444{% else %}var(--accent){% endif %};"></div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);">{{ pct }}%</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {# FIG 5 — Contradictions / Debate #}
+  {% if report.contradictions %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>5</span> — CONTRADICTIONS / DEBATE</div>
+    <div class="panel" style="padding:20px 24px;margin-bottom:28px;">
+      {% for c in report.contradictions %}
+      <div style="padding:10px 0;{% if not loop.last %}border-bottom:1px solid var(--border);margin-bottom:10px;{% endif %}">
+        <div style="font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:8px;">{{ c.point }}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:13px;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:4px;">SIDE A</div>
+            <div style="color:var(--text);line-height:1.55;">{{ c.side_a }}</div>
+            {% if c.citations_a %}
+            <div style="margin-top:4px;">
+              {% for cid in c.citations_a %}<a href="#src-{{ cid }}" style="margin-right:2px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:4px;padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:10px;">[{{ cid }}]</a>{% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:4px;">SIDE B</div>
+            <div style="color:var(--text);line-height:1.55;">{{ c.side_b }}</div>
+            {% if c.citations_b %}
+            <div style="margin-top:4px;">
+              {% for cid in c.citations_b %}<a href="#src-{{ cid }}" style="margin-right:2px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:4px;padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:10px;">[{{ cid }}]</a>{% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# FIG 6 — Risks & Unknowns #}
+  {% if report.risks_unknowns %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>6</span> — RISKS &amp; UNKNOWNS</div>
+    <div class="panel" style="padding:18px 24px;margin-bottom:28px;">
+      <ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.75;color:var(--text);">
+        {% for r in report.risks_unknowns %}
+        <li style="margin-bottom:6px;">{{ r }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  {# FIG 7 — Recommendation #}
+  {% if report.recommendation %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>7</span> — RECOMMENDATION</div>
+    <div class="panel accent-bar" style="padding:22px 24px;margin-bottom:28px;font-size:14.5px;line-height:1.75;color:var(--text);white-space:pre-wrap;">{{ report.recommendation }}</div>
+  </div>
+  {% endif %}
+
+  {# FIG 8 — What Could Change This #}
+  {% if report.what_could_change %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>8</span> — WHAT COULD CHANGE THIS</div>
+    <div class="panel" style="padding:18px 24px;margin-bottom:28px;">
+      <ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.75;color:var(--text-muted);">
+        {% for w in report.what_could_change %}
+        <li style="margin-bottom:6px;">{{ w }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  {# FIG 9 — Next Actions #}
+  {% if report.next_actions %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>9</span> — NEXT ACTIONS</div>
+    <div class="panel" style="padding:18px 24px;margin-bottom:28px;">
+      <ol style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.75;color:var(--text);">
+        {% for a in report.next_actions %}
+        <li style="margin-bottom:6px;">{{ a }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  {% endif %}
+
+  {# FIG 10 — Sources #}
+  {% if sources %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>10</span> — SOURCES</div>
+    <div class="panel" style="padding:8px 0;margin-bottom:28px;">
+      {% for s in sources %}
+      {% set q = source_quality.get(s.id|string) or source_quality.get(s.id) %}
+      {% set overall = (q.overall if q else none) %}
+      {% set q_color = '#10b981' if (overall and overall >= 0.7) else ('#eab308' if (overall and overall >= 0.45) else '#94a3b8') %}
+      <div id="src-{{ s.id }}" style="padding:12px 22px;{% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">
+        <div style="display:flex;gap:10px;align-items:baseline;">
+          <span style="flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:0.5px;min-width:28px;">[{{ s.id }}]</span>
+          <a href="{{ s.url }}" target="_blank" rel="noopener nofollow" style="font-size:13.5px;color:var(--text);text-decoration:none;line-height:1.5;flex:1;">{{ s.title }}</a>
+        </div>
+        <div style="padding-left:38px;margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.4px;">
+          <span>{{ s.domain }}</span>
+          {% if s.published %}<span>·</span><span>{{ s.published[:10] }}</span>{% endif %}
+          {% if overall is not none %}
+          <span>·</span>
+          <span style="color:{{ q_color }};">Q {{ (overall * 100)|round(0)|int }}%</span>
+          {% endif %}
+          {% if s.full_content %}
+          <span>·</span>
+          <span style="color:var(--accent);">FULL TEXT</span>
+          {% endif %}
+          {% set agreeing = s.providers_agreeing or [] %}
+          {% if agreeing|length > 1 %}
+          <span>·</span>
+          <span style="color:#10b981;">{{ agreeing|join('+') }}</span>
+          {% elif s.provider %}
+          <span>·</span>
+          <span>via {{ s.provider }}</span>
+          {% endif %}
+        </div>
+        {% if s.snippet %}
+        <div style="padding-left:38px;margin-top:6px;font-size:12.5px;color:var(--text-muted);line-height:1.6;">{{ s.snippet[:280] }}{% if s.snippet|length > 280 %}…{% endif %}</div>
+        {% endif %}
+        {% if s.full_content %}
+        <details style="padding-left:38px;margin-top:8px;">
+          <summary style="cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.5px;">READ EXTRACTED CONTENT</summary>
+          <div style="margin-top:8px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:12.5px;color:var(--text-muted);line-height:1.65;white-space:pre-wrap;max-height:320px;overflow-y:auto;">{{ s.full_content }}</div>
+        </details>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="rv">
+    <div class="fig-label">FIG <span>10</span> — SOURCES</div>
+    <div class="panel" style="padding:14px 22px;margin-bottom:28px;color:var(--text-muted);font-size:13px;line-height:1.6;">
+      No external sources retrieved for this run. Claims above rest on model reasoning only.
+    </div>
+  </div>
+  {% endif %}
+
+  {% else %}
+  {# ────────── LEGACY RAW-MARKDOWN FALLBACK ────────── #}
   <div class="rv">
     <div class="fig-label">FIG <span>1</span> — SYNTHESIZED ANSWER</div>
     <div class="panel accent-bar md-output" id="mdOutput" style="padding:28px 28px 28px 24px;margin-bottom:32px;">
@@ -51,10 +389,20 @@
     .md-output th, .md-output td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
     .md-output th { background: var(--surface2); font-weight: 600; }
   </style>
+  {% endif %}
+
+  {# ────────── Shared: share actions, per-phase drill-down, CTA ────────── #}
 
   {% with share_url=(request.url|string), share_text='Synthesis research: ' + result.prompt[:120], show_download_md=True %}
   {% include "partials/_share_actions.html" %}
   {% endwith %}
+
+  <div style="text-align:center;margin:8px 0 16px;">
+    <a href="/synthesis/result/{{ result.run_id }}.pdf"
+       style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:12px;border-radius:8px;text-decoration:none;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;">
+      DOWNLOAD PDF
+    </a>
+  </div>
 
   <script>
   (function() {
@@ -77,7 +425,7 @@
 
   {% if result.strategist_outputs %}
   <div class="rv rv1">
-    <div class="fig-label">FIG <span>2</span> — PER-PHASE STRATEGIST SYNTHESIS</div>
+    <div class="fig-label">APPENDIX — PER-PHASE STRATEGIST SYNTHESIS</div>
     {% for phase_name, phase_output in result.strategist_outputs.items() %}
     <details class="panel" style="margin-bottom:6px;padding:0;">
       <summary style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:500;color:var(--text);">
@@ -90,7 +438,6 @@
   </div>
   {% endif %}
 
-  <!-- CTA -->
   <div class="rv rv2" style="text-align:center;margin-top:32px;">
     <a href="/synthesis" style="display:inline-block;padding:10px 28px;background:var(--accent);color:#fff;font-weight:600;border-radius:8px;font-size:13px;text-decoration:none;">Run new research</a>
     <div style="margin-top:14px;">
@@ -111,7 +458,9 @@
     window.plausible('synthesis_result_viewed', { props: {
       category: {{ (result.category or 'deep_research') | tojson }},
       mode: {{ (result.mode or 'standard') | tojson }},
-      model_count: {{ result.model_count or 5 }}
+      model_count: {{ result.model_count or 5 }},
+      has_structured_report: {{ 'true' if report else 'false' }},
+      source_count: {{ sources|length }}
     }});
   }
 </script>

@@ -50,18 +50,28 @@ _FRESHNESS_CONTEXT = [
     r"inflation.*rate",
 ]
 
-# Categories that inherently lean toward freshness
+# Categories that inherently lean toward freshness.
+#
+# Expanded 2026: marketing channels, funnel benchmarks, pricing, product,
+# AI systems, and comparisons all shift fast enough that relying on
+# training-date knowledge produces stale or wrong answers. Better to err
+# on the side of retrieving sources — Tavily is cheap and the pipeline
+# degrades gracefully if nothing is found.
 _FRESHNESS_CATEGORIES = {
     "competitor_market_research",
     "deep_research",
-}
-
-# Categories that almost never need freshness
-_NO_FRESHNESS_CATEGORIES = {
+    "marketing_growth",
     "product_offer_design",
     "funnel_conversion",
     "ai_systems_automation",
+    "comparison_evaluation",
+    "business_ideas_validation",
 }
+
+# Categories that almost never need freshness. Intentionally small — only
+# pure reasoning tasks belong here (e.g. an internal framework question
+# with no external anchor).
+_NO_FRESHNESS_CATEGORIES: set[str] = set()
 
 
 def detect_freshness(prompt: str, category: str = "") -> str:

@@ -21,7 +21,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import FastAPI, Request, UploadFile, File, Form as FastAPIForm
-from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse, RedirectResponse
+from fastapi.responses import StreamingResponse, JSONResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
@@ -1208,6 +1208,27 @@ async def synthesis_home(request: Request):
     return templates.TemplateResponse(request, "index.html", {"tool": "synthesis"})
 
 
+@app.get("/synthesis/result/{run_id}.pdf")
+async def synthesis_result_pdf(run_id: str):
+    """PDF export of a Synthesis run. Declared BEFORE the HTML route so
+    the greedy {run_id} path param doesn't swallow the .pdf suffix."""
+    from shared.tracking.synthesis_history import get_synthesis_run
+    from shared.exporters.synthesis_pdf import build_synthesis_pdf
+    result = get_synthesis_run(run_id)
+    if not result:
+        return JSONResponse(status_code=404, content={"error": "not found"})
+    try:
+        pdf_bytes = build_synthesis_pdf(result)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"pdf build failed: {e}"})
+    filename = f"synthesis-{run_id}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @app.get("/synthesis/result/{run_id}", response_class=HTMLResponse)
 async def synthesis_result(request: Request, run_id: str):
     from shared.tracking.synthesis_history import get_synthesis_run
@@ -1248,6 +1269,11 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
     # Capture outputs for persistence
     strategist_outputs = {}
     final_output = None
+    structured_report = None
+    retrieved_sources: list = []
+    source_quality_map: dict = {}
+    retrieval_provider: str | None = None
+    scope_payload: dict | None = None
     phase_names = []
 
     pipeline_task = asyncio.create_task(
@@ -1287,6 +1313,15 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
             strategist_outputs[phase_name] = data.get("result", "")
         elif event == "decision":
             final_output = data.get("result", "")
+        elif event == "sources":
+            retrieved_sources = data.get("sources", []) or []
+            retrieval_provider = data.get("provider")
+        elif event == "source_quality":
+            source_quality_map = data.get("quality", {}) or {}
+        elif event == "structured_report":
+            structured_report = data.get("report")
+        elif event == "scope":
+            scope_payload = data.get("scope")
 
         yield f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
@@ -1310,6 +1345,12 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
                 "output": final_output,
                 "strategist_outputs": strategist_outputs,
                 "model_count": len(models),
+                # New: grounded research artefacts
+                "structured_report": structured_report,
+                "sources": retrieved_sources,
+                "source_quality": source_quality_map,
+                "retrieval_provider": retrieval_provider,
+                "scope": scope_payload,
             })
             log_event("synthesis_completed", {
                 "run_id": run_id,
@@ -1317,6 +1358,8 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
                 "category": category,
                 "output_length": len(final_output),
                 "phases": len(strategist_outputs),
+                "source_count": len(retrieved_sources),
+                "has_structured_report": bool(structured_report),
             })
         except Exception:
             pass

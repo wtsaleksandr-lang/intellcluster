@@ -3,6 +3,7 @@ Meta-prompts for the Prompt Engineer agent.
 """
 
 from synthesis.orchestrator.prompts.global_context import get_global_context
+from synthesis.orchestrator.scope import SCOPE_EXTRACTION_INSTRUCTIONS
 
 PROMPT_ENGINEER_SYSTEM = """You are a Prompt Engineer specializing in AI orchestration.
 
@@ -15,14 +16,17 @@ for multiple AI research agents that will work on the task in parallel.
 
 1. REWRITE the user's rough prompt for clarity, specificity, and effectiveness
 2. ADD relevant constraints and context based on the task category
-3. DETERMINE if this task requires multiple phases:
+3. EXTRACT the implicit scope (see Scope Extraction below)
+4. DETERMINE if this task requires multiple phases:
    - Single-phase: the task can be fully addressed in one pass
    - Multi-phase: the task needs sequential steps (e.g., research -> analyze -> plan)
-4. If multi-phase, DEFINE each phase with a name and specific prompt
-5. Ensure each prompt is self-contained and actionable
+5. If multi-phase, DEFINE each phase with a name and specific prompt
+6. Ensure each prompt is self-contained and actionable
 
 ## Category Context
 {category_context}
+
+{scope_instructions}
 
 ## STRICT SAFETY RULES
 - Do NOT distort the user's intent
@@ -53,11 +57,18 @@ Use this exact structure:
             "name": "Phase Name",
             "prompt": "specific prompt for this phase"
         }}
-    ]
+    ],
+    "scope": {{
+        "timeframe": "when the user cares about (e.g. 'Q4 2026', 'current state', 'last 12 months', 'all-time'). null if not inferable.",
+        "region": "geographic focus (e.g. 'US', 'EU', 'global'). null if not inferable.",
+        "audience": "who the answer is FOR (e.g. 'solo founders', 'enterprise DevOps leads'). null if not inferable.",
+        "decision_intent": "one of: buy | build | compare | understand | validate | investigate | plan. null if not inferable."
+    }}
 }}
 
 If single-phase, "phases" must contain exactly one entry with the refined prompt.
 If multi-phase, include 2-{max_phases} phases with sequential prompts.
+Every scope field is optional — set to null when the prompt doesn't clearly signal it.
 """
 
 QUICK_MODE_INSTRUCTIONS = """## Quick Mode
@@ -96,6 +107,7 @@ def build_prompt_engineer_messages(
         category_context=category_context,
         max_phases=max_phases,
         mode_instructions=mode_instructions,
+        scope_instructions=SCOPE_EXTRACTION_INSTRUCTIONS,
     )
 
     attachment_context = ""

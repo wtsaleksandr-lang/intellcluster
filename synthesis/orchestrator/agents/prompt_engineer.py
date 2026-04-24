@@ -13,6 +13,8 @@ from synthesis.config import settings
 from synthesis.orchestrator.prompts.categories import get_category_context
 from synthesis.orchestrator.prompts.meta_prompts import build_prompt_engineer_messages
 from synthesis.orchestrator.providers import call_with_role_fallback
+from synthesis.orchestrator.scope import parse_scope
+from synthesis.orchestrator.types import Scope
 
 
 def _parse_json_response(text: str) -> dict | None:
@@ -69,10 +71,16 @@ def _validate_parsed(data: dict) -> tuple[dict | None, str]:
     if len(valid_phases) == 0:
         return None, f"no valid phases found in {len(phases)} entries"
 
+    # Scope is optional — PE may omit it entirely on older prompts or
+    # when the model decides nothing is inferable. parse_scope always
+    # returns a Scope (possibly empty) and never raises.
+    scope = parse_scope(data.get("scope"))
+
     return {
         "refined_prompt": refined,
         "is_multi_phase": bool(is_multi) and len(valid_phases) > 1,
         "phases": valid_phases,
+        "scope": scope,
     }, ""
 
 
@@ -140,9 +148,14 @@ async def run_prompt_engineer(
 
 
 def _fallback(user_prompt: str) -> dict:
-    """Fallback when prompt engineer fails: single-phase with original prompt."""
+    """Fallback when prompt engineer fails: single-phase with original prompt.
+
+    Returns an empty Scope so downstream callers can assume `scope` is
+    always present.
+    """
     return {
         "refined_prompt": user_prompt,
         "is_multi_phase": False,
         "phases": [{"name": "Main Task", "prompt": user_prompt}],
+        "scope": Scope(),
     }

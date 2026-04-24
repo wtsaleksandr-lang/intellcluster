@@ -3,22 +3,29 @@ from pydantic_settings import BaseSettings
 
 
 # === Display Name Mapping ===
-# UI-facing premium labels -> actual backend model IDs are resolved via config.
-# These are purely cosmetic. Backend NEVER uses these for API calls.
+# Honest labels: show the REAL model the user is paying for.
+# Previously this file mapped model ids to invented premium names
+# ("GPT-5.4 Thinking", "Grok 4.20 Heavy", "Gemini 3.1 Pro"). Those names
+# do not exist, and a research tool that fakes its model names has no
+# credibility the moment a sophisticated user notices. Kept flat and
+# truthful; if a white-label need appears later, put it behind an
+# explicit admin flag rather than lying by default.
 MODEL_DISPLAY_NAMES = {
-    # Flagship models (Expert tier research)
-    "gpt-4o": {"display": "GPT-5.4 Thinking", "description": "Broad reasoning and structured problem solving"},
-    "claude-sonnet-4-6": {"display": "Claude Sonnet 4.6", "description": "Strong synthesis and analytical reasoning"},
-    "claude-opus-4-6": {"display": "Claude Opus 4.7", "description": "Deepest reasoning and premium written analysis"},
-    # Workhorse models (Standard tier research)
-    "gpt-4o-mini": {"display": "GPT-4.1 Turbo", "description": "Fast and cost-efficient reasoning"},
-    "claude-haiku-4-5-20251001": {"display": "Claude Haiku 4.5", "description": "Quick analytical support"},
-    # Shared across tiers
-    "gemini-2.5-flash": {"display": "Gemini 3.1 Pro", "description": "Strong multimodal and long-context reasoning"},
-    "gemini-2.0-flash": {"display": "Gemini 3.1 Pro", "description": "Fast and reliable model"},
-    "gemini-1.5-flash": {"display": "Gemini 3.1 Pro", "description": "Stable and reliable model"},
-    "deepseek-chat": {"display": "DeepSeek V3.2 Speciale", "description": "Cost-efficient analytical support"},
-    "grok-3": {"display": "Grok 4.20 Heavy", "description": "Broad context and fast agentic analysis"},
+    # OpenAI
+    "gpt-4o":      {"display": "GPT-4o",      "description": "OpenAI flagship reasoning model"},
+    "gpt-4o-mini": {"display": "GPT-4o mini", "description": "OpenAI fast / cost-efficient reasoning"},
+    # Anthropic
+    "claude-sonnet-4-6":         {"display": "Claude Sonnet 4.6", "description": "Anthropic balanced reasoning + synthesis"},
+    "claude-haiku-4-5-20251001": {"display": "Claude Haiku 4.5",  "description": "Anthropic fast analytical model"},
+    "claude-opus-4-6":           {"display": "Claude Opus 4.6",   "description": "Anthropic deepest reasoning model"},
+    # Google
+    "gemini-2.5-flash": {"display": "Gemini 2.5 Flash", "description": "Google fast long-context model"},
+    "gemini-2.0-flash": {"display": "Gemini 2.0 Flash", "description": "Google fast general model"},
+    "gemini-1.5-flash": {"display": "Gemini 1.5 Flash", "description": "Google reliable general model"},
+    # DeepSeek
+    "deepseek-chat": {"display": "DeepSeek Chat", "description": "DeepSeek cost-efficient general model"},
+    # xAI
+    "grok-3": {"display": "Grok 3", "description": "xAI general reasoning model"},
 }
 
 # Role display names for UI

@@ -1,11 +1,29 @@
 """
 Core orchestration pipeline.
-Manages the full flow: Prompt Engineer → Research → Strategist → Decision-Maker.
-Emits SSE events to the provided asyncio.Queue.
 
-Research step streams per-model results as they complete.
-Models run until done — only a long safety timeout prevents deadlocks.
-Individual model cancellation is supported via model_tasks dict.
+Flow: Prompt Engineer → Retrieval → Research (parallel, streaming)
+      → Consensus → Strategist → (optional) Red Team → Decision-Maker.
+
+New in this version
+-------------------
+- Real retrieval layer (Tavily, key-gated). Sources flow into every
+  downstream agent so claims can be grounded and cited by id.
+- Source quality scoring (deterministic heuristic, no LLM cost).
+- Composite confidence (source quality × evidence × agreement × freshness
+  × contradiction penalty × model consensus). Band reported, not percent.
+- Decision-Maker now returns a StructuredReport (executive summary,
+  key findings, evidence table, contradictions, risks, recommendation,
+  what-could-change, next actions) with citations validated against the
+  retrieved source IDs — any fabricated [N] refs are stripped.
+- Graceful fallback: if retrieval is unconfigured or returns nothing, the
+  pipeline runs as before and confidence is computed from model consensus
+  alone. No breaking changes to existing users.
+
+The SSE event surface gains three events:
+    sources            — list of RetrievedSource dicts
+    source_quality     — {id: SourceQuality dict}
+    structured_report  — StructuredReport dict (sent alongside `decision`)
+Existing events are unchanged.
 """
 
 import asyncio
@@ -24,6 +42,17 @@ from synthesis.orchestrator.freshness import detect_freshness, get_freshness_ins
 from synthesis.orchestrator.prompts.categories import get_category_context
 from synthesis.orchestrator.prompts.global_context import get_global_context
 from synthesis.orchestrator.providers import get_providers
+from synthesis.orchestrator.retrieval import (
+    is_configured as retrieval_configured,
+    retrieve_sources,
+    format_sources_for_prompt,
+)
+from synthesis.orchestrator.source_quality import score_sources
+from synthesis.orchestrator.confidence import compute_confidence
+from synthesis.orchestrator.report_schema import collect_cited_source_ids
+from synthesis.orchestrator.scope import format_scope_for_prompt
+from synthesis.orchestrator.types import Scope
+from synthesis.orchestrator.verification import verify_evidence_rows
 from shared.providers.base import ModelResult
 
 
@@ -45,17 +74,11 @@ async def _run_research_streaming(
     model_tasks: dict[str, asyncio.Task],
     web_search: bool = False,
 ) -> list[ModelResult]:
-    """Run research across multiple models, streaming results as each finishes.
-
-    Creates individual tasks per model stored in model_tasks for cancellation.
-    Uses asyncio.wait(FIRST_COMPLETED) to emit results as they arrive.
-    Safety timeout (from config) prevents infinite waits.
-    """
+    """Run research across multiple models, streaming results as each finishes."""
     providers = get_providers(model_names, role="research")
     if not providers:
         return []
 
-    # Log model selection: requested vs actually scheduled
     scheduled_names = [p.name for p in providers]
     skipped_names = [m for m in model_names if m not in scheduled_names]
     timeout_used = providers[0].timeout if providers else settings.get_timeout_for_role("research")
@@ -73,7 +96,6 @@ async def _run_research_streaming(
         ),
     )
 
-    # Emit selection info to UI
     await _emit(queue, "research_info", {
         "phase": phase_num,
         "requested": model_names,
@@ -82,7 +104,6 @@ async def _run_research_streaming(
         "timeout_seconds": timeout_used,
     })
 
-    # Emit queued status for all models, then create tasks
     for p in providers:
         await _emit(queue, "model_status", {
             "model": p.name,
@@ -91,7 +112,6 @@ async def _run_research_streaming(
             "timeout_seconds": p.timeout,
         })
 
-    # Create individual tasks
     task_to_model: dict[asyncio.Task, str] = {}
     for p in providers:
         task = asyncio.create_task(call_model(p, prompt, system, web_search=web_search))
@@ -103,13 +123,11 @@ async def _run_research_streaming(
             "status": "running",
         })
 
-    # Collect results as they complete
     results: list[ModelResult] = []
     pending = set(task_to_model.keys())
 
-    # Use research timeout + buffer for the orchestration safety net
     research_timeout = settings.get_timeout_for_role("research")
-    orchestration_timeout = research_timeout + 30  # 30s buffer beyond the httpx timeout
+    orchestration_timeout = research_timeout + 30
 
     try:
         while pending:
@@ -120,7 +138,6 @@ async def _run_research_streaming(
             )
 
             if not done and pending:
-                # Safety timeout hit — cancel remaining and mark them
                 for task in pending:
                     task.cancel()
                     model_name = task_to_model[task]
@@ -171,7 +188,6 @@ async def _run_research_streaming(
 
                 results.append(result)
 
-                # Emit result immediately
                 await _emit(queue, "model_result", {
                     "model": result.model_name,
                     "phase": phase_num,
@@ -191,7 +207,6 @@ async def _run_research_streaming(
                     error=result.error,
                 )
     finally:
-        # Clean up model tasks from the shared dict
         for p in providers:
             model_tasks.pop(p.name, None)
 
@@ -218,11 +233,9 @@ async def run_pipeline(
 
     mode_config = settings.get_mode_config(mode)
 
-    # Detect prompt complexity and determine effective routing tier
     complexity = settings.classify_prompt_complexity(prompt, category)
     tier = settings.get_effective_tier(mode, complexity)
 
-    # Admin overrides
     force_tier = admin_overrides.get("force_tier", "auto")
     if force_tier != "auto":
         tier = force_tier
@@ -232,14 +245,10 @@ async def run_pipeline(
     log_event(run_id, "routing", status="info",
               prompt=f"mode={mode}, complexity={complexity}, tier={tier}, admin_force_tier={force_tier}")
 
-    # IMPORTANT: Research models always come from the USER-FACING mode (standard/expert),
-    # NEVER from the hidden cost_efficient tier. The cost_efficient tier only affects
-    # system roles (PE, Strategist, DM) — research always shows 5 models.
     mode_config = settings.get_mode_config(mode)
     mode_research_models = mode_config["research_models"]
     available_map = {m["model"] for m in settings.get_available_models()}
     effective_models = [m for m in mode_research_models if m in available_map]
-    # If user selected specific models via checkboxes, use their selection
     if models and set(models) != set(mode_research_models):
         effective_models = [m for m in models if m in available_map]
     if not effective_models:
@@ -265,8 +274,8 @@ async def run_pipeline(
 
         refined_prompt = pe_result["refined_prompt"]
         phases = pe_result["phases"]
+        scope: Scope = pe_result.get("scope") or Scope()
 
-        # Phase cap: admin override > mode default
         admin_max_phases = admin_overrides.get("max_phases")
         if admin_max_phases and admin_max_phases > 0:
             phases = phases[:admin_max_phases]
@@ -287,7 +296,14 @@ async def run_pipeline(
             "provider": pe_provider,
             "used_fallback": pe_fallback,
         })
-        log_event(run_id, "prompt_engineer", status="done", response=refined_prompt)
+        # Always emit scope — even when empty — so the frontend knows to
+        # hide the chips row for runs where nothing was inferred.
+        await _emit(queue, "scope", {"scope": scope.to_dict()})
+        log_event(run_id, "prompt_engineer", status="done",
+                  response=refined_prompt,
+                  prompt=f"scope={scope.to_dict()}")
+
+        scope_block = format_scope_for_prompt(scope)
 
         # ===== Freshness Detection =====
         freshness = detect_freshness(prompt, category)
@@ -297,13 +313,91 @@ async def run_pipeline(
         log_event(run_id, "freshness", status=freshness,
                   error=f"web_search={use_web_search}")
 
-        # ===== STEP 2: Phase Loop (Research + Strategist) =====
+        # ===== Retrieval (key-gated; graceful fallback to empty) =====
+        retrieved_sources: list = []
+        source_quality_map: dict = {}
+        retrieval_meta: dict = {"provider": "none", "queries": [], "configured": False}
+
+        if use_web_search and retrieval_configured():
+            await _emit(queue, "progress_message", {"message": "Searching the web for sources..."})
+            await _emit(queue, "step", {"step": "retrieval", "status": "running"})
+            async def _on_progress(info: dict) -> None:
+                # Per-provider query/return progress. Piggyback the
+                # existing progress_message channel so the UI already
+                # renders the humanised line, AND emit a structured
+                # `retrieval_progress` event for future UX work.
+                stage = info.get("stage")
+                provider = info.get("provider")
+                if stage == "querying" and provider:
+                    qi = info.get("query_idx", 0)
+                    tq = info.get("total_queries", 1)
+                    await _emit(queue, "progress_message",
+                                {"message": f"Searching {provider} ({qi + 1}/{tq})..."})
+                elif stage == "returned" and provider:
+                    count = info.get("count", 0)
+                    await _emit(queue, "progress_message",
+                                {"message": f"{provider}: {count} result(s)"})
+                elif stage == "fusing":
+                    await _emit(queue, "progress_message",
+                                {"message": "Fusing and ranking sources..."})
+                await _emit(queue, "retrieval_progress", info)
+
+            async def _on_source_added(src: dict) -> None:
+                await _emit(queue, "source_added", {"source": src})
+
+            try:
+                first_phase_prompt = phases[0]["prompt"] if phases else refined_prompt
+                retrieved_sources, retrieval_meta = await retrieve_sources(
+                    refined_prompt=refined_prompt,
+                    phase_prompt=first_phase_prompt,
+                    category=category,
+                    max_sources=10,
+                    scope=scope,
+                    on_progress=_on_progress,
+                    on_source_added=_on_source_added,
+                )
+            except Exception as e:
+                log_event(run_id, "retrieval", status="error", error=str(e)[:200])
+                retrieved_sources = []
+
+            if retrieved_sources:
+                source_quality_map = score_sources(retrieved_sources)
+
+            await _emit(queue, "sources", {
+                "sources": [s.to_dict() for s in retrieved_sources],
+                "provider": retrieval_meta.get("provider"),
+                "providers_used": retrieval_meta.get("providers_used", []),
+                "providers_returning": retrieval_meta.get("providers_returning", []),
+                "per_provider_counts": retrieval_meta.get("per_provider_counts", {}),
+                "queries": retrieval_meta.get("queries", []),
+                "enriched": retrieval_meta.get("enriched", 0),
+            })
+            await _emit(queue, "source_quality", {
+                "quality": {sid: q.to_dict() for sid, q in source_quality_map.items()},
+            })
+            await _emit(queue, "step", {"step": "retrieval", "status": "done"})
+            log_event(run_id, "retrieval", status="done",
+                      prompt=f"providers={retrieval_meta.get('providers_returning', [])}, "
+                             f"sources={len(retrieved_sources)}, "
+                             f"enriched={retrieval_meta.get('enriched', 0)}, "
+                             f"per_provider={retrieval_meta.get('per_provider_counts', {})}, "
+                             f"queries={retrieval_meta.get('queries', [])}")
+        else:
+            await _emit(queue, "sources", {"sources": [], "provider": "none", "queries": []})
+            log_event(run_id, "retrieval", status="skipped",
+                      error=f"use_web_search={use_web_search}, "
+                            f"tavily_configured={retrieval_configured()}")
+
+        sources_block = format_sources_for_prompt(retrieved_sources)
+        valid_source_ids = [s.id for s in retrieved_sources]
+
+        # ===== STEP 2: Phase Loop (Research + Consensus + Strategist) =====
         category_context = get_category_context(category)
         phase_syntheses = []
         all_model_outputs = []
         prior_phase_context = ""
+        consensus_data: dict = {}
 
-        # Emit phase plan to UI so user knows what's coming
         await _emit(queue, "phases_info", {
             "total": len(phases),
             "names": [p["name"] for p in phases],
@@ -314,7 +408,6 @@ async def run_pipeline(
             phase_name = phase["name"]
             phase_prompt = phase["prompt"]
 
-            # Emit current phase progress
             await _emit(queue, "phase_progress", {
                 "current": phase_num,
                 "total": len(phases),
@@ -334,6 +427,16 @@ async def run_pipeline(
                 f"Be detailed, specific, and actionable. Avoid generic advice."
                 f"{freshness_instruction}"
             )
+            if scope_block:
+                research_system += "\n\n" + scope_block
+            if sources_block:
+                research_system += (
+                    "\n\n"
+                    + sources_block
+                    + "\nWhen you cite a specific fact from these sources, "
+                      "reference its id in brackets like [1] so downstream "
+                      "synthesis can verify it."
+                )
 
             full_prompt = phase_prompt
             if prior_phase_context:
@@ -342,7 +445,6 @@ async def run_pipeline(
                     f"## Context from Previous Phases\n{prior_phase_context}"
                 )
 
-            # Debug: log context merge for multi-phase verification
             if settings.test_mode or settings.debug_mode:
                 log_event(run_id, "context_merge",
                     phase=phase_num,
@@ -352,9 +454,6 @@ async def run_pipeline(
                            f"MERGED_LENGTH={len(full_prompt)}, "
                            f"HAS_PRIOR={'yes' if prior_phase_context else 'no'}",
                 )
-
-            # Emit debug info for test inspection
-            if settings.test_mode or settings.debug_mode:
                 await _emit(queue, "debug_context", {
                     "phase": phase_num,
                     "phase_prompt_length": len(phase_prompt),
@@ -364,6 +463,7 @@ async def run_pipeline(
                     "tier": tier,
                     "models": effective_models,
                     "web_search": use_web_search,
+                    "retrieved_source_count": len(retrieved_sources),
                 })
 
             results = await _run_research_streaming(
@@ -377,7 +477,6 @@ async def run_pipeline(
                 web_search=use_web_search,
             )
 
-            # Track model coverage
             successful = [r for r in results if r.status == "success"]
             failed_models = [r.model_name for r in results if r.status != "success"]
             expected_count = len(effective_models)
@@ -404,7 +503,6 @@ async def run_pipeline(
 
             await _emit(queue, "step", {"step": "research", "status": "done"})
 
-            # Collect model outputs for history/proof
             for r in results:
                 all_model_outputs.append({
                     "model_name": r.model_name,
@@ -416,7 +514,6 @@ async def run_pipeline(
 
             # --- 2b: Consensus Extraction ---
             await _emit(queue, "progress_message", {"message": "Analyzing consensus patterns..."})
-            consensus_data = {}
             consensus_text = ""
             try:
                 consensus_data = await extract_consensus(
@@ -429,7 +526,8 @@ async def run_pipeline(
                 themes_count = len(consensus_data.get("themes", []))
                 contradictions_count = len(consensus_data.get("contradictions", []))
                 log_event(run_id, "consensus", phase=phase_num, status="done",
-                          prompt=f"agreement={agreement_score:.2f}, themes={themes_count}, contradictions={contradictions_count}")
+                          prompt=f"agreement={agreement_score:.2f}, themes={themes_count}, "
+                                 f"contradictions={contradictions_count}")
                 await _emit(queue, "consensus", {
                     "phase": phase_num,
                     "agreement_score": agreement_score,
@@ -473,7 +571,7 @@ async def run_pipeline(
             await _emit(queue, "step", {"step": "strategist", "status": "done"})
             log_event(run_id, "strategist", phase=phase_num, status="done", response=synthesis)
 
-        # ===== OPTIONAL: Red Team Critique =====
+        # ===== OPTIONAL: Grounded Red Team Critique =====
         red_team_critique = None
         if consensus_data and should_trigger_red_team(consensus_data, category):
             await _emit(queue, "progress_message", {"message": "Running critical analysis..."})
@@ -485,6 +583,7 @@ async def run_pipeline(
                     strategy=last_synthesis,
                     consensus=consensus_data,
                     tier=tier,
+                    sources_block=sources_block,
                 )
                 if red_team_critique:
                     log_event(run_id, "red_team", status="done",
@@ -493,12 +592,22 @@ async def run_pipeline(
             except Exception as e:
                 log_event(run_id, "red_team", status="error", error=str(e)[:200])
 
-        # ===== STEP 3: Decision-Maker (cross-phase) =====
+        # ===== Confidence Decomposition =====
+        # Pre-DM confidence based on all current signals. The DM may tighten
+        # the set of cited ids; we recompute after the report is parsed.
+        pre_confidence = compute_confidence(
+            sources=retrieved_sources,
+            quality=source_quality_map,
+            cited_source_ids=set(valid_source_ids),
+            consensus=consensus_data or {},
+            freshness_need=freshness,
+        )
+
+        # ===== STEP 3: Decision-Maker (cross-phase, structured output) =====
         await _emit(queue, "progress_message", {"message": "Synthesizing final answer..."})
         await _emit(queue, "step", {"step": "decision_maker", "status": "running"})
         log_event(run_id, "decision_maker", status="running")
 
-        # If red team critique exists, append it to phase syntheses for DM
         dm_syntheses = phase_syntheses
         if red_team_critique:
             dm_syntheses = phase_syntheses + [{
@@ -506,16 +615,64 @@ async def run_pipeline(
                 "synthesis": red_team_critique,
             }]
 
-        final_output = await run_decision_maker(
+        structured_report, final_output_raw = await run_decision_maker(
             original_prompt=prompt,
             phase_syntheses=dm_syntheses,
             category=category,
+            confidence=pre_confidence,
             tier=tier,
+            sources_block=sources_block,
+            valid_source_ids=valid_source_ids,
+            scope_block=scope_block,
         )
 
-        await _emit(queue, "decision", {"result": final_output})
+        # Recompute confidence using the actually cited source ids from the
+        # DM's report — tightens evidence_quantity + corroboration.
+        cited_ids = collect_cited_source_ids(structured_report)
+        final_confidence = compute_confidence(
+            sources=retrieved_sources,
+            quality=source_quality_map,
+            cited_source_ids=cited_ids,
+            consensus=consensus_data or {},
+            freshness_need=freshness,
+        )
+        structured_report.confidence = final_confidence
+
+        # ===== Per-claim verification (cheap LLM pass) =====
+        # Runs only when retrieval found sources AND the DM produced a
+        # non-empty evidence table with cited rows. Annotates each row's
+        # .verification field in place. Never raises.
+        verification_stats = {"verified": 0, "supported": 0, "partial": 0, "unsupported": 0}
+        if retrieved_sources and structured_report.evidence_table:
+            try:
+                await _emit(queue, "progress_message",
+                            {"message": "Verifying cited claims..."})
+                verification_stats = await verify_evidence_rows(
+                    report=structured_report,
+                    sources=retrieved_sources,
+                )
+                log_event(run_id, "verification", status="done",
+                          prompt=f"{verification_stats}")
+                await _emit(queue, "verification", verification_stats)
+            except Exception as e:
+                log_event(run_id, "verification", status="error",
+                          error=str(e)[:200])
+
+        # Emit both the raw decision text (back-compat) and the new structured report.
+        await _emit(queue, "decision", {"result": final_output_raw})
+        await _emit(queue, "structured_report", {
+            "report": structured_report.to_dict(),
+            "sources": [s.to_dict() for s in retrieved_sources],
+            "source_quality": {sid: q.to_dict() for sid, q in source_quality_map.items()},
+            "scope": scope.to_dict(),
+            "verification": verification_stats,
+        })
         await _emit(queue, "step", {"step": "decision_maker", "status": "done"})
-        log_event(run_id, "decision_maker", status="done", response=final_output)
+        log_event(run_id, "decision_maker", status="done",
+                  response=final_output_raw[:2000] if final_output_raw else "",
+                  prompt=f"cited_ids={sorted(cited_ids)}, "
+                         f"confidence_band={final_confidence.band}, "
+                         f"source_count={len(retrieved_sources)}")
 
         # ===== COST TRACKING =====
         try:
@@ -525,7 +682,7 @@ async def run_pipeline(
                 if mo.get("status") == "success" and mo.get("response_content"):
                     c = estimate_cost(
                         mo["model_name"],
-                        len(prompt) + 500,  # approx input
+                        len(prompt) + 500,
                         len(mo["response_content"]),
                     )
                     model_costs.append({"model": mo["model_name"], "cost_usd": round(c, 6)})
@@ -546,7 +703,7 @@ async def run_pipeline(
                 refined_prompt=refined_prompt,
                 models=models,
                 strategist_output=all_strategist,
-                decision_output=final_output,
+                decision_output=final_output_raw,
                 mode=mode,
                 quick_mode=quick_mode,
                 attachments=attachments,

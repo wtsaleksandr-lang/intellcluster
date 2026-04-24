@@ -70,6 +70,8 @@ PUBLIC_ROUTES = [
     # Phronesis OS advisory — new in V1.5
     ("/advisory", 200),
     ("/advisory/result/does-not-exist", 404),
+    # Synthesis PDF export (returns 404 for unknown run, 200 for known).
+    ("/synthesis/result/does-not-exist.pdf", 404),
     ("/advisory/api/session/does-not-exist", 404),
     # Magic-link auth
     ("/login", 200),

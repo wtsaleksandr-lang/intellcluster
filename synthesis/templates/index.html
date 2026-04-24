@@ -380,6 +380,14 @@ goBtn.addEventListener('click', async () => {
       setProgress(100, 'Analysis complete');
       pFill.classList.add('done');
       setTimeout(() => { PS.style.display = 'none'; renderFinal(d); }, 500);
+    } else if (event === 'progress_message') {
+      // Humanised one-liners from the pipeline (retrieval phases etc.).
+      if (d && d.message && pTitle) {
+        pTitle.textContent = d.message;
+      }
+    } else if (event === 'retrieval_progress' || event === 'source_added') {
+      // Reserved for future granular UI; currently the pipeline also
+      // emits progress_message strings that drive the label already.
     } else if (event === 'error') {
       throw new Error(d.message || 'Pipeline error');
     }
