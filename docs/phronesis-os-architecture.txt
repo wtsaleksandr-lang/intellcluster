@@ -1,0 +1,801 @@
+================================================================================
+INTELLCLUSTER PHRONESIS OS — STRATEGIC ARCHITECTURE
+================================================================================
+A blueprint for the next layer on top of what already exists.
+Written to ship, not to brainstorm.
+
+Date: 2026-04-23
+Author: Product architecture working document
+
+================================================================================
+EXECUTIVE FRAMING
+================================================================================
+
+The single hardest product decision is the one staring you in the face:
+what's the product? My honest read of your brief:
+
+Phronesis OS is not a "decision tool." It's a STRATEGIC ADVISOR IN A BOX —
+the thing a founder, operator, or ambitious individual would pay a McKinsey
+partner $800/hour to do, compressed into 60 seconds of AI reasoning with
+receipts. The competitor isn't ChatGPT. The competitor is THE HOUR YOU'D
+SPEND SECOND-GUESSING, and the $800 you'd pay a human advisor you don't have.
+
+The category to own, phrased the way a buyer would type it into a search bar:
+
+  "What should I do about X, and why?"
+
+Everything below serves that one sentence.
+
+
+================================================================================
+1. AI-LED USER INTAKE (MAX-5 MCQ)
+================================================================================
+
+THE OPENING MOVE
+----------------
+One input box. One placeholder. No menus. No category pickers.
+
+  What are you trying to figure out?
+  e.g. "Should I take the senior engineer offer at Stripe or hold
+        for a promo at my current company?"
+
+On submit, an INTAKE AGENT analyzes the text and routes to at most 5
+clarifying MCQs, chosen dynamically from a question bank of ~40 primitives.
+Never ask all 40 — only the ones with the highest information gain for this
+specific question.
+
+THE MCQ QUESTION BANK (curated, not exhaustive)
+-----------------------------------------------
+These are the PRIMITIVES — the LLM picks 3–5 that best reduce ambiguity:
+
+Context primitives:
+  - What matters most right now?
+    [ Save money / Grow income / Reduce stress / Long-term upside / Status ]
+  - What's your timeline?
+    [ This week / 1 month / 3 months / 1 year / Flexible ]
+  - What risk level suits you?
+    [ Low (protect what I have) / Moderate (balanced) / High (go big) ]
+  - How reversible is this?
+    [ One-way door / Hard to unwind / Mostly reversible / Fully reversible ]
+  - Who else is affected?
+    [ Just me / My family / My team / My company / Customers ]
+
+Situation primitives:
+  - Current financial posture: Tight / Stable / Strong / Very strong
+  - How much context do I have on the options?
+    I know these well / some / very little
+  - Do you have a strong gut preference already?
+    Yes option A / Yes option B / No strong lean
+  - What's the cost of being wrong?
+    Low ($, weeks) / Medium ($$, months) / High ($$$, year+) / Career-defining
+
+Advisory-mode primitives:
+  - What role do you want me to play?
+    Straight analyst / Skeptical devil's advocate / Practical operator / Balanced
+  - How confident do you want the advice?
+    Only if highly confident / Give me the lean either way / Full spectrum
+
+RULES FOR THE INTAKE AGENT
+--------------------------
+1. Max 5 questions. Hard cap. If the model thinks it needs more, that's a
+   signal to answer anyway with lower confidence, not to ask more.
+2. Never ask a question already answered in the free-text input. If the user
+   wrote "I have 90 days," don't ask timeline.
+3. Each question must have measurable impact on the recommendation. If
+   swapping answer A for answer B doesn't change the output, the question
+   shouldn't be asked.
+4. Show a progress indicator (Question 2 of 4) so the user knows the end
+   is close.
+5. Allow "skip / not sure" on every question — the Clarifier Agent can
+   infer. Don't force false precision.
+
+ALTERNATIVE PATH: "SKIP QUESTIONS"
+----------------------------------
+A permanent button on the first MCQ: "Just give me the best take you can
+with what I've told you so far." Lower-confidence output, but ships in ~20
+seconds instead of ~45. Critical for users who just want a fast read.
+
+
+================================================================================
+2. AUTO-CLASSIFICATION
+================================================================================
+
+After intake, but before the advisory run, the CATEGORY AGENT reads the
+question and assigns a primary + secondary category.
+
+CATEGORIES (pick the minimum viable set — 9 is plenty)
+------------------------------------------------------
+  career       Should I take this job?
+  purchase     MacBook Air vs ThinkPad?
+  business     Should I start this company?
+  finance      Rent vs buy? Pay off debt vs invest?
+  vendor       Which CRM? Which cloud?
+  relocation   Move to Lisbon?
+  strategic    Should we enter this market?
+  personal     Should I have this conversation with my partner?
+  exploratory  I'm stuck. Help me think.
+
+THE CONFIRMATION UI
+-------------------
+Single line above the Running-Council panel:
+
+  "This looks like a CAREER GROWTH call."  [Correct] [Change] [Not sure]
+
+  - Correct  → continues immediately
+  - Change   → surfaces a 9-chip picker
+  - Not sure → Council runs in exploratory mode, drops category-specific
+               agents and leans harder on the Criteria Architect + Skeptic
+
+Don't block on this. If the user doesn't click anything within 3 seconds,
+proceed with the inferred category and an unobtrusive "category: career
+growth · change?" link near the output.
+
+
+================================================================================
+3. MULTI-AGENT ADVISORY COUNCIL
+================================================================================
+
+THE CORE IP. This is what makes Phronesis OS different from "prompt Claude
+harder." It's also the hardest part to build well.
+
+AGENT ROSTER
+------------
+
+ 1. INTAKE AGENT
+    Runs: Every run
+    Input:  Raw free-text + (optional) MCQ answers
+    Output: Structured {question, goal, constraints, timeline, risk,
+            reversibility, stakes}
+    Failure mode fixed: Users phrasing vague questions; LLMs making up
+    context that wasn't stated.
+
+ 2. CLARIFIER AGENT
+    Runs: If intake structure has low confidence
+    Input:  Intake output
+    Output: 3–5 MCQ chosen from primitives bank
+    Failure mode fixed: Wasted analysis on under-specified input.
+
+ 3. CATEGORY AGENT
+    Runs: Every run, parallel with Intake
+    Input:  Intake output
+    Output: {primary_cat, secondary_cat, confidence} + routing instructions
+            for domain agents
+    Failure mode fixed: Generic advice that ignores category-specific
+    heuristics.
+
+ 4. CRITERIA ARCHITECT
+    Runs: Every run
+    Input:  Intake + Category
+    Output: Weighted criteria list (auto-generated, user can edit)
+    Failure mode fixed: Users who don't know what "criteria" even means;
+    LLMs that skip weighting.
+
+ 5. EVIDENCE AGENT
+    Runs: Every run
+    Input:  Intake + Criteria
+    Output: Relevant facts, benchmarks, base rates, cited sources (pulls
+            from web search + seeded data)
+    Failure mode fixed: LLM hallucinated statistics.
+
+ 6. BLIND SCORING AGENTS × 3
+    Runs: Every run, parallel
+    Input:  Shuffled options + Criteria + Evidence
+    Output: Per-option scores across criteria, blind to option names
+    Failure mode fixed: Anchoring bias; recognition bias.
+
+ 7. DOMAIN EXPERT AGENT (variable persona)
+    Runs: Routed by Category Agent
+    Input:  Intake + Evidence
+    Output: Category-specific reasoning (career coach / financial planner
+            / strategy consultant persona)
+    Failure mode fixed: One-size-fits-all reasoning.
+
+ 8. RED-TEAM / SKEPTIC AGENT
+    Runs: Every run, AFTER blind scoring
+    Input:  Preliminary recommendation from blind scorers
+    Output: Strongest 3 arguments AGAINST the leading option
+    Failure mode fixed: Confident wrong answers.
+
+ 9. PRE-MORTEM AGENT
+    Runs: Every run
+    Input:  Leading recommendation
+    Output: 2–3 plausible failure scenarios with probabilities
+    Failure mode fixed: Ignored downside risk.
+
+10. OPPORTUNITY COST AGENT
+    Runs: Every run with budget/time stakes
+    Input:  Intake + Leading option
+    Output: "What are you giving up by doing this?" — explicit alternatives
+            you're declining
+    Failure mode fixed: Hidden trade-offs.
+
+11. REVERSIBILITY AGENT
+    Runs: Every run
+    Input:  Intake + Leading option
+    Output: Classification (one-way / hard to unwind / reversible) +
+            cost-to-reverse estimate
+    Failure mode fixed: Treating reversible and irreversible decisions
+    identically.
+
+12. SCENARIO AGENT
+    Runs: Every run on strategic/business inputs
+    Input:  Leading option + Evidence
+    Output: 3 scenarios — base case, good case, bad case
+    Failure mode fixed: Planning only for the median world.
+
+13. CONSENSUS AGENT
+    Runs: After blind scoring + red-team + pre-mortem
+    Input:  All agents' outputs
+    Output: Aggregated ranking + explicit AGREEMENT LEVEL (unanimous /
+            split / fragmented)
+    Failure mode fixed: Hiding real disagreement behind an averaged
+    "confidence" number.
+
+14. CONFIDENCE CALIBRATOR
+    Runs: Last, runs on Consensus output
+    Input:  All prior outputs + historical calibration data
+    Output: Final confidence score (50–95%) + what would change it
+    Failure mode fixed: Overclaiming confidence.
+
+15. FINAL ADVICE WRITER
+    Runs: Last
+    Input:  Everything
+    Output: The user-facing brief in the exact shape users want (§4)
+    Failure mode fixed: LLMs that dump raw analysis instead of delivering
+    a recommendation.
+
+ORCHESTRATION PIPELINE
+----------------------
+
+  [User input]
+      ↓
+  Intake ──┬──► Category Agent ──► Domain Expert selection
+           └──► Clarifier (optional MCQ)
+                       ↓
+                Criteria Architect
+                       ↓
+                Evidence Agent  [web search if useful]
+                       ↓
+      ┌────────────────┼────────────────┐
+      ▼                ▼                ▼
+   Blind Scorer 1  Blind Scorer 2  Blind Scorer 3   (parallel)
+      └────────────────┬────────────────┘
+                       ▼
+            [Preliminary ranking]
+                       ▼
+      ┌────────────────┼────────────────┬────────────────┐
+      ▼                ▼                ▼                ▼
+   Red-Team      Pre-Mortem      Opportunity       Scenario
+   Agent         Agent           Cost Agent        Agent     (parallel)
+      └────────────────┬────────────────┴────────────────┘
+                       ▼
+                Consensus Agent
+                       ▼
+             Confidence Calibrator
+                       ▼
+              Final Advice Writer
+                       ▼
+              [User-facing brief]
+
+WALL-CLOCK TARGET: 20–60 seconds for standard runs, up to 120s for strategic
+runs that involve Evidence + Scenario. Stream progress events like the
+existing Synthesis does.
+
+WHY THIS BEATS A SINGLE LLM CALL
+--------------------------------
+Three specific mechanisms, each independently measurable:
+
+1. BLIND SCORING eliminates name recognition bias — proven effect in our
+   existing Phronesis benchmark (65% win rate vs single Claude).
+2. ADVERSARIAL AGENTS (Red-Team + Pre-Mortem) catch the overconfidence that
+   kills 30–40% of single-LLM advisory outputs.
+3. CALIBRATION FEEDBACK LOOP over time: when users rate outcomes on
+   /account, the Confidence Calibrator's mapping improves. After 500
+   graded outcomes, our confidence scores become MEASURABLY CALIBRATED —
+   a moat no single-model assistant can replicate.
+
+
+================================================================================
+4. FINAL OUTPUT PHILOSOPHY
+================================================================================
+
+The single most important rule: USERS WANT A RECOMMENDATION, NOT A REPORT.
+The brief should lead with the answer, not bury it under caveats.
+
+THE TEMPLATE
+------------
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RECOMMENDED BEST MOVE          [confidence: 78%]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Take the Stripe offer.
+
+One sentence why, written in the second person:
+→ Your top-weighted criterion (long-term upside) and
+  second (comp) both favor Stripe; reversibility is
+  moderate either way, and staying for the promo has
+  a 40% chance of not materializing within your 3-
+  month window.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RANKED ALTERNATIVES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. Take Stripe offer         8.7 ████████▊
+  2. Counter-offer at current  7.1 ███████▏
+  3. Stay and wait for promo   5.4 █████▍
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHY THIS RECOMMENDATION WINS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• 3 of 3 analysts converge on Stripe
+• Dominant on: upside, comp, career trajectory
+• Opportunity cost of staying > cost of switching
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WHAT COULD CHANGE THIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• If your current company confirms the promo in
+  writing within 14 days → recommendation flips
+• If Stripe's equity becomes illiquid → weakens
+• If you prioritize stress reduction over upside
+  → counter-offer becomes the best move
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RISKS / DOWNSIDES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Ramp-up cost: ~90 days before you're contributing at level
+• Cultural unknown: Stripe's velocity may not suit
+• Vesting cliff: you give up ~8 months of current RSU
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IF WE WERE YOU, WE'D DO THIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Respond to Stripe: "Interested, need 5 days"
+2. Today: ask current manager for promo timeline in writing
+3. Day 5: if no written promo commitment, accept Stripe
+4. If promo commitment arrives Day 2–5: decide then
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COPY PRINCIPLES
+---------------
+- Second person, active voice.
+  "Take the offer" not "The user should consider accepting."
+- Numbers where they help.
+  "78% confident" > "high confidence."
+  "40% chance promo doesn't materialize" > "promo may not happen."
+- Named failure modes.
+  Not "risks" in the abstract — specific conditions that would flip the
+  recommendation.
+- End with an action ladder.
+  "If X, do Y. If not X by day 5, do Z."
+  The user should know what to do in the next hour.
+- Never ship without the "What could change this" section.
+  This is the honesty tax that builds long-term trust.
+
+
+================================================================================
+5. VISUAL TRUST DASHBOARD
+================================================================================
+
+The UI challenge: look SCIENTIFIC without looking cold. Premium without
+looking expensive. The reference point is Bloomberg Terminal ∩ Linear, not
+Duolingo.
+
+REQUIRED MODULES
+----------------
+
+RANKING BAR — single accent color, tabular numerals, no gradients.
+
+  Option A  ████████████▊        8.7
+  Option B  ██████████▏          7.2
+  Option C  ██████▍              5.1
+
+CONSENSUS BAR — three segments showing agent agreement level.
+
+  UNANIMOUS on winner       3 / 3 analysts
+  SPLIT on cost dimension   2 / 3 → Option A
+
+CONFIDENCE METER — horizontal gauge, 50–95 scale, with active bucket labeled.
+
+  [░░░░░░░░░░░░░░░██████████████░░░░]  78%  MODERATE-HIGH
+    50      65       75         85     95
+
+RISK INDICATORS — three named risks as small cards, each with a dot color
+and a probability range.
+
+AGENT AGREEMENT HEATMAP — a compact 3×6 grid showing, for each analyst ×
+criterion, whether that analyst ranked the winner on that dimension.
+  Green  = ranked #1
+  Yellow = #2
+  Gray   = lower
+Lets the user spot exactly where disagreement lives.
+
+SCENARIO CARDS — 3 cards (base / good / bad) with one-line outcomes and
+numbered probabilities.
+
+CRITERIA SCORE BREAKDOWN — a simple table, winner highlighted.
+
+VISUAL RULES
+------------
+- Color palette: neutrals + one accent (orange) + green (strength) + amber
+  (caution) + red (weakness). Four colors total. No rainbow.
+- Typography: Instrument Serif for headers, DM Sans for body, JetBrains
+  Mono for numbers. Tabular numerals everywhere numbers line up in columns.
+- Density: scan-readable in 8 seconds, deep-readable in 90. No infinite
+  scroll.
+- Motion: used once per module, not continuously. Entry reveal, then rest.
+- No "AI" icons. No sparkles, no wands. The reasoning is the wow, not
+  the chrome.
+
+
+================================================================================
+6. RECOMMENDATION ENGINE FORMULA
+================================================================================
+
+The internal scoring function — explainable enough to print on a customer's
+receipt.
+
+  final_score(option)
+    =  (weighted_criteria_score)                    [40% of weight]
+    +  (agent_consensus_bonus)                      [20%]
+    −  (risk_penalty × risk_severity)               [15%]
+    −  (opportunity_cost × time_sensitivity)        [10%]
+    +  (reversibility_bonus)                        [10%]
+    +  (evidence_strength_bonus)                    [5%]
+
+  where:
+    weighted_criteria_score  = Σ( score[i] × weight[i] ) across the N criteria
+    agent_consensus_bonus    = +0.8 if 3/3 agree, +0.3 if 2/3, 0 if split
+    risk_penalty             = sum of pre-mortem probabilities × severity (1–5)
+    opportunity_cost         = explicit alternative's expected value × declined
+    reversibility_bonus      = +0.5 if fully reversible, 0 if neutral,
+                               −0.5 if one-way with high stakes
+    evidence_strength_bonus  = +0.3 if Evidence Agent cited 3+ sources,
+                               +0.1 if 1–2, 0 if none
+
+  confidence_score
+    = 50
+    + (agent_consensus_component, up to +20)
+    + (evidence_component, up to +15)
+    + (historical_calibration_adjustment, −10 to +10)
+
+EXPLAINABILITY RULE: every number in the final brief traces back to exactly
+one of these terms. If a user asks "why 78%?", the tool can show them the
+math. This is the single biggest differentiator from "GPT told me so."
+
+
+================================================================================
+7. TRUST LANGUAGE & POSITIONING COPY
+================================================================================
+
+PRODUCT NAME HIERARCHY
+----------------------
+Brand:           IntellCluster
+Product line:    Phronesis OS (keep the name — it carries the scientific weight)
+What it is:      "Your strategic advisory council"
+One-liner:       "Evidence-backed recommendations for what to do next"
+Paragraph:       "Phronesis OS is a multi-agent advisory system. You bring the
+                  question; fifteen specialized AI analysts bring the reasoning.
+                  You leave with a recommendation you can act on — with the
+                  exact conditions that would change it."
+
+KILL LIST (never use)
+---------------------
+- "Decision-making tool"
+- "Decision helper"
+- "AI that decides for you"
+- "Powered by advanced AI"             (empty)
+- "Make better decisions"              (generic)
+- "AI-powered recommendations"         (shallow)
+
+USE INSTEAD
+-----------
+Instead of                    Use
+----------                    ---
+"Make a decision"             "Figure out the best next move"
+"Decision score"              "Recommendation strength"
+"High confidence"             "78%, moderate-high"
+"AI recommendation"           "Council recommendation"
+"Our AI says…"                "Three of three analysts agree…"
+"Best choice"                 "Strongest move"
+"Decision tool"               "Advisory engine"
+
+POSITIONING TAGLINES (for A/B testing)
+--------------------------------------
+1. "What should I do next?" — now answered properly.
+2. Fifteen analysts. One recommendation. Reasoning you can show your boss.
+3. The advisory council McKinsey charges $800 an hour for.
+   Ours runs in 60 seconds.
+4. Evidence-backed moves, not AI guesses.
+5. Phronesis OS — strategic guidance, with receipts.
+
+HERO COPY FOR THE HOMEPAGE
+--------------------------
+
+  Phronesis OS
+  Fifteen analysts. One recommendation.
+  Every step of the reasoning, shown.
+
+  Bring any real-world call — career, purchase, strategy, finance — and
+  Phronesis OS runs a structured advisory council on it. Fifteen specialized
+  AI agents evaluate your options across evidence, risk, opportunity cost,
+  and reversibility. You leave with the strongest move, the runners-up, and
+  the exact conditions that would flip the answer.
+
+  [Start a free advisory session →]
+
+
+================================================================================
+8. DEMO EXPERIENCE
+================================================================================
+
+The demo has to pass the "would a skeptical CTO pause their scroll" test.
+Design it as a LIVE, PINNED, SCROLL-DRIVEN PIPELINE with the user's input as
+the anchor.
+
+THE PINNED HERO DEMO
+--------------------
+Placement: directly below the headline on /. The user types (or picks a
+seeded example: "Should I buy MacBook Air M3 or ThinkPad X1?") and the
+pipeline runs on the page — no nav away.
+
+6-station horizontal pipeline (or vertical on mobile):
+
+   01           02                    03              04             05         06
+  INTAKE → CLARIFY PRIORITIES → BLIND SCORING → EXPERT REVIEW → CONSENSUS → RECOMMENDATION
+           (2–4 MCQ)             (3 analysts)   (red-team)     (agreement   (final brief)
+                                                                scan)
+
+Each station:
+- LEFT COLUMN: station name, mono label, small status dot (idle / running / done).
+- RIGHT COLUMN: live preview of what that station produced — intake's
+  structured parse, clarifier's 4 selected MCQs, blind scorers' sealed
+  score cards, red-team's counter-arguments, consensus's agreement map,
+  final's recommendation card.
+
+When a station completes, its right-column content fades in. The overall run
+takes ~45 seconds — fast enough to keep attention, slow enough to SHOW THE
+WORK.
+
+WHAT MAKES IT IMPRESSIVE
+------------------------
+- The user's own input is in every station header.
+  "Intake: Should I buy MacBook Air M3 or ThinkPad X1?"
+  Keeps it from feeling like a canned demo.
+- Live counters. "Analyst 2 scoring on dimension 3 of 6…" with a progress
+  bar. This is the visible labor that makes "$800/hour advisor" believable.
+- Blur + reveal on the final station. The recommendation card starts blurred
+  and resolves into focus as the Consensus Agent finishes — functions as a
+  payoff moment.
+- "How we got here" button at the bottom of the final card expands a trace
+  of every intermediate step, with the scoring math visible.
+
+SEEDED EXAMPLES PANEL
+---------------------
+Below the demo, 6 chips with real use cases:
+- Should I take the senior engineer offer at Stripe?
+- MacBook Air M3 or ThinkPad X1 for my workflow?
+- Should I move from Berlin to Lisbon?
+- Build in-house or buy the SaaS?
+- Raise a seed round now or bootstrap 12 more months?
+- Start the side project or focus on my day job?
+
+Each chip prefills the input and re-runs the demo. Low-friction exploration.
+
+
+================================================================================
+9. MVP PRODUCT
+================================================================================
+
+The smallest version that's genuinely useful, not the biggest version that's
+technically impressive.
+
+MVP v0 (SHIP IN 2–3 WEEKS FROM EXISTING PHRONESIS BASE)
+-------------------------------------------------------
+
+REUSE from what already exists:
+- Composer + streaming SSE pipeline  ✓
+- Three blind analyst models         ✓
+- Weighted criteria + confidence scoring  ✓
+- Shareable /result/{run_id} URLs    ✓
+- PDF + JSON export                  ✓
+- Magic-link auth + account history  ✓
+
+NEW for MVP (the delta):
+1. INTAKE AGENT + CLARIFIER: replace the current free-text-only flow with
+   the MCQ layer. ~1 week.
+2. RED-TEAM + PRE-MORTEM AGENTS: wire two new agents into the pipeline
+   after blind scoring. Use the existing SSE streaming to surface them as
+   two more visible stations. ~3 days.
+3. FINAL ADVICE WRITER TEMPLATE: replace the current ranked-output renderer
+   with the "Recommended Best Move / If we were you" format from §4. ~3 days.
+4. REFRAME ALL COPY from "decision" to "advice / recommendation / move".
+   Homepage, pricing, FAQ, email templates, result page. ~2 days.
+
+SKIP for MVP:
+- Evidence Agent (needs web search integration — add in v1)
+- Domain Expert routing (complex; use generalist for MVP)
+- Opportunity Cost & Reversibility as separate agents (fold into Red-Team)
+- Scenario Agent (add in v1 for strategic category only)
+
+TOP 3 LAUNCH USE CASES
+----------------------
+Pick the three with the highest "would I pay for this" latent willingness:
+
+1. CAREER MOVES — job offers, promotion decisions, side-project-vs-focus,
+   should-I-quit. Highest emotional stakes, highest $ willingness. Seed 20
+   templates.
+2. PURCHASE DECISIONS $2K+ — laptops, cars, big tools, SaaS stacks.
+   Recurring use case, shareable output, fits the "3 blind analysts"
+   narrative perfectly. Seed 20 templates.
+3. STRATEGIC BUSINESS CALLS — build/buy, raise/bootstrap, hire/contract,
+   market entry. Highest willingness-to-pay-Pro. Seed 10 detailed scenarios.
+
+PRICING MODEL
+-------------
+Match what's already there; don't reinvent.
+
+- FREE   — 5 advisory runs/month, standard tier, no Evidence Agent
+- PRO    ($19/mo) — 200 runs, all agents incl. Evidence + Scenario, PDF
+          export, run history, no ads
+- TEAM   ($49/mo) — 5 seats, shared workspace, advisor-level Scenario
+          output, SSO
+
+Credit packs for bursts. Annual = 22% off.
+Existing Stripe flow handles all of this.
+
+RETENTION LOOP (why users come back weekly)
+-------------------------------------------
+Three mechanisms layered:
+
+1. OUTCOME REMINDER AT DAY 14 — the loop already built. After a user rates
+   how the outcome actually went, the system becomes measurably more
+   calibrated for THEM SPECIFICALLY. Calibration compounds → perceived magic.
+2. DECISION JOURNAL FEED on /account — every run they've done, searchable,
+   with the ability to re-run with updated context ("If I knew then what I
+   know now…"). Turns the tool into a personal thinking archive, which is
+   inherently sticky.
+3. WEEKLY "OPEN LOOPS" DIGEST EMAIL — if they have 3+ runs with ratings
+   pending, send a Monday digest: "Three of your recent calls are due for
+   an outcome check. 30 seconds total." Trains weekly return.
+
+EXPANSION PATH (v1 → v2 → v3)
+------------------------------
+- v1 (month 3):  Evidence Agent with web search. Scenario Agent for
+                 strategic category.
+- v2 (month 6):  Teams feature — shared workspace, runs owned by multiple
+                 people, approval flows.
+- v3 (month 9–12): Advisor marketplace — third parties publish agent
+                   personas (e.g. "John Doerr's deal evaluator") that users
+                   can plug into their council. Revenue share.
+
+
+================================================================================
+10. BRUTAL VERDICT
+================================================================================
+
+CAN THIS BECOME A GENUINELY STRONG SAAS? YES — CONDITIONALLY.
+-------------------------------------------------------------
+The category is real and underserved. "What should I do next" is the single
+most common question humans ask, and ChatGPT's answer to it is structurally
+mediocre because chat is a single-model, single-prompt format. You're
+building the right thing.
+
+But this category is a cemetery for undifferentiated AI startups. Every
+other Y Combinator batch has 3–5 "AI decides for you" pitches. The graveyard
+is deep. The reason they fail is not that the idea is wrong — the reason
+they fail is that they ship a prettier wrapper around a single LLM call and
+call it a council.
+
+CAN IT OUTPERFORM SINGLE-CHAT AI ASSISTANTS?
+--------------------------------------------
+YES, on specific measurable axes. NO, on others.
+
+- OUTPUT QUALITY on complex questions: yes, proven by existing 65% win
+  rate benchmark. Expand that benchmark, publish it quarterly, make it a
+  marketing asset.
+- CALIBRATED CONFIDENCE: yes, and this is the durable moat. ChatGPT cannot
+  do honest confidence; they're trained on RLHF that punishes hedging.
+  We can.
+- SPEED: no. ChatGPT answers in 4 seconds. Ours answers in 45. The pitch
+  has to be "worth waiting for," not "fast."
+- CONVERSATIONAL DEPTH: no. ChatGPT can iterate 20 turns. Don't try to
+  out-chat them. Stay structured.
+
+WHAT WOULD MAKE IT ELITE
+------------------------
+1. Ship the calibration loop first, not the pretty UI. Every run rated →
+   every future run's confidence improves → after 12 months, our confidence
+   number is the most accurate in the category. That's the moat.
+2. Publish the benchmark. Quarterly, against ChatGPT / Claude / Gemini, on
+   a public 100-question test set. If we're confident, this becomes free
+   marketing. If we're not, we shouldn't be shipping.
+3. Put the agents' disagreements on the front page. Competitors hide
+   disagreement. Our brand is "we show it." This is a content strategy, a
+   UI strategy, and a trust strategy simultaneously.
+4. Earn one category deeply before expanding. Career decisions is the pick
+   — highest stakes, highest willingness to pay, most shareable. Win it
+   first, then adjacent (finance, strategic business).
+5. One obsessive UX detail. Linear has keyboard shortcuts. Figma has
+   multiplayer. Ours should be: the 6-station visible reasoning trace.
+   Make it so well-executed that users screenshot it and tweet it.
+
+WHAT WOULD MAKE IT FAIL
+-----------------------
+1. Chasing ChatGPT-shaped UX. If users type → wait → read a paragraph, we
+   lose. The whole product is in the structure of the output and the
+   visible reasoning.
+2. Overclaiming accuracy. If one user acts on a recommendation that turns
+   out badly and their complaint goes viral, our confidence numbers are
+   our defense. Overclaim them and we're finished.
+3. Agent sprawl. 15 agents is the brief; 15 agents is probably too many to
+   ship. Start with 6–8 and expand ONLY when outcome data justifies each
+   new agent.
+4. Generalist trap. "Help with any decision" is a positioning disaster.
+   Pick career. Win career. Then expand.
+5. Ignoring the session loop. A one-shot advisor has no retention. The
+   decision journal + outcome feedback is not optional — it's the product.
+6. Running our own models. Don't. Orchestrate frontier models. Let OpenAI
+   and Anthropic pay for the capex; we own the orchestration layer and
+   the calibration data. That's a venture-scale business; running our own
+   models is a $1M+ infrastructure tax.
+
+THE HONEST 18-MONTH BET
+-----------------------
+Probability of becoming a real business:
+
+- Launch MVP in 3 weeks with existing Phronesis base + 4 delta items:
+                                                              85%
+- Get to $10k MRR in 6 months:                                 40%
+  (mostly depends on whether category landing pages rank on SEO;
+   the 26 blog articles help)
+- Get to $100k MRR in 18 months:                               15%
+  (requires winning one vertical deeply + building a brand around the
+   blind-jury + calibration message)
+- Becoming a meaningful category leader ("when you want real advice, you
+  use Phronesis OS") — the venture outcome:                     5%
+  (possible, not probable; requires unusual execution consistency over
+   24+ months)
+
+5% is not small. Most SaaS bets are 1%. We're starting from a defensible
+position: real multi-model benchmark data, shipped product, pricing system
+already working, blog + SEO compounding. The 5% is earned by SHIPPING THE
+CALIBRATION LOOP AND NOT CHASING CHAT UX.
+
+THE ONE-SENTENCE SUMMARY
+------------------------
+
+  Build the advisory council with visible reasoning and calibrated
+  confidence; win career decisions first; publish the benchmark quarterly;
+  don't try to out-chat ChatGPT, out-STRUCTURE it.
+
+
+================================================================================
+EXECUTION PLAN — IF YOU SAY GO
+================================================================================
+
+Week 1:      Rewrite all user-facing copy from "decision" to "advice /
+             recommendation / next move". Ship the new homepage hero +
+             tagline. Rename the shipped Phronesis tool page to "Advisory
+             Council." Smoke test, push.
+
+Week 1–2:    Build the Intake + Clarifier MCQ layer. Insert before the
+             existing pipeline. Ship.
+
+Week 2–3:    Add Red-Team and Pre-Mortem agents as two new SSE-streamed
+             stations. Upgrade the result page to the "Recommended Best
+             Move / If we were you" format.
+
+Week 3:      Launch the 6-station pinned demo on /. Record Loom. Share.
+
+Week 4:      Quarterly benchmark v1 published on /blog. Compare Phronesis
+             OS vs raw GPT-4 vs raw Claude on 50 seeded advisory questions.
+
+Say the word and we start with step 1. Everything above is architecture;
+the execution plan takes 3–4 weeks from the existing Phronesis codebase.
+
+
+================================================================================
+END OF DOCUMENT
+================================================================================
