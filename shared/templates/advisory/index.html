@@ -283,6 +283,18 @@
 
   {# ─── Stage 1: input ─── #}
   <section id="stageInput">
+    {# Resume banner — shown only when localStorage has a pending session #}
+    <div id="resumeBanner" style="display:none;max-width:640px;margin:20px auto 0;padding:14px 18px;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:10px;display:none;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <div class="t-mono" style="font-size:10px;letter-spacing:1.4px;color:var(--accent);text-transform:uppercase;margin-bottom:4px;">Session in progress</div>
+        <div id="resumeQuestion" style="font-size:13.5px;color:var(--text-primary);line-height:1.5;"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" id="resumeBtn" style="padding:8px 16px;background:var(--accent);color:#fff;border:0;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer;">Resume</button>
+        <button type="button" id="discardBtn" style="padding:8px 16px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer;">Start fresh</button>
+      </div>
+    </div>
+
     <div class="adv-hero rv">
       <span class="fin-label" style="margin:0 auto;display:inline-flex;">ADVISORY COUNCIL <span>·</span> PHRONESIS OS</span>
       <h1>Seven analysts. <em>One recommendation.</em> Reasoning, shown.</h1>
@@ -426,6 +438,48 @@
   const stagePipe = el('stagePipe');
   const stageError = el('stageError');
 
+  // ─── Session resumption scaffolding ───
+  // When the Intake + Clarifier finishes, we stash the {runId, questions,
+  // category, idx, answers} in localStorage under a 1-hour TTL key. On
+  // page reload the user sees a "Resume previous advisory?" banner above
+  // the input instead of losing their progress.
+  //
+  // Caveats (these are the scaffolding parts):
+  //   * The session on the server may have already progressed to the
+  //     council phase if the user was mid-submit when they refreshed.
+  //     We check server state via GET /advisory/api/session/{run_id} —
+  //     if stage !== 'awaiting_answers', we discard the local state and
+  //     let the user start fresh or navigate to their result page.
+  //   * TTL is 1 hour. Longer is risky — the user's intent may have
+  //     changed and a half-remembered run creates confusion.
+  //   * If the user starts a fresh advisory, we overwrite the stash.
+  const STASH_KEY = 'ic_advisory_pending';
+  const STASH_TTL_MS = 60 * 60 * 1000;   // 1 hour
+
+  function stash(data) {
+    try {
+      localStorage.setItem(STASH_KEY, JSON.stringify({
+        ...data, saved_at: Date.now(),
+      }));
+    } catch (e) { /* localStorage can fail in Safari private mode */ }
+  }
+  function readStash() {
+    try {
+      const raw = localStorage.getItem(STASH_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (!data || !data.saved_at) return null;
+      if (Date.now() - data.saved_at > STASH_TTL_MS) {
+        localStorage.removeItem(STASH_KEY);
+        return null;
+      }
+      return data;
+    } catch (e) { return null; }
+  }
+  function clearStash() {
+    try { localStorage.removeItem(STASH_KEY); } catch (e) {}
+  }
+
   const state = {
     runId: null,
     questions: [],
@@ -433,6 +487,57 @@
     category: null,
     idx: 0,
   };
+
+  // ─── Boot: check for a resumable session ───
+  (async function checkResumable() {
+    const stashed = readStash();
+    if (!stashed || !stashed.runId) return;
+
+    // Verify the server still has it and it's still awaiting answers.
+    try {
+      const r = await fetch('/advisory/api/session/' + encodeURIComponent(stashed.runId));
+      if (!r.ok) throw new Error('gone');
+      const remote = await r.json();
+      if (remote.stage !== 'awaiting_answers') {
+        // Server already moved on; either already running the council or
+        // finished. If finished, offer the result link.
+        clearStash();
+        if (remote.stage === 'done') {
+          // Silent — don't interrupt a fresh visit. User can find it in
+          // /account or via the shared URL.
+        }
+        return;
+      }
+
+      // All good — show the banner.
+      const banner = document.getElementById('resumeBanner');
+      const qEl = document.getElementById('resumeQuestion');
+      const q = (remote.intake && remote.intake.advisory_question) ||
+                stashed.raw_input || 'Your previous advisory session';
+      qEl.textContent = q;
+      banner.style.display = 'flex';
+
+      document.getElementById('resumeBtn').addEventListener('click', () => {
+        state.runId = stashed.runId;
+        state.questions = stashed.questions || [];
+        state.answers = stashed.answers || {};
+        state.category = stashed.category || remote.category || null;
+        state.idx = Math.min(stashed.idx || 0, Math.max(0, state.questions.length - 1));
+        banner.style.display = 'none';
+        if (state.questions.length > 0 && state.idx < state.questions.length) {
+          showMCQ();
+        } else {
+          runCouncil();
+        }
+      });
+      document.getElementById('discardBtn').addEventListener('click', () => {
+        clearStash();
+        banner.style.display = 'none';
+      });
+    } catch (e) {
+      clearStash();
+    }
+  })();
 
   // Example chips populate the textarea.
   document.querySelectorAll('.adv-example').forEach(b => {
@@ -470,8 +575,17 @@
       state.idx = 0;
 
       if (state.questions.length > 0) {
+        stash({
+          runId: state.runId,
+          questions: state.questions,
+          answers: state.answers,
+          category: state.category,
+          idx: state.idx,
+          raw_input: input.value,
+        });
         showMCQ();
       } else {
+        clearStash();
         runCouncil();
       }
     } catch (e) {
@@ -547,27 +661,37 @@
     el('mcqNextBtn').disabled = !state.answers[q.id];
   }
 
-  el('mcqNextBtn').addEventListener('click', () => {
-    state.idx += 1;
+  function advanceOrRun() {
+    // Persist progress on each MCQ step
+    stash({
+      runId: state.runId,
+      questions: state.questions,
+      answers: state.answers,
+      category: state.category,
+      idx: state.idx,
+    });
     if (state.idx >= state.questions.length) {
+      clearStash();
       runCouncil();
     } else {
       renderQuestion();
     }
+  }
+
+  el('mcqNextBtn').addEventListener('click', () => {
+    state.idx += 1;
+    advanceOrRun();
   });
   el('mcqSkipBtn').addEventListener('click', () => {
     const q = state.questions[state.idx];
     if (q) state.answers[q.id] = null;
     state.idx += 1;
-    if (state.idx >= state.questions.length) {
-      runCouncil();
-    } else {
-      renderQuestion();
-    }
+    advanceOrRun();
   });
   el('mcqBypassBtn').addEventListener('click', () => {
     // Answer nothing; skip straight to the council run.
     state.answers = {};
+    clearStash();
     runCouncil();
   });
 

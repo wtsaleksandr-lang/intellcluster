@@ -98,6 +98,35 @@ async def run_council(session: AdvisorySession, emit: EmitFn) -> AdvisorySession
         # ─── Evidence Agent ───
         session.stage = AdvisoryStage.EVIDENCE.value
         _emit("stage_start", {"stage": "evidence"})
+
+        # Optional web search — runs only if TAVILY_API_KEY is set. Results
+        # are stashed on session._web_search_block so the Evidence Agent's
+        # (sync) build_user can read them. When unconfigured, this is a
+        # no-op.
+        try:
+            from .web_search import (
+                is_configured as _search_configured,
+                infer_search_queries,
+                search as _run_search,
+                format_for_prompt,
+            )
+            if _search_configured():
+                queries = infer_search_queries(session)
+                if queries:
+                    result_lists = await asyncio.gather(
+                        *[_run_search(q, max_results=4) for q in queries[:2]],
+                        return_exceptions=True,
+                    )
+                    combined = []
+                    for lst in result_lists:
+                        if isinstance(lst, list):
+                            combined.extend(lst)
+                    session._web_search_block = format_for_prompt(combined[:8])
+                    _emit("web_search", {"queries": queries, "n_results": len(combined)})
+        except Exception as e:
+            print(f"[pipeline] web search pre-step failed: {e}")
+            session._web_search_block = ""
+
         evidence_out = await EvidenceAgent().run(session=session)
         session.agent_outputs.append(evidence_out)
         ev_raw = evidence_out.raw or {}

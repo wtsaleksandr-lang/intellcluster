@@ -61,11 +61,20 @@ Respond ONLY with JSON:
             "budget": intake.budget if intake else None,
             "raw_user_input": session.raw_input,
         }
-        return (
-            f"Intake + raw user input:\n\n"
-            f"{json.dumps(intake_dict, indent=2)}\n\n"
-            "Produce the JSON evidence ledger now."
-        )
+
+        # Web search is OPTIONAL scaffolding. The pipeline orchestrator runs
+        # the async search BEFORE calling this agent and stashes a prompt
+        # fragment on session._web_search_block. When TAVILY_API_KEY isn't
+        # set, the fragment stays empty and the Agent behaves as before.
+        web_block = getattr(session, "_web_search_block", "") or ""
+
+        parts = [
+            f"Intake + raw user input:\n\n{json.dumps(intake_dict, indent=2)}",
+        ]
+        if web_block:
+            parts.extend(["", web_block])
+        parts.extend(["", "Produce the JSON evidence ledger now."])
+        return "\n\n".join(parts)
 
     def parse(self, data: dict[str, Any], **_) -> AgentOutput:
         facts = data.get("facts_from_user") or []
