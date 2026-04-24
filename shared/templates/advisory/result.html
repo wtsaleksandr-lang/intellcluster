@@ -434,6 +434,7 @@
   <div class="share-bar rv">
     <span class="lbl">Share</span>
     <button type="button" class="share-btn" id="copyLinkBtn">Copy link</button>
+    <a href="/advisory/result/{{ session.run_id }}.pdf" class="share-btn">Download PDF</a>
     <a href="/advisory/api/session/{{ session.run_id }}" class="share-btn" download="phronesis-{{ session.run_id }}.json">Download JSON</a>
     <a href="/advisory" class="share-btn" style="margin-left:auto;">New advisory →</a>
   </div>

@@ -828,6 +828,34 @@ async def advisory_home(request: Request):
     return templates.TemplateResponse(request, "advisory/index.html", {"tool": "phronesis"})
 
 
+@app.get("/advisory/result/{run_id}.pdf", include_in_schema=False)
+async def advisory_result_pdf(run_id: str):
+    """Download an advisory session as a branded PDF brief.
+    IMPORTANT: this route must be declared BEFORE /advisory/result/{run_id}
+    — FastAPI matches in declaration order, and the bare path parameter
+    would otherwise greedy-capture the '.pdf' suffix."""
+    from fastapi.responses import Response
+    from phronesis.advisory import get_session
+    from shared.exporters.advisory_pdf import build_advisory_pdf
+    session = get_session(run_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found."})
+    if not session.report:
+        return JSONResponse(status_code=422, content={"error": "Session has no completed report yet."})
+    try:
+        pdf = build_advisory_pdf(session)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"PDF build failed: {str(e)[:200]}"})
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="phronesis-os-{run_id}.pdf"',
+            "Cache-Control": "private, max-age=3600",
+        },
+    )
+
+
 @app.get("/advisory/result/{run_id}", response_class=HTMLResponse)
 async def advisory_result(request: Request, run_id: str):
     from phronesis.advisory import get_session
