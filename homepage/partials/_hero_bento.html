@@ -333,6 +333,70 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
 @media (max-width: 340px) {
   .ph-phone { width: 280px; height: 540px; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   BENTO TREND POLYLINES — theme-aware via currentColor
+   ═══════════════════════════════════════════════════════════ */
+.hbp .hbp-trend-1 { stroke: rgba(255,255,255,0.40); }
+.hbp .hbp-trend-2 { stroke: rgba(255,255,255,0.30); }
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHT-THEME OVERRIDES for the bento. Flat selectors (no CSS nesting)
+   for broadest browser support. The phone (.ph-*) stays dark — it's a
+   device mockup, not a page surface.
+   ═══════════════════════════════════════════════════════════ */
+html[data-theme="light"] .hbp { background: rgba(255, 255, 255, 0.70); }
+html[data-theme="light"] .hbp .hbp-border rect { stroke: rgba(0,0,0,0.14); }
+html[data-theme="light"] .hbp .hbp-border .draw { stroke: var(--accent-border); }
+
+html[data-theme="light"] .hbp-label          { color: rgba(0,0,0,0.26); }
+html[data-theme="light"] .hbp.lit .hbp-label { color: rgba(0,0,0,0.72); }
+html[data-theme="light"] .hbp-heading          { color: rgba(0,0,0,0.38); }
+html[data-theme="light"] .hbp.lit .hbp-heading { color: rgba(0,0,0,0.92); }
+html[data-theme="light"] .hbp-list li          { color: rgba(0,0,0,0.32); }
+html[data-theme="light"] .hbp.lit .hbp-list li { color: rgba(0,0,0,0.72); }
+html[data-theme="light"] .hbp-list-num          { color: rgba(0,0,0,0.38); }
+html[data-theme="light"] .hbp.lit .hbp-list-num { color: rgba(0,0,0,0.92); }
+
+html[data-theme="light"] .hbp-field   { border-bottom-color: rgba(0,0,0,0.06); }
+html[data-theme="light"] .hbp-row-key { color: rgba(0,0,0,0.30); }
+html[data-theme="light"] .hbp-row-val { color: rgba(0,0,0,0.38); }
+html[data-theme="light"] .hbp.lit .hbp-row-key { color: rgba(0,0,0,0.58); }
+html[data-theme="light"] .hbp.lit .hbp-row-val { color: rgba(0,0,0,0.92); }
+
+html[data-theme="light"] .hbp-func      { border-color: rgba(0,0,0,0.10); }
+html[data-theme="light"] .hbp-func-icon { border-color: rgba(0,0,0,0.18); color: rgba(0,0,0,0.38); }
+html[data-theme="light"] .hbp-func-text { color: rgba(0,0,0,0.38); }
+html[data-theme="light"] .hbp.lit .hbp-func-icon { border-color: rgba(0,0,0,0.58); color: rgba(0,0,0,0.92); }
+html[data-theme="light"] .hbp.lit .hbp-func-text { color: rgba(0,0,0,0.92); }
+
+html[data-theme="light"] .hbp-histogram rect          { fill: rgba(0,0,0,0.30); }
+html[data-theme="light"] .hbp.lit .hbp-histogram rect { fill: rgba(0,0,0,0.58); }
+html[data-theme="light"] .hbp-compare-bar             { background: rgba(0,0,0,0.06); }
+html[data-theme="light"] .hbp-compare-fill            { background: rgba(0,0,0,0.32); }
+html[data-theme="light"] .hbp.lit .hbp-compare-fill   { background: rgba(0,0,0,0.60); }
+html[data-theme="light"] .hbp-wf-bar                  { background: rgba(0,0,0,0.05); }
+html[data-theme="light"] .hbp-wf-seg                  { background: rgba(0,0,0,0.32); }
+html[data-theme="light"] .hbp.lit .hbp-wf-seg         { background: rgba(0,0,0,0.60); }
+html[data-theme="light"] .hbp-miniblock               { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
+html[data-theme="light"] .hbp-minibars span           { background: rgba(0,0,0,0.22); }
+html[data-theme="light"] .hbp-donut .bg               { stroke: rgba(0,0,0,0.10); }
+html[data-theme="light"] .hbp-donut .fg               { stroke: rgba(0,0,0,0.32); }
+html[data-theme="light"] .hbp-donut-label             { color: rgba(0,0,0,0.30); }
+html[data-theme="light"] .hbp.lit .hbp-donut-label    { color: rgba(0,0,0,0.72); }
+html[data-theme="light"] .hbp-icon                    { border-color: rgba(0,0,0,0.10); color: rgba(0,0,0,0.30); }
+
+html[data-theme="light"] .hbp .hbp-trend-1 { stroke: rgba(0,0,0,0.40); }
+html[data-theme="light"] .hbp .hbp-trend-2 { stroke: rgba(0,0,0,0.28); }
+html[data-theme="light"] .hbp.lit .hbp-trend-1 { stroke: rgba(0,0,0,0.70); }
+html[data-theme="light"] .hbp.lit .hbp-trend-2 { stroke: rgba(0,0,0,0.55); }
+
+html[data-theme="light"] .hbp-compare-score          { color: rgba(0,0,0,0.32); }
+html[data-theme="light"] .hbp.lit .hbp-compare-score { color: rgba(0,0,0,0.92); }
+html[data-theme="light"] .hbp-counter-num            { color: rgba(0,0,0,0.38); }
+html[data-theme="light"] .hbp.lit .hbp-counter-num   { color: rgba(0,0,0,0.92); }
+
+html[data-theme="light"] .ph-dots .dot { background: rgba(0,0,0,0.18); }
 </style>
 
 <section class="ic-hero-wrap">
@@ -454,11 +518,11 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
     </div>
     <div class="hbp hbp-near" id="hbRegistry" style="grid-column:4; grid-row:4/6;">
       <svg class="hbp-border"><rect width="100%" height="100%"/><rect class="draw" width="100%" height="100%"/></svg>
-      <div class="hbp-label">Analyst Registry</div>
-      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent1">Analyst 1 &middot; General</span><span class="hbp-row-val" id="hbAgent1Score">9.2</span></div>
-      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent2">Analyst 2 &middot; Skeptic</span><span class="hbp-row-val" id="hbAgent2Score">8.8</span></div>
-      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent3">Analyst 3 &middot; Pragmatist</span><span class="hbp-row-val" id="hbAgent3Score">9.0</span></div>
-      <div class="hbp-field"><span class="hbp-row-key">Spread</span><span class="hbp-row-val" id="hbSpread">0.4</span></div>
+      <div class="hbp-label">Advisory Council</div>
+      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent1">Optimizer</span><span class="hbp-row-val" id="hbAgent1Score">Stripe</span></div>
+      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent2">Skeptic</span><span class="hbp-row-val" id="hbAgent2Score">Counter</span></div>
+      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent3">Pragmatist</span><span class="hbp-row-val" id="hbAgent3Score">Stripe</span></div>
+      <div class="hbp-field"><span class="hbp-row-key" id="hbAgent4">Domain Expert</span><span class="hbp-row-val" id="hbAgent4Score">Stripe</span></div>
     </div>
     <div class="hbp hbp-far" style="grid-column:5; grid-row:5;">
       <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
@@ -536,8 +600,8 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
       <svg class="hbp-border"><rect width="100%" height="100%"/></svg>
       <div class="hbp-label">Analyst Trends &middot; 30d</div>
       <svg viewBox="0 0 260 40" preserveAspectRatio="none" style="height:40px; width:100%">
-        <polyline fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" points="22,30 60,27 98,22 136,18 174,14 212,10 250,8"/>
-        <polyline fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.2" points="22,34 60,31 98,28 136,25 174,22 212,18 250,14"/>
+        <polyline class="hbp-trend-1" fill="none" stroke-width="1.2" points="22,30 60,27 98,22 136,18 174,14 212,10 250,8"/>
+        <polyline class="hbp-trend-2" fill="none" stroke-width="1.2" points="22,34 60,31 98,28 136,25 174,22 212,18 250,14"/>
         <polyline fill="none" stroke="var(--accent)" stroke-width="1.4" points="22,26 60,20 98,16 136,12 174,8 212,5 250,3"/>
       </svg>
     </div>
@@ -562,7 +626,7 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
         </div>
         <div class="ph-body" id="phBody"></div>
         <div class="ph-input" id="phInput">
-          <div class="ph-placeholder" id="phPlaceholder">Ask Phronesis to rank your options…</div>
+          <div class="ph-placeholder" id="phPlaceholder">What are you trying to figure out?</div>
           <div class="ph-sendbtn" id="phSendBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div>
         </div>
       </div>
@@ -575,14 +639,14 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
 
   <div class="ic-hero-caption">
     <h1>
-      <span class="muted">One decision.</span> <em>Three</em> <span class="muted">analysts.</span> <em>Zero</em> <span class="muted">guesswork.</span>
+      <em>Seven</em> <span class="muted">analysts.</span> <em>One</em> <span class="muted">recommendation.</span> <em>Every</em> <span class="muted">step, shown.</span>
     </h1>
     <p>
-      Phronesis ranks your options with blind multi-analyst evaluation. Synthesis runs deep multi-model research. Both hit <strong style="color: var(--text-primary);">94% agreement</strong> vs 68–71% for single-AI models.
+      Phronesis OS runs a structured AI advisory council on your real-world calls — career, purchase, strategy, finance. Web-grounded evidence, honest consensus, confidence you can trust.
     </p>
     <div class="ic-hero-cta-row">
-      <a href="/phronesis" class="ic-hero-cta primary">Try Phronesis →</a>
-      <a href="/synthesis" class="ic-hero-cta ghost">Open Synthesis</a>
+      <a href="/advisory" class="ic-hero-cta primary">Start advisory session →</a>
+      <a href="/synthesis" class="ic-hero-cta ghost">Try Synthesis</a>
     </div>
   </div>
 </section>
@@ -608,46 +672,46 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
 
   const scenarios = [
     {
-      user: "MacBook Air M3 vs ThinkPad X1 vs Framework 13 for dev work under $1.5k?",
-      ai: `Winner: <strong>MacBook Air M3 15-inch</strong> &middot; 92% confidence.<br><br>All three analysts agreed. Leads on perf-per-dollar, battery, and display. ThinkPad wins on keyboard but loses on value. Framework is most flexible but rated lower on out-of-box experience.<br><br>Want the full scorecard?`,
-      funcText: 'RANK_LAPTOPS<br><span style="opacity:0.75">PERF · BUILD · VALUE · BATTERY</span>',
-      score: '9.0',
-      ctx: { name: 'Alex K.', domain: 'Laptops', budget: '$1,500', options: '3', criteria: '4' },
+      user: "Should I take the senior engineer offer at Stripe or hold for a promo at my current company?",
+      ai: `<strong>Recommended best move:</strong> Take the Stripe offer — unless your current company confirms the promotion in writing within 7 days.<br><br>Confidence: <strong>moderate-high</strong> · 74–82%. 3 of 4 analysts agree. Skeptic flags the vesting cliff as the biggest give-up.<br><br><strong>Next 48h:</strong> reply to Stripe with a 5-day window; ask your current manager for the promo in writing today.`,
+      funcText: 'ADVISORY_RUN<br><span style="opacity:0.75">CAREER · 4 ANALYSTS · WEB-GROUNDED</span>',
+      score: '8.7',
+      ctx: { name: 'Alex K.', domain: 'Career', budget: '—', options: '3', criteria: '6' },
       agents: [
-        { name: 'Analyst 1 · General',    score: '9.2' },
-        { name: 'Analyst 2 · Skeptic',    score: '8.8' },
-        { name: 'Analyst 3 · Pragmatist', score: '9.0' },
-        { name: 'Spread',                 score: '0.4' },
+        { name: 'Optimizer',      score: 'Stripe' },
+        { name: 'Skeptic',        score: 'Counter' },
+        { name: 'Pragmatist',     score: 'Stripe' },
+        { name: 'Domain Expert',  score: 'Stripe' },
       ],
-      chain: ['Parsed 3 options', 'Anonymized as A/B/C', 'Distributed to 3 analysts', 'Converged on Option A'],
+      chain: ['Intake: parsed 3 paths', 'Council ran in parallel', 'Skeptic dissented (vesting cliff)', 'Synthesis: moderate-high'],
     },
     {
-      user: "HubSpot vs Salesforce vs Pipedrive for a 10-person sales team?",
-      ai: `Winner: <strong>HubSpot</strong> &middot; 88% confidence.<br><br>Analysts converged on ease-of-use + marketing integration at your team size. Salesforce would win above 50 seats or with complex reporting needs. Pipedrive stays cheaper but loses to HubSpot on integrations.<br><br>Want me to weight price higher?`,
-      funcText: 'RANK_CRM<br><span style="opacity:0.75">USE · PRICE · INTEGRATIONS · REPORTS</span>',
-      score: '8.8',
-      ctx: { name: 'Morgan T.', domain: 'SaaS', budget: '$500/mo', options: '3', criteria: '4' },
+      user: "MacBook Air M3 vs ThinkPad X1 Carbon Gen 12 for remote dev, $2k budget?",
+      ai: `<strong>Recommended best move:</strong> Buy the MacBook Air M3 16GB/512GB at $1,299–$1,499.<br><br>Confidence: <strong>moderate-high</strong> · 72–80%. Wins on battery + build quality. <em>Current web search note: M3 was discontinued March 2025 — available at liquidation pricing.</em><br><br><strong>Next 48h:</strong> audit your 5 core dev tools for macOS compatibility before ordering.`,
+      funcText: 'ADVISORY_RUN<br><span style="opacity:0.75">PURCHASE · WEB-GROUNDED · $0.15 · 94s</span>',
+      score: '8.3',
+      ctx: { name: 'Morgan T.', domain: 'Purchase', budget: '$2,000', options: '2', criteria: '5' },
       agents: [
-        { name: 'Analyst 1 · General',    score: '8.9' },
-        { name: 'Analyst 2 · Skeptic',    score: '8.5' },
-        { name: 'Analyst 3 · Pragmatist', score: '9.0' },
-        { name: 'Spread',                 score: '0.5' },
+        { name: 'Optimizer',      score: 'MacBook' },
+        { name: 'Skeptic',        score: 'ThinkPad' },
+        { name: 'Pragmatist',     score: 'MacBook' },
+        { name: 'Domain Expert',  score: 'MacBook' },
       ],
-      chain: ['Parsed 3 CRMs', 'Weighted 4 criteria', 'Ran blind evaluation', 'Converged on HubSpot'],
+      chain: ['Intake: category=purchase', 'Evidence: 10 sources cited', 'M3 discontinued fact surfaced', 'Synthesis: MacBook wins 3-1'],
     },
     {
-      user: "Flat subscription, usage-based, or freemium for a B2B SaaS?",
-      ai: `Winner: <strong>Flat monthly subscription</strong> &middot; 94% confidence.<br><br>Unanimous. Flat wins on revenue predictability for enterprise customers. Usage-based fits infra/API products. Freemium only works if you can monetize &lt;5% of users at high ACV.<br><br>Your ICP points to flat — want to model pricing tiers?`,
-      funcText: 'RANK_PRICING<br><span style="opacity:0.75">PREDICTABILITY · CAC · SCALE</span>',
-      score: '9.4',
-      ctx: { name: 'Sam R.', domain: 'Pricing', budget: '—', options: '3', criteria: '3' },
+      user: "Should I bootstrap my SaaS for 12 more months or raise a seed round now?",
+      ai: `<strong>Recommended best move:</strong> Bootstrap 12 more months, then raise from a position of revenue strength.<br><br>Confidence: <strong>moderate</strong> · 62–70%. Split verdict: Optimizer picks raise-now; Pragmatist + Skeptic + Domain Expert pick bootstrap.<br><br><strong>Next 48h:</strong> build the "raise-now vs wait" cap-table model with both dilution scenarios side-by-side.`,
+      funcText: 'ADVISORY_RUN<br><span style="opacity:0.75">STRATEGY · SPLIT CONSENSUS</span>',
+      score: '7.6',
+      ctx: { name: 'Sam R.', domain: 'Strategy', budget: '$45k MRR', options: '2', criteria: '6' },
       agents: [
-        { name: 'Analyst 1 · General',    score: '9.5' },
-        { name: 'Analyst 2 · Skeptic',    score: '9.2' },
-        { name: 'Analyst 3 · Pragmatist', score: '9.4' },
-        { name: 'Spread',                 score: '0.3' },
+        { name: 'Optimizer',      score: 'Raise' },
+        { name: 'Skeptic',        score: 'Bootstrap' },
+        { name: 'Pragmatist',     score: 'Bootstrap' },
+        { name: 'Domain Expert',  score: 'Bootstrap' },
       ],
-      chain: ['Parsed 3 pricing models', 'Mapped to ICP', 'Ran blind evaluation', 'Converged on flat sub'],
+      chain: ['Intake: strategic call', '18% MoM growth logged', 'Cap-table math ran', 'Synthesis: 3-1 bootstrap'],
     },
   ];
 
@@ -683,7 +747,7 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
     a1: document.getElementById('hbAgent1'),  a1s: document.getElementById('hbAgent1Score'),
     a2: document.getElementById('hbAgent2'),  a2s: document.getElementById('hbAgent2Score'),
     a3: document.getElementById('hbAgent3'),  a3s: document.getElementById('hbAgent3Score'),
-    spread: document.getElementById('hbSpread'),
+    a4: document.getElementById('hbAgent4'),  a4s: document.getElementById('hbAgent4Score'),
     chain: document.getElementById('hbChainList'),
   };
 
@@ -719,7 +783,7 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
     }
   }
   function aiCardHTML(body) {
-    return `<div class="ph-card-ai-head"><span class="ph-logo"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 2 L18 12 L28 10 L20 16 L28 22 L18 20 L16 30 L14 20 L4 22 L12 16 L4 10 L14 12 Z"/></svg></span>IntellCluster <span class="sep">&middot;</span> <span class="sub">Phronesis</span></div><div class="ph-card-ai-body">${body}</div>`;
+    return `<div class="ph-card-ai-head"><span class="ph-logo"><svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 2 L18 12 L28 10 L20 16 L28 22 L18 20 L16 30 L14 20 L4 22 L12 16 L4 10 L14 12 Z"/></svg></span>Phronesis OS <span class="sep">&middot;</span> <span class="sub">Advisory Council</span></div><div class="ph-card-ai-body">${body}</div>`;
   }
   function scrollDown() { phBody.scrollTo({ top: phBody.scrollHeight, behavior: 'smooth' }); }
 
@@ -737,7 +801,7 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
     refs.a1.innerHTML = s.agents[0].name; refs.a1s.textContent = s.agents[0].score;
     refs.a2.innerHTML = s.agents[1].name; refs.a2s.textContent = s.agents[1].score;
     refs.a3.innerHTML = s.agents[2].name; refs.a3s.textContent = s.agents[2].score;
-    refs.spread.textContent = s.agents[3].score;
+    if (refs.a4 && s.agents[3]) { refs.a4.innerHTML = s.agents[3].name; refs.a4s.textContent = s.agents[3].score; }
     refs.chain.innerHTML = '';
     for (const step of s.chain) {
       const li = document.createElement('li');
@@ -755,7 +819,7 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
     phInput.classList.remove('active');
     phSend.classList.remove('active');
     phPlace.classList.remove('filled');
-    phPlace.textContent = 'Ask Phronesis to rank your options…';
+    phPlace.textContent = 'What are you trying to figure out?';
 
     await wait(T.typeStart);
 
@@ -768,7 +832,7 @@ html[data-theme="light"] .ic-hero-caption h1 .muted { color: rgba(0,0,0,0.45); }
     phInput.classList.remove('active');
     phSend.classList.remove('active');
     phPlace.classList.remove('filled');
-    phPlace.textContent = 'Ask Phronesis to rank your options…';
+    phPlace.textContent = 'What are you trying to figure out?';
     const ub = el('div', 'ph-bubble-user');
     ub.textContent = s.user;
     phBody.appendChild(ub);
