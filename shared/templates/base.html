@@ -1239,7 +1239,7 @@ summary:focus-visible {
 
     <!-- Desktop nav — hidden below 820px -->
     <div class="ic-nav-links">
-      <a href="/phronesis" data-tool="phronesis" class="nav-tool">Phronesis</a>
+      <a href="/advisory" data-tool="advisory" class="nav-tool">Advisory</a>
       <a href="/synthesis" data-tool="synthesis" class="nav-tool">Synthesis</a>
       <a href="/pricing" class="nav-tool">Pricing</a>
       <a href="/blog" class="nav-tool">Blog</a>
@@ -1273,7 +1273,8 @@ summary:focus-visible {
 
   <!-- Full-screen mobile drawer -->
   <div class="ic-nav-drawer" id="icNavDrawer" role="dialog" aria-modal="true" aria-label="Site navigation">
-    <a href="/phronesis">Phronesis</a>
+    <a href="/advisory">Advisory Council</a>
+    <a href="/phronesis">Phronesis (classic)</a>
     <a href="/synthesis">Synthesis</a>
     <a href="/pricing">Pricing</a>
     <a href="/blog">Blog</a>
@@ -1327,7 +1328,8 @@ summary:focus-visible {
       <div class="ic-footer-col">
         <h4>Product</h4>
         <ul>
-          <li><a href="/phronesis">Phronesis</a></li>
+          <li><a href="/advisory">Advisory Council</a></li>
+          <li><a href="/phronesis">Phronesis (classic)</a></li>
           <li><a href="/synthesis">Synthesis</a></li>
           <li><a href="/templates">Templates</a></li>
           <li><a href="/compare">Compare</a></li>
@@ -1444,7 +1446,10 @@ summary:focus-visible {
 
   // Active tool highlight
   var path = window.location.pathname;
-  var tool = path.startsWith('/synthesis') ? 'synthesis' : path.startsWith('/phronesis') ? 'phronesis' : null;
+  var tool = path.startsWith('/synthesis') ? 'synthesis'
+           : path.startsWith('/phronesis') ? 'advisory'     // classic page highlights Advisory
+           : path.startsWith('/advisory')  ? 'advisory'
+           : null;
   if (tool) document.querySelectorAll('.nav-tool[data-tool="' + tool + '"]').forEach(function(el) { el.classList.add('active'); });
 
   // Nav scroll-border — reveals the bottom hairline only after the page

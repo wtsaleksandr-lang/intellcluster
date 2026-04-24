@@ -67,6 +67,10 @@ PUBLIC_ROUTES = [
     ("/contact", 200),
     ("/faq", 200),
     ("/docs", 200),
+    # Phronesis OS advisory — new in V1.5
+    ("/advisory", 200),
+    ("/advisory/result/does-not-exist", 404),
+    ("/advisory/api/session/does-not-exist", 404),
     # Magic-link auth
     ("/login", 200),
     ("/account", 302),  # redirects to /login when unauthenticated

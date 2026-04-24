@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+{% block title %}{{ report.recommended_best_move[:60] }} — Phronesis OS{% endblock %}
+{% block meta_desc %}Phronesis OS advisory result: {{ report.recommended_best_move[:140] }}{% endblock %}
+{% block og_title %}Phronesis OS advisory: {{ report.recommended_best_move[:80] }}{% endblock %}
+{% block og_desc %}Seven-analyst advisory council recommendation with ranked alternatives and risks.{% endblock %}
+{% block canonical %}{{ site_url }}/advisory/result/{{ session.run_id }}{% endblock %}
+
+{% block head %}
+<style>
+  .res-wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  .res-header {
+    padding: 40px 0 28px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .res-header .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--text-tertiary);
+    display: inline-flex; align-items: center; gap: 10px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border-decor);
+    margin-bottom: 16px;
+  }
+  .res-header .eyebrow::before {
+    content: ''; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .res-header .q {
+    color: var(--text-muted); font-size: 15px; line-height: 1.55;
+    margin: 0 0 20px;
+  }
+
+  /* Hero recommendation card */
+  .rec-card {
+    padding: 28px 30px;
+    background: var(--surface-solid);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-left: 3px solid var(--accent);
+    border-radius: 14px;
+    margin-top: 8px;
+  }
+  html[data-theme="light"] .rec-card {
+    background: #ffffff; border-color: rgba(0,0,0,0.14);
+    border-left-color: var(--accent);
+  }
+  .rec-card .label-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+  }
+  .rec-card .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 1.4px; color: var(--accent);
+    text-transform: uppercase;
+  }
+  .rec-card .conf {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    padding: 4px 10px;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid var(--accent-border); border-radius: 4px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .rec-card h1 {
+    font-family: 'Instrument Serif', serif; font-weight: 400;
+    font-size: clamp(26px, 4vw, 38px); line-height: 1.15;
+    letter-spacing: -0.025em; margin: 0 0 8px;
+    color: var(--text-primary);
+  }
+  .rec-card .rec-sub {
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid var(--border-subtle);
+    color: var(--text-secondary); font-size: 15px; line-height: 1.6;
+  }
+
+  /* Section headers */
+  .sec-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin: 48px 0 20px;
+  }
+  .sec-head .fig {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  .sec-head h2 {
+    font-family: 'Instrument Serif', serif; font-weight: 400;
+    font-size: 26px; letter-spacing: -0.02em; line-height: 1.2;
+    color: var(--text-primary); margin: 0;
+  }
+
+  /* Ranking bars */
+  .ranking-list { display: flex; flex-direction: column; gap: 12px; }
+  .rank-row {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px;
+    align-items: center;
+    padding: 16px 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color 0.2s var(--ease-out);
+  }
+  .rank-row[data-color="green"]  { border-left: 3px solid var(--green); }
+  .rank-row[data-color="yellow"] { border-left: 3px solid var(--amber); }
+  .rank-row[data-color="red"]    { border-left: 3px solid var(--red); }
+  .rank-pos {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 1px; color: var(--text-tertiary);
+    width: 24px; text-align: center;
+  }
+  .rank-main .rank-name {
+    font-size: 15px; font-weight: 500; color: var(--text-primary);
+    letter-spacing: -0.01em; line-height: 1.35;
+  }
+  .rank-bar-wrap {
+    margin-top: 8px; height: 6px; background: rgba(255,255,255,0.05);
+    border-radius: 3px; overflow: hidden; position: relative;
+  }
+  html[data-theme="light"] .rank-bar-wrap { background: rgba(0,0,0,0.05); }
+  .rank-bar {
+    height: 100%; border-radius: 3px;
+    transition: width 1s var(--ease-out);
+  }
+  .rank-row[data-color="green"]  .rank-bar { background: var(--green); }
+  .rank-row[data-color="yellow"] .rank-bar { background: var(--amber); }
+  .rank-row[data-color="red"]    .rank-bar { background: var(--red); }
+  .rank-score {
+    font-family: 'Instrument Serif', serif; font-weight: 400;
+    font-size: 28px; letter-spacing: -0.03em; line-height: 1;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Confidence meter */
+  .conf-meter {
+    padding: 22px 24px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+  }
+  .conf-meter .track {
+    height: 8px; background: rgba(255,255,255,0.05);
+    border-radius: 4px; position: relative; overflow: hidden;
+    margin: 14px 0 10px;
+  }
+  html[data-theme="light"] .conf-meter .track { background: rgba(0,0,0,0.05); }
+  .conf-meter .fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    border-radius: 4px;
+    transition: width 1s var(--ease-out);
+  }
+  .conf-meter[data-level="high"]          .fill { background: var(--green); }
+  .conf-meter[data-level="moderate-high"] .fill { background: var(--green); opacity: 0.82; }
+  .conf-meter[data-level="moderate"]      .fill { background: var(--amber); }
+  .conf-meter[data-level="low"]           .fill { background: var(--red); }
+  .conf-meter .scale {
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .conf-meter .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 1.4px; color: var(--text-primary);
+    text-transform: uppercase;
+  }
+
+  /* Agent consensus */
+  .consensus-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+  }
+  .consensus-card {
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+  }
+  .consensus-card .role {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--text-tertiary); margin-bottom: 6px;
+  }
+  .consensus-card .pick {
+    font-size: 15px; color: var(--text-primary); font-weight: 500;
+    letter-spacing: -0.01em; line-height: 1.3;
+  }
+  .consensus-note {
+    padding: 14px 18px; background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 10px; margin-top: 12px;
+    font-size: 13.5px; color: var(--text-primary);
+  }
+  .consensus-note strong { color: var(--accent); }
+
+  /* Bullet blocks */
+  .bul-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; }
+  .bul-block ul { list-style: none; padding: 0; margin: 0; }
+  .bul-block li {
+    padding: 10px 0;
+    font-size: 14.5px; line-height: 1.6; color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; gap: 12px;
+  }
+  .bul-block li:last-child { border-bottom: 0; }
+  .bul-block li::before {
+    content: ''; flex-shrink: 0; width: 4px; height: 4px;
+    border-radius: 50%; margin-top: 10px;
+    background: var(--accent);
+  }
+  .bul-block.risks li::before  { background: var(--red); }
+  .bul-block.change li::before { background: var(--amber); }
+
+  /* Action ladder */
+  .ladder { display: flex; flex-direction: column; gap: 10px; }
+  .ladder-step {
+    padding: 16px 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px;
+    display: grid; grid-template-columns: 32px 1fr; gap: 14px;
+    align-items: baseline;
+  }
+  .ladder-step .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: var(--accent); font-weight: 500;
+  }
+  .ladder-step .text {
+    font-size: 14.5px; color: var(--text-primary); line-height: 1.55;
+    letter-spacing: -0.01em;
+  }
+  .ladder-step.first {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+  }
+
+  /* Download bar */
+  .share-bar {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-top: 40px;
+    padding: 18px 20px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    align-items: center;
+  }
+  .share-bar .lbl {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    color: var(--text-tertiary); margin-right: 6px;
+  }
+  .share-btn {
+    padding: 8px 14px; font-family: inherit; font-size: 12.5px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 8px; cursor: pointer;
+    transition: all 0.15s var(--ease-out);
+    text-decoration: none;
+  }
+  .share-btn:hover {
+    border-color: var(--accent-border); color: var(--accent);
+    background: var(--accent-soft);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="res-wrap">
+
+  {# ─── Breadcrumb + header ─── #}
+  <nav style="padding:28px 0 0;font-size:11px;color:var(--text-dim);letter-spacing:1.2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;" aria-label="Breadcrumb">
+    <a href="/" style="color:var(--text-dim);text-decoration:none;">IntellCluster</a>
+    <span style="margin:0 8px;">/</span>
+    <a href="/advisory" style="color:var(--text-dim);text-decoration:none;">Advisory</a>
+    <span style="margin:0 8px;">/</span>
+    <span style="color:var(--text-muted);">Result</span>
+  </nav>
+
+  <header class="res-header rv">
+    <div class="eyebrow">ADVISORY RESULT <span>·</span> {{ session.category|upper if session.category else 'EXPLORATORY' }}</div>
+    {% if session.intake and session.intake.advisory_question %}
+    <p class="q">{{ session.intake.advisory_question }}</p>
+    {% elif session.raw_input %}
+    <p class="q">{{ session.raw_input }}</p>
+    {% endif %}
+
+    {# RECOMMENDED BEST MOVE #}
+    <div class="rec-card">
+      <div class="label-row">
+        <span class="label">Recommended best move</span>
+        <span class="conf">{{ report.confidence_level|replace('-', '–')|upper }}{% if report.confidence_range %} · {{ report.confidence_range }}{% endif %}</span>
+      </div>
+      <h1>{{ report.recommended_best_move }}</h1>
+      {% if report.immediate_next_step %}
+      <div class="rec-sub">
+        <strong style="color:var(--text-primary);">Next 48 hours:</strong> {{ report.immediate_next_step }}
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  {# ─── Ranked options ─── #}
+  {% if report.ranked_options %}
+  <section class="rv rv1">
+    <div class="sec-head">
+      <h2>Ranked options</h2>
+      <span class="fig">FIG 1</span>
+    </div>
+    <div class="ranking-list">
+      {% set max_score = (report.ranked_options|map(attribute='score')|max) or 10 %}
+      {% for o in report.ranked_options %}
+      <div class="rank-row" data-color="{{ o.color }}">
+        <span class="rank-pos">{{ o.rank }}</span>
+        <div class="rank-main">
+          <div class="rank-name">{{ o.option }}</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-bar" style="width: {{ (o.score / max_score * 100)|round(1) }}%;"></div>
+          </div>
+        </div>
+        <span class="rank-score">{{ '%.1f'|format(o.score) }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── Confidence meter ─── #}
+  <section class="rv rv1">
+    <div class="sec-head">
+      <h2>Confidence</h2>
+      <span class="fig">FIG 2</span>
+    </div>
+    {% set conf_pct = {'low':30,'moderate':55,'moderate-high':72,'high':88}.get(report.confidence_level, 55) %}
+    <div class="conf-meter" data-level="{{ report.confidence_level }}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;">
+        <span class="label">{{ report.confidence_level|replace('-', '–')|upper }}{% if report.confidence_range %} · {{ report.confidence_range }}{% endif %}</span>
+        <span style="font-size:13px;color:var(--text-muted);">Agents: {{ report.consensus_level|replace('-', '–') }}</span>
+      </div>
+      <div class="track"><div class="fill" style="width: {{ conf_pct }}%;"></div></div>
+      <div class="scale"><span>Low</span><span>Moderate</span><span>Mod-High</span><span>High</span></div>
+    </div>
+  </section>
+
+  {# ─── Why this wins ─── #}
+  {% if report.why_this_wins %}
+  <section class="rv rv2">
+    <div class="sec-head">
+      <h2>Why this wins</h2>
+      <span class="fig">FIG 3</span>
+    </div>
+    <div class="bul-block">
+      <ul>
+        {% for b in report.why_this_wins %}
+        <li>{{ b }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── Agent consensus ─── #}
+  {% if report.agent_consensus %}
+  <section class="rv rv2">
+    <div class="sec-head">
+      <h2>Agent consensus</h2>
+      <span class="fig">FIG 4</span>
+    </div>
+    <div class="consensus-grid">
+      {% for role, pick in report.agent_consensus.items() %}
+      <div class="consensus-card">
+        <div class="role">{{ role }}</div>
+        <div class="pick">{{ pick }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="consensus-note">
+      <strong>Consensus:</strong> {{ report.consensus_level|replace('-', '–')|capitalize }}.
+      {% if report.consensus_level in ('unanimous', 'strong') %}
+        All three analysts converge on the recommendation.
+      {% elif report.consensus_level == 'split' %}
+        Split verdict — treat confidence as moderate at best.
+      {% elif report.consensus_level == 'fragmented' %}
+        Fragmented — the analysts disagree; the recommendation is the best available read, not a strong consensus.
+      {% else %}
+        The analysts mostly agree, with material qualifications.
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── Key risks ─── #}
+  {% if report.key_risks %}
+  <section class="rv">
+    <div class="sec-head">
+      <h2>Key risks</h2>
+      <span class="fig">FIG 5</span>
+    </div>
+    <div class="bul-block risks">
+      <ul>
+        {% for r in report.key_risks %}
+        <li>{{ r }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── What could change this ─── #}
+  {% if report.what_could_change_this %}
+  <section class="rv">
+    <div class="sec-head">
+      <h2>What could change this advice</h2>
+      <span class="fig">FIG 6</span>
+    </div>
+    <div class="bul-block change">
+      <ul>
+        {% for c in report.what_could_change_this %}
+        <li>{{ c }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── Action ladder ─── #}
+  {% if report.action_ladder %}
+  <section class="rv">
+    <div class="sec-head">
+      <h2>If we were you, we'd do this</h2>
+      <span class="fig">FIG 7</span>
+    </div>
+    <div class="ladder">
+      {% for step in report.action_ladder %}
+      <div class="ladder-step{% if loop.first %} first{% endif %}">
+        <span class="num">{{ '%02d'|format(loop.index) }}</span>
+        <div class="text">{{ step }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {# ─── Share / download bar ─── #}
+  <div class="share-bar rv">
+    <span class="lbl">Share</span>
+    <button type="button" class="share-btn" id="copyLinkBtn">Copy link</button>
+    <a href="/advisory/api/session/{{ session.run_id }}" class="share-btn" download="phronesis-{{ session.run_id }}.json">Download JSON</a>
+    <a href="/advisory" class="share-btn" style="margin-left:auto;">New advisory →</a>
+  </div>
+
+  <div style="margin:24px 0 80px;padding:18px 20px;border:1px dashed var(--border-decor);border-radius:10px;text-align:center;">
+    <p style="margin:0;font-size:12.5px;color:var(--text-muted);">
+      Run ID: <code style="color:var(--text-primary);">{{ session.run_id }}</code>
+      {% if session.total_cost_usd %} · Analysis cost ${{ '%.4f'|format(session.total_cost_usd) }}{% endif %}
+      {% if session.total_latency_ms %} · {{ (session.total_latency_ms / 1000)|round(1) }}s wall-clock{% endif %}
+    </p>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('copyLinkBtn')?.addEventListener('click', async function() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      this.textContent = 'Copied';
+      setTimeout(() => { this.textContent = 'Copy link'; }, 1600);
+    } catch (e) { /* ignore */ }
+  });
+</script>
+{% endblock %}

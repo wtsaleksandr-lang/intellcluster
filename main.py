@@ -214,6 +214,7 @@ async def sitemap():
     base = os.environ.get("SITE_URL", "https://intellcluster.com").rstrip("/")
     static_urls = [
         ("/", "1.0", "weekly"),
+        ("/advisory", "1.0", "weekly"),
         ("/phronesis", "0.9", "weekly"),
         ("/synthesis", "0.9", "weekly"),
         ("/pricing", "0.7", "monthly"),
@@ -806,6 +807,123 @@ class DecisionRequest(BaseModel):
 @app.get("/phronesis", response_class=HTMLResponse)
 async def phronesis_home(request: Request):
     return templates.TemplateResponse(request, "index.html", {"tool": "phronesis"})
+
+
+# ═══════════════════════════════════════════════════════
+# PHRONESIS OS — Advisory Council (V1.5)
+# ═══════════════════════════════════════════════════════
+
+class AdvisoryStartRequest(BaseModel):
+    text: str = Field(min_length=5, max_length=4000)
+
+
+class AdvisoryAnswersRequest(BaseModel):
+    run_id: str = Field(min_length=4, max_length=32)
+    answers: list[dict] = Field(default_factory=list)   # [{question_id, answer}]
+    category: str | None = None   # user can correct category here
+
+
+@app.get("/advisory", response_class=HTMLResponse)
+async def advisory_home(request: Request):
+    return templates.TemplateResponse(request, "advisory/index.html", {"tool": "phronesis"})
+
+
+@app.get("/advisory/result/{run_id}", response_class=HTMLResponse)
+async def advisory_result(request: Request, run_id: str):
+    from phronesis.advisory import get_session
+    session = get_session(run_id)
+    if not session or not session.report:
+        return templates.TemplateResponse(request, "404.html", status_code=404)
+    return templates.TemplateResponse(
+        request, "advisory/result.html",
+        {"session": session, "report": session.report, "tool": "phronesis"},
+    )
+
+
+@app.post("/advisory/api/start")
+async def advisory_api_start(req_body: AdvisoryStartRequest, req: Request):
+    """Kick off an advisory run. Returns the session with Intake + MCQs if any."""
+    from phronesis.advisory import start_session
+    if not settings.has_any_api_key():
+        return JSONResponse(status_code=503, content={"error": "No AI API keys configured."})
+
+    _user = _current_user(req)
+    email = (_user.get("email") if _user else None)
+    try:
+        session = await start_session(req_body.text, user_email=email)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)[:300]})
+
+    log_event("advisory_started", {
+        "run_id": session.run_id,
+        "has_user": bool(email),
+        "category": session.category,
+        "n_questions": len(session.clarifying_questions),
+    })
+
+    from dataclasses import asdict
+    return {
+        "run_id": session.run_id,
+        "stage": session.stage,
+        "intake": asdict(session.intake) if session.intake else None,
+        "category": session.category,
+        "category_confidence": session.category_confidence,
+        "clarifying_questions": [asdict(q) for q in session.clarifying_questions],
+        "error": session.error,
+    }
+
+
+@app.post("/advisory/api/answers")
+async def advisory_api_answers(req_body: AdvisoryAnswersRequest, req: Request):
+    """Submit MCQ answers, then stream the council run as SSE."""
+    from phronesis.advisory import submit_answers, get_session
+    from phronesis.advisory.pipeline import run_council
+    from phronesis.advisory.session import record_category_correction
+
+    session = submit_answers(req_body.run_id, req_body.answers or [])
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found."})
+
+    if req_body.category and req_body.category != session.category:
+        record_category_correction(req_body.run_id, req_body.category)
+        session = get_session(req_body.run_id)
+
+    queue: asyncio.Queue = asyncio.Queue()
+
+    def emit(stage: str, payload: dict):
+        queue.put_nowait({"stage": stage, "payload": payload})
+
+    async def runner():
+        try:
+            await run_council(session, emit)
+        finally:
+            queue.put_nowait(None)
+
+    task = asyncio.create_task(runner())
+
+    async def stream():
+        while True:
+            item = await queue.get()
+            if item is None:
+                break
+            yield f"event: {item['stage']}\ndata: {json.dumps(item['payload'], default=str)}\n\n"
+        await task
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
+    )
+
+
+@app.get("/advisory/api/session/{run_id}")
+async def advisory_api_session(run_id: str):
+    from dataclasses import asdict
+    from phronesis.advisory import get_session
+    session = get_session(run_id)
+    if not session:
+        return JSONResponse(status_code=404, content={"error": "Session not found."})
+    return asdict(session)
 
 
 @app.get("/phronesis/result/{run_id}", response_class=HTMLResponse)
