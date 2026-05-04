@@ -100,8 +100,13 @@ def get_provider_for_role(role: str, tier: str = "standard") -> BaseProvider:
     raise RuntimeError(f"No LLM provider available for role '{role}'. Check API keys and config.")
 
 
-async def call_with_role_fallback(role: str, prompt: str, system: str = "", tier: str = "standard") -> tuple[ModelResult, str]:
-    """Call a provider for a role, falling back on failure."""
+async def call_with_role_fallback(role: str, prompt: str, system: str = "", tier: str = "standard", cache_system: bool = False) -> tuple[ModelResult, str]:
+    """Call a provider for a role, falling back on failure.
+
+    cache_system=True hints that the `system` prompt is stable enough to
+    cache. Forwarded only to providers that support it (currently
+    Anthropic). Other providers ignore the hint.
+    """
     configured_model, _ = settings.get_role_model_for_tier(role, tier)
 
     candidates = []
@@ -123,7 +128,12 @@ async def call_with_role_fallback(role: str, prompt: str, system: str = "", tier
     last_error = None
     tried = []
     for provider in candidates:
-        result = await provider.complete(prompt=prompt, system=system)
+        # Only Anthropic implements cache_system today; pass it conditionally
+        # so other providers don't see an unexpected kwarg.
+        extra: dict = {}
+        if cache_system and getattr(provider, "provider", "") == "anthropic":
+            extra["cache_system"] = True
+        result = await provider.complete(prompt=prompt, system=system, **extra)
         tried.append(provider.name)
         if result.status == "success" and result.response_content:
             return result, provider.name

@@ -23,14 +23,29 @@ async def run_strategist(
 ) -> str:
     category_context = get_category_context(category)
 
-    model_output_dicts = [
-        {
-            "model_name": r.model_name,
-            "response_content": r.response_content or "(no response)",
-        }
-        for r in model_results
-        if r.status == "success" and r.response_content
-    ]
+    # Tag researcher output with role only when role specialization is on
+    # (gated separately from SYNTHESIS_V2 — see pipeline.py).
+    import os as _os
+    _v2 = _os.environ.get("SYNTHESIS_ROLES", "").lower() == "true"
+    if _v2:
+        from synthesis.orchestrator.research_roles import get_role_for_model
+        model_output_dicts = [
+            {
+                "model_name": f"{r.model_name} ({get_role_for_model(r.model_name)})",
+                "response_content": r.response_content or "(no response)",
+            }
+            for r in model_results
+            if r.status == "success" and r.response_content
+        ]
+    else:
+        model_output_dicts = [
+            {
+                "model_name": r.model_name,
+                "response_content": r.response_content or "(no response)",
+            }
+            for r in model_results
+            if r.status == "success" and r.response_content
+        ]
 
     system_msg, user_msg = build_strategist_messages(
         refined_prompt=refined_prompt,
@@ -50,6 +65,9 @@ async def run_strategist(
         prompt=user_msg,
         system=system_msg,
         tier=tier,
+        # System prompt is stable per category — cache for ~90% input savings
+        # on the Anthropic path within the 5-min cache window.
+        cache_system=True,
     )
 
     if result.status != "success" or not result.response_content:

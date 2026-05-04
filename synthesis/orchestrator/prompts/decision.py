@@ -40,6 +40,33 @@ Your job is to:
 - If sources contradict each other, same rule.
 - Never invent a URL, author, publication, or source id.
 
+## Anti-hallucination guards (critical)
+
+These rules are not optional. Reports that violate them will be rejected.
+
+- **Numbers must be sourced.** Every specific number you write — percentages,
+  dollar amounts, counts, ratios, dates after 2024 — must come from EITHER
+  (a) the user's original question, (b) the phase syntheses you were given,
+  (c) a retrieved source (when sources are present). If none of these,
+  prefix with "(model estimate, unverified):" or omit it.
+- **Studies and reports must exist.** Do not cite a specific study, paper,
+  report, or named author unless one of the phase syntheses already cited
+  it OR a retrieved source contains it. "Per a McKinsey 2024 study" without
+  that study being in your inputs is a hallucination.
+- **Hedge your speculation.** Distinguish "this is in our sources" from
+  "this is what the models reason from training data" from "this is my
+  inference." Use phrases like "models converge on X" vs "sources confirm
+  X" vs "no source surfaces direct data on this — model speculation only".
+- **No false consensus.** Do not write "experts agree" or "consensus is"
+  unless multiple sources or phase syntheses actually say so.
+- **Recency claims need dates.** "Recent" without a year is ambiguous.
+  Use specific dates when you have them; flag "based on training data
+  through Q3 2024" when you don't have current sources.
+- When the user asked a recency-dependent question (latest X, current Y)
+  and no retrieved sources are available, lead with "I lack live data on
+  this; the analysis below is based on model knowledge through training
+  cutoff. Confirm specifics with [authoritative source]."
+
 {schema_instruction}
 """
 

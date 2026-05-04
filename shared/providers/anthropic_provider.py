@@ -8,7 +8,22 @@ class AnthropicProvider(BaseProvider):
     provider = "anthropic"
     API_URL = "https://api.anthropic.com/v1/messages"
 
-    async def complete(self, prompt: str, system: str = "", web_search: bool = False) -> ModelResult:
+    async def complete(
+        self,
+        prompt: str,
+        system: str = "",
+        web_search: bool = False,
+        cache_system: bool = False,
+    ) -> ModelResult:
+        """Call Claude.
+
+        cache_system=True wraps the system prompt in an Anthropic
+        prompt-cache block (`cache_control: {"type": "ephemeral"}`). For
+        repeat callers in a 5-minute window the input cost on the cached
+        block drops ~90%. Use only when the system prompt is stable
+        across multiple calls (strategist, decision_maker), not for
+        per-call dynamic system content.
+        """
         start = time.time()
         body = {
             "model": self.model_id,
@@ -16,7 +31,20 @@ class AnthropicProvider(BaseProvider):
             "messages": [{"role": "user", "content": prompt}],
         }
         if system:
-            body["system"] = system
+            if cache_system and len(system) > 1000:
+                # Anthropic requires the cached block to be sizeable
+                # (~1024 tokens / ~4000 chars minimum) for the cache to
+                # actually engage. Below that threshold we skip caching
+                # entirely to avoid a no-op tax on tiny prompts.
+                body["system"] = [
+                    {
+                        "type": "text",
+                        "text": system,
+                        "cache_control": {"type": "ephemeral"},
+                    }
+                ]
+            else:
+                body["system"] = system
 
         # Native web search via Anthropic's server-executed tool. Claude decides
         # whether to search; Anthropic runs the search and feeds results back

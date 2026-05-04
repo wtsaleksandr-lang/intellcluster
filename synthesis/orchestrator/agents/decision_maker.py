@@ -54,6 +54,8 @@ async def run_decision_maker(
         prompt=user_msg,
         system=system_msg,
         tier=tier,
+        # Stable per category — cache for ~90% input savings on Anthropic.
+        cache_system=True,
     )
 
     if result.status != "success" or not result.response_content:

@@ -90,7 +90,18 @@ def should_trigger_red_team(
     consensus: dict,
     category: str,
 ) -> bool:
-    """Determine if Red Team critique should run."""
+    """Determine if Red Team critique should run.
+
+    v2 (SYNTHESIS_V2=true): always fire. The audit identified the red team
+    as one of the genuinely-useful structural agents in the pipeline; gating
+    it on disagreement signal means it only catches cases where the models
+    happened to disagree publicly, missing cases where they confidently
+    agree on a wrong answer.
+    """
+    import os
+    if os.environ.get("SYNTHESIS_V2", "").lower() == "true":
+        return True
+
     score = consensus.get("agreement_score", 1.0)
     contradictions = len(consensus.get("contradictions", []))
 

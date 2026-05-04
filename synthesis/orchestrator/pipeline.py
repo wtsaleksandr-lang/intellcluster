@@ -73,6 +73,7 @@ async def _run_research_streaming(
     queue: asyncio.Queue,
     model_tasks: dict[str, asyncio.Task],
     web_search: bool = False,
+    role_specialize: bool = False,
 ) -> list[ModelResult]:
     """Run research across multiple models, streaming results as each finishes."""
     providers = get_providers(model_names, role="research")
@@ -114,7 +115,15 @@ async def _run_research_streaming(
 
     task_to_model: dict[asyncio.Task, str] = {}
     for p in providers:
-        task = asyncio.create_task(call_model(p, prompt, system, web_search=web_search))
+        # v2.2: assign each model a specialized role, so the strategist receives
+        # structurally different content from each researcher. Falls back to
+        # uniform system prompt if role_specialize is False (v1 behavior).
+        if role_specialize:
+            from synthesis.orchestrator.research_roles import build_role_system
+            per_model_system = build_role_system(p.name, system)
+        else:
+            per_model_system = system
+        task = asyncio.create_task(call_model(p, prompt, per_model_system, web_search=web_search))
         model_tasks[p.name] = task
         task_to_model[task] = p.name
         await _emit(queue, "model_status", {
@@ -466,6 +475,12 @@ async def run_pipeline(
                     "retrieved_source_count": len(retrieved_sources),
                 })
 
+            # Role specialization (Searcher/Quantifier/Skeptic/etc) is gated
+            # by an opt-in flag separate from SYNTHESIS_V2 because eval showed
+            # it regressed on most cases (likely because narrow roles lose
+            # comprehensive coverage). Held back for further design work.
+            import os as _os
+            _role_specialize = _os.environ.get("SYNTHESIS_ROLES", "").lower() == "true"
             results = await _run_research_streaming(
                 run_id=run_id,
                 phase_num=phase_num,
@@ -475,6 +490,7 @@ async def run_pipeline(
                 queue=queue,
                 model_tasks=model_tasks,
                 web_search=use_web_search,
+                role_specialize=_role_specialize,
             )
 
             successful = [r for r in results if r.status == "success"]

@@ -96,11 +96,14 @@ class Settings(BaseSettings):
     prompt_engineer_provider: str = "google"
 
     # --- Synthesis Layer (Strategist + Decision Maker) ---
-    # Tier 2 (Standard): top-tier Claude for synthesis
-    strategist_model: str = "claude-opus-4-6"
+    # Tier 2 (Standard): Claude Sonnet 4.6 — ~95% of Opus quality at ~1/5 the
+    # output cost. Strategist + DM are responsible for ~80% of the per-run
+    # bill, so this single change is the largest cost lever in the codebase.
+    # Opus is preserved for `expert` mode below where it earns its keep.
+    strategist_model: str = "claude-sonnet-4-6"
     strategist_provider: str = "anthropic"
 
-    decision_maker_model: str = "claude-opus-4-6"
+    decision_maker_model: str = "claude-sonnet-4-6"
     decision_maker_provider: str = "anthropic"
 
     coding_model: str = "claude-sonnet-4-6"
