@@ -73,6 +73,13 @@ app = FastAPI(title="IntellCluster", version="0.1.0", lifespan=_lifespan)
 # fonts.bunny.net (fonts), plausible.io (analytics), stripe.com (checkout),
 # cdn.jsdelivr.net (marked.js on synthesis result page). Nothing else is
 # allowed to load scripts, frame this site, or send data upstream.
+# Allow IntellCluster to be embedded as an iframe by these specific origins.
+# Comma- or space-separated list set via env. Empty = same-origin only (the
+# previous strict default). Example for embedding inside a Tailscale-hosted
+# co-pilot: IFRAME_ALLOWED_PARENTS="https://freight-copilot-pc.tail50246d.ts.net"
+_iframe_allowed = (os.environ.get("IFRAME_ALLOWED_PARENTS") or "").replace(",", " ").split()
+_frame_ancestors_value = "'self' " + " ".join(_iframe_allowed) if _iframe_allowed else "'none'"
+
 _CSP = "; ".join([
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' https://plausible.io https://*.plausible.io https://cdn.jsdelivr.net https://js.stripe.com",
@@ -81,7 +88,7 @@ _CSP = "; ".join([
     "img-src 'self' data: blob: https:",
     "connect-src 'self' https://plausible.io https://*.plausible.io https://api.stripe.com",
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
-    "frame-ancestors 'none'",
+    f"frame-ancestors {_frame_ancestors_value}",
     "form-action 'self' https://checkout.stripe.com",
     "base-uri 'self'",
     "object-src 'none'",
@@ -91,7 +98,11 @@ _CSP = "; ".join([
 _SECURITY_HEADERS = {
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
     "X-Content-Type-Options": "nosniff",
-    "X-Frame-Options": "DENY",
+    # X-Frame-Options is the legacy equivalent of frame-ancestors. Modern
+    # browsers honour CSP's frame-ancestors when both are present, so we
+    # use SAMEORIGIN when iframe parents are configured (a permissive-but-
+    # bounded fallback for older browsers) and DENY otherwise.
+    "X-Frame-Options": "SAMEORIGIN" if _iframe_allowed else "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(self), microphone=(self), geolocation=(), payment=(self), usb=(), accelerometer=(), gyroscope=()",
     "Content-Security-Policy": _CSP,
@@ -774,8 +785,25 @@ class IntentRequest(BaseModel):
 
 
 @app.post("/api/intent")
-async def intent(req: IntentRequest):
-    """Classify user input. Returns which tool best fits + handoff recommendation."""
+async def intent(req: IntentRequest, request: Request):
+    """Classify user input. Returns which tool best fits + handoff recommendation.
+
+    Anonymous callers get the heuristic-only result (free, no LLM call), which
+    correctly handles ~70% of inputs. Signed-in users get the AI classifier
+    fallback for ambiguous cases. This stops the public endpoint from being
+    a denial-of-wallet vector against the OpenAI key while preserving the
+    typeahead UX for paying users.
+    """
+    if not _current_user(request):
+        from shared.intent_router import heuristic_classify
+        if not req.text or len(req.text.strip()) < 8:
+            return {"tool": "ambiguous", "confidence": 0.0, "reason": "Input too short", "should_handoff": False}
+        tool, conf = heuristic_classify(req.text)
+        should_handoff = bool(
+            req.current_tool and tool != "ambiguous"
+            and tool != req.current_tool and conf >= 0.65
+        )
+        return {"tool": tool, "confidence": conf, "reason": "Pattern-matched (sign in for AI fallback)", "should_handoff": should_handoff}
     result = await classify_intent(req.text, current_tool=req.current_tool)
     return result
 
@@ -1254,13 +1282,13 @@ async def synthesis_run(req_body: SynthesisRequest, req: Request):
         admin_overrides = {"force_tier": "standard", "force_web_search": False}
 
     return StreamingResponse(
-        _stream_synthesis(run_id, req_body.prompt, req_body.category, req_body.mode, models, admin_overrides, req_body.quick_mode, (_current_user(req) or {}).get("email")),
+        _stream_synthesis(req, run_id, req_body.prompt, req_body.category, req_body.mode, models, admin_overrides, req_body.quick_mode, (_current_user(req) or {}).get("email")),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "Connection": "keep-alive"},
     )
 
 
-async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, models: list, admin_overrides: dict, quick_mode: bool = False, user_email: str | None = None):
+async def _stream_synthesis(request: Request, run_id: str, prompt: str, category: str, mode: str, models: list, admin_overrides: dict, quick_mode: bool = False, user_email: str | None = None):
     from shared.tracking.synthesis_history import save_synthesis_run
 
     queue = asyncio.Queue()
@@ -1290,12 +1318,32 @@ async def _stream_synthesis(run_id: str, prompt: str, category: str, mode: str, 
         )
     )
 
+    import time as _time
+    started_at = _time.time()
+    HARD_BUDGET_SEC = 1800  # 30-minute overall cap (preserves prior behavior)
+
     while True:
+        # Cancel the pipeline if the client closed the SSE stream — otherwise
+        # we'd keep burning LLM budget on a dead connection.
         try:
-            item = await asyncio.wait_for(queue.get(), timeout=1800)
-        except asyncio.TimeoutError:
+            if await request.is_disconnected():
+                pipeline_task.cancel()
+                print(f"[synthesis] {run_id} client disconnected — pipeline cancelled")
+                break
+        except Exception:
+            pass
+        if _time.time() - started_at > HARD_BUDGET_SEC:
+            pipeline_task.cancel()
             yield f"event: error\ndata: {json.dumps({'message': 'Timeout after 30 minutes'})}\n\n"
             break
+        try:
+            # Short queue timeout lets us re-check disconnect every 15s instead
+            # of waiting 30 minutes for the queue to drain on a dead client.
+            item = await asyncio.wait_for(queue.get(), timeout=15)
+        except asyncio.TimeoutError:
+            if pipeline_task.done():
+                break
+            continue
 
         event = item.get("event", "")
         data = item.get("data", {})

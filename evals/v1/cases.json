@@ -1,0 +1,173 @@
+{
+  "version": "v1",
+  "description": "IntellCluster accuracy benchmark — 20 cases (10 decisions, 10 research) covering reasoning patterns where multi-model orchestration plausibly beats single-model baselines.",
+  "scoring_max": 50,
+  "rubric_dims": ["correctness", "completeness", "hallucination_freedom", "calibration", "specificity"],
+
+  "decisions": [
+    {
+      "id": "DEC-01-saas-pricing",
+      "kind": "decision",
+      "question": "I run a small SaaS (WriteFlow — AI writing assistant for non-fiction authors). Should I price at $9/month or $49/year ($4/month equivalent)? Currently 200 free users, 0 paid.",
+      "options": ["$9/month subscription", "$49/year annual-only", "Both at the same time"],
+      "criteria": [{"name": "Cash flow", "weight": 6}, {"name": "LTV maximization", "weight": 8}, {"name": "Conversion rate", "weight": 7}, {"name": "Operational simplicity", "weight": 5}],
+      "grading_guide": "A strong answer recognizes: (1) annual-only collects cash upfront and reduces churn but kills monthly conversion velocity at zero-paid stage, (2) at 200 free / 0 paid, you have no churn data so LTV is unknown, (3) the literature (Patrick Campbell ProfitWell) is consistent: offer monthly first, add annual at 20% discount AFTER you have 6mo of churn data, (4) 'both' is correct if positioned right but increases decision friction. Best answer: monthly at $9 first, add annual later. Penalize: confidently picking annual without acknowledging churn-data unknown. Penalize: vague 'depends on goals' without a recommended path.",
+      "notes": "Tests cash-vs-LTV tradeoff reasoning + recognition of unknown variables"
+    },
+    {
+      "id": "DEC-02-job-offer",
+      "kind": "decision",
+      "question": "I have two job offers as a senior engineer (5 yrs experience): (A) $130K base, $20K bonus, public company, 60-min commute, established team of 50; (B) $95K base, 0.4% equity, fully remote, seed-stage 8-person startup, 18 months runway, recent YC. I'm 28, no kids, $40K savings.",
+      "options": ["Offer A (public)", "Offer B (startup)"],
+      "criteria": [{"name": "Expected total comp (5yr)", "weight": 9}, {"name": "Career growth", "weight": 8}, {"name": "Risk profile", "weight": 7}, {"name": "Lifestyle (commute/remote)", "weight": 6}],
+      "grading_guide": "Strong answer quantifies: (A) 5yr expected comp ~$750K assuming 4% raises. (B) 0.4% × seed-stage realistic exit value: most YC startups die or exit small; expected value of 0.4% × outcomes ≈ $20-50K (high variance). (B) base + EV ≈ $475K + $50K = $525K over 5yr — A wins on expected value. BUT: B teaches more, opens more doors, remote = no commute = +1hr/day. Strong answer treats this as a risk-tolerance question, not a comp-only question, and notes the YC seed survival rate (~10% reach Series B). Penalize: ignoring equity expected value math entirely. Penalize: hand-waving 'B has more upside' without numbers.",
+      "notes": "Tests quantitative reasoning under uncertainty + base-rate awareness"
+    },
+    {
+      "id": "DEC-03-ecommerce-stack",
+      "kind": "decision",
+      "question": "I'm launching a niche e-commerce brand (artisanal coffee, expecting 50-200 orders/month in year 1). Should I use Shopify, build custom on Next.js + Stripe, or use WooCommerce on WordPress?",
+      "options": ["Shopify", "Custom Next.js + Stripe", "WooCommerce"],
+      "criteria": [{"name": "Time-to-market", "weight": 8}, {"name": "Total cost of ownership (3yr)", "weight": 7}, {"name": "Flexibility", "weight": 5}, {"name": "Reliability/uptime", "weight": 6}],
+      "grading_guide": "Correct answer: Shopify, with reasoning that (1) at 50-200 orders/month, custom dev is wildly over-engineered — 200 orders × $30 AOV = $6K/mo revenue can't support $5-15K of custom dev, (2) Shopify Basic ($29/mo) handles this scale trivially, (3) WooCommerce works but adds hosting/security maintenance burden, (4) custom Next.js makes sense ONLY if you have a unique commerce flow Shopify can't model. Strong answer flags the scale mismatch explicitly. Penalize: recommending custom for a small artisanal brand with no specified custom requirement. Penalize: WooCommerce without acknowledging the maintenance overhead.",
+      "notes": "Tests scale-appropriate technology selection"
+    },
+    {
+      "id": "DEC-04-investment-allocation",
+      "kind": "decision",
+      "question": "I'm 35, $200K in cash savings (currently 0% in market), stable salary $130K, no debt, no kids. Want to invest for retirement at 65. Pick: (A) 100% S&P 500 (VOO), (B) 60% VTI / 30% VXUS / 10% BND, (C) 80% VTI / 20% BND.",
+      "options": ["A: 100% S&P 500", "B: 60/30/10 global", "C: 80/20 US-heavy"],
+      "criteria": [{"name": "Long-term expected return", "weight": 8}, {"name": "Risk-adjusted return", "weight": 8}, {"name": "Diversification", "weight": 7}, {"name": "Behavioral robustness (will I stay invested in a crash?)", "weight": 7}],
+      "grading_guide": "Strong answer notes: 30-year horizon → can absorb volatility. 100% equities is appropriate for a 30-yr horizon (this is the academic consensus per Bengen, Vanguard's lifecycle model). The choice is between A and C. International diversification (B) is debated but Vanguard 2024 paper supports 30-40% international. Sequence-of-returns risk matters near retirement, not at 35. Strong answer picks B or C, NOT A — but acknowledges A's higher expected return. Penalize: recommending heavy bonds at age 35 for retirement (fundamentally wrong for the time horizon). Penalize: not acknowledging international vs US-only debate.",
+      "notes": "Tests time-horizon-appropriate allocation + acknowledging legitimate disagreement"
+    },
+    {
+      "id": "DEC-05-restaurant-pricing",
+      "kind": "decision",
+      "question": "I own a small Italian restaurant in Brooklyn (10 tables, ~80 covers/night, $42 avg ticket). Food costs are up 12% YoY. Should I (A) raise prices 10% across the menu, (B) raise prices 15% on entrees only and keep apps/desserts, (C) hold prices and absorb the cost hit?",
+      "options": ["A: 10% across the board", "B: 15% on entrees only", "C: hold prices"],
+      "criteria": [{"name": "Margin recovery", "weight": 9}, {"name": "Volume retention", "weight": 8}, {"name": "Competitive position", "weight": 6}],
+      "grading_guide": "Strong answer addresses: (1) restaurant price elasticity is typically -0.5 to -1.0; a 10% raise loses ~5-8% volume in the casual-dining segment. (2) Option A nets ~+2-4% margin if elasticity is -0.5, breakeven if -1.0. (3) Option B (entree-focused) has lower visible price impact (menu prices commonly compared on entrees) but recovers less margin. (4) C kills margin permanently. (5) Brooklyn 2026 has very high restaurant cost inflation; competitors will also raise. Best answer: A or B with 'monitor weekly cover counts' qualifier. Penalize: C without strong reasoning. Penalize: not mentioning elasticity or volume impact.",
+      "notes": "Tests microeconomic reasoning (price elasticity)"
+    },
+    {
+      "id": "DEC-06-database-migration",
+      "kind": "decision",
+      "question": "We're a 3-engineer startup (1.5yr old) with 50K users on Postgres. Considering migrating to MongoDB because some product team members say schema flexibility would help us ship faster. What should we do?",
+      "options": ["Migrate to MongoDB", "Stay on Postgres", "Add MongoDB alongside Postgres for specific features"],
+      "criteria": [{"name": "Engineering risk", "weight": 9}, {"name": "Long-term maintainability", "weight": 8}, {"name": "Real productivity gain", "weight": 7}],
+      "grading_guide": "Strong answer: stay on Postgres. Reasoning: (1) database migration at 50K users is a 3-6 month project for 3 engineers — that's 30%+ of capacity for a year, (2) Postgres has JSONB columns providing the schema-flex benefit MongoDB users cite, without losing relational integrity, (3) most reported MongoDB productivity wins are confounded by 'we rewrote the app' = anything would be faster, (4) only legitimate reason to add MongoDB is genuine schema-less workload (e.g. event logs, time-series with varying shape). Best: stay Postgres + use JSONB. Penalize: recommending migration without acknowledging the engineering cost. Penalize: not mentioning JSONB.",
+      "notes": "Tests technical-debt + opportunity-cost reasoning"
+    },
+    {
+      "id": "DEC-07-life-insurance",
+      "kind": "decision",
+      "question": "I'm 50, non-smoker, $400K savings, $250K mortgage remaining, two kids in college (3 yrs and 1 yr left). My partner doesn't work. I'm offered a 10-year $750K term life policy at $55/month. Should I buy it, decline, or look for a different policy?",
+      "options": ["Buy this policy", "Decline (self-insure)", "Look for different policy"],
+      "criteria": [{"name": "Family financial protection", "weight": 9}, {"name": "Cost vs benefit", "weight": 7}, {"name": "Time horizon match", "weight": 7}],
+      "grading_guide": "Strong answer: buy it (or shop around for similar terms). Reasoning: (1) need is real — $250K mortgage + ~$200K college finishing + several years of income replacement for non-working partner = ~$700K-$1M coverage need, (2) $400K savings ≠ $750K need, can't self-insure, (3) $55/mo for $750K at 50 non-smoker is in-market (typical $40-70 for 10yr term), (4) 10yr horizon roughly matches when youngest finishes college and mortgage is shrunk. Best answer: buy + price-shop for cheaper equivalent. Penalize: recommending self-insurance with $400K against $700K+ need. Penalize: not flagging that price-shopping might find $40/mo same coverage.",
+      "notes": "Tests insurance need-analysis fundamentals"
+    },
+    {
+      "id": "DEC-08-car-purchase",
+      "kind": "decision",
+      "question": "Should I buy a 10-year-old Honda Civic (100K miles, owner-maintained, asking $9K) cash, or finance a new Toyota Corolla LE ($24K out the door, 4.9% APR for 60 months)? I drive ~12K miles/year, suburban use, $50K income, $25K savings.",
+      "options": ["Used Civic cash", "New Corolla financed"],
+      "criteria": [{"name": "Total cost of ownership 5yr", "weight": 9}, {"name": "Reliability risk", "weight": 8}, {"name": "Financial flexibility", "weight": 7}],
+      "grading_guide": "Strong answer: used Civic. TCO math: (a) Civic: $9K + ~$1.2K/yr maintenance × 5 + insurance ~$1K/yr + depreciation ~$3K over 5yr = ~$20K total. (b) Corolla: $24K + 4.9%×60mo financing = ~$27K + insurance ~$1.6K/yr + minimal maintenance + ~$10K depreciation = ~$35K-$40K TCO. Civic saves $15-20K over 5yrs. Caveats: 100K-mile Civic with documented maintenance is a sweet spot (Civics famously last 250K+); reliability risk lower than typical. Penalize: Corolla without showing TCO math. Penalize: ignoring depreciation and total interest paid.",
+      "notes": "Tests TCO reasoning (depreciation + financing + insurance + maintenance)"
+    },
+    {
+      "id": "DEC-09-brand-spinoff",
+      "kind": "decision",
+      "question": "Our SaaS company (HRPro, $8M ARR, 60% from SMB customers, 40% from enterprise) is debating whether to spin our enterprise product into a separate brand (HRForce). Pros: dedicated enterprise positioning, premium pricing. Cons: brand recognition split, 2 marketing motions. CEO leans yes. What's the right call?",
+      "options": ["Spin off as separate brand", "Keep unified", "Keep unified but create enterprise sub-brand (e.g. HRPro Enterprise)"],
+      "criteria": [{"name": "Sales motion clarity", "weight": 7}, {"name": "Marketing efficiency", "weight": 7}, {"name": "Future M&A optionality", "weight": 6}, {"name": "Customer confusion", "weight": 7}],
+      "grading_guide": "Strong answer: option C (sub-brand). Reasoning: (1) at $8M ARR you can't afford 2 separate brand investments, (2) enterprise buyers WILL pay attention to a sub-brand if positioning is clean (Slack→Slack Enterprise Grid, GitHub→GitHub Enterprise patterns), (3) full spinoff makes sense at $30M+ ARR with separate sales orgs, not at $8M, (4) preserves M&A optionality (acquirers buy 1 brand, not 2). Penalize: recommending full spinoff at this scale without flagging the marketing-spend split. Penalize: ignoring the sub-brand pattern entirely.",
+      "notes": "Tests scale-appropriate brand strategy + going-concern economics"
+    },
+    {
+      "id": "DEC-10-college-major",
+      "kind": "decision",
+      "question": "My nephew is 17, deciding college majors. Considering: (A) CS at a state flagship (cost: $30K/yr), (B) Business with CS minor at the same school, (C) CS at MIT ($85K/yr after aid). He's strong in math, enjoys both engineering and business, family income $150K.",
+      "options": ["A: CS state flagship", "B: Business + CS minor", "C: CS MIT"],
+      "criteria": [{"name": "Career earning potential 10yr", "weight": 8}, {"name": "Total cost / debt", "weight": 8}, {"name": "Optionality", "weight": 6}, {"name": "Personal fit", "weight": 6}],
+      "grading_guide": "Strong answer: depends, but most rigorous answer is A. Reasoning: (1) state CS flagship 4yr cost = $120K vs MIT $340K = $220K differential, (2) MIT median CS grad starts at ~$165K vs state CS $115K — $50K/yr × 10yrs = $500K nominal, but discounted/probabilistic gap is closer to $200-300K NPV (per studies by Dale & Krueger on selectivity bias), (3) Business+CS minor is weaker for high earnings ceiling in tech roles. Strong answer notes Dale-Krueger (selective school premium is much smaller than naive comparison suggests). Best: A unless he wants academia or specific MIT-only opportunity. C if family can afford. Penalize: recommending C without acknowledging the cost/debt gap. Penalize: ignoring that selective-school premium is largely selection bias.",
+      "notes": "Tests education ROI + recognition of selection bias in college rankings"
+    }
+  ],
+
+  "research": [
+    {
+      "id": "RES-01-self-driving-timeline",
+      "kind": "research",
+      "question": "What's the realistic timeline for fully autonomous Level 4 self-driving cars to reach mainstream deployment (>10% of urban miles driven autonomously) on US roads?",
+      "grading_guide": "Strong answer cites: (1) Waymo's current Phoenix/SF/LA scale (~150K rides/week as of 2026), (2) Tesla's robotaxi trajectory (limited Austin pilot 2024 → expanding), (3) Cruise's 2023 setbacks (paused operations after pedestrian incident, sold to GM 2024) as a cautionary base rate, (4) regulatory pace (state-by-state in US), (5) realistic 2028-2032 for major-city expansion, 2030-2035 for >10% of urban miles. Strong answer is HONEST about uncertainty bands and notes failed predictions (Musk 2018: 'million robotaxis by 2020'). Penalize: confident dates without uncertainty. Penalize: ignoring Cruise/Tesla setbacks. Penalize: vague 'within 10 years' without justification.",
+      "expected_topics": ["Waymo current scale", "Cruise 2023 incidents", "Tesla robotaxi", "regulatory environment", "L4 vs L5 distinction", "uncertainty quantification"]
+    },
+    {
+      "id": "RES-02-recession-defensive",
+      "kind": "research",
+      "question": "Looking at historical recessions (2008, 2020, 2001, 1990), which industries are most defensive — meaning they preserve revenue and stock returns better than the broad market in a typical recession?",
+      "grading_guide": "Strong answer: (1) defensive = consumer staples, healthcare, utilities, telecom (essential consumption + stable demand), (2) Specific names: P&G, Coca-Cola, Pepsi, J&J, Pfizer, NextEra, Verizon, (3) During 2008, S&P -38% but XLP (staples) -16%, XLV (health) -23%, XLU (utilities) -29%, (4) Discretionary, financials, real estate were worst-hit, (5) NUANCE: 2020 was atypical — staples held but tech soared (work-from-home), so 'defensive' depends on recession TYPE. Penalize: not citing specific data. Penalize: missing the 2020 atypical pattern. Penalize: confidently recommending without time-horizon caveat.",
+      "expected_topics": ["consumer staples", "healthcare", "utilities", "historical performance data", "ETF tickers (XLP/XLV/XLU)", "2020 atypical comparison", "sector ETFs"]
+    },
+    {
+      "id": "RES-03-glp1-comparison",
+      "kind": "research",
+      "question": "Compare the four leading GLP-1 weight-loss drugs — Ozempic, Wegovy, Mounjaro, Zepbound — on efficacy (% body weight loss), side effects, FDA approval scope, and monthly cost in the US.",
+      "grading_guide": "Strong answer (drug = ingredient): (1) Ozempic & Wegovy = semaglutide (Novo Nordisk); Wegovy is the obesity-indication brand, Ozempic = T2D, (2) Mounjaro & Zepbound = tirzepatide (Lilly); same brand relationship, (3) Efficacy: STEP trials sema → ~15% body weight; SURMOUNT tirzepatide → ~21% body weight (tirzepatide higher), (4) Side effects: GI (nausea, vomiting) primary in both, gallbladder events, rare pancreatitis, recent FDA suicide-ideation review found no causal link, (5) Cost: ~$1000-1300/mo retail US, before insurance/discounts; copay assistance often brings to $25 with eligible insurance, (6) Coverage: Medicare doesn't cover obesity indication (as of 2026 unless reform passed). Penalize: confusing the brand pairs. Penalize: specifics without sources. Penalize: missing tirzepatide's higher efficacy.",
+      "expected_topics": ["semaglutide vs tirzepatide", "STEP and SURMOUNT trials", "% body weight loss numbers", "GI side effects", "monthly cost retail vs covered", "FDA approval indications"]
+    },
+    {
+      "id": "RES-04-llm-carbon-footprint",
+      "kind": "research",
+      "question": "What's the actual carbon footprint of training a frontier LLM (GPT-4 class) and how does it compare to inference at scale (e.g., a billion ChatGPT queries)?",
+      "grading_guide": "Strong answer: (1) GPT-3 (2020 estimate, Patterson et al.): ~552 tCO2e for training, (2) GPT-4 estimated 5-10x higher → ~3000-5000 tCO2e (Anthropic/OpenAI haven't disclosed precisely), (3) Single-query inference: ~3-5 Wh per query (varies by model and provider) → ~3-5 g CO2e per query at average grid, (4) 1 billion queries × 4g = 4000 tCO2e — comparable to ONE training run, (5) Training is one-time, inference is continuous → at scale inference dominates over the model's lifetime, (6) Comparison: 1 transatlantic flight = ~1 tCO2/passenger. Strong answer acknowledges huge uncertainty in estimates, points out Google/Meta have published more transparent numbers. Penalize: making up specific numbers without citing methodology. Penalize: only training OR only inference without comparison.",
+      "expected_topics": ["training emissions estimates", "inference per-query emissions", "training vs lifetime inference comparison", "data center energy mix", "uncertainty bands"]
+    },
+    {
+      "id": "RES-05-college-rankings",
+      "kind": "research",
+      "question": "How effective are major US college rankings (US News, Forbes, WSJ/THE) at predicting career outcomes? What does the academic literature say about the value of attending a higher-ranked school?",
+      "grading_guide": "Strong answer: (1) Naive correlation: yes, higher-ranked schools have higher earnings — but this is mostly SELECTION (admitted students were already higher-ability), (2) Dale & Krueger (2002, 2014): when you control for student ABILITY (e.g., comparing students who applied to and were admitted to similar schools but chose differently), the selectivity premium is near zero for white males from middle-class+, (3) BUT: the selectivity premium is real and large for first-generation, low-income, and underrepresented students (~10-20%), (4) Specific majors matter much more than school rank: CS at state flagship > English at Ivy for earnings, (5) Network effects matter for finance/consulting (Wall Street recruits heavily from ~20 schools), (6) Limit: the methodology behind US News rankings (acceptance rate, faculty resources, alumni giving) is widely critiqued as Goodhart-able. Penalize: confidently endorsing rankings as predictive without Dale-Krueger nuance. Penalize: dismissing rankings entirely without acknowledging genuine signal in some cases.",
+      "expected_topics": ["Dale & Krueger studies", "selection bias", "first-gen/low-income exception", "major matters more than school", "network effects in finance", "US News methodology critiques"]
+    },
+    {
+      "id": "RES-06-microdosing-psilocybin",
+      "kind": "research",
+      "question": "What does the current evidence say about microdosing psilocybin for depression and anxiety? Distinguish placebo-controlled trials from observational/anecdotal reports.",
+      "grading_guide": "Strong answer: (1) BIG distinction: high-dose ('macrodose') psilocybin in 2-3 supervised sessions has strong evidence (COMPASS Pathways P3, JAMA 2022/2024) for treatment-resistant depression, (2) MICRODOSING (sub-perceptual ~0.1-0.3g dried) has very different evidence base, (3) Placebo-controlled microdosing studies (Szigeti et al. 2021 self-blinding study; Kuypers Univ. Maastricht; Imperial College RCTs): NULL or near-null effect on mood vs placebo. The expectancy effect explains most reported benefits, (4) BUT: some signals on creativity, focus (mixed), (5) Survey/anecdotal data is OVERWHELMINGLY positive, but is confounded by self-selection, expectancy, lack of blinding. Strong answer flags the observational/RCT divergence clearly. Penalize: presenting microdosing as evidence-based for depression. Penalize: conflating macro and microdosing. Penalize: accepting survey data uncritically.",
+      "expected_topics": ["RCT vs observational distinction", "macrodose vs microdose", "Szigeti self-blinding study", "expectancy/placebo effects", "COMPASS Pathways macrodose data"]
+    },
+    {
+      "id": "RES-07-mobile-stack-comparison",
+      "kind": "research",
+      "synthesis_category": "comparison_evaluation",
+      "question": "Compare React Native, Flutter, and native iOS/Android (Swift/Kotlin) for building a fintech mobile app with 3 engineers, primary US market, expected user base 100K in year 1.",
+      "grading_guide": "Strong answer: (1) Native (Swift+Kotlin) → highest quality + perf, but 2x dev cost (need iOS + Android engineers OR slower shipping), (2) React Native → leverages JS skills, large ecosystem, performance acceptable for fintech UI, BUT specific issues with native modules, (3) Flutter → best perf among cross-platform, single codebase, but smaller ecosystem and Dart is rare hire pool, (4) For fintech specifically: regulators care about PCI/SOC compliance — RN/Flutter have ~equal compliance story to native if app is built right, (5) With 3 engineers, native means 1.5 per platform — too thin. Cross-platform doubles effective output. (6) Recommendation: React Native if engineers know JS/TS (most common), Flutter if they're willing to learn Dart and want perf edge, native only if you have specialized iOS+Android background. Penalize: recommending native for 3-engineer team without flagging cost. Penalize: omitting hiring pool considerations.",
+      "expected_topics": ["dev cost per platform", "JS vs Dart vs Swift+Kotlin hiring pools", "fintech compliance", "React Native ecosystem maturity", "Flutter performance positioning"]
+    },
+    {
+      "id": "RES-08-section-230-reform",
+      "kind": "research",
+      "question": "What's the realistic impact of proposed Section 230 reforms (e.g., Senator Hawley's 'Make Big Tech Accountable' bill, Senator Warner's PACT Act, EARN IT Act) on smaller online platforms (forums, niche sites, communities <100K users)?",
+      "grading_guide": "Strong answer: (1) S230 currently shields platforms from liability for user-generated content, (2) Most reform proposals carve out exceptions (CSAM, terrorism, harassment) but the COMPLIANCE burden falls disproportionately on small platforms — large platforms have legal+ML moderation teams, smaller ones often have one volunteer mod, (3) PACT Act specifically tried to scale requirements by company size, EARN IT does not, (4) Real-world precedent: Section 230 carve-out for FOSTA-SESTA (2018, sex-trafficking) led to many small forums shutting down rather than risk liability — Craigslist personals removed in days, Reddit shut several subreddits, (5) Net effect of broad reform: chilling effect on small/niche platforms, consolidation toward large players who can afford compliance — opposite of stated goals. Strong answer cites FOSTA-SESTA precedent specifically. Penalize: not mentioning FOSTA-SESTA. Penalize: treating reform as a single position vs. multiple competing bills.",
+      "expected_topics": ["FOSTA-SESTA precedent and effects", "compliance asymmetry small vs large platforms", "specific bill differences", "moderation-team economics", "consolidation effect"]
+    },
+    {
+      "id": "RES-09-four-day-workweek",
+      "kind": "research",
+      "question": "How effective are 4-day work weeks based on actual company experiments and trials (not employee opinion surveys)? What does the productivity, retention, and revenue data show?",
+      "grading_guide": "Strong answer: (1) Largest study: 4 Day Week Global trials (UK 2022, US/Ireland 2022-2023, multiple cohorts) — 60+ companies × 6 months. Headline: ~95% chose to continue, productivity maintained or slightly up, employee burnout/satisfaction improved significantly, (2) Iceland 2015-2019 government trial: similar results in public sector, (3) METHODOLOGICAL CAVEATS: self-selected companies (those willing to try are not representative), measurement of 'productivity' inconsistent (output measures rare in knowledge work), (4) Microsoft Japan 2019 short trial showed 40% productivity boost — single-month, not generalizable, (5) Failure cases: customer-facing operations (retail, hospitality) struggle, manufacturing throughput-constrained. (6) Real conclusion: works for asynchronous knowledge work, fails or strains for in-person service work. Penalize: presenting 4DWW as universally validated. Penalize: not flagging selection bias in 4DWG trials. Penalize: ignoring that customer-service/retail stories are different.",
+      "expected_topics": ["4 Day Week Global study", "Iceland public sector study", "Microsoft Japan", "selection bias in voluntary trials", "knowledge work vs service work distinction", "productivity measurement caveats"]
+    },
+    {
+      "id": "RES-10-solar-roi-boston",
+      "kind": "research",
+      "question": "What's the realistic ROI of installing a residential solar panel system (10kW) on a single-family home in Boston, MA in 2026, accounting for current federal/state incentives, electricity rates, and panel degradation?",
+      "grading_guide": "Strong answer: (1) System cost 2026: ~$25-32K gross for 10kW residential, (2) Federal tax credit: 30% (Inflation Reduction Act, valid through 2032) → ~$8-10K back, (3) MA state incentives: SMART program rebate (varies), state tax credit ~$1000, (4) Net cost after incentives: ~$15-20K, (5) Boston annual production for 10kW: ~12,000 kWh (lower than Phoenix due to latitude+weather), (6) MA electricity rates: ~$0.30/kWh (high) → annual savings ~$3,600, (7) Simple payback: ~5-7 years, (8) 25-yr panel warranty, ~0.5%/yr degradation, lifetime ROI ~3-4x (NPV positive at typical discount rates), (9) Caveats: depends on roof orientation/shade, net metering policy stability. Penalize: numbers without specifics for Boston/MA. Penalize: ignoring degradation. Penalize: not citing IRA 30% credit.",
+      "expected_topics": ["IRA 30% federal credit", "MA SMART program", "10kW production at Boston latitude", "electricity rate $0.30/kWh", "5-7yr payback", "panel degradation 0.5%/yr"]
+    }
+  ]
+}
