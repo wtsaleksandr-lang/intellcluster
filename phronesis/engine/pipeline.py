@@ -13,6 +13,13 @@ from phronesis.engine.verdict import compute_confidence, build_recommendation
 from phronesis.engine.validator import validate_extraction, apply_fixes
 from phronesis.engine.synthesizer import synthesize_recommendation
 from phronesis.judges.rubric import build_dimensions, JUDGE_PERSPECTIVE_MAP
+from phronesis.judges.role_prompts import ROLE_JUDGE_MAP
+import os as _os
+
+
+def _judge_assignment_map() -> dict:
+    """Pick perspective vs role map based on PHRONESIS_V2 env flag."""
+    return ROLE_JUDGE_MAP if _os.environ.get("PHRONESIS_V2", "").lower() == "true" else JUDGE_PERSPECTIVE_MAP
 from phronesis.judges.blind_judge import anonymize_options, run_judge, JUDGE_MODELS
 from phronesis.judges.aggregator import aggregate_decision_results
 from shared.tracking.cost_tracking import CostTracker
@@ -128,7 +135,7 @@ async def run_decision_pipeline(
             continue
 
         model_override = model_overrides.get(judge_name, config["model"])
-        perspective = JUDGE_PERSPECTIVE_MAP.get(judge_name, "general")
+        perspective = _judge_assignment_map().get(judge_name, "general")
 
         judge_tasks.append(
             run_judge(
@@ -157,8 +164,11 @@ async def run_decision_pipeline(
     processed_results = []
     for i, result in enumerate(judge_results):
         if isinstance(result, Exception):
+            print(f"[pipeline] judge {judge_names[i]} raised: {type(result).__name__}: {str(result)[:200]}")
             processed_results.append({"error": str(result)[:200], "judge": judge_names[i]})
         else:
+            if isinstance(result, dict) and "error" in result:
+                print(f"[pipeline] judge {judge_names[i]} returned error: {result['error'][:200]}")
             processed_results.append(result)
             model = model_overrides.get(judge_names[i], JUDGE_MODELS[judge_names[i]]["model"])
             cost_tracker.record(
@@ -196,16 +206,39 @@ async def run_decision_pipeline(
 
     # ─── Step 7: Synthesize recommendation ───
     emit("synthesizing", "Writing recommendation...")
+    # Surface role-specific extras (failure_modes, base_rates, counterarguments)
+    # produced by v2 specialized judges. v1 judges don't emit these so the
+    # field is empty in v1 mode — synthesizer handles either case.
+    judge_extras = []
+    for r in processed_results:
+        if isinstance(r, dict) and "error" not in r:
+            ex = {}
+            if "failure_modes" in r:
+                ex["failure_modes"] = r["failure_modes"]
+            if "base_rates" in r:
+                ex["base_rates"] = r["base_rates"]
+            if "counterarguments" in r:
+                ex["counterarguments"] = r["counterarguments"]
+            if ex:
+                judge_extras.append(ex)
     synthesized = await synthesize_recommendation(
         question=question,
         winner=aggregated["winner"],
         ranked_options=[
-            {"option": o.option, "rank": o.rank, "score": o.final_score}
+            {
+                "option": o.option,
+                "rank": o.rank,
+                "score": o.final_score,
+                "strengths": o.strengths,
+                "weaknesses": o.weaknesses,
+            }
             for o in ranked_options
         ],
         judge_explanations=aggregated.get("explanations", []),
         judges_agree=aggregated["judges_agree"],
         judge_count=aggregated["judge_count"],
+        judge_extras=judge_extras if judge_extras else None,
+        criteria=criteria,
     )
 
     # Fall back to old verdict logic if synthesizer fails

@@ -164,7 +164,13 @@ def build_judge_system(
     length: str = "standard",
     perspective: str = "general",
 ) -> str:
-    """Build the system prompt for judge models with focus/length/perspective modes."""
+    """Build the system prompt for judge models with focus/length/perspective modes.
+
+    `perspective` accepts both v1 perspective names (general/skeptic/pragmatist)
+    and v2 role names (risk_modeler/base_rate_finder/devils_advocate). The
+    role-based prompts in role_prompts.py are richer and produce structurally
+    different analytical content, not just framing differences.
+    """
     dim_text = "\n".join(
         f"- {d['label']}: {d['description']} ({d['scale']})"
         for d in dimensions
@@ -172,8 +178,20 @@ def build_judge_system(
     dim_keys = "\n      ".join(f'"{d["name"]}": "<int>",' for d in dimensions)
     focus_instruction = FOCUS_INSTRUCTIONS.get(focus, FOCUS_INSTRUCTIONS["balanced"])
     length_instruction = LENGTH_INSTRUCTIONS.get(length, LENGTH_INSTRUCTIONS["standard"])
-    perspective_text = JUDGE_PERSPECTIVES.get(perspective, JUDGE_PERSPECTIVES["general"])
 
+    # v2 role specialization — defer to role_prompts.py if the perspective is a role
+    from phronesis.judges.role_prompts import is_role, build_role_system
+    if is_role(perspective):
+        return build_role_system(
+            base_system_template=JUDGE_SYSTEM_PROMPT,
+            role=perspective,
+            dim_text=dim_text,
+            dim_keys=dim_keys,
+            focus_instruction=focus_instruction,
+            length_instruction=length_instruction,
+        )
+
+    perspective_text = JUDGE_PERSPECTIVES.get(perspective, JUDGE_PERSPECTIVES["general"])
     return JUDGE_SYSTEM_PROMPT.format(
         perspective=perspective_text,
         dimensions=dim_text,

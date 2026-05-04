@@ -67,8 +67,8 @@ async def extract_decision(text: str) -> dict | None:
                 resp.raise_for_status()
                 content = resp.json()["choices"][0]["message"]["content"]
                 return json.loads(content)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[extractor] OpenAI extract failed: {type(e).__name__}: {e}")
 
     # Fallback to Anthropic
     anthropic_key = get_api_key("anthropic")
@@ -90,8 +90,8 @@ async def extract_decision(text: str) -> dict | None:
                 match = re.search(r'\{[\s\S]*\}', raw)
                 if match:
                     return json.loads(match.group())
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[extractor] Anthropic extract failed: {type(e).__name__}: {e}")
 
     return None
 

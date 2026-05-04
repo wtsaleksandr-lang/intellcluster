@@ -42,6 +42,12 @@ def anonymize_options(options: list[str]) -> tuple[dict[str, str], dict[str, str
 
 
 # Judge model configs — same pattern as ai-orchestrator
+# Judge JSON output: 3 options × ~6 dimensions × rationale text fits in
+# ~2500 tokens in practice; 3000 gives headroom against truncation on
+# long rationales without permitting the rare 4096-token ramble. Setting
+# too low truncates JSON mid-document and the parser errors.
+_JUDGE_MAX_TOKENS = 3000
+
 JUDGE_MODELS = {
     "judge_openai": {
         "url": "https://api.openai.com/v1/chat/completions",
@@ -51,7 +57,7 @@ JUDGE_MODELS = {
         "body_fn": lambda model, system, prompt: {
             "model": model,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            "max_tokens": 4096, "temperature": 0.3,
+            "max_tokens": _JUDGE_MAX_TOKENS, "temperature": 0.3,
             "response_format": {"type": "json_object"},
         },
         "extract_fn": lambda data: data["choices"][0]["message"]["content"],
@@ -64,7 +70,7 @@ JUDGE_MODELS = {
             "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json",
         },
         "body_fn": lambda model, system, prompt: {
-            "model": model, "max_tokens": 4096,
+            "model": model, "max_tokens": _JUDGE_MAX_TOKENS,
             "system": system,
             "messages": [{"role": "user", "content": prompt}],
         },
@@ -80,18 +86,34 @@ JUDGE_MODELS = {
         "header_fn": lambda key: {"Content-Type": "application/json"},
         "body_fn": lambda model, system, prompt: {
             "contents": [{"role": "user", "parts": [{"text": system + "\n\n" + prompt}]}],
-            "generationConfig": {"maxOutputTokens": 4096, "temperature": 0.3},
+            # thinkingBudget=0 disables internal "thinking tokens" on Gemini 2.5
+            # models — without it, a 1500-token cap can be entirely consumed by
+            # invisible reasoning before any output is emitted (finishReason
+            # ends up MAX_TOKENS with empty content).
+            "generationConfig": {
+                "maxOutputTokens": _JUDGE_MAX_TOKENS,
+                "temperature": 0.3,
+                "thinkingConfig": {"thinkingBudget": 0},
+            },
         },
-        "extract_fn": lambda data: data["candidates"][0]["content"]["parts"][0]["text"],
+        # Some models return content with no parts on edge cases; guard.
+        "extract_fn": lambda data: (
+            (data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", ""))
+            or ""
+        ),
     },
 }
 
 
-# Fallback chains: if primary fails, try these in order (escalate UP, not sideways)
+# Fallback chains: if primary fails, try these in order. Same-provider only
+# (the call uses one config + api_key per judge). Fallbacks must NEVER climb
+# the price curve — a flake on the cheap model shouldn't silently 25x the
+# cost. The chain entry equal to the primary is a no-op (deduped against
+# `tried` upstream), so listing it just documents intent.
 JUDGE_FALLBACK_CHAINS = {
-    "judge_openai": ["gpt-4o-mini", "gpt-4o"],
-    "judge_anthropic": ["claude-haiku-4-5-20251001", "claude-sonnet-4-6"],
-    "judge_google": ["gemini-2.0-flash", "gemini-2.5-flash"],
+    "judge_openai": ["gpt-4o-mini"],                            # cheapest OpenAI tier; no further fallback
+    "judge_anthropic": ["claude-haiku-4-5-20251001"],           # cheapest Anthropic tier; no further fallback
+    "judge_google": ["gemini-2.5-flash", "gemini-2.5-flash-lite"],  # 2.0/1.5 flash are deprecated for new keys; flash-lite is the working fallback
 }
 
 MAX_RETRIES = 1
@@ -122,13 +144,71 @@ async def _call_judge_once(
             data = resp.json()
             raw_text = config["extract_fn"](data)
 
-            json_match = re.search(r'\{[\s\S]*\}', raw_text)
-            if json_match:
-                return json.loads(json_match.group())
+            parsed = _try_parse_judge_json(raw_text)
+            if parsed is not None:
+                return parsed
             return {"error": "Judge returned no valid JSON", "raw": raw_text[:500]}
 
     except Exception as e:
         return {"error": str(e)[:200]}
+
+
+def _try_parse_judge_json(text: str) -> dict | None:
+    """Robust JSON extraction from a judge response.
+
+    Anthropic in particular sometimes wraps JSON in markdown code fences or
+    appends trailing prose. The greedy `{[\\s\\S]*}` match used to cut on the
+    LAST `}` in the document — which fails when the model emits trailing
+    explanatory text after a complete object. We try (in order):
+      1. Direct json.loads on the whole string
+      2. Strip ```json ... ``` fences and re-parse
+      3. Find the first balanced top-level {...} via brace-counting
+    """
+    if not text:
+        return None
+    # 1. straight parse
+    try:
+        return json.loads(text)
+    except Exception:
+        pass
+    # 2. strip code fences
+    stripped = re.sub(r"^```(?:json)?\s*\n", "", text.strip(), flags=re.MULTILINE)
+    stripped = re.sub(r"\n```\s*$", "", stripped.strip())
+    if stripped != text:
+        try:
+            return json.loads(stripped)
+        except Exception:
+            pass
+    # 3. find first balanced top-level object
+    start = text.find("{")
+    if start == -1:
+        return None
+    depth = 0
+    in_str = False
+    esc = False
+    for i in range(start, len(text)):
+        ch = text[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                candidate = text[start:i + 1]
+                try:
+                    return json.loads(candidate)
+                except Exception:
+                    return None
+    return None
 
 
 async def run_judge(

@@ -69,8 +69,8 @@ Criteria: {json.dumps(criteria)}"""
                 resp.raise_for_status()
                 content = resp.json()["choices"][0]["message"]["content"]
                 return json.loads(content)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[validator] OpenAI validate failed: {type(e).__name__}: {e}")
 
     # If validation fails, assume valid (don't block the pipeline)
     return {"valid": True, "issues": [], "suggested_fixes": {}}
