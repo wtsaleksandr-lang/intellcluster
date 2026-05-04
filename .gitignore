@@ -19,3 +19,7 @@ phronesis/benchmark/outputs/
 phronesis/benchmark/reports/*.json
 phronesis/benchmark/reports/*.md
 synthesis/history/
+
+# secret backups + eval runs — local only
+.env.bak
+evals/v1/runs/

@@ -26,11 +26,33 @@ ADMIN_COOKIE = "intellcluster_admin"
 TOKEN_TTL_SECONDS = 24 * 60 * 60  # 24 hours
 
 
+_INSECURE_SECRET_MARKERS = ("change-me", "change-this", "default", "secret-key", "admin123")
+
+
+def _is_insecure_secret(value: str) -> bool:
+    if not value:
+        return True
+    if len(value) < 24:
+        return True
+    lo = value.lower()
+    return any(m in lo for m in _INSECURE_SECRET_MARKERS)
+
+
 def _get_admin_creds() -> tuple[str, str, str]:
-    """Load admin credentials from env. Returns (username, password, secret_key)."""
+    """Load admin credentials from env. Returns (username, password, secret_key).
+
+    Refuses to boot if ADMIN_SECRET_KEY is missing or contains a default
+    placeholder, since the HMAC token is the only thing standing between
+    a request and admin access. The previous fallback ("change-me-in-production")
+    let anyone forge an admin cookie on a misconfigured deploy.
+    """
     username = os.environ.get("ADMIN_USERNAME", "admin")
     password = os.environ.get("ADMIN_PASSWORD", "")
-    secret = os.environ.get("ADMIN_SECRET_KEY", "change-me-in-production")
+    secret = os.environ.get("ADMIN_SECRET_KEY", "")
+    if _is_insecure_secret(secret):
+        raise RuntimeError(
+            "ADMIN_SECRET_KEY is missing or insecure. Set a strong value (>=24 chars, no 'change-me' placeholder) in your .env."
+        )
     return username, password, secret
 
 
@@ -709,11 +731,14 @@ async def admin_login_submit(request: Request, username: str = Form(...), passwo
     if username == expected_user and hmac.compare_digest(password, expected_pass):
         token = create_admin_token(username)
         resp = RedirectResponse(url="/admin", status_code=302)
+        # secure flag follows SECURE_COOKIES env (default True so admin sessions
+        # never travel over HTTP — set explicitly to "false" only for local dev).
+        secure_flag = os.environ.get("SECURE_COOKIES", "true").lower() != "false"
         resp.set_cookie(
             ADMIN_COOKIE, token,
             httponly=True, samesite="lax",
             max_age=TOKEN_TTL_SECONDS,
-            secure=False,  # set True in production with HTTPS
+            secure=secure_flag,
         )
         return resp
 

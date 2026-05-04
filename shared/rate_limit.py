@@ -29,6 +29,23 @@ from fastapi.responses import JSONResponse
 # key (ip|user:email) -> deque of recent timestamps
 _buckets: dict[str, deque] = defaultdict(lambda: deque(maxlen=400))
 
+# Counter to amortize the bucket-eviction sweep over many requests so we
+# don't grow _buckets unbounded under attack-from-many-IPs scenarios.
+_request_counter = 0
+_GC_EVERY = 1000
+
+
+def _maybe_gc_buckets(now: float) -> None:
+    global _request_counter
+    _request_counter += 1
+    if _request_counter < _GC_EVERY:
+        return
+    _request_counter = 0
+    cutoff = now - 60.0  # anything outside the sliding window is dead
+    stale = [k for k, q in _buckets.items() if not q or q[-1] < cutoff]
+    for k in stale:
+        _buckets.pop(k, None)
+
 
 # Hardcoded plan caps (requests/minute). Intentionally NOT env-configurable
 # past the free tier so an over-eager env change can't accidentally rate-
@@ -121,6 +138,7 @@ async def rate_limit_middleware(request: Request, call_next):
 
     key, plan, limit = _resolve_identity(request)
     now = time.time()
+    _maybe_gc_buckets(now)
     bucket = _buckets[key]
     window = 60.0
 

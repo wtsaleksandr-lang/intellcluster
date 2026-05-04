@@ -144,6 +144,21 @@ def delete_user(email: str) -> dict[str, Any]:
         "outcome_reminders_cleared": 0,
     }
 
+    import os as _os
+
+    def _atomic_write(path: _Path, content: str) -> None:
+        """Write to <path>.tmp then os.replace. If the process dies mid-write
+        the original file is preserved intact."""
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write(content)
+            f.flush()
+            try:
+                _os.fsync(f.fileno())
+            except OSError:
+                pass
+        _os.replace(tmp, path)
+
     def _filter_jsonl(path: _Path, match_key: str) -> int:
         if not path.exists():
             return 0
@@ -163,7 +178,7 @@ def delete_user(email: str) -> dict[str, Any]:
                 else:
                     kept.append(_json.dumps(rec, ensure_ascii=False))
         if removed:
-            path.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
+            _atomic_write(path, "\n".join(kept) + ("\n" if kept else ""))
         return removed
 
     def _redact_purchases(path: _Path) -> int:
@@ -185,7 +200,7 @@ def delete_user(email: str) -> dict[str, Any]:
                     redacted += 1
                 rewritten.append(_json.dumps(rec, ensure_ascii=False))
         if redacted:
-            path.write_text("\n".join(rewritten) + "\n", encoding="utf-8")
+            _atomic_write(path, "\n".join(rewritten) + "\n")
         return redacted
 
     counts["users"] = _filter_jsonl(_FILE, "email")

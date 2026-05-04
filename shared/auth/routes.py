@@ -50,6 +50,15 @@ _templates = Jinja2Templates(directory=[
 # Per-email throttle: email → last send timestamp.
 _LAST_SEND: dict[str, float] = {}
 _MIN_INTERVAL = 30  # seconds between link requests for the same email
+_LAST_SEND_GC_AGE = 600  # 10 min — well past _MIN_INTERVAL
+
+
+def _gc_last_send(now: float) -> None:
+    """Drop stale entries so _LAST_SEND can't grow unbounded over deployment lifetime."""
+    cutoff = now - _LAST_SEND_GC_AGE
+    stale = [k for k, v in _LAST_SEND.items() if v < cutoff]
+    for k in stale:
+        _LAST_SEND.pop(k, None)
 
 
 def _site_url(request: Request) -> str:
@@ -77,6 +86,7 @@ async def request_link(request: Request, email: str = Form(...)):
 
     # Per-email throttle
     now = time.time()
+    _gc_last_send(now)
     last = _LAST_SEND.get(email, 0)
     if now - last < _MIN_INTERVAL:
         wait = int(_MIN_INTERVAL - (now - last)) + 1

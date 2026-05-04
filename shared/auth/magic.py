@@ -5,7 +5,9 @@ Two token types:
 
   * **Magic token** — short-lived (15 min), embedded in the login email
     URL. Carries an email + expiry + HMAC signature. Verifying it creates
-    a session cookie. Stateless — no DB lookup required.
+    a session cookie. One-time-use: the signature is recorded in a small
+    ledger after `verify_magic_token` returns successfully, so reusing a
+    leaked link (browser history, mail forwarding) gets rejected.
   * **Session cookie** — 30-day, HMAC-signed, sets the authenticated
     identity. Read on every request via `current_user()`.
 
@@ -19,7 +21,9 @@ import base64
 import hashlib
 import hmac
 import os
+import threading
 import time
+from pathlib import Path
 from typing import Any
 
 from fastapi import HTTPException, Request
@@ -31,13 +35,65 @@ SESSION_COOKIE = "intellcluster_user"
 MAGIC_TOKEN_TTL = 15 * 60          # 15 minutes
 SESSION_TTL = 30 * 24 * 60 * 60    # 30 days
 
+_USED_TOKENS_FILE = Path("history/auth_used_tokens.jsonl")
+_used_tokens_lock = threading.RLock()
+_used_tokens_cache: set[str] | None = None  # in-memory mirror of the ledger
+_USED_TOKENS_GC_AGE = MAGIC_TOKEN_TTL + 60  # entries past expiry can be forgotten
+
+
+def _warm_used_tokens() -> set[str]:
+    seen: set[str] = set()
+    if not _USED_TOKENS_FILE.exists():
+        return seen
+    cutoff = time.time() - _USED_TOKENS_GC_AGE
+    with open(_USED_TOKENS_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            sig, _, ts = line.partition("|")
+            try:
+                if float(ts) >= cutoff:
+                    seen.add(sig)
+            except ValueError:
+                continue
+    return seen
+
+
+def _record_used_token(sig: str) -> None:
+    global _used_tokens_cache
+    with _used_tokens_lock:
+        if _used_tokens_cache is None:
+            _used_tokens_cache = _warm_used_tokens()
+        if sig in _used_tokens_cache:
+            return
+        _USED_TOKENS_FILE.parent.mkdir(exist_ok=True)
+        with open(_USED_TOKENS_FILE, "a", encoding="utf-8") as f:
+            f.write(f"{sig}|{int(time.time())}\n")
+        _used_tokens_cache.add(sig)
+
+
+def _is_token_used(sig: str) -> bool:
+    global _used_tokens_cache
+    with _used_tokens_lock:
+        if _used_tokens_cache is None:
+            _used_tokens_cache = _warm_used_tokens()
+        return sig in _used_tokens_cache
+
+
+_INSECURE_SECRET_MARKERS = ("change-me", "change-this", "default", "secret-key")
+
 
 def _secret() -> str:
-    return (
-        os.environ.get("AUTH_SECRET_KEY")
-        or os.environ.get("ADMIN_SECRET_KEY")
-        or "change-me-in-production"
-    )
+    """User-session HMAC secret. Refuses to operate on default placeholders so
+    nobody can forge a session cookie on a misconfigured deploy."""
+    s = os.environ.get("AUTH_SECRET_KEY") or os.environ.get("ADMIN_SECRET_KEY") or ""
+    if not s or len(s) < 24 or any(m in s.lower() for m in _INSECURE_SECRET_MARKERS):
+        raise RuntimeError(
+            "AUTH_SECRET_KEY (or ADMIN_SECRET_KEY) is missing or insecure. "
+            "Set a strong value (>=24 chars, no placeholder) in your .env."
+        )
+    return s
 
 
 def _b64e(b: bytes) -> str:
@@ -74,8 +130,13 @@ def create_magic_token(email: str) -> str:
     return f"{_b64e(payload.encode())}.{sig}"
 
 
-def verify_magic_token(token: str) -> str | None:
-    """Return the email if the token is valid and unexpired, else None."""
+def verify_magic_token(token: str, *, consume: bool = True) -> str | None:
+    """Return the email if the token is valid, unexpired, and unused.
+
+    With consume=True (default) the signature is recorded in the used-tokens
+    ledger BEFORE returning the email — so a second call with the same token
+    yields None. Pass consume=False from non-binding paths (e.g. previews).
+    """
     if not token or "." not in token:
         return None
     try:
@@ -89,6 +150,11 @@ def verify_magic_token(token: str) -> str | None:
             return None
         if not is_valid_email(email):
             return None
+        # One-time-use enforcement
+        if _is_token_used(sig):
+            return None
+        if consume:
+            _record_used_token(sig)
         return email
     except Exception:
         return None
