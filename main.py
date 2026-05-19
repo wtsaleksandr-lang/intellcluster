@@ -17,6 +17,12 @@ from pathlib import Path
 # Ensure we can import from the project root
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Doppler bootstrap — MUST be the first project import. Fills os.environ
+# from the Doppler vault before any other module reads env-vars at
+# import time (config.py / pydantic Settings, etc.). Side-effect only;
+# soft-fails if DOPPLER_TOKEN is unset or the API is unreachable.
+import bootstrap_doppler  # noqa: F401,E402
+
 from dotenv import load_dotenv
 load_dotenv()
 
