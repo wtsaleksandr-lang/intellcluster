@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Search Companies & Importers | IntellCluster Data{% endblock %}
+{% block body %}
+<main class="page wide">
+  <div class="subnav">
+    <a class="active" href="/data/search">▰ Companies & Importers</a>
+    <a href="/data/search?province=ON">⌖ Addresses</a>
+    <a href="/data/search?hs=8708">▥ Product Finder by HS Code</a>
+    <a href="/data/search">⌕ Product Finder</a>
+  </div>
+  {% if demo_mode %}<div class="notice">UI preview mode — these sample records will be replaced by the live normalized Canada datasets as persistence/search is connected.</div>{% endif %}
+  <form method="get" action="/data/search" class="filters">
+    <input type="hidden" name="q" value="{{ q }}">
+    <select class="filter" name="type" onchange="this.form.submit()"><option value="">Type</option><option value="Importer" {% if filters.type=='Importer' %}selected{% endif %}>Importer</option><option value="Company" {% if filters.type=='Company' %}selected{% endif %}>Company</option></select>
+    <select class="filter" name="province" onchange="this.form.submit()"><option value="">Province</option>{% for p in ['AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT'] %}<option value="{{ p }}" {% if filters.province==p %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
+    <select class="filter" name="status" onchange="this.form.submit()"><option value="">Corporate Status</option><option value="Active" {% if filters.status=='Active' %}selected{% endif %}>Active</option><option value="Inactive" {% if filters.status=='Inactive' %}selected{% endif %}>Inactive</option></select>
+    <input class="filter" name="origin" value="{{ filters.origin }}" placeholder="Origin country">
+    <input class="filter" name="hs" value="{{ filters.hs }}" placeholder="HS code">
+    <select class="filter" name="sort" onchange="this.form.submit()"><option value="relevance" {% if filters.sort=='relevance' %}selected{% endif %}>Relevance</option><option value="buyer_score" {% if filters.sort=='buyer_score' %}selected{% endif %}>AI Buyer Score</option><option value="name" {% if filters.sort=='name' %}selected{% endif %}>Company Name</option></select>
+    <button class="small-btn" type="submit">Apply</button>
+    <a class="advanced" href="/data/search">Advanced Search</a>
+  </form>
+  <div class="result-meta">Showing {{ companies|length }} business profiles{% if q %} matching “{{ q }}”{% endif %}</div>
+  <div class="cards">
+  {% for c in companies %}
+    <article class="card {% if c.kind != 'Importer' %}supplier{% endif %}">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <a class="card-title" href="/data/company/{{ c.slug }}">{{ c.name }} <span class="badge {% if c.kind != 'Importer' %}dark{% endif %}">{{ c.kind }}</span> {% if c.status=='Active' %}<span class="badge green">Active</span>{% endif %}</a>
+        <div class="card-address">{{ c.city }}, {{ c.province }}, {{ c.country }} · Incorporated {{ c.incorporated }}</div>
+        <div class="stats-row">
+          <div class="mini-stat"><div class="mini-label">AI Buyer Score</div><div class="mini-value">{{ c.buyer_score }}/100</div></div>
+          <div class="mini-stat"><div class="mini-label">HS Codes</div><div class="mini-value">{{ c.hs_codes|join(', ') }}</div></div>
+          <div class="mini-stat"><div class="mini-label">Source Countries</div><div class="mini-value">{{ c.origins|join(', ') }}</div></div>
+          <div class="mini-stat"><div class="mini-label">Data Sources</div><div class="mini-value">{{ c.source_count }} matched sources</div></div>
+        </div>
+      </div>
+    </article>
+  {% else %}
+    <div class="notice">No matching sample profiles. Clear some filters or try another search.</div>
+  {% endfor %}
+  </div>
+</main>
+{% endblock %}
