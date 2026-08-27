@@ -106,18 +106,66 @@ async def intelligence_suggest(q: str = Query(default="", min_length=0, max_leng
 
 
 @router.get("/data/search", response_class=HTMLResponse)
-async def intelligence_search(request: Request,q: str | None=Query(default=None),type: str | None=Query(default=None),province: str | None=Query(default=None),origin: str | None=Query(default=None),hs: str | None=Query(default=None),status: str | None=Query(default=None),sort: str=Query(default="relevance")):
-    # Existing company-profile BOL links historically used the general search URL.
-    # Detect that click from the Referer and route it into the native cached BOL page.
+async def intelligence_search(
+    request: Request,
+    q: str | None = Query(default=None),
+    type: str | None = Query(default=None),
+    province: str | None = Query(default=None),
+    city: str | None = Query(default=None),
+    origin: str | None = Query(default=None),
+    hs: str | None = Query(default=None),
+    status: str | None = Query(default=None),
+    incorporated_from: int | None = Query(default=None, ge=1800, le=2100),
+    incorporated_to: int | None = Query(default=None, ge=1800, le=2100),
+    website: str | None = Query(default=None),
+    sort: str = Query(default="relevance"),
+    page: int = Query(default=1, ge=1),
+):
     company_slug = _referer_company_slug(request)
     if company_slug and _looks_like_bol(q):
         return RedirectResponse(url=f"/data/company/{company_slug}/bol/{q}", status_code=302)
 
+    has_website = True if website == "yes" else False if website == "no" else None
+    page_size = 50
     with connect() as conn:
-        rows=search_entities(conn,q=q,company_type=type,province=province,origin=origin,hs=hs,status=status,sort=sort,limit=50)
-    demo_mode=not rows
-    if demo_mode: rows=_demo_search(q)
-    return templates.TemplateResponse(request=request,name="search.html",context={"active":"search","companies":rows,"q":q or "","filters":{"type":type or "","province":province or "","origin":origin or "","hs":hs or "","status":status or "","sort":sort},"demo_mode":demo_mode})
+        rows = search_entities(
+            conn,
+            q=q,
+            company_type=type,
+            province=province,
+            city=city,
+            origin=origin,
+            hs=hs,
+            status=status,
+            incorporated_from=incorporated_from,
+            incorporated_to=incorporated_to,
+            has_website=has_website,
+            sort=sort,
+            limit=page_size + 1,
+            offset=(page - 1) * page_size,
+        )
+    has_next = len(rows) > page_size
+    rows = rows[:page_size]
+    demo_mode = not rows and page == 1
+    if demo_mode:
+        rows = _demo_search(q)
+    filters = {
+        "type": type or "",
+        "province": province or "",
+        "city": city or "",
+        "origin": origin or "",
+        "hs": hs or "",
+        "status": status or "",
+        "incorporated_from": incorporated_from or "",
+        "incorporated_to": incorporated_to or "",
+        "website": website or "",
+        "sort": sort,
+    }
+    return templates.TemplateResponse(
+        request=request,
+        name="search.html",
+        context={"active":"search","companies":rows,"q":q or "","filters":filters,"demo_mode":demo_mode,"page":page,"has_next":has_next},
+    )
 
 
 @router.get("/data/company/{slug}", response_class=HTMLResponse)
