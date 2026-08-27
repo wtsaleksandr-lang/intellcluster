@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -11,6 +12,8 @@ from openpyxl import load_workbook
 
 from intelligence.models import SourceRecord
 from intelligence.sources.base import SourceAdapter
+
+logger = logging.getLogger(__name__)
 
 
 class CanadianImportersAdapter(SourceAdapter):
@@ -44,6 +47,7 @@ class CanadianImportersAdapter(SourceAdapter):
         target_dir = cache_dir / self.key
         target_dir.mkdir(parents=True, exist_ok=True)
         paths: list[Path] = []
+        failures: list[str] = []
         timeout = httpx.Timeout(180.0, connect=30.0)
         async with httpx.AsyncClient(
             timeout=timeout,
@@ -54,9 +58,24 @@ class CanadianImportersAdapter(SourceAdapter):
                 path = target_dir / f"{name}.xlsx"
                 payload: bytes | None = None
                 last_problem = "unknown response"
-                for attempt in range(3):
-                    response = await client.get(url)
-                    response.raise_for_status()
+
+                # A previously cached valid workbook is better than failing the whole
+                # source sync because one ISED endpoint temporarily returns zero bytes.
+                if path.exists():
+                    cached = path.read_bytes()
+                    if self._is_valid_xlsx(cached):
+                        paths.append(path)
+                        continue
+
+                for attempt in range(4):
+                    try:
+                        response = await client.get(url)
+                        response.raise_for_status()
+                    except httpx.HTTPError as exc:
+                        last_problem = f"request error: {exc}"
+                        await asyncio.sleep(1.5 * (attempt + 1))
+                        continue
+
                     candidate = response.content
                     content_type = response.headers.get("content-type", "")
                     if self._is_valid_xlsx(candidate):
@@ -65,19 +84,28 @@ class CanadianImportersAdapter(SourceAdapter):
                     snippet = candidate[:300].decode("utf-8", errors="replace").replace("\n", " ")
                     last_problem = (
                         f"HTTP {response.status_code}, content-type={content_type!r}, "
-                        f"first bytes={snippet[:180]!r}"
+                        f"bytes={len(candidate)}, first bytes={snippet[:180]!r}"
                     )
                     await asyncio.sleep(1.5 * (attempt + 1))
 
                 if payload is None:
-                    raise RuntimeError(
-                        "ISED returned a non-XLSX response for "
-                        f"{name}. This is usually a temporary anti-bot/rate-limit page. "
-                        f"Details: {last_problem}"
-                    )
+                    failures.append(f"{name}: {last_problem}")
+                    logger.warning("Skipping unavailable ISED workbook %s (%s)", name, last_problem)
+                    continue
 
                 path.write_bytes(payload)
                 paths.append(path)
+
+        if not paths:
+            detail = "; ".join(failures) or "no workbook paths were produced"
+            raise RuntimeError(f"No usable Canadian Importers workbooks could be downloaded. Details: {detail}")
+
+        if failures:
+            logger.warning(
+                "Canadian Importers sync is continuing with %s usable workbook(s); %s workbook(s) were unavailable.",
+                len(paths),
+                len(failures),
+            )
         return paths
 
     async def iter_records(self, paths: list[Path]) -> AsyncIterator[SourceRecord]:
@@ -92,7 +120,8 @@ class CanadianImportersAdapter(SourceAdapter):
             if "descriptions" in path.stem:
                 continue
             if not self._is_valid_xlsx(path.read_bytes()):
-                raise RuntimeError(f"Cached importer file is not a valid XLSX: {path}")
+                logger.warning("Skipping invalid cached importer workbook: %s", path)
+                continue
             workbook = load_workbook(path, read_only=True, data_only=True)
             try:
                 for sheet in workbook.worksheets:
