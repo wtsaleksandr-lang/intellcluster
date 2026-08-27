@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }} | IntellCluster Data{% endblock %}
+{% block meta_desc %}Business intelligence profile for {{ company.name }} including corporate status, import products, HS codes, source countries and AI buyer fit.{% endblock %}
+{% block body %}
+<main class="page wide">
+  {% if demo_mode %}<div class="notice">UI preview mode — profile structure is live; sample values will be replaced by source-backed records.</div>{% endif %}
+  <section class="profile-box">
+    <div class="profile-head">
+      <div><div class="profile-title">{{ company.name }} <span class="badge">{{ company.kind }}</span> <span class="badge green">{{ company.status }}</span></div></div>
+      <div class="profile-actions"><button class="small-btn">☆ Save</button><button class="small-btn">⇩ Export</button><button class="small-btn">⋮</button></div>
+    </div>
+    <div class="profile-meta">
+      <div>⌖ {{ company.city }}, {{ company.province }}, {{ company.country }}</div>
+      <div>◉ Incorporated {{ company.incorporated }} · Federal/provincial source match pending</div>
+      <div>⇄ Imports/products matched under {{ company.hs_codes|length }} HS families</div>
+      <div>✦ AI classification: likely B2B buyer / distributor profile</div>
+    </div>
+    <div class="source-line">Sources: Corporations Canada + Canadian Importers Database · provenance shown per field when live ingestion is connected</div>
+  </section>
+
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-label">AI Buyer Score</div><div class="metric-value">{{ company.buyer_score }}/100</div></div>
+    <div class="metric"><div class="metric-label">Corporate Status</div><div class="metric-value">{{ company.status }}</div></div>
+    <div class="metric"><div class="metric-label">HS Families</div><div class="metric-value">{{ company.hs_codes|length }}</div></div>
+    <div class="metric"><div class="metric-label">Origin Countries</div><div class="metric-value">{{ company.origins|length }}</div></div>
+    <div class="metric"><div class="metric-label">Matched Sources</div><div class="metric-value">{{ company.source_count }}</div></div>
+  </div>
+
+  <section class="section">
+    <h2>{{ company.name }}'s Product / HS Code Breakdown</h2>
+    <table class="data-table"><thead><tr><th>HS Code</th><th>Product Category</th><th>Source Countries</th><th>Buyer Fit</th></tr></thead><tbody>
+    {% for code in company.hs_codes %}<tr><td><a href="/data/search?hs={{ code }}">{{ code }}</a></td><td>{{ company.products[loop.index0] if loop.index0 < company.products|length else company.products[0] }}</td><td>{{ company.origins|join(', ') }}</td><td>{{ company.buyer_score }}/100</td></tr>{% endfor %}
+    </tbody></table>
+  </section>
+
+  <section class="section">
+    <h2>Import / Sourcing Geography</h2>
+    <div class="barlist">
+      {% for origin in company.origins %}
+      <div class="barrow"><a href="/data/search?origin={{ origin }}">{{ origin }}</a><div class="bar"><span style="width:{{ 88 - loop.index0*22 }}%"></span></div><strong>{{ 88 - loop.index0*22 }}%</strong></div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Products & Searchable Intelligence</h2>
+    <div class="tags">{% for p in company.products %}<a class="tag" href="/data/search?q={{ p|urlencode }}">{{ p }}</a>{% endfor %}{% for hs in company.hs_codes %}<a class="tag" href="/data/search?hs={{ hs }}">HS {{ hs }}</a>{% endfor %}</div>
+  </section>
+
+  <section class="section">
+    <h2>Company & Contact Enrichment</h2>
+    <table class="data-table"><thead><tr><th>Field</th><th>Value</th><th>Source</th></tr></thead><tbody>
+      <tr><td>Website</td><td>Lazy enrichment — resolve on first profile request</td><td>Web discovery</td></tr>
+      <tr><td>Decision makers</td><td>Enrich on demand</td><td>Hunter</td></tr>
+      <tr><td>Industry classification</td><td>AI classification from public records + website</td><td>IntellCluster AI</td></tr>
+      <tr><td>Corporate identity</td><td>{{ company.name }} · {{ company.status }}</td><td>Corporations Canada</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="section">
+    <h2>Related Companies & Buyer Matches</h2>
+    <div class="cards">
+      {% for related in ['Similar Canadian importers in the same HS family','Companies sourcing the same products from '+company.origins[0],'Potential competitors and distributors'] %}
+      <article class="card"><div class="card-accent"></div><div class="card-body"><div class="card-title">{{ related }}</div><div class="card-address">This relationship panel will populate from entity resolution + importer relationship tables.</div></div></article>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+{% endblock %}
