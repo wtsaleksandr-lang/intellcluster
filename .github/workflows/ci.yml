@@ -30,17 +30,16 @@ jobs:
         env:
           ADMIN_USERNAME: smoke
           ADMIN_PASSWORD: smoke-test-pw
-          ADMIN_SECRET_KEY: smoke-secret-key
+          ADMIN_SECRET_KEY: smoke-ci-secret-key-32-chars-2026
         run: |
           python -m tests.smoke
           python -m tests.intelligence_unit
           python -m tests.intelligence_ui
 
   lint:
-    name: Lint (ruff)
+    name: Lint intelligence changes
     runs-on: ubuntu-latest
     timeout-minutes: 4
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -48,5 +47,5 @@ jobs:
           python-version: "3.11"
       - name: Install ruff
         run: pip install ruff
-      - name: Run ruff
-        run: ruff check . --exclude=uploads --exclude=history --output-format=github
+      - name: Run ruff on new intelligence layer
+        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_ui.py --output-format=github
