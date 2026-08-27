@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-import logging
+import re
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -13,8 +13,6 @@ from openpyxl import load_workbook
 from intelligence.models import SourceRecord
 from intelligence.sources.base import SourceAdapter
 
-logger = logging.getLogger(__name__)
-
 
 class CanadianImportersAdapter(SourceAdapter):
     key = "canadian_importers"
@@ -22,7 +20,7 @@ class CanadianImportersAdapter(SourceAdapter):
     license_name = "Open Government Licence - Canada"
     attribution = "Innovation, Science and Economic Development Canada"
 
-    # 2023 is the latest published importer activity dataset as of Aug 2026.
+    # 2023 is the latest bulk importer dataset currently wired into this adapter.
     DATASETS = {
         "major_importers_hs10": "https://ised-isde.canada.ca/site/ised/sites/default/files/documents/cid-bdic-majorimportersbyhs102023.xlsx",
         "major_importers_hs6": "https://ised-isde.canada.ca/site/ised/sites/default/files/documents/cid-bdic-majorimportersbyhs62023.xlsx",
@@ -47,8 +45,9 @@ class CanadianImportersAdapter(SourceAdapter):
         target_dir = cache_dir / self.key
         target_dir.mkdir(parents=True, exist_ok=True)
         paths: list[Path] = []
-        failures: list[str] = []
+        failed: list[str] = []
         timeout = httpx.Timeout(180.0, connect=30.0)
+
         async with httpx.AsyncClient(
             timeout=timeout,
             follow_redirects=True,
@@ -56,23 +55,26 @@ class CanadianImportersAdapter(SourceAdapter):
         ) as client:
             for name, url in self.DATASETS.items():
                 path = target_dir / f"{name}.xlsx"
-                payload: bytes | None = None
-                last_problem = "unknown response"
 
-                # A previously cached valid workbook is better than failing the whole
-                # source sync because one ISED endpoint temporarily returns zero bytes.
+                # A previously downloaded valid workbook is preferable to replacing
+                # it with the occasional zero-byte response returned by ISED.
                 if path.exists():
-                    cached = path.read_bytes()
+                    try:
+                        cached = path.read_bytes()
+                    except OSError:
+                        cached = b""
                     if self._is_valid_xlsx(cached):
                         paths.append(path)
                         continue
 
-                for attempt in range(4):
+                payload: bytes | None = None
+                last_problem = "unknown response"
+                for attempt in range(3):
                     try:
                         response = await client.get(url)
                         response.raise_for_status()
                     except httpx.HTTPError as exc:
-                        last_problem = f"request error: {exc}"
+                        last_problem = f"request failed: {exc}"
                         await asyncio.sleep(1.5 * (attempt + 1))
                         continue
 
@@ -81,6 +83,7 @@ class CanadianImportersAdapter(SourceAdapter):
                     if self._is_valid_xlsx(candidate):
                         payload = candidate
                         break
+
                     snippet = candidate[:300].decode("utf-8", errors="replace").replace("\n", " ")
                     last_problem = (
                         f"HTTP {response.status_code}, content-type={content_type!r}, "
@@ -89,71 +92,106 @@ class CanadianImportersAdapter(SourceAdapter):
                     await asyncio.sleep(1.5 * (attempt + 1))
 
                 if payload is None:
-                    failures.append(f"{name}: {last_problem}")
-                    logger.warning("Skipping unavailable ISED workbook %s (%s)", name, last_problem)
+                    failed.append(name)
+                    print(f"Skipping unavailable ISED workbook {name} ({last_problem})")
                     continue
 
                 path.write_bytes(payload)
                 paths.append(path)
 
         if not paths:
-            detail = "; ".join(failures) or "no workbook paths were produced"
-            raise RuntimeError(f"No usable Canadian Importers workbooks could be downloaded. Details: {detail}")
-
-        if failures:
-            logger.warning(
-                "Canadian Importers sync is continuing with %s usable workbook(s); %s workbook(s) were unavailable.",
-                len(paths),
-                len(failures),
+            raise RuntimeError(
+                "No Canadian Importers workbooks could be downloaded. "
+                "ISED may be temporarily blocking automated downloads."
+            )
+        if failed:
+            print(
+                "Canadian Importers sync is continuing with "
+                f"{len(paths)} usable workbook(s); {len(failed)} workbook(s) were unavailable."
             )
         return paths
 
     async def iter_records(self, paths: list[Path]) -> AsyncIterator[SourceRecord]:
-        """Yield importer/company records from the major-importer workbooks.
+        """Yield importer/company records from ISED workbooks.
 
-        The ISED workbooks have varied column labels across releases, so parsing
-        uses normalized aliases and preserves the entire row in attributes.
-        Description-only files are skipped here and will be used by a taxonomy
-        loader later.
+        The exported workbooks are presentation-oriented: title and metadata rows
+        may appear before the real table, and header text varies by report. This
+        parser discovers table headers anywhere in the sheet, recognizes labels
+        by meaning, and keeps context such as an HS code found in surrounding rows.
         """
         for path in paths:
             if "descriptions" in path.stem:
                 continue
             if not self._is_valid_xlsx(path.read_bytes()):
-                logger.warning("Skipping invalid cached importer workbook: %s", path)
+                print(f"Skipping invalid cached importer workbook: {path}")
                 continue
+
             workbook = load_workbook(path, read_only=True, data_only=True)
             try:
                 for sheet in workbook.worksheets:
-                    rows = sheet.iter_rows(values_only=True)
-                    try:
-                        headers = next(rows)
-                    except StopIteration:
-                        continue
-                    keys = [self._norm(v) for v in headers]
-                    for values in rows:
-                        row = {
-                            keys[i]: self._string(values[i])
-                            for i in range(min(len(keys), len(values)))
-                            if keys[i]
-                        }
-                        name = self._pick(
-                            row,
-                            "companyname",
-                            "importername",
-                            "nameofimporter",
-                            "company",
-                            "importer",
-                        )
-                        if not name:
+                    header_map: dict[str, int] | None = None
+                    context_hs10: str | None = self._digits_from_text(sheet.title, 10)
+                    context_hs6: str | None = self._digits_from_text(sheet.title, 6)
+                    context_origin: str | None = None
+                    blank_rows = 0
+
+                    for values in sheet.iter_rows(values_only=True):
+                        strings = [self._string(value) for value in values]
+                        nonempty = [value for value in strings if value]
+                        if not nonempty:
+                            blank_rows += 1
+                            # A substantial gap often separates report sections.
+                            if blank_rows >= 3:
+                                header_map = None
                             continue
-                        hs10 = self._digits(self._pick(row, "hs10", "hscode10", "hs10code"), 10)
-                        hs6 = self._digits(self._pick(row, "hs6", "hscode6", "hs6code"), 6)
-                        city = self._pick(row, "city", "importercity")
-                        province = self._pick(row, "province", "prov", "provincecode")
-                        origin = self._pick(row, "country", "countryoforigin", "origincountry")
+                        blank_rows = 0
+
+                        # Update report-level context before checking whether this is
+                        # a table header. This helps reports where HS code/country are
+                        # printed in a title rather than repeated for every company.
+                        row_text = " | ".join(nonempty)
+                        found10 = self._digits_from_text(row_text, 10)
+                        found6 = self._digits_from_text(row_text, 6)
+                        if found10:
+                            context_hs10 = found10
+                            context_hs6 = found10[:6]
+                        elif found6:
+                            context_hs6 = found6
+
+                        detected_header = self._detect_header(strings)
+                        if detected_header:
+                            header_map = detected_header
+                            continue
+
+                        if header_map is None:
+                            # Some country reports print a heading such as "China"
+                            # before the table. Preserve a conservative country hint.
+                            if len(nonempty) == 1 and 2 <= len(nonempty[0]) <= 80:
+                                candidate = nonempty[0].strip()
+                                if not any(ch.isdigit() for ch in candidate) and "import" not in candidate.casefold():
+                                    context_origin = candidate
+                            continue
+
+                        name = self._value_at(strings, header_map.get("name"))
+                        if not name or self._looks_like_header(name):
+                            continue
+
+                        city = self._value_at(strings, header_map.get("city"))
+                        province = self._value_at(strings, header_map.get("province"))
+                        postal = self._value_at(strings, header_map.get("postal_code"))
+                        hs10 = self._digits(self._value_at(strings, header_map.get("hs10")), 10) or context_hs10
+                        hs6 = self._digits(self._value_at(strings, header_map.get("hs6")), 6) or context_hs6
+                        if hs10 and not hs6:
+                            hs6 = hs10[:6]
+                        origin = self._value_at(strings, header_map.get("origin_country")) or context_origin
+
+                        # Build a readable raw row keyed by the original visible headers
+                        # where possible; semantic fields are stored separately below.
+                        raw = {f"column_{i + 1}": value for i, value in enumerate(strings) if value}
                         record_id = "|".join(
-                            part for part in [path.stem, name, hs10 or hs6 or "", origin or "", city or ""] if part
+                            part
+                            for part in [path.stem, name, hs10 or hs6 or "", origin or "", city or "", postal or ""]
+                            if part
                         )
                         yield SourceRecord(
                             source=self.key,
@@ -163,6 +201,7 @@ class CanadianImportersAdapter(SourceAdapter):
                             country="CA",
                             region=province,
                             city=city,
+                            postal_code=postal,
                             source_url="https://open.canada.ca/data/en/dataset/873cfcb0-1c9b-4a48-a366-076697069bb9",
                             attributes={
                                 "activity_year": 2023,
@@ -170,11 +209,53 @@ class CanadianImportersAdapter(SourceAdapter):
                                 "hs6": hs6,
                                 "origin_country": origin,
                                 "dataset": path.stem,
-                                "raw": row,
+                                "sheet": sheet.title,
+                                "raw": raw,
                             },
                         )
             finally:
                 workbook.close()
+
+    @classmethod
+    def _detect_header(cls, values: list[str]) -> dict[str, int] | None:
+        mapping: dict[str, int] = {}
+        for index, value in enumerate(values):
+            normalized = cls._norm(value)
+            if not normalized:
+                continue
+            if (
+                normalized.startswith("companyname")
+                or normalized.startswith("importername")
+                or normalized in {"company", "importer", "nameofimporter"}
+            ):
+                mapping["name"] = index
+            elif normalized.startswith("city") or normalized == "importercity":
+                mapping["city"] = index
+            elif normalized.startswith("province") or normalized in {"prov", "provinceterritory"}:
+                mapping["province"] = index
+            elif normalized.startswith("postalcode") or normalized in {"postcode", "zipcode"}:
+                mapping["postal_code"] = index
+            elif normalized.startswith("countryoforigin") or normalized in {"origincountry", "country"}:
+                mapping["origin_country"] = index
+            elif "hs10" in normalized or normalized in {"hscode10", "tariffitem"}:
+                mapping["hs10"] = index
+            elif "hs6" in normalized or normalized in {"hscode6", "subheading"}:
+                mapping["hs6"] = index
+
+        # A company/importer column is the one indispensable signal. Most ISED
+        # report tables also contain city/province/postal, but some report types do not.
+        return mapping if "name" in mapping else None
+
+    @staticmethod
+    def _value_at(values: list[str], index: int | None) -> str | None:
+        if index is None or index < 0 or index >= len(values):
+            return None
+        return values[index] or None
+
+    @classmethod
+    def _looks_like_header(cls, value: str) -> bool:
+        normalized = cls._norm(value)
+        return normalized.startswith("companyname") or normalized.startswith("importername")
 
     @staticmethod
     def _is_valid_xlsx(payload: bytes) -> bool:
@@ -202,16 +283,18 @@ class CanadianImportersAdapter(SourceAdapter):
         return str(value).strip()
 
     @staticmethod
-    def _pick(row: dict[str, str], *keys: str) -> str | None:
-        for key in keys:
-            value = row.get(key)
-            if value:
-                return value
-        return None
-
-    @staticmethod
     def _digits(value: str | None, length: int) -> str | None:
         if not value:
             return None
         digits = "".join(ch for ch in value if ch.isdigit())
-        return digits.zfill(length)[:length] if digits else None
+        if len(digits) < length:
+            return None
+        return digits[:length]
+
+    @staticmethod
+    def _digits_from_text(value: str | None, length: int) -> str | None:
+        if not value:
+            return None
+        # Avoid treating years, postal codes, and unrelated numbers as HS codes.
+        match = re.search(rf"(?<!\d)(\d{{{length}}})(?!\d)", value.replace(" ", ""))
+        return match.group(1) if match else None
