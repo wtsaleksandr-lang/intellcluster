@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
+from zipfile import BadZipFile, ZipFile
 
 import httpx
 from openpyxl import load_workbook
@@ -28,16 +30,53 @@ class CanadianImportersAdapter(SourceAdapter):
         "hs6_descriptions": "https://ised-isde.canada.ca/site/ised/sites/default/files/documents/cid-bdic-hs6description2023_0.xlsx",
     }
 
+    REQUEST_HEADERS = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131 Safari/537.36"
+        ),
+        "Accept": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream,*/*;q=0.8",
+        "Accept-Language": "en-CA,en;q=0.9",
+        "Referer": "https://open.canada.ca/",
+    }
+
     async def fetch(self, cache_dir: Path) -> list[Path]:
         target_dir = cache_dir / self.key
         target_dir.mkdir(parents=True, exist_ok=True)
         paths: list[Path] = []
-        async with httpx.AsyncClient(timeout=180, follow_redirects=True) as client:
+        timeout = httpx.Timeout(180.0, connect=30.0)
+        async with httpx.AsyncClient(
+            timeout=timeout,
+            follow_redirects=True,
+            headers=self.REQUEST_HEADERS,
+        ) as client:
             for name, url in self.DATASETS.items():
                 path = target_dir / f"{name}.xlsx"
-                response = await client.get(url)
-                response.raise_for_status()
-                path.write_bytes(response.content)
+                payload: bytes | None = None
+                last_problem = "unknown response"
+                for attempt in range(3):
+                    response = await client.get(url)
+                    response.raise_for_status()
+                    candidate = response.content
+                    content_type = response.headers.get("content-type", "")
+                    if self._is_valid_xlsx(candidate):
+                        payload = candidate
+                        break
+                    snippet = candidate[:300].decode("utf-8", errors="replace").replace("\n", " ")
+                    last_problem = (
+                        f"HTTP {response.status_code}, content-type={content_type!r}, "
+                        f"first bytes={snippet[:180]!r}"
+                    )
+                    await asyncio.sleep(1.5 * (attempt + 1))
+
+                if payload is None:
+                    raise RuntimeError(
+                        "ISED returned a non-XLSX response for "
+                        f"{name}. This is usually a temporary anti-bot/rate-limit page. "
+                        f"Details: {last_problem}"
+                    )
+
+                path.write_bytes(payload)
                 paths.append(path)
         return paths
 
@@ -52,6 +91,8 @@ class CanadianImportersAdapter(SourceAdapter):
         for path in paths:
             if "descriptions" in path.stem:
                 continue
+            if not self._is_valid_xlsx(path.read_bytes()):
+                raise RuntimeError(f"Cached importer file is not a valid XLSX: {path}")
             workbook = load_workbook(path, read_only=True, data_only=True)
             try:
                 for sheet in workbook.worksheets:
@@ -105,6 +146,19 @@ class CanadianImportersAdapter(SourceAdapter):
                         )
             finally:
                 workbook.close()
+
+    @staticmethod
+    def _is_valid_xlsx(payload: bytes) -> bool:
+        if len(payload) < 4 or not payload.startswith(b"PK"):
+            return False
+        try:
+            from io import BytesIO
+
+            with ZipFile(BytesIO(payload)) as archive:
+                names = set(archive.namelist())
+                return "[Content_Types].xml" in names and "xl/workbook.xml" in names
+        except BadZipFile:
+            return False
 
     @staticmethod
     def _norm(value: Any) -> str:
