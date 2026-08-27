@@ -23,7 +23,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "uvicorn main:app --host 0.0.0.0 --port 5000"
+args = "uvicorn main_data:app --host 0.0.0.0 --port 5000"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -35,4 +35,4 @@ externalPort = 80
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", "main:app"]
+run = ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", "main_data:app"]
