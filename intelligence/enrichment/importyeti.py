@@ -92,16 +92,24 @@ def cache_is_fresh(cache: dict[str, Any] | None, max_age_days: int = 30) -> bool
 
 
 def compact_profile(data: dict[str, Any]) -> dict[str, Any]:
-    """Keep the fields needed by IntellCluster while avoiding a giant JSON blob."""
+    """Keep presentation/search facets needed by IntellCluster.
+
+    The profile remains far smaller than the source payload while preserving all
+    fields used by interactive charts, drill-down links and supply-chain panels.
+    """
     keep = {
         "title",
         "also_known_names",
         "address",
+        "address_plain",
+        "other_addresses_contact_info",
         "website",
+        "other_websites",
         "phone_number",
         "total_shipments",
         "country",
         "country_code",
+        "carriers_per_country",
         "container_types",
         "containers",
         "containers_load",
@@ -114,6 +122,9 @@ def compact_profile(data: dict[str, Any]) -> dict[str, Any]:
         "suppliers_table",
         "notify_party_shipments",
         "notify_party_shipments_perc",
+        "internal_notify_party_shipments",
+        "internal_notify_party_shipments_perc",
+        "notify_party_table",
         "recent_bols",
         "total_shipping_cost",
         "avg_teu_per_shipment",
@@ -124,9 +135,13 @@ def compact_profile(data: dict[str, Any]) -> dict[str, Any]:
     }
     result = {key: value for key, value in data.items() if key in keep}
     if isinstance(result.get("suppliers_table"), list):
-        result["suppliers_table"] = result["suppliers_table"][:50]
+        result["suppliers_table"] = result["suppliers_table"][:60]
     if isinstance(result.get("recent_bols"), list):
-        result["recent_bols"] = result["recent_bols"][:100]
+        result["recent_bols"] = result["recent_bols"][:150]
     if isinstance(result.get("lane_permutations"), list):
-        result["lane_permutations"] = result["lane_permutations"][:50]
+        result["lane_permutations"] = result["lane_permutations"][:60]
+    if isinstance(result.get("notify_party_table"), list):
+        result["notify_party_table"] = result["notify_party_table"][:40]
+    if isinstance(result.get("other_addresses_contact_info"), list):
+        result["other_addresses_contact_info"] = result["other_addresses_contact_info"][:60]
     return result
