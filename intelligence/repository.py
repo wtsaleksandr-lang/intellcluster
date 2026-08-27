@@ -267,6 +267,23 @@ def get_entity_by_slug(conn: Connection, slug: str) -> dict[str, Any] | None:
     return _decorate_company(conn, dict(row), full=True) if row else None
 
 
+def get_entity_enrichment(conn: Connection, entity_id: int) -> dict[str, Any]:
+    value = conn.execute(select(entities.c.enrichment).where(entities.c.id == entity_id)).scalar_one_or_none()
+    return dict(value or {}) if isinstance(value, dict) else {}
+
+
+def set_entity_enrichment(conn: Connection, entity_id: int, provider: str, payload: dict[str, Any]) -> None:
+    current = get_entity_enrichment(conn, entity_id)
+    current[provider] = json_safe(payload)
+    values: dict[str, Any] = {"enrichment": current, "updated_at": func.now()}
+    if provider == "importyeti":
+        if payload.get("website"):
+            values["website"] = str(payload["website"])
+        if payload.get("summary"):
+            values["summary"] = str(payload["summary"])
+    conn.execute(update(entities).where(entities.c.id == entity_id).values(**values))
+
+
 def _percentage_rows(counter: Counter[str], limit: int = 10) -> list[dict[str, Any]]:
     total = sum(counter.values()) or 1
     return [
@@ -314,6 +331,7 @@ def _decorate_company(conn: Connection, company: dict[str, Any], full: bool = Fa
         select(func.count(source_records.c.id)).where(source_records.c.entity_id == entity_id)
     ).scalar_one()
 
+    enrichment = company.get("enrichment") if isinstance(company.get("enrichment"), dict) else {}
     company.update(
         name=company.pop("canonical_name"),
         kind="Importer" if company.get("is_importer") else "Company",
@@ -330,5 +348,6 @@ def _decorate_company(conn: Connection, company: dict[str, Any], full: bool = Fa
         hs_breakdown=hs_breakdown,
         origin_breakdown=_percentage_rows(origin_counter, 12),
         dataset_breakdown=_percentage_rows(dataset_counter, 10),
+        importyeti=enrichment.get("importyeti") if isinstance(enrichment, dict) else None,
     )
     return company
