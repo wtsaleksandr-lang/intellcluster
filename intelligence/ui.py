@@ -11,7 +11,12 @@ from fastapi.templating import Jinja2Templates
 
 from intelligence.database import connect
 from intelligence.enrichment.importyeti import ImportYetiClient, cache_is_fresh, compact_profile
-from intelligence.repository import get_entity_by_slug, search_entities, set_entity_enrichment
+from intelligence.repository import (
+    get_entity_by_slug,
+    get_entity_enrichment,
+    search_entities,
+    set_entity_enrichment,
+)
 
 router = APIRouter(tags=["intelligence-ui"])
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
@@ -64,6 +69,7 @@ async def _maybe_enrich_importyeti(company: dict) -> dict:
             refreshed = get_entity_by_slug(conn, company["slug"])
         return refreshed or company
     except (httpx.HTTPError, RuntimeError, ValueError):
+        # Stale cached data remains attached to company and is still served.
         return company
 
 
@@ -102,3 +108,40 @@ async def intelligence_company(request: Request, slug: str):
     elif not demo_mode:
         company = await _maybe_enrich_importyeti(company)
     return templates.TemplateResponse(request=request,name="company.html",context={"active":"company","company":company,"demo_mode":demo_mode})
+
+
+@router.get("/data/company/{slug}/bol/{bol_number}", response_class=HTMLResponse)
+async def intelligence_bol(request: Request, slug: str, bol_number: str):
+    with connect() as conn:
+        company = get_entity_by_slug(conn, slug)
+        enrichment = get_entity_enrichment(conn, int(company["id"])) if company else {}
+    if company is None:
+        return templates.TemplateResponse(
+            request=request,
+            name="bol.html",
+            context={"active":"company","company":None,"bol":None,"error":"Company not found."},
+            status_code=404,
+        )
+
+    cache_key = f"importyeti_bol:{bol_number.upper()}"
+    cached = enrichment.get(cache_key) if isinstance(enrichment, dict) else None
+    bol = cached if isinstance(cached, dict) else None
+    error = None
+    if not cache_is_fresh(bol) and os.getenv("IMPORTYETI_API_KEY"):
+        try:
+            fresh = await ImportYetiClient().bol_detail(bol_number)
+            bol = fresh
+            with connect() as conn:
+                set_entity_enrichment(conn, int(company["id"]), cache_key, fresh)
+        except (httpx.HTTPError, RuntimeError, ValueError) as exc:
+            # Keep stale cached detail if available; otherwise show a useful error.
+            if bol is None:
+                error = f"Shipment detail could not be loaded: {exc}"
+    elif bol is None and not os.getenv("IMPORTYETI_API_KEY"):
+        error = "ImportYeti API is not configured for shipment detail."
+
+    return templates.TemplateResponse(
+        request=request,
+        name="bol.html",
+        context={"active":"company","company":company,"bol":bol,"error":error},
+    )
