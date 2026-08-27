@@ -1,69 +1,129 @@
 {% extends "base.html" %}
 {% block title %}{{ company.name }} | IntellCluster Data{% endblock %}
-{% block meta_desc %}Business intelligence profile for {{ company.name }} including corporate status, import products, HS codes, source countries and AI buyer fit.{% endblock %}
+{% block meta_desc %}Business intelligence profile for {{ company.name }} including corporate status, import products, HS codes, source countries and buyer intelligence.{% endblock %}
 {% block body %}
+<style>
+  .profile-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:18px 0}
+  .chart-card{border:1px solid #dedee1;border-radius:10px;background:#fff;padding:16px 17px;min-height:260px}
+  .chart-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:17px}
+  .chart-head h2{font-size:15px;margin:0;color:#202123}.chart-head small{font-size:9px;color:#8a8a91;max-width:180px;text-align:right;line-height:1.4}
+  .chart-rows{display:flex;flex-direction:column;gap:11px}.chart-row{display:grid;grid-template-columns:minmax(105px,180px) 1fr 46px;gap:10px;align-items:center;font-size:10px}
+  .chart-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#44454b}.chart-track{height:17px;background:#f1f1f2;border:1px solid #e6e6e8;border-radius:4px;overflow:hidden}.chart-fill{height:100%;background:#343541;border-radius:3px;min-width:2px;transition:width .35s ease}.chart-row:hover .chart-fill{background:#111214}.chart-value{text-align:right;font-size:9px;color:#6d6d73;font-variant-numeric:tabular-nums}
+  .intel-summary{border:1px solid #dedee1;border-radius:10px;background:#f7f7f8;padding:16px 17px;margin:18px 0}.intel-summary h2{font-size:14px;margin:0 0 8px}.intel-summary p{font-size:11px;color:#565861;margin:0;line-height:1.7}
+  .coverage-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.coverage-cell{background:#fff;border:1px solid #e2e2e5;border-radius:7px;padding:10px}.coverage-cell strong{display:block;font-size:15px;color:#202123}.coverage-cell span{display:block;font-size:8px;color:#888991;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+  .product-table .desc{max-width:470px;line-height:1.45}.muted-dash{color:#aaa}
+  @media(max-width:760px){.profile-grid{grid-template-columns:1fr}.coverage-strip{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:100px 1fr 40px}}
+</style>
 <main class="page wide">
-  {% if demo_mode %}<div class="notice">UI preview mode — profile structure is live; sample values will be replaced by source-backed records.</div>{% endif %}
+  {% if demo_mode %}<div class="notice">Preview fallback — this URL did not match a live entity.</div>{% endif %}
+
   <section class="profile-box">
     <div class="profile-head">
-      <div><div class="profile-title">{{ company.name }} <span class="badge">{{ company.kind }}</span> <span class="badge green">{{ company.status }}</span></div></div>
+      <div>
+        <div class="profile-title">{{ company.name }} <span class="badge">{{ company.kind }}</span>{% if company.status != 'Unknown' %} <span class="badge green">{{ company.status }}</span>{% endif %}</div>
+      </div>
       <div class="profile-actions"><button class="small-btn">☆ Save</button><button class="small-btn">⇩ Export</button><button class="small-btn">⋮</button></div>
     </div>
     <div class="profile-meta">
-      <div>⌖ {{ company.city }}, {{ company.province }}, {{ company.country }}</div>
-      <div>◉ Incorporated {{ company.incorporated }} · Federal/provincial source match pending</div>
-      <div>⇄ Imports/products matched under {{ company.hs_codes|length }} HS families</div>
-      <div>✦ AI classification: likely B2B buyer / distributor profile</div>
+      <div>⌖ {% if company.city %}{{ company.city }}{% endif %}{% if company.province %}{% if company.city %}, {% endif %}{{ company.province }}{% endif %}{% if company.country %}, {{ company.country }}{% endif %}</div>
+      {% if company.incorporated %}<div>◉ Incorporated {{ company.incorporated }}</div>{% endif %}
+      <div>⇄ {{ company.relationship_count }} public importer relationships across {{ company.hs_codes|length }} HS codes</div>
+      <div>◫ {{ company.source_records_count }} source records matched to this entity</div>
     </div>
-    <div class="source-line">Sources: Corporations Canada + Canadian Importers Database · provenance shown per field when live ingestion is connected</div>
+    <div class="source-line">Current sources: Canadian Importers Database{% if company.source_count > 1 %} + matched public corporate data{% endif %}. Charts below represent public-record coverage, not shipment volume or spend.</div>
   </section>
 
   <div class="metric-grid">
-    <div class="metric"><div class="metric-label">AI Buyer Score</div><div class="metric-value">{{ company.buyer_score }}/100</div></div>
-    <div class="metric"><div class="metric-label">Corporate Status</div><div class="metric-value">{{ company.status }}</div></div>
-    <div class="metric"><div class="metric-label">HS Families</div><div class="metric-value">{{ company.hs_codes|length }}</div></div>
+    <div class="metric"><div class="metric-label">Importer Relationships</div><div class="metric-value">{{ company.relationship_count }}</div></div>
+    <div class="metric"><div class="metric-label">HS Codes</div><div class="metric-value">{{ company.hs_codes|length }}</div></div>
     <div class="metric"><div class="metric-label">Origin Countries</div><div class="metric-value">{{ company.origins|length }}</div></div>
-    <div class="metric"><div class="metric-label">Matched Sources</div><div class="metric-value">{{ company.source_count }}</div></div>
+    <div class="metric"><div class="metric-label">Source Records</div><div class="metric-value">{{ company.source_records_count }}</div></div>
+    <div class="metric"><div class="metric-label">AI Buyer Score</div><div class="metric-value">{% if company.buyer_score %}{{ company.buyer_score }}/100{% else %}Pending{% endif %}</div></div>
+  </div>
+
+  <section class="intel-summary">
+    <h2>Intelligence Snapshot</h2>
+    <p>
+      {{ company.name }} is currently matched as a Canadian {{ company.kind|lower }}.
+      {% if company.products %} Public importer records associate it with {{ company.products[:3]|join(', ') }}{% if company.products|length > 3 %} and additional product categories{% endif %}.{% endif %}
+      {% if company.origins %} Recorded sourcing-country relationships include {{ company.origins[:5]|join(', ') }}.{% endif %}
+      Contact, website and AI classification enrichment will be cached on demand rather than pre-purchased for every company.
+    </p>
+    <div class="coverage-strip">
+      <div class="coverage-cell"><strong>{{ company.hs_codes|length }}</strong><span>Product codes</span></div>
+      <div class="coverage-cell"><strong>{{ company.origins|length }}</strong><span>Origin markets</span></div>
+      <div class="coverage-cell"><strong>{{ company.source_count }}</strong><span>Matched datasets</span></div>
+      <div class="coverage-cell"><strong>{{ company.source_records_count }}</strong><span>Evidence records</span></div>
+    </div>
+  </section>
+
+  <div class="profile-grid">
+    <section class="chart-card">
+      <div class="chart-head"><h2>Top Product / HS Coverage</h2><small>Share of this company’s matched importer relationships, not import value.</small></div>
+      <div class="chart-rows">
+        {% for item in company.hs_breakdown %}
+        <div class="chart-row" title="{{ item.description or ('HS ' + item.label) }}">
+          <a class="chart-label" href="/data/search?hs={{ item.label }}">HS {{ item.label }}</a>
+          <div class="chart-track"><div class="chart-fill" style="width:{{ item.percent }}%"></div></div>
+          <div class="chart-value">{{ item.percent }}%</div>
+        </div>
+        {% else %}<div class="muted-dash">No HS-code relationships available for this record.</div>{% endfor %}
+      </div>
+    </section>
+
+    <section class="chart-card">
+      <div class="chart-head"><h2>Sourcing-Country Coverage</h2><small>How often each origin appears across matched public records.</small></div>
+      <div class="chart-rows">
+        {% for item in company.origin_breakdown %}
+        <div class="chart-row">
+          <a class="chart-label" href="/data/search?origin={{ item.label|urlencode }}">{{ item.label }}</a>
+          <div class="chart-track"><div class="chart-fill" style="width:{{ item.percent }}%"></div></div>
+          <div class="chart-value">{{ item.percent }}%</div>
+        </div>
+        {% else %}<div class="muted-dash">Country-level sourcing data is not available in the currently matched rows.</div>{% endfor %}
+      </div>
+    </section>
   </div>
 
   <section class="section">
-    <h2>{{ company.name }}'s Product / HS Code Breakdown</h2>
-    <table class="data-table"><thead><tr><th>HS Code</th><th>Product Category</th><th>Source Countries</th><th>Buyer Fit</th></tr></thead><tbody>
-    {% for code in company.hs_codes %}<tr><td><a href="/data/search?hs={{ code }}">{{ code }}</a></td><td>{{ company.products[loop.index0] if loop.index0 < company.products|length else company.products[0] }}</td><td>{{ company.origins|join(', ') }}</td><td>{{ company.buyer_score }}/100</td></tr>{% endfor %}
-    </tbody></table>
-  </section>
-
-  <section class="section">
-    <h2>Import / Sourcing Geography</h2>
-    <div class="barlist">
-      {% for origin in company.origins %}
-      <div class="barrow"><a href="/data/search?origin={{ origin }}">{{ origin }}</a><div class="bar"><span style="width:{{ 88 - loop.index0*22 }}%"></span></div><strong>{{ 88 - loop.index0*22 }}%</strong></div>
-      {% endfor %}
-    </div>
+    <h2>{{ company.name }} Product / HS Intelligence</h2>
+    <table class="data-table product-table">
+      <thead><tr><th>HS Code</th><th>Product Description</th><th>Record Coverage</th><th>Search</th></tr></thead>
+      <tbody>
+        {% for item in company.hs_breakdown %}
+        <tr>
+          <td><strong>{{ item.label }}</strong></td>
+          <td class="desc">{{ item.description or 'Description will populate from ISED HS taxonomy on the next data sync.' }}</td>
+          <td>{{ item.count }} matched relationship{% if item.count != 1 %}s{% endif %} · {{ item.percent }}%</td>
+          <td><a href="/data/search?hs={{ item.label }}">Similar companies →</a></td>
+        </tr>
+        {% else %}<tr><td colspan="4">No HS-code data available.</td></tr>{% endfor %}
+      </tbody>
+    </table>
   </section>
 
   <section class="section">
     <h2>Products & Searchable Intelligence</h2>
-    <div class="tags">{% for p in company.products %}<a class="tag" href="/data/search?q={{ p|urlencode }}">{{ p }}</a>{% endfor %}{% for hs in company.hs_codes %}<a class="tag" href="/data/search?hs={{ hs }}">HS {{ hs }}</a>{% endfor %}</div>
+    <div class="tags">
+      {% for p in company.products %}<a class="tag" href="/data/search?q={{ p|urlencode }}">{{ p }}</a>{% endfor %}
+      {% for hs in company.hs_codes %}<a class="tag" href="/data/search?hs={{ hs }}">HS {{ hs }}</a>{% endfor %}
+    </div>
   </section>
 
   <section class="section">
     <h2>Company & Contact Enrichment</h2>
-    <table class="data-table"><thead><tr><th>Field</th><th>Value</th><th>Source</th></tr></thead><tbody>
-      <tr><td>Website</td><td>Lazy enrichment — resolve on first profile request</td><td>Web discovery</td></tr>
-      <tr><td>Decision makers</td><td>Enrich on demand</td><td>Hunter</td></tr>
-      <tr><td>Industry classification</td><td>AI classification from public records + website</td><td>IntellCluster AI</td></tr>
-      <tr><td>Corporate identity</td><td>{{ company.name }} · {{ company.status }}</td><td>Corporations Canada</td></tr>
+    <table class="data-table"><thead><tr><th>Field</th><th>Current Value</th><th>Source / Method</th></tr></thead><tbody>
+      <tr><td>Website</td><td>{{ company.website or 'Not enriched yet' }}</td><td>Web discovery / cache</td></tr>
+      <tr><td>Corporate status</td><td>{{ company.status }}</td><td>Public corporate registry when matched</td></tr>
+      <tr><td>Decision makers</td><td>On-demand enrichment</td><td>Hunter</td></tr>
+      <tr><td>Business classification</td><td>Pending AI enrichment</td><td>IntellCluster AI + public website</td></tr>
+      <tr><td>Buyer-fit score</td><td>{% if company.buyer_score %}{{ company.buyer_score }}/100{% else %}Pending{% endif %}</td><td>IntellCluster AI</td></tr>
     </tbody></table>
   </section>
 
   <section class="section">
-    <h2>Related Companies & Buyer Matches</h2>
-    <div class="cards">
-      {% for related in ['Similar Canadian importers in the same HS family','Companies sourcing the same products from '+company.origins[0],'Potential competitors and distributors'] %}
-      <article class="card"><div class="card-accent"></div><div class="card-body"><div class="card-title">{{ related }}</div><div class="card-address">This relationship panel will populate from entity resolution + importer relationship tables.</div></div></article>
-      {% endfor %}
-    </div>
+    <h2>Shipment Intelligence</h2>
+    <div class="notice">Monthly shipments, BOL history, suppliers, ports, carriers, FCL/LCL, container types and estimated spend require shipment-level customs data. IntellCluster will show these panels only when a licensed shipment source is connected; we will not infer or fabricate them from the Canadian Importers Database.</div>
   </section>
 </main>
 {% endblock %}
