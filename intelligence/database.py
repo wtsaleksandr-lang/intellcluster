@@ -22,7 +22,6 @@ from sqlalchemy import (
     Text,
     create_engine,
     func,
-    select,
 )
 from sqlalchemy.engine import Connection, Engine
 
