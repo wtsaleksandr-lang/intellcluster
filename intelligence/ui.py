@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 from intelligence.database import connect
@@ -43,6 +43,26 @@ def _demo_search(q: str | None = None) -> list[dict]:
 @router.get("/data", response_class=HTMLResponse)
 async def intelligence_home(request: Request):
     return templates.TemplateResponse(request=request, name="home.html", context={"active": "home"})
+
+
+@router.get("/data/suggest", response_class=JSONResponse)
+async def intelligence_suggest(q: str = Query(default="", min_length=0, max_length=120)):
+    term = q.strip()
+    if len(term) < 2:
+        return JSONResponse({"items": []})
+    with connect() as conn:
+        rows = search_entities(conn, q=term, limit=8)
+    items = [
+        {
+            "name": row["name"],
+            "slug": row["slug"],
+            "kind": row.get("kind", "Company"),
+            "location": ", ".join(x for x in [row.get("city"), row.get("province")] if x),
+            "hs_codes": row.get("hs_codes", [])[:3],
+        }
+        for row in rows
+    ]
+    return JSONResponse({"items": items})
 
 
 @router.get("/data/search", response_class=HTMLResponse)
