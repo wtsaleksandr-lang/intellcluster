@@ -31,7 +31,9 @@ jobs:
           ADMIN_USERNAME: smoke
           ADMIN_PASSWORD: smoke-test-pw
           ADMIN_SECRET_KEY: smoke-secret-key
-        run: python -m tests.smoke
+        run: |
+          python -m tests.smoke
+          python -m tests.intelligence_unit
 
   lint:
     name: Lint (ruff)
