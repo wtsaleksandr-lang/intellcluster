@@ -1,142 +1,67 @@
 {% extends "base.html" %}
 {% block title %}{{ company.name }} | IntellCluster Data{% endblock %}
-{% block meta_desc %}Business intelligence profile for {{ company.name }} including corporate status, import products, HS codes, source countries and buyer intelligence.{% endblock %}
+{% block meta_desc %}Business intelligence profile for {{ company.name }} including corporate status, import products, HS codes, source countries and shipment intelligence.{% endblock %}
 {% block body %}
 <style>
   html{scroll-behavior:smooth}.profile-anchor{scroll-margin-top:82px}
-  .profile-jump{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid #e6e6e8;margin:0 -18px 16px;padding:0 18px;overflow:auto;white-space:nowrap}.profile-jump-inner{display:flex;gap:22px;min-width:max-content;height:44px;align-items:center}.profile-jump a{font-size:10px;color:#73747b;padding:15px 0 12px;border-bottom:2px solid transparent;transition:color .15s ease,border-color .15s ease}.profile-jump a:hover{color:#111214;border-bottom-color:#b6b6bb}
-  .profile-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:18px 0}
-  .chart-card{border:1px solid #dedee1;border-radius:10px;background:#fff;padding:16px 17px;min-height:260px}
-  .chart-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:17px}
-  .chart-head h2{font-size:15px;margin:0;color:#202123}.chart-head small{font-size:9px;color:#8a8a91;max-width:180px;text-align:right;line-height:1.4}
-  .chart-rows{display:flex;flex-direction:column;gap:11px}.chart-row{display:grid;grid-template-columns:minmax(105px,180px) 1fr 46px;gap:10px;align-items:center;font-size:10px}
-  .chart-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#44454b}.chart-track{height:17px;background:#f1f1f2;border:1px solid #e6e6e8;border-radius:4px;overflow:hidden}.chart-fill{height:100%;background:#343541;border-radius:3px;min-width:2px;transition:width .35s ease}.chart-row:hover .chart-fill{background:#111214}.chart-value{text-align:right;font-size:9px;color:#6d6d73;font-variant-numeric:tabular-nums}
-  .intel-summary{border:1px solid #dedee1;border-radius:10px;background:#f7f7f8;padding:16px 17px;margin:18px 0}.intel-summary h2{font-size:14px;margin:0 0 8px}.intel-summary p{font-size:11px;color:#565861;margin:0;line-height:1.7}
-  .coverage-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.coverage-cell{background:#fff;border:1px solid #e2e2e5;border-radius:7px;padding:10px}.coverage-cell strong{display:block;font-size:15px;color:#202123}.coverage-cell span{display:block;font-size:8px;color:#888991;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
-  .product-table .desc{max-width:470px;line-height:1.45}.muted-dash{color:#aaa}
-  @media(max-width:760px){.profile-grid{grid-template-columns:1fr}.coverage-strip{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:100px 1fr 40px}.profile-jump{margin-left:-10px;margin-right:-10px;padding:0 10px}}
+  .profile-jump{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid #e6e6e8;margin:0 -18px 16px;padding:0 18px;overflow:auto;white-space:nowrap}.profile-jump-inner{display:flex;gap:22px;min-width:max-content;height:44px;align-items:center}.profile-jump a{font-size:10px;color:#73747b;padding:15px 0 12px;border-bottom:2px solid transparent}.profile-jump a:hover{color:#111214;border-bottom-color:#b6b6bb}
+  .profile-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:18px 0}.chart-card{border:1px solid #dedee1;border-radius:10px;background:#fff;padding:16px 17px;min-height:260px}.chart-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:17px}.chart-head h2{font-size:15px;margin:0}.chart-head small{font-size:9px;color:#8a8a91;max-width:220px;text-align:right;line-height:1.4}
+  .chart-rows{display:flex;flex-direction:column;gap:11px}.chart-row{display:grid;grid-template-columns:minmax(105px,180px) 1fr 46px;gap:10px;align-items:center;font-size:10px}.chart-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#44454b}.chart-track{height:17px;background:#f1f1f2;border:1px solid #e6e6e8;border-radius:4px;overflow:hidden}.chart-fill{height:100%;background:#343541;border-radius:3px;min-width:2px}.chart-row:hover .chart-fill{background:#111214}.chart-value{text-align:right;font-size:9px;color:#6d6d73;font-variant-numeric:tabular-nums}
+  .intel-summary{border:1px solid #dedee1;border-radius:10px;background:#f7f7f8;padding:16px 17px;margin:18px 0}.intel-summary h2{font-size:14px;margin:0 0 8px}.intel-summary p{font-size:11px;color:#565861;margin:0;line-height:1.7}.coverage-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.coverage-cell{background:#fff;border:1px solid #e2e2e5;border-radius:7px;padding:10px}.coverage-cell strong{display:block;font-size:15px}.coverage-cell span{display:block;font-size:8px;color:#888991;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+  .trade-wrap{border:1px solid #dedee1;border-radius:10px;background:#fff;margin:18px 0;overflow:hidden}.trade-head{padding:16px 18px;border-bottom:1px solid #e7e7e9;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.trade-title{font-size:18px;font-weight:750}.trade-source{font-size:9px;color:#8a8a91;margin-top:4px}.trade-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px 18px}.trade-kpi{border:1px solid #e2e2e5;border-radius:8px;padding:11px 12px;background:#fafafa}.trade-kpi small{display:block;color:#8a8a91;font-size:8px;text-transform:uppercase;letter-spacing:.45px}.trade-kpi strong{display:block;font-size:16px;margin-top:4px;color:#202123}
+  .timeline-panel{padding:16px 18px 20px;border-top:1px solid #ededee}.timeline-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.timeline-toolbar h3{font-size:15px;margin:0}.timeline-legend{font-size:9px;color:#85858c}.shipment-chart{height:280px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid #d7d7da;border-left:1px solid #ececef;padding:18px 10px 0;position:relative;background:linear-gradient(to bottom,transparent 24%,#f0f0f2 25%,transparent 25.5%,transparent 49%,#f0f0f2 50%,transparent 50.5%,transparent 74%,#f0f0f2 75%,transparent 75.5%)}
+  .shipment-bar{flex:1;min-width:2px;max-width:10px;background:#075a70;height:var(--h);position:relative;cursor:pointer;transition:background .12s ease,filter .12s ease;transform-origin:bottom}.shipment-bar:hover,.shipment-bar.active{background:#003f50;filter:brightness(1.12)}.shipment-tooltip{position:fixed;z-index:1000;background:#202123;color:#fff;border-radius:7px;padding:8px 10px;font-size:10px;line-height:1.45;pointer-events:none;box-shadow:0 8px 22px rgba(0,0,0,.18);display:none;min-width:120px}.shipment-tooltip strong{display:block;font-size:11px;margin-bottom:2px}.timeline-axis{display:flex;justify-content:space-between;color:#85858c;font-size:8px;margin-top:6px;padding:0 8px}
+  .trade-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;padding:0 18px 18px}.trade-card{border:1px solid #e2e2e5;border-radius:9px;background:#fff;padding:14px}.trade-card h3{font-size:13px;margin:0 0 12px}.mix-row{display:flex;height:18px;border-radius:4px;overflow:hidden;background:#ececef;margin:8px 0 11px}.mix-full{background:#0b5a70}.mix-less{background:#76c8d8}.mix-labels{display:flex;justify-content:space-between;font-size:9px;color:#696a71}
+  .supplier-table{width:100%;border-collapse:collapse;font-size:10px}.supplier-table th{text-align:left;color:#85858c;font-size:8px;font-weight:600;padding:7px 6px;border-bottom:1px solid #e5e5e7}.supplier-table td{padding:9px 6px;border-bottom:1px solid #eeeeef;vertical-align:top}.supplier-table tr:last-child td{border-bottom:0}.supplier-name{font-weight:700}.mini-spark{height:28px;display:flex;align-items:flex-end;gap:1px}.mini-spark i{display:block;width:3px;background:#075a70;min-height:2px}.recent-bols{max-height:350px;overflow:auto}.product-table .desc{max-width:470px;line-height:1.45}.muted-dash{color:#aaa}
+  @media(max-width:760px){.profile-grid,.trade-grid{grid-template-columns:1fr}.coverage-strip{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:100px 1fr 40px}.profile-jump{margin-left:-10px;margin-right:-10px;padding:0 10px}.trade-kpis{grid-template-columns:repeat(2,1fr)}.shipment-chart{height:220px;gap:1px}.shipment-bar{min-width:1px}}
 </style>
 <main class="page wide">
   {% if demo_mode %}<div class="notice">Preview fallback — this URL did not match a live entity.</div>{% endif %}
+  <nav class="profile-jump" aria-label="Company profile sections"><div class="profile-jump-inner"><a href="#overview">Overview</a><a href="#products">Product / HS</a><a href="#countries">Sourcing Countries</a><a href="#shipments">Shipment Intelligence</a><a href="#suppliers">Suppliers</a><a href="#contacts">Contacts & Enrichment</a></div></nav>
+  <section class="profile-box profile-anchor" id="overview"><div class="profile-head"><div><div class="profile-title">{{ company.name }} <span class="badge">{{ company.kind }}</span>{% if company.status != 'Unknown' %} <span class="badge green">{{ company.status }}</span>{% endif %}</div></div><div class="profile-actions"><button class="small-btn">☆ Save</button><button class="small-btn">⇩ Export</button><button class="small-btn">⋮</button></div></div><div class="profile-meta"><div>⌖ {% if company.city %}{{ company.city }}{% endif %}{% if company.province %}{% if company.city %}, {% endif %}{{ company.province }}{% endif %}{% if company.country %}, {{ company.country }}{% endif %}</div>{% if company.incorporated %}<div>◉ Incorporated {{ company.incorporated }}</div>{% endif %}<div>⇄ {{ company.relationship_count }} public importer relationships across {{ company.hs_codes|length }} HS codes</div><div>◫ {{ company.source_records_count }} source records matched to this entity</div></div><div class="source-line">Sources: Canadian public datasets{% if company.importyeti %} + ImportYeti purchased shipment data{% endif %}.</div></section>
+  <div class="metric-grid"><div class="metric"><div class="metric-label">Importer Relationships</div><div class="metric-value">{{ company.relationship_count }}</div></div><div class="metric"><div class="metric-label">HS Codes</div><div class="metric-value">{{ company.hs_codes|length }}</div></div><div class="metric"><div class="metric-label">Origin Countries</div><div class="metric-value">{{ company.origins|length }}</div></div><div class="metric"><div class="metric-label">Source Records</div><div class="metric-value">{{ company.source_records_count }}</div></div><div class="metric"><div class="metric-label">AI Buyer Score</div><div class="metric-value">{% if company.buyer_score %}{{ company.buyer_score }}/100{% else %}Pending{% endif %}</div></div></div>
 
-  <nav class="profile-jump" aria-label="Company profile sections">
-    <div class="profile-jump-inner">
-      <a href="#overview">Overview</a>
-      <a href="#products">Product / HS</a>
-      <a href="#countries">Sourcing Countries</a>
-      <a href="#searchable">Searchable Intelligence</a>
-      <a href="#contacts">Contacts & Enrichment</a>
-      <a href="#shipments">Shipment Intelligence</a>
+  {% if company.importyeti %}
+  {% set iy = company.importyeti %}
+  <section class="trade-wrap profile-anchor" id="shipments">
+    <div class="trade-head"><div><div class="trade-title">Shipment Intelligence</div><div class="trade-source">ImportYeti match: {{ iy._matchedTitle or iy.title }}{% if iy._cachedAt %} · cached {{ iy._cachedAt[:10] }}{% endif %}</div></div>{% if iy._creditsRemaining is defined %}<div class="trade-source">API credits remaining: {{ iy._creditsRemaining }}</div>{% endif %}</div>
+    <div class="trade-kpis">
+      <div class="trade-kpi"><small>Total sea shipments</small><strong>{{ '{:,}'.format(iy.total_shipments or 0) }}</strong></div>
+      <div class="trade-kpi"><small>Suppliers</small><strong>{{ iy.suppliers_table|length if iy.suppliers_table else 0 }}</strong></div>
+      <div class="trade-kpi"><small>Avg. TEU / shipment</small><strong>{{ iy.avg_teu_per_shipment['12m'] if iy.avg_teu_per_shipment and iy.avg_teu_per_shipment.get('12m') is not none else '—' }}</strong></div>
+      <div class="trade-kpi"><small>Avg. TEU / month</small><strong>{{ iy.avg_teu_per_month['12m'] if iy.avg_teu_per_month and iy.avg_teu_per_month.get('12m') is not none else '—' }}</strong></div>
+      <div class="trade-kpi"><small>Est. shipping spend</small><strong>{% if iy.total_shipping_cost %}${{ '{:,.0f}'.format(iy.total_shipping_cost|float) }}{% else %}—{% endif %}</strong></div>
     </div>
-  </nav>
-
-  <section class="profile-box profile-anchor" id="overview">
-    <div class="profile-head">
-      <div>
-        <div class="profile-title">{{ company.name }} <span class="badge">{{ company.kind }}</span>{% if company.status != 'Unknown' %} <span class="badge green">{{ company.status }}</span>{% endif %}</div>
-      </div>
-      <div class="profile-actions"><button class="small-btn">☆ Save</button><button class="small-btn">⇩ Export</button><button class="small-btn">⋮</button></div>
-    </div>
-    <div class="profile-meta">
-      <div>⌖ {% if company.city %}{{ company.city }}{% endif %}{% if company.province %}{% if company.city %}, {% endif %}{{ company.province }}{% endif %}{% if company.country %}, {{ company.country }}{% endif %}</div>
-      {% if company.incorporated %}<div>◉ Incorporated {{ company.incorporated }}</div>{% endif %}
-      <div>⇄ {{ company.relationship_count }} public importer relationships across {{ company.hs_codes|length }} HS codes</div>
-      <div>◫ {{ company.source_records_count }} source records matched to this entity</div>
-    </div>
-    <div class="source-line">Current sources: Canadian Importers Database{% if company.source_count > 1 %} + matched public corporate data{% endif %}. Charts below represent public-record coverage, not shipment volume or spend.</div>
-  </section>
-
-  <div class="metric-grid">
-    <div class="metric"><div class="metric-label">Importer Relationships</div><div class="metric-value">{{ company.relationship_count }}</div></div>
-    <div class="metric"><div class="metric-label">HS Codes</div><div class="metric-value">{{ company.hs_codes|length }}</div></div>
-    <div class="metric"><div class="metric-label">Origin Countries</div><div class="metric-value">{{ company.origins|length }}</div></div>
-    <div class="metric"><div class="metric-label">Source Records</div><div class="metric-value">{{ company.source_records_count }}</div></div>
-    <div class="metric"><div class="metric-label">AI Buyer Score</div><div class="metric-value">{% if company.buyer_score %}{{ company.buyer_score }}/100{% else %}Pending{% endif %}</div></div>
-  </div>
-
-  <section class="intel-summary">
-    <h2>Intelligence Snapshot</h2>
-    <p>
-      {{ company.name }} is currently matched as a Canadian {{ company.kind|lower }}.
-      {% if company.products %} Public importer records associate it with {{ company.products[:3]|join(', ') }}{% if company.products|length > 3 %} and additional product categories{% endif %}.{% endif %}
-      {% if company.origins %} Recorded sourcing-country relationships include {{ company.origins[:5]|join(', ') }}.{% endif %}
-      Contact, website and AI classification enrichment will be cached on demand rather than pre-purchased for every company.
-    </p>
-    <div class="coverage-strip">
-      <div class="coverage-cell"><strong>{{ company.hs_codes|length }}</strong><span>Product codes</span></div>
-      <div class="coverage-cell"><strong>{{ company.origins|length }}</strong><span>Origin markets</span></div>
-      <div class="coverage-cell"><strong>{{ company.source_count }}</strong><span>Matched datasets</span></div>
-      <div class="coverage-cell"><strong>{{ company.source_records_count }}</strong><span>Evidence records</span></div>
+    {% if iy.time_series %}
+    <div class="timeline-panel"><div class="timeline-toolbar"><h3>{{ company.name }}'s Total Sea Shipments Over Time</h3><div class="timeline-legend">Hover any bar for exact month and volume</div></div><div class="shipment-chart" id="shipmentChart"></div><div class="timeline-axis"><span id="axisStart"></span><span id="axisMid"></span><span id="axisEnd"></span></div></div>
+    {% endif %}
+    <div class="trade-grid">
+      <div class="trade-card profile-anchor" id="suppliers"><h3>Top Suppliers</h3>{% if iy.suppliers_table %}<table class="supplier-table"><thead><tr><th>Supplier</th><th>Country</th><th>Shipments</th><th>Recent Activity</th><th>Products</th></tr></thead><tbody>{% for s in iy.suppliers_table[:12] %}<tr><td><div class="supplier-name">{{ s.supplier_name }}</div></td><td>{{ s.country or s.supplier_address_country or '—' }}</td><td>{{ '{:,}'.format(s.total_shipments_company or 0) }}</td><td><div class="mini-spark" data-series='{{ (s.supplier_time_series or {})|tojson }}'></div></td><td>{{ (s.product_descriptions or [])[:2]|join(' · ') }}</td></tr>{% endfor %}</tbody></table>{% else %}<div class="muted-dash">No supplier table returned for this company.</div>{% endif %}</div>
+      <div class="trade-card"><h3>FCL vs LCL</h3>{% set load=iy.containers_load or {} %}{% set full=load.get('full',{}) %}{% set less=load.get('less',{}) %}<div class="mix-row"><span class="mix-full" style="width:{{ full.get('shipments_perc',0) }}%"></span><span class="mix-less" style="width:{{ less.get('shipments_perc',0) }}%"></span></div><div class="mix-labels"><span>FCL {{ full.get('shipments_perc','—') }}%</span><span>LCL {{ less.get('shipments_perc','—') }}%</span></div><h3 style="margin-top:22px">Recent BOLs</h3><div class="recent-bols">{% if iy.recent_bols %}<table class="supplier-table"><thead><tr><th>Date</th><th>BOL</th><th>Supplier</th><th>HS</th></tr></thead><tbody>{% for bol in iy.recent_bols[:15] %}<tr><td>{{ bol.date_formatted }}</td><td>{{ bol.Bill_of_Lading }}</td><td>{{ bol.Shipper_Name }}</td><td>{{ bol.HS_Code or '—' }}</td></tr>{% endfor %}</tbody></table>{% else %}<div class="muted-dash">No recent BOLs returned.</div>{% endif %}</div></div>
     </div>
   </section>
+  {% endif %}
 
-  <div class="profile-grid">
-    <section class="chart-card profile-anchor" id="products">
-      <div class="chart-head"><h2>Top Product / HS Coverage</h2><small>Share of this company’s matched importer relationships, not import value.</small></div>
-      <div class="chart-rows">
-        {% for item in company.hs_breakdown %}
-        <div class="chart-row" title="{{ item.description or ('HS ' + item.label) }}">
-          <a class="chart-label" href="/data/search?hs={{ item.label }}">HS {{ item.label }}</a>
-          <div class="chart-track"><div class="chart-fill" style="width:{{ item.percent }}%"></div></div>
-          <div class="chart-value">{{ item.percent }}%</div>
-        </div>
-        {% else %}<div class="muted-dash">No HS-code relationships available for this record.</div>{% endfor %}
-      </div>
-    </section>
-
-    <section class="chart-card profile-anchor" id="countries">
-      <div class="chart-head"><h2>Sourcing-Country Coverage</h2><small>How often each origin appears across matched public records.</small></div>
-      <div class="chart-rows">
-        {% for item in company.origin_breakdown %}
-        <div class="chart-row">
-          <a class="chart-label" href="/data/search?origin={{ item.label|urlencode }}">{{ item.label }}</a>
-          <div class="chart-track"><div class="chart-fill" style="width:{{ item.percent }}%"></div></div>
-          <div class="chart-value">{{ item.percent }}%</div>
-        </div>
-        {% else %}<div class="muted-dash">Country-level sourcing data is not available in the currently matched rows.</div>{% endfor %}
-      </div>
-    </section>
-  </div>
-
-  <section class="section">
-    <h2>{{ company.name }} Product / HS Intelligence</h2>
-    <table class="data-table product-table">
-      <thead><tr><th>HS Code</th><th>Product Description</th><th>Record Coverage</th><th>Search</th></tr></thead>
-      <tbody>
-        {% for item in company.hs_breakdown %}
-        <tr>
-          <td><strong>{{ item.label }}</strong></td>
-          <td class="desc">{{ item.description or 'Description will populate from ISED HS taxonomy on the next data sync.' }}</td>
-          <td>{{ item.count }} matched relationship{% if item.count != 1 %}s{% endif %} · {{ item.percent }}%</td>
-          <td><a href="/data/search?hs={{ item.label }}">Similar companies →</a></td>
-        </tr>
-        {% else %}<tr><td colspan="4">No HS-code data available.</td></tr>{% endfor %}
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section profile-anchor" id="searchable">
-    <h2>Products & Searchable Intelligence</h2>
-    <div class="tags">
-      {% for p in company.products %}<a class="tag" href="/data/search?q={{ p|urlencode }}">{{ p }}</a>{% endfor %}
-      {% for hs in company.hs_codes %}<a class="tag" href="/data/search?hs={{ hs }}">HS {{ hs }}</a>{% endfor %}
-    </div>
-  </section>
-
-  <section class="section profile-anchor" id="contacts">
-    <h2>Company & Contact Enrichment</h2>
-    <table class="data-table"><thead><tr><th>Field</th><th>Current Value</th><th>Source / Method</th></tr></thead><tbody>
-      <tr><td>Website</td><td>{{ company.website or 'Not enriched yet' }}</td><td>Web discovery / cache</td></tr>
-      <tr><td>Corporate status</td><td>{{ company.status }}</td><td>Public corporate registry when matched</td></tr>
-      <tr><td>Decision makers</td><td>On-demand enrichment</td><td>Hunter</td></tr>
-      <tr><td>Business classification</td><td>Pending AI enrichment</td><td>IntellCluster AI + public website</td></tr>
-      <tr><td>Buyer-fit score</td><td>{% if company.buyer_score %}{{ company.buyer_score }}/100{% else %}Pending{% endif %}</td><td>IntellCluster AI</td></tr>
-    </tbody></table>
-  </section>
-
-  <section class="section profile-anchor" id="shipments">
-    <h2>Shipment Intelligence</h2>
-    <div class="notice">Monthly shipments, BOL history, suppliers, ports, carriers, FCL/LCL, container types and estimated spend require shipment-level customs data. IntellCluster will show these panels only when a licensed shipment source is connected; we will not infer or fabricate them from the Canadian Importers Database.</div>
-  </section>
+  <section class="intel-summary"><h2>Intelligence Snapshot</h2><p>{{ company.name }} is currently matched as a Canadian {{ company.kind|lower }}.{% if company.products %} Public importer records associate it with {{ company.products[:3]|join(', ') }}{% if company.products|length > 3 %} and additional product categories{% endif %}.{% endif %}{% if company.origins %} Recorded sourcing-country relationships include {{ company.origins[:5]|join(', ') }}.{% endif %}</p><div class="coverage-strip"><div class="coverage-cell"><strong>{{ company.hs_codes|length }}</strong><span>Product codes</span></div><div class="coverage-cell"><strong>{{ company.origins|length }}</strong><span>Origin markets</span></div><div class="coverage-cell"><strong>{{ company.source_count }}</strong><span>Matched datasets</span></div><div class="coverage-cell"><strong>{{ company.source_records_count }}</strong><span>Evidence records</span></div></div></section>
+  <div class="profile-grid"><section class="chart-card profile-anchor" id="products"><div class="chart-head"><h2>Top Product / HS Coverage</h2><small>Share of matched Canadian importer relationships.</small></div><div class="chart-rows">{% for item in company.hs_breakdown %}<div class="chart-row" title="{{ item.description or ('HS ' + item.label) }}"><a class="chart-label" href="/data/search?hs={{ item.label }}">HS {{ item.label }}</a><div class="chart-track"><div class="chart-fill" style="width:{{ item.percent }}%"></div></div><div class="chart-value">{{ item.percent }}%</div></div>{% else %}<div class="muted-dash">No HS-code relationships available.</div>{% endfor %}</div></section><section class="chart-card profile-anchor" id="countries"><div class="chart-head"><h2>Sourcing-Country Coverage</h2><small>How often each origin appears across matched public records.</small></div><div class="chart-rows">{% for item in company.origin_breakdown %}<div class="chart-row"><a class="chart-label" href="/data/search?origin={{ item.label|urlencode }}">{{ item.label }}</a><div class="chart-track"><div class="chart-fill" style="width:{{ item.percent }}%"></div></div><div class="chart-value">{{ item.percent }}%</div></div>{% else %}<div class="muted-dash">Country-level sourcing data unavailable.</div>{% endfor %}</div></section></div>
+  <section class="section"><h2>{{ company.name }} Product / HS Intelligence</h2><table class="data-table product-table"><thead><tr><th>HS Code</th><th>Product Description</th><th>Record Coverage</th><th>Search</th></tr></thead><tbody>{% for item in company.hs_breakdown %}<tr><td><strong>{{ item.label }}</strong></td><td class="desc">{{ item.description or 'Description pending taxonomy sync.' }}</td><td>{{ item.count }} relationship{% if item.count != 1 %}s{% endif %} · {{ item.percent }}%</td><td><a href="/data/search?hs={{ item.label }}">Similar companies →</a></td></tr>{% else %}<tr><td colspan="4">No HS-code data available.</td></tr>{% endfor %}</tbody></table></section>
+  <section class="section profile-anchor" id="contacts"><h2>Company & Contact Enrichment</h2><table class="data-table"><thead><tr><th>Field</th><th>Current Value</th><th>Source / Method</th></tr></thead><tbody><tr><td>Website</td><td>{{ company.website or (company.importyeti.website if company.importyeti else 'Not enriched yet') }}</td><td>ImportYeti / web discovery</td></tr><tr><td>Corporate status</td><td>{{ company.status }}</td><td>Public corporate registry</td></tr><tr><td>Decision makers</td><td>On-demand enrichment</td><td>Hunter</td></tr><tr><td>Business classification</td><td>Pending AI enrichment</td><td>IntellCluster AI</td></tr></tbody></table></section>
+  {% if not company.importyeti %}<section class="section profile-anchor" id="shipments"><h2>Shipment Intelligence</h2><div class="notice">No confident ImportYeti company match is cached for this entity yet. ImportYeti company search is attempted lazily when the profile is viewed; a paid profile call is made only for a confident name match.</div></section>{% endif %}
 </main>
+<div class="shipment-tooltip" id="shipmentTooltip"></div>
+{% if company.importyeti and company.importyeti.time_series %}
+<script>
+(() => {
+  const raw={{ company.importyeti.time_series|tojson }};
+  const chart=document.getElementById('shipmentChart'), tip=document.getElementById('shipmentTooltip');
+  if(!chart)return;
+  const parseDate=s=>{const p=s.split('/').map(Number);return new Date(p[2],p[1]-1,p[0])};
+  const rows=Object.entries(raw).map(([date,v])=>({date,dt:parseDate(date),shipments:Number(v.shipments||0),teu:Number(v.teu||0),weight:Number(v.weight||0)})).sort((a,b)=>a.dt-b.dt);
+  const max=Math.max(1,...rows.map(r=>r.shipments));
+  rows.forEach(r=>{const bar=document.createElement('div');bar.className='shipment-bar';bar.style.setProperty('--h',Math.max(1.5,r.shipments/max*100)+'%');bar.dataset.date=r.date;bar.dataset.shipments=r.shipments;bar.dataset.teu=r.teu;bar.addEventListener('mouseenter',e=>{bar.classList.add('active');tip.innerHTML=`<strong>${r.dt.toLocaleDateString(undefined,{month:'short',year:'numeric'})}</strong>${r.shipments.toLocaleString()} shipments${r.teu?`<br>${r.teu.toLocaleString()} TEU`:''}`;tip.style.display='block'});bar.addEventListener('mousemove',e=>{tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-50)+'px'});bar.addEventListener('mouseleave',()=>{bar.classList.remove('active');tip.style.display='none'});chart.appendChild(bar)});
+  if(rows.length){document.getElementById('axisStart').textContent=rows[0].dt.getFullYear();document.getElementById('axisMid').textContent=rows[Math.floor(rows.length/2)].dt.getFullYear();document.getElementById('axisEnd').textContent=rows[rows.length-1].dt.getFullYear()}
+  document.querySelectorAll('.mini-spark').forEach(el=>{let data={};try{data=JSON.parse(el.dataset.series||'{}')}catch(e){}const vals=Object.values(data).map(v=>Number(v.shipments||0));const m=Math.max(1,...vals);vals.slice(-24).forEach(v=>{const i=document.createElement('i');i.style.height=Math.max(2,v/m*26)+'px';el.appendChild(i)})});
+})();
+</script>
+{% endif %}
 {% endblock %}
