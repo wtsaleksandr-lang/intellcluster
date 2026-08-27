@@ -31,9 +31,11 @@ jobs:
           ADMIN_USERNAME: smoke
           ADMIN_PASSWORD: smoke-test-pw
           ADMIN_SECRET_KEY: smoke-ci-secret-key-32-chars-2026
+          INTELLIGENCE_DB_PATH: /tmp/intelligence-ci.db
         run: |
           python -m tests.smoke
           python -m tests.intelligence_unit
+          python -m tests.intelligence_persistence
           python -m tests.intelligence_ui
 
   lint:
@@ -48,4 +50,4 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Run ruff on new intelligence layer
-        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_ui.py --output-format=github
+        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_persistence.py tests/intelligence_ui.py --output-format=github
