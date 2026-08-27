@@ -194,9 +194,13 @@ def search_entities(
     q: str | None = None,
     company_type: str | None = None,
     province: str | None = None,
+    city: str | None = None,
     origin: str | None = None,
     hs: str | None = None,
     status: str | None = None,
+    incorporated_from: int | None = None,
+    incorporated_to: int | None = None,
+    has_website: bool | None = None,
     sort: str = "relevance",
     limit: int = 50,
     offset: int = 0,
@@ -216,6 +220,8 @@ def search_entities(
         conditions.append(or_(func.lower(entities.c.canonical_name).like(term), rel_text))
     if province:
         conditions.append(func.lower(entities.c.region) == province.casefold())
+    if city:
+        conditions.append(func.lower(func.coalesce(entities.c.city, "")).like(f"%{city.casefold()}%"))
     if company_type:
         if company_type.casefold() == "importer":
             conditions.append(entities.c.is_importer.is_(True))
@@ -223,6 +229,14 @@ def search_entities(
             conditions.append(entities.c.entity_type == "company")
     if status:
         conditions.append(func.lower(entities.c.corporate_status) == status.casefold())
+    if incorporated_from:
+        conditions.append(entities.c.incorporated_year >= incorporated_from)
+    if incorporated_to:
+        conditions.append(entities.c.incorporated_year <= incorporated_to)
+    if has_website is True:
+        conditions.append(and_(entities.c.website.is_not(None), func.length(func.trim(entities.c.website)) > 0))
+    elif has_website is False:
+        conditions.append(or_(entities.c.website.is_(None), func.length(func.trim(func.coalesce(entities.c.website, ""))) == 0))
     if origin:
         conditions.append(
             exists(
@@ -256,6 +270,8 @@ def search_entities(
         stmt = stmt.order_by(entities.c.buyer_score.desc().nullslast(), entities.c.canonical_name)
     elif sort == "name":
         stmt = stmt.order_by(entities.c.canonical_name)
+    elif sort == "newest":
+        stmt = stmt.order_by(entities.c.incorporated_year.desc().nullslast(), entities.c.canonical_name)
     else:
         stmt = stmt.order_by(entities.c.is_importer.desc(), entities.c.canonical_name)
     rows = conn.execute(stmt.limit(limit).offset(offset)).mappings().all()
