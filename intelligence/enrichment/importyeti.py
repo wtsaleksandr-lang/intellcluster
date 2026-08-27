@@ -18,10 +18,10 @@ class ImportYetiMatch:
 
 
 class ImportYetiClient:
-    """Small async client for lazy, cached ImportYeti enrichment.
+    """Small async client for lazy, persistent ImportYeti enrichment.
 
     Search is free. Full company profiles consume ImportYeti data credits, so
-    callers should cache the returned profile and avoid repeat paid calls.
+    callers persist returned profiles indefinitely and only refresh stale data.
     """
 
     BASE_URL = "https://data.importyeti.com/v1.0"
@@ -71,7 +71,12 @@ class ImportYetiClient:
         return data
 
 
-def cache_is_fresh(cache: dict[str, Any] | None, max_age_hours: int = 168) -> bool:
+def cache_is_fresh(cache: dict[str, Any] | None, max_age_days: int = 30) -> bool:
+    """Return whether persisted ImportYeti data is still inside the refresh window.
+
+    Stale data is never deleted. A false result only makes it eligible for a
+    refresh; callers may continue serving the persisted profile if refresh fails.
+    """
     if not cache:
         return False
     cached_at = cache.get("_cachedAt")
@@ -83,7 +88,7 @@ def cache_is_fresh(cache: dict[str, Any] | None, max_age_hours: int = 168) -> bo
         return False
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=UTC)
-    return datetime.now(UTC) - parsed <= timedelta(hours=max_age_hours)
+    return datetime.now(UTC) - parsed <= timedelta(days=max_age_days)
 
 
 def compact_profile(data: dict[str, Any]) -> dict[str, Any]:
