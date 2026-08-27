@@ -4,20 +4,122 @@
 {% block nav %}<header class="nav"><span style="margin-left:auto"></span><nav class="nav-links"><span class="grid-btn">▦</span><a class="account-btn" href="/account">My Account⌄</a></nav></header>{% endblock %}
 {% block body %}
 <main class="hero">
-  <div class="hero-logo"><span class="brand-mark">IC</span><span>Intell<em>Cluster</em></span></div>
-  <form class="hero-search" action="/data/search" method="get">
-    <input name="q" placeholder="Find companies, importers, products or HS codes" autofocus>
-    <button class="search-btn" aria-label="Search">⌕</button>
-  </form>
-  <div class="hero-note">Search <strong>open business intelligence</strong> across companies, imports and public datasets</div>
-  <a class="random" href="/data/company/maple-auto-supply-inc">Random Company</a>
+  <div class="hero-logo" aria-label="IntellCluster">
+    <span class="cluster-logo" aria-hidden="true">
+      <svg viewBox="0 0 72 72" role="img">
+        <circle cx="36" cy="36" r="8" class="node-core"/>
+        <circle cx="17" cy="22" r="6" class="node"/>
+        <circle cx="55" cy="20" r="6" class="node"/>
+        <circle cx="57" cy="52" r="6" class="node"/>
+        <circle cx="17" cy="52" r="6" class="node"/>
+        <path d="M22 25 30 32M50 24 42 32M42 41 52 49M30 41 22 49M22 22h27M23 52h28" class="links"/>
+      </svg>
+    </span>
+    <span>IntellCluster</span>
+  </div>
+
+  <div class="search-shell" id="searchShell">
+    <form class="hero-search" action="/data/search" method="get" autocomplete="off">
+      <input id="heroSearch" name="q" placeholder="Find companies, importers, products or HS codes" autofocus aria-autocomplete="list" aria-controls="suggestions">
+      <button class="search-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+      </button>
+    </form>
+    <div class="suggestions" id="suggestions" role="listbox" hidden></div>
+  </div>
+
+  <div class="hero-note">Search open business intelligence across companies, imports and public datasets</div>
+
   <div class="feature-grid">
-    <a class="feature" href="/data/search"><span>⌕</span><strong>Company Search</strong></a>
-    <a class="feature" href="/data/search?type=Importer"><span>⇄</span><strong>Importer Search</strong></a>
-    <a class="feature" href="/data/search?hs=8708"><span>HS</span><strong>HS Code Explorer</strong></a>
-    <a class="feature" href="/data/search?province=ON"><span>⌖</span><strong>Location Search</strong></a>
-    <a class="feature" href="/data/search?sort=buyer_score"><span>✦</span><strong>AI Buyer Ranking</strong></a>
-    <a class="feature" href="/data/search"><span>＋</span><strong>Data Enrichment</strong></a>
+    <a class="feature" href="/data/search">
+      <span class="feature-icon">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="20" r="10"></circle><path d="m28 28 10 10M20 15v10M15 20h10"></path></svg>
+      </span>
+      <strong>Company Search</strong>
+    </a>
+    <a class="feature" href="/data/search?type=Importer">
+      <span class="feature-icon">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 18h28M30 12l6 6-6 6M40 30H12M18 24l-6 6 6 6"></path></svg>
+      </span>
+      <strong>Importer Search</strong>
+    </a>
+    <a class="feature" href="/data/search?hs=8708">
+      <span class="feature-icon">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="8" width="30" height="32" rx="4"></rect><path d="M16 17h16M16 24h16M16 31h8"></path></svg>
+      </span>
+      <strong>HS Code Explorer</strong>
+    </a>
+    <a class="feature" href="/data/search?province=ON">
+      <span class="feature-icon">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40s11-10 11-21a11 11 0 1 0-22 0c0 11 11 21 11 21Z"></path><circle cx="24" cy="19" r="4"></circle></svg>
+      </span>
+      <strong>Location Search</strong>
+    </a>
+    <a class="feature" href="/data/search?sort=buyer_score">
+      <span class="feature-icon">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 7 3.4 9.6L37 20l-9.6 3.4L24 33l-3.4-9.6L11 20l9.6-3.4L24 7Z"></path><path d="m36 31 1.8 5.2L43 38l-5.2 1.8L36 45l-1.8-5.2L29 38l5.2-1.8L36 31Z"></path></svg>
+      </span>
+      <strong>AI Buyer Ranking</strong>
+    </a>
+    <a class="feature" href="/data/search">
+      <span class="feature-icon">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="12" cy="14" r="4"></circle><circle cx="35" cy="12" r="4"></circle><circle cx="35" cy="35" r="4"></circle><circle cx="13" cy="35" r="4"></circle><circle cx="24" cy="24" r="5"></circle><path d="m15 16 5 5M31 15l-4 5M28 28l4 4M20 28l-4 4"></path></svg>
+      </span>
+      <strong>Data Enrichment</strong>
+    </a>
   </div>
 </main>
+
+<script>
+(() => {
+  const input = document.getElementById('heroSearch');
+  const box = document.getElementById('suggestions');
+  const shell = document.getElementById('searchShell');
+  let controller;
+  let timer;
+
+  function hide() {
+    box.hidden = true;
+    box.innerHTML = '';
+    shell.classList.remove('suggesting');
+  }
+
+  function render(items) {
+    if (!items.length) return hide();
+    box.innerHTML = items.map((item) => `
+      <a class="suggestion-item" href="/data/company/${encodeURIComponent(item.slug)}" role="option">
+        <span class="suggestion-mark">${item.kind === 'Importer' ? 'IM' : 'CO'}</span>
+        <span class="suggestion-copy"><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(item.location || item.kind)}${item.hs_codes?.length ? ' · HS ' + item.hs_codes.map(escapeHtml).join(', ') : ''}</small></span>
+      </a>`).join('');
+    box.hidden = false;
+    shell.classList.add('suggesting');
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if (q.length < 2) return hide();
+    timer = setTimeout(async () => {
+      if (controller) controller.abort();
+      controller = new AbortController();
+      try {
+        const response = await fetch(`/data/suggest?q=${encodeURIComponent(q)}`, {signal: controller.signal});
+        if (!response.ok) return hide();
+        const data = await response.json();
+        render(data.items || []);
+      } catch (err) {
+        if (err.name !== 'AbortError') hide();
+      }
+    }, 180);
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!shell.contains(event.target)) hide();
+  });
+})();
+</script>
 {% endblock %}
