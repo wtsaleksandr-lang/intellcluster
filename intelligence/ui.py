@@ -6,7 +6,7 @@ from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from intelligence.database import connect
@@ -48,6 +48,23 @@ def _confident_importyeti_match(company_name: str, match_title: str) -> bool:
     return overlap >= 0.72 or (len(left) >= 5 and (left in right or right in left))
 
 
+def _looks_like_bol(value: str | None) -> bool:
+    text = (value or "").strip()
+    return (
+        9 <= len(text) <= 28
+        and " " not in text
+        and sum(ch.isalpha() for ch in text) >= 2
+        and sum(ch.isdigit() for ch in text) >= 4
+        and all(ch.isalnum() or ch in {"-", "_"} for ch in text)
+    )
+
+
+def _referer_company_slug(request: Request) -> str | None:
+    ref = request.headers.get("referer", "")
+    match = re.search(r"/data/company/([^/?#]+)", ref)
+    return match.group(1) if match else None
+
+
 async def _maybe_enrich_importyeti(company: dict) -> dict:
     if not os.getenv("IMPORTYETI_API_KEY") or not company.get("id"):
         return company
@@ -69,7 +86,6 @@ async def _maybe_enrich_importyeti(company: dict) -> dict:
             refreshed = get_entity_by_slug(conn, company["slug"])
         return refreshed or company
     except (httpx.HTTPError, RuntimeError, ValueError):
-        # Stale cached data remains attached to company and is still served.
         return company
 
 
@@ -91,6 +107,12 @@ async def intelligence_suggest(q: str = Query(default="", min_length=0, max_leng
 
 @router.get("/data/search", response_class=HTMLResponse)
 async def intelligence_search(request: Request,q: str | None=Query(default=None),type: str | None=Query(default=None),province: str | None=Query(default=None),origin: str | None=Query(default=None),hs: str | None=Query(default=None),status: str | None=Query(default=None),sort: str=Query(default="relevance")):
+    # Existing company-profile BOL links historically used the general search URL.
+    # Detect that click from the Referer and route it into the native cached BOL page.
+    company_slug = _referer_company_slug(request)
+    if company_slug and _looks_like_bol(q):
+        return RedirectResponse(url=f"/data/company/{company_slug}/bol/{q}", status_code=302)
+
     with connect() as conn:
         rows=search_entities(conn,q=q,company_type=type,province=province,origin=origin,hs=hs,status=status,sort=sort,limit=50)
     demo_mode=not rows
@@ -116,12 +138,7 @@ async def intelligence_bol(request: Request, slug: str, bol_number: str):
         company = get_entity_by_slug(conn, slug)
         enrichment = get_entity_enrichment(conn, int(company["id"])) if company else {}
     if company is None:
-        return templates.TemplateResponse(
-            request=request,
-            name="bol.html",
-            context={"active":"company","company":None,"bol":None,"error":"Company not found."},
-            status_code=404,
-        )
+        return templates.TemplateResponse(request=request,name="bol.html",context={"active":"company","company":None,"bol":None,"error":"Company not found."},status_code=404)
 
     cache_key = f"importyeti_bol:{bol_number.upper()}"
     cached = enrichment.get(cache_key) if isinstance(enrichment, dict) else None
@@ -134,14 +151,9 @@ async def intelligence_bol(request: Request, slug: str, bol_number: str):
             with connect() as conn:
                 set_entity_enrichment(conn, int(company["id"]), cache_key, fresh)
         except (httpx.HTTPError, RuntimeError, ValueError) as exc:
-            # Keep stale cached detail if available; otherwise show a useful error.
             if bol is None:
                 error = f"Shipment detail could not be loaded: {exc}"
     elif bol is None and not os.getenv("IMPORTYETI_API_KEY"):
         error = "ImportYeti API is not configured for shipment detail."
 
-    return templates.TemplateResponse(
-        request=request,
-        name="bol.html",
-        context={"active":"company","company":company,"bol":bol,"error":error},
-    )
+    return templates.TemplateResponse(request=request,name="bol.html",context={"active":"company","company":company,"bol":bol,"error":error})
