@@ -3,6 +3,8 @@
 {% block meta_desc %}Business intelligence profile for {{ company.name }} including corporate status, import products, HS codes, source countries and buyer intelligence.{% endblock %}
 {% block body %}
 <style>
+  html{scroll-behavior:smooth}.profile-anchor{scroll-margin-top:82px}
+  .profile-jump{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid #e6e6e8;margin:0 -18px 16px;padding:0 18px;overflow:auto;white-space:nowrap}.profile-jump-inner{display:flex;gap:22px;min-width:max-content;height:44px;align-items:center}.profile-jump a{font-size:10px;color:#73747b;padding:15px 0 12px;border-bottom:2px solid transparent;transition:color .15s ease,border-color .15s ease}.profile-jump a:hover{color:#111214;border-bottom-color:#b6b6bb}
   .profile-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:18px 0}
   .chart-card{border:1px solid #dedee1;border-radius:10px;background:#fff;padding:16px 17px;min-height:260px}
   .chart-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:17px}
@@ -12,12 +14,23 @@
   .intel-summary{border:1px solid #dedee1;border-radius:10px;background:#f7f7f8;padding:16px 17px;margin:18px 0}.intel-summary h2{font-size:14px;margin:0 0 8px}.intel-summary p{font-size:11px;color:#565861;margin:0;line-height:1.7}
   .coverage-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.coverage-cell{background:#fff;border:1px solid #e2e2e5;border-radius:7px;padding:10px}.coverage-cell strong{display:block;font-size:15px;color:#202123}.coverage-cell span{display:block;font-size:8px;color:#888991;margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
   .product-table .desc{max-width:470px;line-height:1.45}.muted-dash{color:#aaa}
-  @media(max-width:760px){.profile-grid{grid-template-columns:1fr}.coverage-strip{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:100px 1fr 40px}}
+  @media(max-width:760px){.profile-grid{grid-template-columns:1fr}.coverage-strip{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:100px 1fr 40px}.profile-jump{margin-left:-10px;margin-right:-10px;padding:0 10px}}
 </style>
 <main class="page wide">
   {% if demo_mode %}<div class="notice">Preview fallback — this URL did not match a live entity.</div>{% endif %}
 
-  <section class="profile-box">
+  <nav class="profile-jump" aria-label="Company profile sections">
+    <div class="profile-jump-inner">
+      <a href="#overview">Overview</a>
+      <a href="#products">Product / HS</a>
+      <a href="#countries">Sourcing Countries</a>
+      <a href="#searchable">Searchable Intelligence</a>
+      <a href="#contacts">Contacts & Enrichment</a>
+      <a href="#shipments">Shipment Intelligence</a>
+    </div>
+  </nav>
+
+  <section class="profile-box profile-anchor" id="overview">
     <div class="profile-head">
       <div>
         <div class="profile-title">{{ company.name }} <span class="badge">{{ company.kind }}</span>{% if company.status != 'Unknown' %} <span class="badge green">{{ company.status }}</span>{% endif %}</div>
@@ -58,7 +71,7 @@
   </section>
 
   <div class="profile-grid">
-    <section class="chart-card">
+    <section class="chart-card profile-anchor" id="products">
       <div class="chart-head"><h2>Top Product / HS Coverage</h2><small>Share of this company’s matched importer relationships, not import value.</small></div>
       <div class="chart-rows">
         {% for item in company.hs_breakdown %}
@@ -71,7 +84,7 @@
       </div>
     </section>
 
-    <section class="chart-card">
+    <section class="chart-card profile-anchor" id="countries">
       <div class="chart-head"><h2>Sourcing-Country Coverage</h2><small>How often each origin appears across matched public records.</small></div>
       <div class="chart-rows">
         {% for item in company.origin_breakdown %}
@@ -102,7 +115,7 @@
     </table>
   </section>
 
-  <section class="section">
+  <section class="section profile-anchor" id="searchable">
     <h2>Products & Searchable Intelligence</h2>
     <div class="tags">
       {% for p in company.products %}<a class="tag" href="/data/search?q={{ p|urlencode }}">{{ p }}</a>{% endfor %}
@@ -110,7 +123,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section profile-anchor" id="contacts">
     <h2>Company & Contact Enrichment</h2>
     <table class="data-table"><thead><tr><th>Field</th><th>Current Value</th><th>Source / Method</th></tr></thead><tbody>
       <tr><td>Website</td><td>{{ company.website or 'Not enriched yet' }}</td><td>Web discovery / cache</td></tr>
@@ -121,7 +134,7 @@
     </tbody></table>
   </section>
 
-  <section class="section">
+  <section class="section profile-anchor" id="shipments">
     <h2>Shipment Intelligence</h2>
     <div class="notice">Monthly shipments, BOL history, suppliers, ports, carriers, FCL/LCL, container types and estimated spend require shipment-level customs data. IntellCluster will show these panels only when a licensed shipment source is connected; we will not infer or fabricate them from the Canadian Importers Database.</div>
   </section>
