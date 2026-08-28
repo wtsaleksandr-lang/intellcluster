@@ -18,6 +18,8 @@ def run() -> int:
         ("/data/hs/8708", 200),
         ("/data/hs/870899", 200),
         ("/data/origin/China", 200),
+        ("/data/location/ON", 200),
+        ("/data/location/ON/Mississauga", 200),
         ("/data/company/maple-auto-supply-inc", 200),
         ("/data/company/maple-auto-supply-inc/export.csv", 200),
         ("/api/intelligence/health", 200),
