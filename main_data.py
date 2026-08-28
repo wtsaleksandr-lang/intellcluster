@@ -7,10 +7,12 @@ be rolled out independently of the ingestion pipeline.
 
 from main import app
 from intelligence.api import router as intelligence_api_router
+from intelligence.hs import router as intelligence_hs_router
 from intelligence.ui import router as intelligence_ui_router
 
 app.include_router(intelligence_api_router)
 app.include_router(intelligence_ui_router)
+app.include_router(intelligence_hs_router)
 
 
 _PROFILE_POLISH = r'''
@@ -57,6 +59,15 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
     });
   }
 
+  // HS links now open a true analytical HS-code explorer rather than generic search.
+  document.querySelectorAll('a[href^="/data/search?hs="]').forEach(a=>{
+    try{
+      const u=new URL(a.getAttribute('href'),location.origin);
+      const code=(u.searchParams.get('hs')||'').replace(/\D/g,'').slice(0,10);
+      if(code.length>=2){a.href=`/data/hs/${code}`;a.title=a.title||`Explore HS ${code}`;}
+    }catch{}
+  });
+
   // Make source provenance scannable instead of leaving it as one vague sentence.
   const source=document.querySelector('.source-line');
   if(source){
@@ -72,7 +83,7 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
   // Add useful row counts to dense data sections.
   const supplierTitle=document.querySelector('#suppliers h2');
   const supplierRows=document.querySelectorAll('#supplierTable tbody tr').length;
-  if(supplierTitle&&supplierRows){const s=document.createElement('span');s.className='ic-section-count';s.textContent=supplierRows; s.title='suppliers shown';supplierTitle.appendChild(s)}
+  if(supplierTitle&&supplierRows){const s=document.createElement('span');s.className='ic-section-count';s.textContent=supplierRows;s.title='suppliers shown';supplierTitle.appendChild(s)}
   const bolTitle=document.querySelector('#recent-bols h2');
   const bolRows=document.querySelectorAll('#bolTable tbody tr').length;
   if(bolTitle&&bolRows){const s=document.createElement('span');s.className='ic-section-count';s.textContent=bolRows;s.title='recent shipments shown';bolTitle.appendChild(s)}
