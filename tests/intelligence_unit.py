@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from intelligence.country_intelligence import normalize_country, profile_capabilities
+from intelligence.enrichment.epa_echo import EPAEchoClient, compact_echo_profile
 from intelligence.enrichment.fmcsa import FMCSAClient
 from intelligence.enrichment.importyeti import ImportYetiClient, live_importyeti_enabled
 from intelligence.enrichment.usaspending import USAspendingClient
@@ -72,6 +73,9 @@ def run() -> int:
     assert us_contracts["sections"]["contracts"]["status"] == "cached"
     us_fleet = profile_capabilities({"country": "US", "enrichment": {"fmcsa": {"dot_number": "1234567", "power_units": 42}}})
     assert us_fleet["sections"]["fleet"]["status"] == "cached"
+    us_epa = profile_capabilities({"country": "US", "enrichment": {"epa_echo": {"facility_count": 2}}})
+    assert us_epa["sections"]["facilities"]["status"] == "cached"
+    assert us_epa["sections"]["compliance"]["status"] == "cached"
     us_contacts = profile_capabilities({"country": "US", "enrichment": {"web": {"website": "https://example.com"}}})
     assert us_contacts["sections"]["contacts"]["status"] == "cached"
 
@@ -137,6 +141,27 @@ def run() -> int:
             os.environ.pop("FMCSA_FIXTURE_PATH", None)
         else:
             os.environ["FMCSA_FIXTURE_PATH"] = previous_fmcsa_fixture
+
+    previous_echo_fixture = os.environ.get("EPA_ECHO_FIXTURE_PATH")
+    try:
+        fixture = Path(__file__).parent / "fixtures" / "epa_echo_company.json"
+        os.environ["EPA_ECHO_FIXTURE_PATH"] = str(fixture)
+        facilities = asyncio.run(EPAEchoClient().search_facilities("IntellCluster Industries", state="TX"))
+        assert len(facilities) == 2
+        assert facilities[0].registry_id == "110000000001"
+        assert facilities[0].inspections_5y == 7
+        assert facilities[0].formal_actions_5y == 1
+        profile = compact_echo_profile(facilities)
+        assert profile["facility_count"] == 2
+        assert profile["major_facility_count"] == 1
+        assert profile["inspections_5y"] == 10
+        assert profile["formal_actions_5y"] == 1
+        assert profile["total_penalties"] == 12500.0
+    finally:
+        if previous_echo_fixture is None:
+            os.environ.pop("EPA_ECHO_FIXTURE_PATH", None)
+        else:
+            os.environ["EPA_ECHO_FIXTURE_PATH"] = previous_echo_fixture
 
     print("INTELLIGENCE UNIT OK")
     return 0
