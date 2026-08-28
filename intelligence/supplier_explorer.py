@@ -112,6 +112,43 @@ def sync_supplier_relationships(conn: Connection, importer_entity_id: int, profi
     return written
 
 
+def backfill_cached_supplier_relationships(batch_size: int = 1000) -> dict[str, int]:
+    """Build the supplier index from already-persisted company caches only."""
+    batch_size = max(50, min(int(batch_size), 5000))
+    last_id = 0
+    scanned = 0
+    cached_profiles = 0
+    relationships_written = 0
+
+    while True:
+        with connect() as conn:
+            rows = conn.execute(
+                select(entities.c.id, entities.c.enrichment)
+                .where(entities.c.id > last_id)
+                .order_by(entities.c.id)
+                .limit(batch_size)
+            ).mappings().all()
+            if not rows:
+                break
+            for row in rows:
+                last_id = int(row["id"])
+                scanned += 1
+                enrichment = row["enrichment"] if isinstance(row["enrichment"], dict) else {}
+                profile = enrichment.get("importyeti")
+                if not isinstance(profile, dict) or not profile.get("suppliers_table"):
+                    continue
+                cached_profiles += 1
+                relationships_written += sync_supplier_relationships(conn, last_id, profile)
+        if len(rows) < batch_size:
+            break
+
+    return {
+        "entities_scanned": scanned,
+        "cached_profiles": cached_profiles,
+        "supplier_relationships_written": relationships_written,
+    }
+
+
 def supplier_intelligence(name: str) -> dict:
     decoded = unquote(name).strip()
     normalized = normalize_name(decoded)
@@ -235,4 +272,14 @@ async def supplier_page(request: Request, supplier: str):
             "error": data.get("error"),
         },
         status_code=404 if data.get("error") else 200,
+    )
+
+
+if __name__ == "__main__":
+    result = backfill_cached_supplier_relationships()
+    print(
+        "Supplier cache backfill complete: "
+        f"{result['entities_scanned']:,} entities scanned · "
+        f"{result['cached_profiles']:,} cached profiles · "
+        f"{result['supplier_relationships_written']:,} supplier relationships written"
     )
