@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Supplier Directory | IntellCluster Data{% endblock %}
+{% block body %}
+<style>
+  .supplier-directory{max-width:1180px;margin:0 auto;padding:20px 18px 48px}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:14px}.hero h1{font-size:23px;letter-spacing:-.6px;margin:0 0 5px}.hero p{margin:0;color:#83848a;font-size:10px}.filters{display:flex;gap:8px;flex-wrap:wrap;border:1px solid #dedee1;border-radius:10px;padding:10px;background:#fff;margin-bottom:12px}.filters input,.filters select{height:35px;border:1px solid #d8d8dc;border-radius:7px;padding:0 10px;font-size:10px;background:#fff;color:#33353b}.filters input{flex:1 1 260px}.filters select{min-width:150px}.filters button{height:35px;border:1px solid #202123;border-radius:7px;background:#202123;color:#fff;padding:0 13px;font-size:10px;font-weight:750;cursor:pointer}.country-strip{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 13px}.country-chip{display:inline-flex;border:1px solid #e0e0e2;border-radius:999px;padding:5px 8px;background:#f7f7f8;font-size:8px;color:#65666d}.country-chip:hover{background:#fff;border-color:#b7b8bc;color:#202123}.country-chip.active{background:#202123;color:#fff;border-color:#202123}.meta{display:flex;justify-content:space-between;gap:10px;align-items:center;color:#8a8b91;font-size:9px;margin-bottom:8px}.table-wrap{overflow:auto;border:1px solid #e1e1e4;border-radius:10px;background:#fff}table{width:100%;border-collapse:collapse;min-width:760px;font-size:9px}th{background:#f7f7f8;text-align:left;padding:9px;color:#777880;font-size:8px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e1e1e4}td{padding:10px 9px;border-bottom:1px solid #eeeeef;color:#55565d;vertical-align:middle}tbody tr:hover{background:#fbfbfc}.supplier-link{font-size:11px;font-weight:750;color:#202123}.supplier-link:hover{text-decoration:underline;text-underline-offset:2px}.country-link{color:#666872}.pill{display:inline-flex;border:1px solid #dedee1;border-radius:999px;padding:3px 7px;background:#fff;font-variant-numeric:tabular-nums}.shipments{font-weight:750;color:#075a70;font-variant-numeric:tabular-nums}.cached{color:#9a9ba0}.empty{padding:28px;text-align:center;color:#7c7d83}.pagination{display:flex;justify-content:center;gap:8px;margin-top:18px}.page-btn{border:1px solid #d8d8dc;border-radius:7px;padding:8px 12px;background:#fff;color:#474850;font-size:9px}.page-btn:hover{background:#f6f6f7}.page-num{font-size:9px;color:#8a8b91;padding:8px}.note{font-size:8px;color:#9b9ca2;line-height:1.45;margin-top:10px}
+  @media(max-width:640px){.supplier-directory{padding:14px 11px 36px}.hero{align-items:flex-start;flex-direction:column}.filters>*{flex:1 1 100%;width:100%}}
+</style>
+<main class="supplier-directory">
+  <div class="subnav">
+    <a href="/data/search">Companies & Importers</a>
+    <a class="active" href="/data/suppliers">Suppliers</a>
+    <a href="/data/search?hs=8708">HS Explorer</a>
+    <a href="/data/search?origin=China">Origin Markets</a>
+  </div>
+  <section class="hero"><div><h1>Cached Supplier Directory</h1><p>Browse suppliers discovered in previously purchased shipment-intelligence profiles.</p></div></section>
+
+  <form class="filters" method="get" action="/data/suppliers">
+    <input name="q" value="{{ q }}" placeholder="Search supplier name">
+    <select name="country"><option value="">All countries</option>{% for item in countries %}<option value="{{ item.country }}" {% if country==item.country %}selected{% endif %}>{{ item.country }} · {{ item.suppliers }}</option>{% endfor %}</select>
+    <select name="sort"><option value="shipments" {% if sort=='shipments' %}selected{% endif %}>Most shipments</option><option value="importers" {% if sort=='importers' %}selected{% endif %}>Most importers</option><option value="name" {% if sort=='name' %}selected{% endif %}>Supplier name</option></select>
+    <button type="submit">Search</button>
+  </form>
+
+  {% if countries %}<div class="country-strip"><a class="country-chip {% if not country %}active{% endif %}" href="/data/suppliers{% if q %}?q={{ q|urlencode }}{% endif %}">All</a>{% for item in countries[:12] %}<a class="country-chip {% if country==item.country %}active{% endif %}" href="/data/suppliers?country={{ item.country|urlencode }}{% if q %}&q={{ q|urlencode }}{% endif %}">{{ item.country }} · {{ item.suppliers }}</a>{% endfor %}</div>{% endif %}
+
+  <div class="meta"><span>Page {{ page }} · {{ suppliers|length }} suppliers shown{% if q %} matching “{{ q }}”{% endif %}</span><span>Cached data only · zero live API calls</span></div>
+  <div class="table-wrap">
+    {% if suppliers %}
+    <table><thead><tr><th>Supplier</th><th>Country</th><th>Linked Importers</th><th>Observed Shipments</th><th>Cache Freshness</th></tr></thead><tbody>
+      {% for row in suppliers %}<tr>
+        <td><a class="supplier-link" href="/data/supplier/{{ row.name|urlencode }}">{{ row.name }}</a></td>
+        <td>{% if row.country %}<a class="country-link" href="/data/origin/{{ row.country|urlencode }}">{{ row.country }}</a>{% else %}—{% endif %}</td>
+        <td><span class="pill">{{ row.importer_count }}</span></td>
+        <td class="shipments">{{ "{:,}".format(row.shipments) }}</td>
+        <td class="cached">{% if row.cached_at %}{{ row.cached_at[:10] }}{% else %}—{% endif %}</td>
+      </tr>{% endfor %}
+    </tbody></table>
+    {% else %}<div class="empty">No cached suppliers match these filters. Supplier records appear here after cached ImportYeti company profiles are indexed.</div>{% endif %}
+  </div>
+
+  {% if page > 1 or has_next %}<nav class="pagination">{% if page > 1 %}<a class="page-btn" href="?q={{ q|urlencode }}&country={{ country|urlencode }}&sort={{ sort }}&page={{ page-1 }}">← Previous</a>{% endif %}<span class="page-num">Page {{ page }}</span>{% if has_next %}<a class="page-btn" href="?q={{ q|urlencode }}&country={{ country|urlencode }}&sort={{ sort }}&page={{ page+1 }}">Next →</a>{% endif %}</nav>{% endif %}
+  <div class="note">Supplier relationships are derived from stored ImportYeti profile caches. Browsing, searching and opening supplier pages do not request new ImportYeti data and do not consume API credits.</div>
+</main>
+{% endblock %}
