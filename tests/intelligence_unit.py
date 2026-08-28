@@ -4,6 +4,7 @@ import asyncio
 import os
 from pathlib import Path
 
+from intelligence.country_intelligence import normalize_country, profile_capabilities
 from intelligence.enrichment.importyeti import ImportYetiClient, live_importyeti_enabled
 from intelligence.entity_resolution import normalize_company_name, score_company_match
 from intelligence.models import SourceRecord
@@ -49,6 +50,21 @@ def run() -> int:
         city="Toronto",
     )
     assert not score_company_match(registry, unrelated).is_likely_match
+
+    # Canada and USA share one profile skeleton while explicitly describing
+    # the evidence level available in each module.
+    assert normalize_country("Canada") == "CA"
+    assert normalize_country("USA") == "US"
+    ca = profile_capabilities(
+        {"country": "CA", "is_importer": True, "hs_codes": ["870892"], "origins": ["China"]}
+    )
+    assert ca["sections"]["trade"]["status"] == "market_context"
+    assert ca["sections"]["suppliers"]["status"] == "not_available"
+    us = profile_capabilities({"country": "US", "importyeti": {"total_shipments": 248}})
+    assert us["sections"]["trade"]["status"] == "cached"
+    assert us["sections"]["suppliers"]["status"] == "cached"
+    us_uncached = profile_capabilities({"country": "US"})
+    assert us_uncached["sections"]["trade"]["status"] == "unlockable"
 
     # ImportYeti development/tests are cached-only. Reuse one fixture and prove
     # no live opt-in is present before exercising profile/search helpers.
