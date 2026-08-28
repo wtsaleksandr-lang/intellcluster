@@ -96,6 +96,8 @@ def run() -> int:
     try:
         checks = [
             ("/data", 200),
+            ("/data/companies", 200),
+            ("/data/companies?country=CA&starts_with=I", 200),
             ("/data/search", 200),
             ("/data/search?type=Importer&province=ON&sort=buyer_score", 200),
             ("/data/search?city=Hamilton&incorporated_from=2010&incorporated_to=2026&website=no", 200),
@@ -126,6 +128,9 @@ def run() -> int:
             response = client.get(path, follow_redirects=False)
             if response.status_code != expected:
                 failed.append(f"{path}: {response.status_code} != {expected}")
+        directory_text = client.get("/data/companies?country=CA&starts_with=I").text
+        if f'/data/company/{slug}' not in directory_text or "IntellCluster UI Test Importer Inc." not in directory_text:
+            failed.append("/data/companies: seeded company or crawlable profile link missing")
         hs_response = client.get("/data/hs/870892")
         hs_text = hs_response.text
         if "Cached Supplier One" not in hs_text or "Cached Suppliers Linked to HS 870892" not in hs_text:
