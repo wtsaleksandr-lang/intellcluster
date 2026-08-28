@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -17,19 +19,66 @@ class ImportYetiMatch:
     most_recent_shipment: str | None
 
 
+def live_importyeti_enabled() -> bool:
+    """Return true only when paid/live ImportYeti network access is explicitly enabled.
+
+    Cached data is the normal operating mode. This opt-in prevents ordinary page
+    views, smoke tests, CI and UI development from accidentally consuming credits.
+    """
+    return os.getenv("IMPORTYETI_ALLOW_LIVE", "").strip().casefold() in {"1", "true", "yes", "on"}
+
+
+def load_importyeti_fixture() -> dict[str, Any] | None:
+    """Load one reusable local ImportYeti response for development/tests.
+
+    Set IMPORTYETI_FIXTURE_PATH to a JSON file containing either the API data object
+    or a full API response with a top-level ``data`` object. No network request is
+    made when this fixture is used.
+    """
+    raw_path = os.getenv("IMPORTYETI_FIXTURE_PATH", "").strip()
+    if not raw_path:
+        return None
+    path = Path(raw_path)
+    if not path.exists() or not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
+    return dict(data) if isinstance(data, dict) else None
+
+
 class ImportYetiClient:
-    """Async client for lazy, persistent ImportYeti enrichment."""
+    """Async client for controlled ImportYeti enrichment.
+
+    Network access is intentionally disabled unless IMPORTYETI_ALLOW_LIVE=1.
+    Development and tests should use persisted cache or IMPORTYETI_FIXTURE_PATH.
+    """
 
     BASE_URL = "https://data.importyeti.com/v1.0"
 
-    def __init__(self, api_key: str | None = None) -> None:
+    def __init__(self, api_key: str | None = None, *, allow_live: bool | None = None) -> None:
         self.api_key = api_key or os.getenv("IMPORTYETI_API_KEY")
-        if not self.api_key:
+        self.allow_live = live_importyeti_enabled() if allow_live is None else allow_live
+        self.fixture = load_importyeti_fixture()
+        if self.allow_live and not self.api_key:
             raise RuntimeError("IMPORTYETI_API_KEY is not configured")
 
     @property
     def headers(self) -> dict[str, str]:
+        if not self.api_key:
+            return {"Accept": "application/json"}
         return {"IYApiKey": self.api_key, "Accept": "application/json"}
+
+    def _assert_live_allowed(self) -> None:
+        if not self.allow_live:
+            raise RuntimeError(
+                "Live ImportYeti requests are disabled. Use cached data or set "
+                "IMPORTYETI_ALLOW_LIVE=1 for an intentional paid refresh."
+            )
 
     async def _get(
         self,
@@ -38,6 +87,12 @@ class ImportYetiClient:
         timeout: int = 45,
         params: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        if self.fixture is not None:
+            data = dict(self.fixture)
+            data.setdefault("_cachedAt", datetime.now(UTC).isoformat())
+            data["_fixture"] = True
+            return data
+        self._assert_live_allowed()
         async with httpx.AsyncClient(timeout=timeout, headers=self.headers) as client:
             response = await client.get(f"{self.BASE_URL}{path}", params=params)
             response.raise_for_status()
@@ -49,6 +104,19 @@ class ImportYetiClient:
         return data
 
     async def search_company(self, name: str, page_size: int = 5) -> list[ImportYetiMatch]:
+        if self.fixture is not None:
+            title = str(self.fixture.get("title") or self.fixture.get("_matchedTitle") or name)
+            slug = str(self.fixture.get("_slug") or "cached-test-company")
+            return [
+                ImportYetiMatch(
+                    slug=slug,
+                    title=title,
+                    address=self.fixture.get("address") or self.fixture.get("address_plain"),
+                    total_shipments=self.fixture.get("total_shipments"),
+                    most_recent_shipment=None,
+                )
+            ]
+        self._assert_live_allowed()
         async with httpx.AsyncClient(timeout=30, headers=self.headers) as client:
             response = await client.get(
                 f"{self.BASE_URL}/company/search",
@@ -135,6 +203,7 @@ def compact_profile(data: dict[str, Any]) -> dict[str, Any]:
         "_requestCost",
         "_creditsRemaining",
         "_cachedAt",
+        "_fixture",
     }
     result = {key: value for key, value in data.items() if key in keep}
     if isinstance(result.get("suppliers_table"), list):
