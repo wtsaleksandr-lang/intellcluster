@@ -72,7 +72,7 @@ async def sitemap_index() -> Response:
 
 @router.get("/sitemaps/static.xml")
 async def sitemap_static() -> Response:
-    paths = ["/data", "/data/suppliers"]
+    paths = ["/data", "/data/companies", "/data/suppliers"]
     urls = "".join(_url_entry(path) for path in paths)
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>"
     return _xml_response(body)
@@ -201,40 +201,38 @@ def _breadcrumb_schema(path: str, *, company_name: str | None = None) -> dict[st
     base = _base_url()
     path = _canonical_path(path)
     crumbs: list[tuple[str, str]] = [("IntellCluster Data", "/data")]
-    match = re.fullmatch(r"/data/company/([^/]+)", path)
-    if match:
-        crumbs.extend([("Companies", "/data"), (company_name or unquote(match.group(1)).replace("-", " ").title(), path)])
+    if path == "/data/companies":
+        crumbs.append(("Companies", path))
     else:
-        match = re.fullmatch(r"/data/hs/(\d{2,10})", path)
+        match = re.fullmatch(r"/data/company/([^/]+)", path)
         if match:
-            code = match.group(1)
-            crumbs.extend([("HS Code Intelligence", "/data"), (f"HS {code}", path)])
+            crumbs.extend([("Companies", "/data/companies"), (company_name or unquote(match.group(1)).replace("-", " ").title(), path)])
         else:
-            match = re.fullmatch(r"/data/origin/(.+)", path)
+            match = re.fullmatch(r"/data/hs/(\d{2,10})", path)
             if match:
-                origin = unquote(match.group(1))
-                crumbs.extend([("Origin Markets", "/data"), (origin, path)])
+                code = match.group(1)
+                crumbs.extend([("HS Code Intelligence", "/data"), (f"HS {code}", path)])
             else:
-                match = re.fullmatch(r"/data/location/([^/]+)(?:/(.+))?", path)
+                match = re.fullmatch(r"/data/origin/(.+)", path)
                 if match:
-                    province = unquote(match.group(1))
-                    city = unquote(match.group(2)) if match.group(2) else ""
-                    crumbs.append(("Locations", "/data"))
-                    crumbs.append((province, f"/data/location/{quote(province, safe='')}"))
-                    if city:
-                        crumbs.append((city, path))
+                    origin = unquote(match.group(1))
+                    crumbs.extend([("Origin Markets", "/data"), (origin, path)])
                 else:
-                    return None
+                    match = re.fullmatch(r"/data/location/([^/]+)(?:/(.+))?", path)
+                    if match:
+                        province = unquote(match.group(1))
+                        city = unquote(match.group(2)) if match.group(2) else ""
+                        crumbs.append(("Locations", "/data"))
+                        crumbs.append((province, f"/data/location/{quote(province, safe='')}"))
+                        if city:
+                            crumbs.append((city, path))
+                    else:
+                        return None
     return {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
-            {
-                "@type": "ListItem",
-                "position": index,
-                "name": name,
-                "item": base + item_path,
-            }
+            {"@type": "ListItem", "position": index, "name": name, "item": base + item_path}
             for index, (name, item_path) in enumerate(crumbs, start=1)
         ],
     }
@@ -279,7 +277,11 @@ def install_seo_middleware(app) -> None:
         base = _base_url()
         clean_path = _canonical_path(path)
         canonical = base + clean_path
-        noindex = path.startswith("/data/search") or path.startswith("/data/suggest")
+        noindex = (
+            path.startswith("/data/search")
+            or path.startswith("/data/suggest")
+            or (clean_path == "/data/companies" and bool(request.query_params))
+        )
         robots = "noindex,follow" if noindex else "index,follow,max-image-preview:large,max-snippet:-1"
         title, description = _rendered_meta(text)
         head_bits = [
@@ -303,11 +305,7 @@ def install_seo_middleware(app) -> None:
                     company = get_entity_by_slug(conn, slug)
                 if company:
                     company_name = str(company.get("name") or company.get("canonical_name") or "Company")
-                    schema = json.dumps(
-                        _organization_schema(company, canonical),
-                        ensure_ascii=False,
-                        separators=(",", ":"),
-                    )
+                    schema = json.dumps(_organization_schema(company, canonical), ensure_ascii=False, separators=(",", ":"))
                     safe_schema = schema.replace("</", "<\\/")
                     head_bits.append(f'<script type="application/ld+json">{safe_schema}</script>')
             except Exception:
