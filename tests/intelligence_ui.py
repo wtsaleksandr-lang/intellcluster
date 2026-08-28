@@ -128,6 +128,12 @@ def run() -> int:
             failed.append("/data/hs/870892: cached supplier ranking missing")
         if "/data/supplier/Cached%20Supplier%20One" not in hs_text:
             failed.append("/data/hs/870892: supplier drilldown link missing")
+        if "expectedKind=()=>box.dataset.view==='companies'?'company':'supplier'" not in hs_text:
+            failed.append("/data/hs/870892: company-tab regression fix missing")
+        company_response = client.get(f"/data/company/{slug}")
+        company_text = company_response.text
+        if "relationship-evidence-enhancer" not in company_text or "Top 10 relationships" not in company_text:
+            failed.append(f"/data/company/{slug}: relationship evidence drilldown enhancer missing")
         freshness = client.get("/api/intelligence/freshness").json()
         if freshness.get("company_count", 0) < 1 or "delta_available" not in freshness:
             failed.append("/api/intelligence/freshness: invalid payload")
