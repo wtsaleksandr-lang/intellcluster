@@ -73,12 +73,18 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
     if importyeti is None and isinstance(enrichment, dict) and isinstance(enrichment.get("importyeti"), dict):
         importyeti = enrichment["importyeti"]
     usaspending = enrichment.get("usaspending") if isinstance(enrichment, dict) else None
-    if not isinstance(usaspending, dict):
-        usaspending = None
+    usaspending = usaspending if isinstance(usaspending, dict) else None
+    fmcsa = enrichment.get("fmcsa") if isinstance(enrichment, dict) else None
+    fmcsa = fmcsa if isinstance(fmcsa, dict) else None
+    web = enrichment.get("web") if isinstance(enrichment, dict) else None
+    web = web if isinstance(web, dict) else None
+    hunter = enrichment.get("hunter") if isinstance(enrichment, dict) else None
+    hunter = hunter if isinstance(hunter, dict) else None
 
     is_importer = bool(company.get("is_importer") or company.get("kind") == "Importer")
     hs_codes = company.get("hs_codes") or []
     origins = company.get("origins") or []
+    relationship_count = int(company.get("relationship_count") or 0)
 
     sections: dict[str, dict[str, str | None]] = {
         "overview": _state("available", label="Overview", source="canonical entity graph"),
@@ -92,19 +98,29 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
             label="Geography",
             source="public records",
         ),
-        "relationships": _state("pending", label="Relationships"),
+        "relationships": _state(
+            "available" if relationship_count else "pending",
+            label="Relationships",
+            source="matched public-data relationships" if relationship_count else None,
+        ),
         "facilities": _state("planned", label="Facilities"),
         "compliance": _state("planned", label="Compliance"),
         "contracts": _state("planned", label="Contracts"),
         "fleet": _state("planned", label="Fleet"),
         "patents": _state("planned", label="Patents"),
-        "contacts": _state("on_demand", label="Contacts", source="cached web/Hunter enrichment"),
+        "contacts": _state(
+            "cached" if web or hunter else "on_demand",
+            label="Contacts",
+            source="cached web/Hunter enrichment" if web or hunter else "web/Hunter enrichment",
+        ),
     }
 
     if code == "US":
         if importyeti:
             sections["trade"] = _state("cached", label="Trade", source="ImportYeti API cache")
             sections["suppliers"] = _state("cached", label="Suppliers", source="ImportYeti API cache")
+            if importyeti.get("suppliers_table"):
+                sections["relationships"] = _state("cached", label="Relationships", source="ImportYeti supplier cache")
         else:
             sections["trade"] = _state(
                 "unlockable",
@@ -125,7 +141,11 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
             if usaspending
             else _state("on_demand", label="Contracts", source="USAspending.gov")
         )
-        sections["fleet"] = _state("planned", label="Fleet", source="FMCSA")
+        sections["fleet"] = (
+            _state("cached", label="Fleet", source="FMCSA Company Census cache")
+            if fmcsa
+            else _state("available" if company.get("usdot_number") else "planned", label="Fleet", source="FMCSA")
+        )
         sections["patents"] = _state("planned", label="Patents", source="USPTO")
     elif code == "CA":
         if importyeti:
