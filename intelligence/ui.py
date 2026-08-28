@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import csv
+import io
 import os
 import re
 from pathlib import Path
 
 import httpx
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from intelligence.database import connect
@@ -63,6 +65,14 @@ def _referer_company_slug(request: Request) -> str | None:
     ref = request.headers.get("referer", "")
     match = re.search(r"/data/company/([^/?#]+)", ref)
     return match.group(1) if match else None
+
+
+def _csv_cell(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, (list, tuple, set)):
+        return " | ".join(str(item) for item in value)
+    return str(value)
 
 
 async def _maybe_enrich_importyeti(company: dict) -> dict:
@@ -178,6 +188,62 @@ async def intelligence_company(request: Request, slug: str):
     elif not demo_mode:
         company = await _maybe_enrich_importyeti(company)
     return templates.TemplateResponse(request=request,name="company.html",context={"active":"company","company":company,"demo_mode":demo_mode})
+
+
+@router.get("/data/company/{slug}/export.csv")
+async def intelligence_company_export(slug: str):
+    """Export the normalized company profile and intelligence facets as a CSV."""
+    with connect() as conn:
+        company = get_entity_by_slug(conn, slug)
+    if company is None:
+        return Response("Company not found", status_code=404, media_type="text/plain")
+
+    output = io.StringIO(newline="")
+    writer = csv.writer(output)
+    writer.writerow(["section", "field", "value", "detail"])
+    core_rows = [
+        ("company", "name", company.get("name"), ""),
+        ("company", "type", company.get("kind"), ""),
+        ("company", "status", company.get("status"), ""),
+        ("company", "corporation_number", company.get("corporation_number"), ""),
+        ("company", "incorporated_year", company.get("incorporated"), ""),
+        ("company", "city", company.get("city"), ""),
+        ("company", "province", company.get("province"), ""),
+        ("company", "country", company.get("country"), ""),
+        ("company", "address", company.get("address"), ""),
+        ("company", "website", company.get("website"), ""),
+        ("evidence", "source_records", company.get("source_records_count"), ""),
+        ("evidence", "matched_sources", company.get("source_count"), ""),
+        ("evidence", "importer_relationships", company.get("relationship_count"), ""),
+        ("ai", "buyer_score", company.get("buyer_score"), ""),
+    ]
+    for row in core_rows:
+        writer.writerow([_csv_cell(cell) for cell in row])
+
+    for item in company.get("hs_breakdown") or []:
+        writer.writerow(["hs", item.get("label", ""), item.get("count", ""), item.get("description", "")])
+    for item in company.get("origin_breakdown") or []:
+        writer.writerow(["origin", item.get("label", ""), item.get("count", ""), f"{item.get('percent', '')}%"])
+    for item in company.get("dataset_breakdown") or []:
+        writer.writerow(["dataset", item.get("label", ""), item.get("count", ""), f"{item.get('percent', '')}%"])
+
+    iy = company.get("importyeti") if isinstance(company.get("importyeti"), dict) else None
+    if iy:
+        writer.writerow(["shipment", "importyeti_match", iy.get("_matchedTitle") or iy.get("title") or "", ""])
+        writer.writerow(["shipment", "total_shipments", iy.get("total_shipments", ""), ""])
+        writer.writerow(["shipment", "estimated_shipping_spend", iy.get("total_shipping_cost", ""), ""])
+        writer.writerow(["shipment", "cached_at", iy.get("_cachedAt", ""), ""])
+        for supplier in (iy.get("suppliers_table") or [])[:60]:
+            writer.writerow([
+                "supplier",
+                supplier.get("supplier_name", ""),
+                supplier.get("total_shipments_company", ""),
+                supplier.get("country") or supplier.get("supplier_address_country") or "",
+            ])
+
+    safe_name = re.sub(r"[^a-zA-Z0-9._-]+", "-", company.get("name") or slug).strip("-")[:100] or "company"
+    headers = {"Content-Disposition": f'attachment; filename="{safe_name}-intelligence.csv"'}
+    return Response(output.getvalue(), media_type="text/csv; charset=utf-8", headers=headers)
 
 
 @router.get("/data/company/{slug}/bol/{bol_number}", response_class=HTMLResponse)
