@@ -55,17 +55,28 @@ def directory_freshness() -> dict:
             .order_by(sync_runs.c.finished_at.desc(), sync_runs.c.id.desc())
             .limit(1)
         ).mappings().first()
-        latest_delta = conn.execute(
+        delta_rows = conn.execute(
             select(sync_delta_stats)
             .where(sync_delta_stats.c.status == "completed")
             .order_by(sync_delta_stats.c.checked_at.desc(), sync_delta_stats.c.id.desc())
-            .limit(1)
-        ).mappings().first()
+            .limit(20)
+        ).mappings().all()
         checkpoints = conn.execute(select(sync_checkpoints)).mappings().all()
 
     active = [row for row in checkpoints if str(row.get("status") or "") in {"running", "interrupted", "paused"}]
     active.sort(key=lambda row: _iso(row.get("updated_at")), reverse=True)
     checkpoint = active[0] if active else None
+
+    latest_delta = None
+    for row in delta_rows:
+        if any(
+            int(row.get(key) or 0) > 0
+            for key in ("files_changed", "records_added", "records_updated", "records_retired")
+        ):
+            latest_delta = row
+            break
+    if latest_delta is None and delta_rows:
+        latest_delta = delta_rows[0]
 
     if latest_delta:
         last_checked = _iso(latest_delta.get("checked_at"))
