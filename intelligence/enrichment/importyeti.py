@@ -31,7 +31,13 @@ class ImportYetiClient:
     def headers(self) -> dict[str, str]:
         return {"IYApiKey": self.api_key, "Accept": "application/json"}
 
-    async def _get(self, path: str, *, timeout: int = 45, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def _get(
+        self,
+        path: str,
+        *,
+        timeout: int = 45,
+        params: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         async with httpx.AsyncClient(timeout=timeout, headers=self.headers) as client:
             response = await client.get(f"{self.BASE_URL}{path}", params=params)
             response.raise_for_status()
@@ -95,19 +101,50 @@ def cache_is_fresh(cache: dict[str, Any] | None, max_age_days: int = 30) -> bool
 def compact_profile(data: dict[str, Any]) -> dict[str, Any]:
     """Preserve fields used by interactive company-profile analytics."""
     keep = {
-        "title", "also_known_names", "address", "address_plain", "other_addresses_contact_info",
-        "website", "other_websites", "phone_number", "total_shipments", "country", "country_code",
-        "carriers_per_country", "container_types", "containers", "containers_load", "map_table",
-        "lane_permutations", "date_range", "time_series", "hs_codes", "bill_type_shipments",
-        "suppliers_table", "notify_party_shipments", "notify_party_shipments_perc",
-        "internal_notify_party_shipments", "internal_notify_party_shipments_perc", "notify_party_table",
-        "recent_bols", "total_shipping_cost", "avg_teu_per_shipment", "avg_teu_per_month",
-        "_requestCost", "_creditsRemaining", "_cachedAt",
+        "title",
+        "also_known_names",
+        "address",
+        "address_plain",
+        "other_addresses_contact_info",
+        "website",
+        "other_websites",
+        "phone_number",
+        "total_shipments",
+        "country",
+        "country_code",
+        "carriers_per_country",
+        "container_types",
+        "containers",
+        "containers_load",
+        "map_table",
+        "lane_permutations",
+        "date_range",
+        "time_series",
+        "hs_codes",
+        "bill_type_shipments",
+        "suppliers_table",
+        "notify_party_shipments",
+        "notify_party_shipments_perc",
+        "internal_notify_party_shipments",
+        "internal_notify_party_shipments_perc",
+        "notify_party_table",
+        "recent_bols",
+        "total_shipping_cost",
+        "avg_teu_per_shipment",
+        "avg_teu_per_month",
+        "_requestCost",
+        "_creditsRemaining",
+        "_cachedAt",
     }
     result = {key: value for key, value in data.items() if key in keep}
-    if isinstance(result.get("suppliers_table"), list): result["suppliers_table"] = result["suppliers_table"][:60]
-    if isinstance(result.get("recent_bols"), list): result["recent_bols"] = result["recent_bols"][:150]
-    if isinstance(result.get("lane_permutations"), list): result["lane_permutations"] = result["lane_permutations"][:60]
-    if isinstance(result.get("notify_party_table"), list): result["notify_party_table"] = result["notify_party_table"][:40]
-    if isinstance(result.get("other_addresses_contact_info"), list): result["other_addresses_contact_info"] = result["other_addresses_contact_info"][:60]
+    if isinstance(result.get("suppliers_table"), list):
+        result["suppliers_table"] = result["suppliers_table"][:60]
+    if isinstance(result.get("recent_bols"), list):
+        result["recent_bols"] = result["recent_bols"][:150]
+    if isinstance(result.get("lane_permutations"), list):
+        result["lane_permutations"] = result["lane_permutations"][:60]
+    if isinstance(result.get("notify_party_table"), list):
+        result["notify_party_table"] = result["notify_party_table"][:40]
+    if isinstance(result.get("other_addresses_contact_info"), list):
+        result["other_addresses_contact_info"] = result["other_addresses_contact_info"][:60]
     return result
