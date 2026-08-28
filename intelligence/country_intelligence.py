@@ -76,6 +76,8 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
     usaspending = usaspending if isinstance(usaspending, dict) else None
     fmcsa = enrichment.get("fmcsa") if isinstance(enrichment, dict) else None
     fmcsa = fmcsa if isinstance(fmcsa, dict) else None
+    epa_echo = enrichment.get("epa_echo") if isinstance(enrichment, dict) else None
+    epa_echo = epa_echo if isinstance(epa_echo, dict) else None
     web = enrichment.get("web") if isinstance(enrichment, dict) else None
     web = web if isinstance(web, dict) else None
     hunter = enrichment.get("hunter") if isinstance(enrichment, dict) else None
@@ -134,8 +136,12 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
                 source="ImportYeti API",
                 message="Supplier shipment intelligence has not been cached for this company yet.",
             )
-        sections["facilities"] = _state("planned", label="Facilities", source="EPA ECHO / public records")
-        sections["compliance"] = _state("planned", label="Compliance", source="OSHA / EPA")
+        if epa_echo:
+            sections["facilities"] = _state("cached", label="Facilities", source="EPA ECHO cache")
+            sections["compliance"] = _state("cached", label="Compliance", source="EPA ECHO cache")
+        else:
+            sections["facilities"] = _state("on_demand", label="Facilities", source="EPA ECHO")
+            sections["compliance"] = _state("on_demand", label="Compliance", source="EPA ECHO / OSHA")
         sections["contracts"] = (
             _state("cached", label="Contracts", source="USAspending.gov cache")
             if usaspending
