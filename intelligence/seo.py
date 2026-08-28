@@ -137,11 +137,18 @@ def install_seo_middleware(app) -> None:
 
     @app.middleware("http")
     async def intellcluster_seo_metadata(request: Request, call_next):
+        path = request.url.path
+        # The underlying product already owns these root-level routes. Intercept
+        # them here so the directory's discovery endpoints are authoritative.
+        if path == "/robots.txt":
+            return await robots_txt()
+        if path == "/sitemap.xml":
+            return await sitemap_index()
+
         response = await call_next(request)
         content_type = response.headers.get("content-type", "")
         if "text/html" not in content_type:
             return response
-        path = request.url.path
         if not path.startswith("/data"):
             return response
 
