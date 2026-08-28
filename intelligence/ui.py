@@ -12,7 +12,12 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Resp
 from fastapi.templating import Jinja2Templates
 
 from intelligence.database import connect
-from intelligence.enrichment.importyeti import ImportYetiClient, cache_is_fresh, compact_profile
+from intelligence.enrichment.importyeti import (
+    ImportYetiClient,
+    compact_profile,
+    live_importyeti_enabled,
+    load_importyeti_fixture,
+)
 from intelligence.repository import (
     get_entity_by_slug,
     get_entity_enrichment,
@@ -76,11 +81,31 @@ def _csv_cell(value: object) -> str:
 
 
 async def _maybe_enrich_importyeti(company: dict) -> dict:
-    if not os.getenv("IMPORTYETI_API_KEY") or not company.get("id"):
+    """Attach shipment intelligence without spending credits during normal browsing.
+
+    Any persisted cache is reused indefinitely. A local fixture can seed one cached
+    test profile. Network calls are possible only when IMPORTYETI_ALLOW_LIVE=1.
+    """
+    if not company.get("id"):
         return company
     cached = company.get("importyeti") if isinstance(company.get("importyeti"), dict) else None
-    if cache_is_fresh(cached):
+    if cached:
         return company
+
+    fixture = load_importyeti_fixture()
+    if fixture is not None:
+        profile = compact_profile(fixture)
+        profile.setdefault("_slug", str(fixture.get("_slug") or "cached-test-company"))
+        profile.setdefault("_matchedTitle", str(fixture.get("title") or company["name"]))
+        profile["_fixture"] = True
+        with connect() as conn:
+            set_entity_enrichment(conn, int(company["id"]), "importyeti", profile)
+            refreshed = get_entity_by_slug(conn, company["slug"])
+        return refreshed or company
+
+    if not live_importyeti_enabled() or not os.getenv("IMPORTYETI_API_KEY"):
+        return company
+
     try:
         client = ImportYetiClient()
         matches = await client.search_company(company["name"], page_size=5)
@@ -258,16 +283,17 @@ async def intelligence_bol(request: Request, slug: str, bol_number: str):
     cached = enrichment.get(cache_key) if isinstance(enrichment, dict) else None
     bol = cached if isinstance(cached, dict) else None
     error = None
-    if not cache_is_fresh(bol) and os.getenv("IMPORTYETI_API_KEY"):
+
+    # Never refresh BOLs automatically. Cached BOL detail is reused indefinitely.
+    if bol is None and live_importyeti_enabled() and os.getenv("IMPORTYETI_API_KEY"):
         try:
             fresh = await ImportYetiClient().bol_detail(bol_number)
             bol = fresh
             with connect() as conn:
                 set_entity_enrichment(conn, int(company["id"]), cache_key, fresh)
         except (httpx.HTTPError, RuntimeError, ValueError) as exc:
-            if bol is None:
-                error = f"Shipment detail could not be loaded: {exc}"
-    elif bol is None and not os.getenv("IMPORTYETI_API_KEY"):
-        error = "ImportYeti API is not configured for shipment detail."
+            error = f"Shipment detail could not be loaded: {exc}"
+    elif bol is None:
+        error = "Shipment detail is not cached. Live ImportYeti requests are disabled to protect API credits."
 
     return templates.TemplateResponse(request=request,name="bol.html",context={"active":"company","company":company,"bol":bol,"error":error})
