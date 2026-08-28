@@ -6,7 +6,7 @@ from urllib.parse import unquote
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import func, select
 
 from intelligence.database import connect, entities, importer_relationships
 
