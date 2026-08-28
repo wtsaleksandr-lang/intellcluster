@@ -4,6 +4,7 @@ import csv
 import io
 import os
 import re
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import httpx
@@ -13,11 +14,17 @@ from fastapi.templating import Jinja2Templates
 
 from intelligence.country_intelligence import profile_capabilities
 from intelligence.database import connect
+from intelligence.enrichment.fmcsa import FMCSAClient, FMCSACompany
 from intelligence.enrichment.importyeti import (
     ImportYetiClient,
     compact_profile,
     live_importyeti_enabled,
     load_importyeti_fixture,
+)
+from intelligence.enrichment.usaspending import (
+    USARecipientMatch,
+    USAspendingClient,
+    compact_usaspending_profile,
 )
 from intelligence.repository import (
     get_entity_by_slug,
@@ -84,6 +91,75 @@ def _csv_cell(value: object) -> str:
     return str(value)
 
 
+def _marker_is_recent(marker: object, max_age_days: int = 7) -> bool:
+    if not isinstance(marker, dict) or not marker.get("checked_at"):
+        return False
+    try:
+        checked = datetime.fromisoformat(str(marker["checked_at"]).replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    if checked.tzinfo is None:
+        checked = checked.replace(tzinfo=UTC)
+    return datetime.now(UTC) - checked <= timedelta(days=max_age_days)
+
+
+def _fmcsa_profile(match: FMCSACompany) -> dict:
+    status = {"A": "Active", "P": "Pending", "I": "Inactive"}.get(match.status_code or "", match.status_code or "Unknown")
+    return {
+        "usdot_number": match.dot_number,
+        "legal_name": match.legal_name,
+        "dba_name": match.dba_name,
+        "status_code": match.status_code,
+        "status": status,
+        "street": match.street,
+        "city": match.city,
+        "state": match.state,
+        "postal_code": match.postal_code,
+        "country": match.country,
+        "phone": match.phone,
+        "cell_phone": match.cell_phone,
+        "power_units": match.power_units,
+        "total_drivers": match.total_drivers,
+        "mcs150_date": match.mcs150_date,
+        "add_date": match.add_date,
+        "carrier_operation": match.carrier_operation,
+        "source": "FMCSA Company Census File",
+        "source_url": f"https://safer.fmcsa.dot.gov/query.asp?searchtype=ANY&query_type=queryCarrierSnapshot&query_param=USDOT&query_string={match.dot_number}",
+    }
+
+
+def _choose_fmcsa(company: dict, matches: list[FMCSACompany]) -> FMCSACompany | None:
+    wanted = _name_key(str(company.get("name") or ""))
+    if not wanted:
+        return None
+    for match in matches:
+        if wanted in {_name_key(match.legal_name), _name_key(match.dba_name or "")}:
+            return match
+    state = str(company.get("province") or "").strip().upper()
+    city = str(company.get("city") or "").strip().casefold()
+    for match in matches:
+        if not _confident_importyeti_match(str(company.get("name") or ""), match.display_name):
+            continue
+        state_ok = not state or state == str(match.state or "").upper()
+        city_ok = not city or city == str(match.city or "").casefold()
+        if state_ok and city_ok:
+            return match
+    return None
+
+
+def _choose_usaspending(company: dict, matches: list[USARecipientMatch]) -> USARecipientMatch | None:
+    wanted = _name_key(str(company.get("name") or ""))
+    if not wanted:
+        return None
+    for match in matches:
+        if wanted == _name_key(match.name):
+            return match
+    for match in matches:
+        if _confident_importyeti_match(str(company.get("name") or ""), match.name):
+            return match
+    return None
+
+
 async def _maybe_enrich_importyeti(company: dict) -> dict:
     """Attach shipment intelligence without spending credits during normal browsing."""
     if not company.get("id"):
@@ -119,6 +195,71 @@ async def _maybe_enrich_importyeti(company: dict) -> dict:
         return refreshed or company
     except (httpx.HTTPError, RuntimeError, ValueError):
         return company
+
+
+async def _enrich_us_public(company: dict) -> tuple[dict, dict]:
+    """Fetch free U.S. public intelligence once, cache it, and never call paid trade APIs."""
+    if str(company.get("country") or "").upper() != "US" or not company.get("id"):
+        return company, {"status": "not_us"}
+
+    enrichment = company.get("enrichment") if isinstance(company.get("enrichment"), dict) else {}
+    marker = enrichment.get("us_public_lookup") if isinstance(enrichment, dict) else None
+    need_fmcsa = not isinstance(enrichment.get("fmcsa"), dict)
+    need_spending = not isinstance(enrichment.get("usaspending"), dict)
+    if not need_fmcsa and not need_spending:
+        return company, {"status": "cached", "fmcsa": "cached", "usaspending": "cached"}
+    if _marker_is_recent(marker):
+        return company, {"status": "recently_checked", **marker}
+
+    result: dict[str, str] = {"status": "checked"}
+    fmcsa_profile: dict | None = None
+    spending_profile: dict | None = None
+
+    if need_fmcsa:
+        try:
+            matches = await FMCSAClient(timeout=12).search(str(company.get("name") or ""), limit=8)
+            chosen = _choose_fmcsa(company, matches)
+            if chosen:
+                fmcsa_profile = _fmcsa_profile(chosen)
+                result["fmcsa"] = "matched"
+            else:
+                result["fmcsa"] = "no_confident_match"
+        except (httpx.HTTPError, RuntimeError, ValueError):
+            result["fmcsa"] = "unavailable"
+    else:
+        result["fmcsa"] = "cached"
+
+    if need_spending:
+        try:
+            client = USAspendingClient(timeout=12)
+            matches = await client.search_recipients(str(company.get("name") or ""), limit=8)
+            chosen = _choose_usaspending(company, matches)
+            if chosen:
+                awards = await client.contract_awards(chosen.recipient_id, limit=25)
+                spending_profile = compact_usaspending_profile(chosen, awards)
+                result["usaspending"] = "matched"
+            else:
+                result["usaspending"] = "no_confident_match"
+        except (httpx.HTTPError, RuntimeError, ValueError):
+            result["usaspending"] = "unavailable"
+    else:
+        result["usaspending"] = "cached"
+
+    marker_payload = {
+        "checked_at": datetime.now(UTC).isoformat(),
+        "fmcsa": result.get("fmcsa", "unknown"),
+        "usaspending": result.get("usaspending", "unknown"),
+        "source": "free_public_us_enrichment",
+    }
+    with connect() as conn:
+        entity_id = int(company["id"])
+        if fmcsa_profile:
+            set_entity_enrichment(conn, entity_id, "fmcsa", fmcsa_profile)
+        if spending_profile:
+            set_entity_enrichment(conn, entity_id, "usaspending", spending_profile)
+        set_entity_enrichment(conn, entity_id, "us_public_lookup", marker_payload)
+        refreshed = get_entity_by_slug(conn, company["slug"])
+    return refreshed or company, {**result, **marker_payload}
 
 
 @router.get("/data", response_class=HTMLResponse)
@@ -203,6 +344,18 @@ async def intelligence_company(request: Request, slug: str):
     )
 
 
+@router.post("/api/intelligence/company/{slug}/enrich/us-public", response_class=JSONResponse)
+async def intelligence_company_us_public_enrichment(slug: str):
+    with connect() as conn:
+        company = get_entity_by_slug(conn, slug)
+    if company is None:
+        return JSONResponse({"error": "Company not found."}, status_code=404)
+    if str(company.get("country") or "").upper() != "US":
+        return JSONResponse({"error": "Free U.S. public enrichment applies only to U.S. company profiles."}, status_code=400)
+    refreshed, lookup = await _enrich_us_public(company)
+    return JSONResponse({"company": refreshed, "capabilities": profile_capabilities(refreshed), "lookup": lookup})
+
+
 @router.get("/data/company/{slug}/export.csv")
 async def intelligence_company_export(slug: str):
     with connect() as conn:
@@ -237,6 +390,19 @@ async def intelligence_company_export(slug: str):
         writer.writerow(["shipment", "cached_at", iy.get("_cachedAt", ""), ""])
         for supplier in (iy.get("suppliers_table") or [])[:60]:
             writer.writerow(["supplier", supplier.get("supplier_name", ""), supplier.get("total_shipments_company", ""), supplier.get("country") or supplier.get("supplier_address_country") or ""])
+    enrichment = company.get("enrichment") if isinstance(company.get("enrichment"), dict) else {}
+    fmcsa = enrichment.get("fmcsa") if isinstance(enrichment.get("fmcsa"), dict) else None
+    if fmcsa:
+        for field in ("usdot_number", "status", "power_units", "total_drivers", "carrier_operation", "phone", "mcs150_date"):
+            writer.writerow(["fleet", field, fmcsa.get(field, ""), "FMCSA Company Census File"])
+    spending = enrichment.get("usaspending") if isinstance(enrichment.get("usaspending"), dict) else None
+    if spending:
+        writer.writerow(["contracts", "uei", spending.get("uei", ""), "USAspending.gov"])
+        writer.writerow(["contracts", "awards_shown", spending.get("contract_awards_shown", ""), "USAspending.gov"])
+        writer.writerow(["contracts", "award_value_shown", spending.get("contract_award_value_shown", ""), "USAspending.gov"])
+        writer.writerow(["contracts", "awarding_agencies", _csv_cell(spending.get("awarding_agencies") or []), "USAspending.gov"])
+        for award in (spending.get("awards") or [])[:25]:
+            writer.writerow(["contract_award", award.get("award_id", ""), award.get("amount", ""), award.get("awarding_agency", "")])
     safe_name = re.sub(r"[^a-zA-Z0-9._-]+", "-", company.get("name") or slug).strip("-")[:100] or "company"
     headers = {"Content-Disposition": f'attachment; filename="{safe_name}-intelligence.csv"'}
     return Response(output.getvalue(), media_type="text/csv; charset=utf-8", headers=headers)
