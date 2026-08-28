@@ -93,6 +93,33 @@ Index("ix_intel_importer_origin", importer_relationships.c.origin_country)
 Index("ix_intel_importer_entity_hs", importer_relationships.c.entity_id, importer_relationships.c.hs6, importer_relationships.c.hs10)
 Index("ix_intel_importer_entity_origin", importer_relationships.c.entity_id, importer_relationships.c.origin_country)
 
+supplier_relationships = Table(
+    "intel_supplier_relationships",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("importer_entity_id", Integer, ForeignKey("intel_entities.id", ondelete="CASCADE"), nullable=False),
+    Column("supplier_name", String(500), nullable=False),
+    Column("supplier_normalized", String(500), nullable=False),
+    Column("supplier_country", String(180)),
+    Column("supplier_address", Text),
+    Column("total_shipments", Integer),
+    Column("product_descriptions", JSON, nullable=False, default=list),
+    Column("recent_bols", JSON, nullable=False, default=list),
+    Column("source", String(80), nullable=False, default="importyeti"),
+    Column("source_cached_at", String(80)),
+    Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now()),
+)
+Index(
+    "ux_intel_supplier_importer_name_source",
+    supplier_relationships.c.importer_entity_id,
+    supplier_relationships.c.supplier_normalized,
+    supplier_relationships.c.source,
+    unique=True,
+)
+Index("ix_intel_supplier_name", supplier_relationships.c.supplier_normalized)
+Index("ix_intel_supplier_country", supplier_relationships.c.supplier_country)
+Index("ix_intel_supplier_importer", supplier_relationships.c.importer_entity_id)
+
 sync_runs = Table(
     "intel_sync_runs",
     metadata,
