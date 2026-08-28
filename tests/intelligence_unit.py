@@ -56,18 +56,24 @@ def run() -> int:
     assert normalize_country("Canada") == "CA"
     assert normalize_country("USA") == "US"
     ca = profile_capabilities(
-        {"country": "CA", "is_importer": True, "hs_codes": ["870892"], "origins": ["China"]}
+        {"country": "CA", "is_importer": True, "hs_codes": ["870892"], "origins": ["China"], "relationship_count": 4}
     )
     assert ca["sections"]["trade"]["status"] == "market_context"
     assert ca["sections"]["suppliers"]["status"] == "not_available"
-    us = profile_capabilities({"country": "US", "importyeti": {"total_shipments": 248}})
+    assert ca["sections"]["relationships"]["status"] == "available"
+    us = profile_capabilities({"country": "US", "importyeti": {"total_shipments": 248, "suppliers_table": [{"supplier_name": "A"}]}})
     assert us["sections"]["trade"]["status"] == "cached"
     assert us["sections"]["suppliers"]["status"] == "cached"
+    assert us["sections"]["relationships"]["status"] == "cached"
     us_uncached = profile_capabilities({"country": "US"})
     assert us_uncached["sections"]["trade"]["status"] == "unlockable"
     assert us_uncached["sections"]["contracts"]["status"] == "on_demand"
     us_contracts = profile_capabilities({"country": "US", "enrichment": {"usaspending": {"contract_awards_shown": 2}}})
     assert us_contracts["sections"]["contracts"]["status"] == "cached"
+    us_fleet = profile_capabilities({"country": "US", "enrichment": {"fmcsa": {"dot_number": "1234567", "power_units": 42}}})
+    assert us_fleet["sections"]["fleet"]["status"] == "cached"
+    us_contacts = profile_capabilities({"country": "US", "enrichment": {"web": {"website": "https://example.com"}}})
+    assert us_contacts["sections"]["contacts"]["status"] == "cached"
 
     previous_fixture = os.environ.get("IMPORTYETI_FIXTURE_PATH")
     previous_live = os.environ.pop("IMPORTYETI_ALLOW_LIVE", None)
