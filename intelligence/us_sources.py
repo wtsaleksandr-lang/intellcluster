@@ -11,6 +11,7 @@ class USIntelligenceSource:
     access: str
     cost: str
     cache_policy: str
+    status: str
 
 
 US_SOURCE_ROADMAP = (
@@ -21,6 +22,7 @@ US_SOURCE_ROADMAP = (
         access="API",
         cost="paid_on_demand",
         cache_policy="cache purchased company/shipment intelligence; no live page-view calls",
+        status="implemented_guarded_cache",
     ),
     USIntelligenceSource(
         key="sam_usaspending",
@@ -28,7 +30,8 @@ US_SOURCE_ROADMAP = (
         layer="contracts",
         access="public_api",
         cost="free",
-        cache_policy="incremental public-data cache",
+        cache_policy="on-demand recipient/award enrichment; persist normalized result",
+        status="implemented_usaspending",
     ),
     USIntelligenceSource(
         key="fmcsa",
@@ -36,7 +39,8 @@ US_SOURCE_ROADMAP = (
         layer="fleet",
         access="public_data",
         cost="free",
-        cache_policy="scheduled public-data sync",
+        cache_policy="resumable bulk census sync plus on-demand canonical-company lookup",
+        status="implemented",
     ),
     USIntelligenceSource(
         key="epa_echo",
@@ -44,7 +48,8 @@ US_SOURCE_ROADMAP = (
         layer="facilities_compliance",
         access="public_api",
         cost="free",
-        cache_policy="lazy or scheduled cache by canonical company/facility",
+        cache_policy="on-demand canonical-company/facility cache; no repeated page-view calls",
+        status="implemented_on_demand",
     ),
     USIntelligenceSource(
         key="osha",
@@ -52,7 +57,8 @@ US_SOURCE_ROADMAP = (
         layer="compliance",
         access="public_data",
         cost="free",
-        cache_policy="scheduled or lazy cache",
+        cache_policy="on-demand establishment inspection cache; no repeated page-view calls",
+        status="implemented_on_demand",
     ),
     USIntelligenceSource(
         key="sec_edgar",
@@ -61,6 +67,7 @@ US_SOURCE_ROADMAP = (
         access="public_api",
         cost="free",
         cache_policy="scheduled identifiers; lazy filing details",
+        status="planned",
     ),
     USIntelligenceSource(
         key="uspto",
@@ -69,6 +76,7 @@ US_SOURCE_ROADMAP = (
         access="public_data",
         cost="free",
         cache_policy="lazy company-linked intellectual-property cache",
+        status="planned",
     ),
 )
 
@@ -82,6 +90,7 @@ def source_roadmap() -> list[dict[str, str]]:
             "access": row.access,
             "cost": row.cost,
             "cache_policy": row.cache_policy,
+            "status": row.status,
         }
         for row in US_SOURCE_ROADMAP
     ]
