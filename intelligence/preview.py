@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 """Seed a small, isolated database for visual/UI development.
 
 Run this only with INTELLIGENCE_PREVIEW=1. The preview entrypoint forces a
 separate SQLite database before importing the normal intelligence application,
 so it cannot touch the long-running Replit/PostgreSQL ingestion database.
 """
+
+from __future__ import annotations
 
 import os
 from pathlib import Path
@@ -93,15 +93,12 @@ def seed_preview() -> Path:
             ids[company["slug"]] = int(result.inserted_primary_key[0])
 
         ca_id = ids["northstar-industrial-supply"]
-        for idx, row in enumerate(
-            [
-                ("870899", "8708999900", "Motor vehicle parts and accessories", "China"),
-                ("848340", "8483400090", "Gears and transmission components", "Germany"),
-                ("851220", "8512200000", "Automotive lighting equipment", "Taiwan"),
-                ("870892", "8708920000", "Exhaust system components", "Mexico"),
-            ],
-            start=1,
-        ):
+        for row in [
+            ("870899", "8708999900", "Motor vehicle parts and accessories", "China"),
+            ("848340", "8483400090", "Gears and transmission components", "Germany"),
+            ("851220", "8512200000", "Automotive lighting equipment", "Taiwan"),
+            ("870892", "8708920000", "Exhaust system components", "Mexico"),
+        ]:
             hs6, hs10, description, origin = row
             conn.execute(
                 importer_relationships.insert().values(
