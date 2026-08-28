@@ -8,11 +8,13 @@ be rolled out independently of the ingestion pipeline.
 from main import app
 from intelligence.api import router as intelligence_api_router
 from intelligence.hs import router as intelligence_hs_router
+from intelligence.origin_explorer import router as intelligence_origin_router
 from intelligence.ui import router as intelligence_ui_router
 
 app.include_router(intelligence_api_router)
 app.include_router(intelligence_ui_router)
 app.include_router(intelligence_hs_router)
+app.include_router(intelligence_origin_router)
 
 
 _PROFILE_POLISH = r'''
@@ -44,7 +46,6 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
   document.body.dataset.intellProfile='1';
   const slug=match[1];
 
-  // Turn the existing decorative Export control into the real CSV export.
   const actions=document.querySelector('.profile-actions');
   if(actions){
     [...actions.querySelectorAll('.small-btn')].forEach(btn=>{
@@ -59,7 +60,7 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
     });
   }
 
-  // HS links now open a true analytical HS-code explorer rather than generic search.
+  // HS and origin links open analytical explorer pages instead of generic search.
   document.querySelectorAll('a[href^="/data/search?hs="]').forEach(a=>{
     try{
       const u=new URL(a.getAttribute('href'),location.origin);
@@ -67,8 +68,14 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
       if(code.length>=2){a.href=`/data/hs/${code}`;a.title=a.title||`Explore HS ${code}`;}
     }catch{}
   });
+  document.querySelectorAll('a[href*="/data/search?origin="]').forEach(a=>{
+    try{
+      const u=new URL(a.getAttribute('href'),location.origin);
+      const country=(u.searchParams.get('origin')||'').trim();
+      if(country){a.href=`/data/origin/${encodeURIComponent(country)}`;a.title=a.title||`Explore sourcing from ${country}`;}
+    }catch{}
+  });
 
-  // Make source provenance scannable instead of leaving it as one vague sentence.
   const source=document.querySelector('.source-line');
   if(source){
     const hasIy=!!document.getElementById('iy-profile');
@@ -80,7 +87,6 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
     if(records)add(`${records} matched records`);
   }
 
-  // Add useful row counts to dense data sections.
   const supplierTitle=document.querySelector('#suppliers h2');
   const supplierRows=document.querySelectorAll('#supplierTable tbody tr').length;
   if(supplierTitle&&supplierRows){const s=document.createElement('span');s.className='ic-section-count';s.textContent=supplierRows;s.title='suppliers shown';supplierTitle.appendChild(s)}
@@ -88,7 +94,6 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
   const bolRows=document.querySelectorAll('#bolTable tbody tr').length;
   if(bolTitle&&bolRows){const s=document.createElement('span');s.className='ic-section-count';s.textContent=bolRows;s.title='recent shipments shown';bolTitle.appendChild(s)}
 
-  // Sticky section navigation follows the reader through the long profile.
   const links=[...document.querySelectorAll('.profile-jump a[href^="#"]')];
   const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
   if('IntersectionObserver' in window&&sections.length){
@@ -100,7 +105,6 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
     sections.forEach(s=>obs.observe(s));
   }
 
-  // Keyboard quality-of-life: / focuses global search; Esc clears local supplier filter.
   document.addEventListener('keydown',e=>{
     if(e.key==='/'&&!/input|textarea|select/i.test(document.activeElement?.tagName||'')){e.preventDefault();document.querySelector('.nav-search input')?.focus()}
     if(e.key==='Escape'){const f=document.getElementById('supplierFilter');if(f&&f===document.activeElement){f.value='';f.dispatchEvent(new Event('input'));f.blur()}}
