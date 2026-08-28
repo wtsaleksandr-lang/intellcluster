@@ -7,7 +7,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy import and_, func, or_, select
 
-from intelligence.database import connect, entities, importer_relationships
+from intelligence.database import connect, entities, importer_relationships, supplier_relationships
 from intelligence.ui import templates
 
 router = APIRouter(tags=["intelligence-hs"])
@@ -43,6 +43,54 @@ def _child_size(code: str) -> int | None:
 
 def _prefix_level(length: int) -> str:
     return {2: "Chapter", 4: "Heading", 6: "HS6", 10: "HS10"}.get(length, "HS")
+
+
+def _bol_hs_matches(bol: dict[str, Any], code: str) -> bool:
+    raw = str(bol.get("HS_Code") or bol.get("hs_code") or bol.get("HTS_Code") or "")
+    digits = "".join(ch for ch in raw if ch.isdigit())
+    return bool(digits and digits.startswith(code))
+
+
+def _cached_suppliers_for_hs(rows: list[dict[str, Any]], code: str) -> list[dict[str, Any]]:
+    ranked: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        bols = row.get("recent_bols") if isinstance(row.get("recent_bols"), list) else []
+        matching_bols = [bol for bol in bols if isinstance(bol, dict) and _bol_hs_matches(bol, code)]
+        if not matching_bols:
+            continue
+        key = str(row.get("supplier_normalized") or row.get("supplier_name") or "").strip()
+        if not key:
+            continue
+        item = ranked.setdefault(
+            key,
+            {
+                "name": str(row.get("supplier_name") or "Unknown supplier"),
+                "country": str(row.get("supplier_country") or ""),
+                "shipments": 0,
+                "matched_bols": 0,
+                "importers": {},
+                "products": Counter(),
+            },
+        )
+        item["shipments"] += int(row.get("total_shipments") or 0)
+        item["matched_bols"] += len(matching_bols)
+        importer_name = str(row.get("importer_name") or "")
+        importer_slug = str(row.get("importer_slug") or "")
+        if importer_name and importer_slug:
+            item["importers"][importer_slug] = importer_name
+        for bol in matching_bols:
+            description = str(bol.get("Product_Description") or bol.get("product_description") or "").strip()
+            if description:
+                item["products"][description] += 1
+
+    results = []
+    for item in ranked.values():
+        products: Counter[str] = item.pop("products")
+        importers: dict[str, str] = item.pop("importers")
+        item["products"] = [label for label, _ in products.most_common(3)]
+        item["importers"] = [{"slug": slug, "name": name} for slug, name in list(importers.items())[:5]]
+        results.append(item)
+    return sorted(results, key=lambda row: (row["matched_bols"], row["shipments"]), reverse=True)[:40]
 
 
 def get_hs_intelligence(code: str) -> dict[str, Any]:
@@ -147,6 +195,27 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
             ).where(condition).limit(10000)
         ).mappings().all()
 
+        cached_supplier_rows = conn.execute(
+            select(
+                supplier_relationships.c.supplier_name,
+                supplier_relationships.c.supplier_normalized,
+                supplier_relationships.c.supplier_country,
+                supplier_relationships.c.total_shipments,
+                supplier_relationships.c.recent_bols,
+                entities.c.slug.label("importer_slug"),
+                entities.c.canonical_name.label("importer_name"),
+            )
+            .select_from(
+                supplier_relationships.join(
+                    entities,
+                    supplier_relationships.c.importer_entity_id == entities.c.id,
+                )
+            )
+            .where(supplier_relationships.c.source == "importyeti")
+            .order_by(supplier_relationships.c.total_shipments.desc())
+            .limit(5000)
+        ).mappings().all()
+
     companies = []
     for row in company_rows:
         relationships = int(row["relationships"] or 0)
@@ -209,6 +278,8 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
             }
         )
 
+    suppliers = _cached_suppliers_for_hs([dict(row) for row in cached_supplier_rows], code)
+
     return {
         "code": code,
         "level": _prefix_level(len(code)),
@@ -218,6 +289,8 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
         "company_count": company_count,
         "origin_count": origin_count,
         "companies": companies,
+        "suppliers": suppliers,
+        "supplier_count": len(suppliers),
         "origins": origins,
         "descriptions": descriptions,
         "years": years,
