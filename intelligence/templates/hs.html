@@ -39,7 +39,7 @@
     </div></section>
 
     <section class="hs-panel"><div class="hs-panel-head"><strong>Relationship Activity by Year</strong><span>where source year is available</span></div><div class="hs-panel-body">
-      {% if hs.years %}{% set max_year=hs.years|max(attribute='count') %}<div class="year-chart">{% for row in hs.years %}<a class="year-col" href="/data/search?hs={{ hs.code }}" title="{{ row.year }}: {{ row.count }} relationships"><i style="--h:{{ (row.count*100/max_year.count) if max_year.count else 1 }}%"></i><small>{{ row.year }}</small></a>{% endfor %}</div><div class="year-note">Activity reflects relationship records in the loaded public datasets, not customs value.</div>{% else %}<div class="empty">No activity-year field is available for these records.</div>{% endif %}
+      {% if hs.years %}{% set max_year=hs.years|max(attribute='count') %}{% set max_year_count=max_year['count'] %}<div class="year-chart">{% for row in hs.years %}<a class="year-col" href="/data/search?hs={{ hs.code }}" title="{{ row.year }}: {{ row.count }} relationships"><i style="--h:{{ (row.count*100/max_year_count) if max_year_count else 1 }}%"></i><small>{{ row.year }}</small></a>{% endfor %}</div><div class="year-note">Activity reflects relationship records in the loaded public datasets, not customs value.</div>{% else %}<div class="empty">No activity-year field is available for these records.</div>{% endif %}
     </div></section>
   </div>
 
