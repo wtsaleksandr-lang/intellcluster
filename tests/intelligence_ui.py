@@ -15,6 +15,7 @@ def run() -> int:
         ("/data/search?sort=newest", 200),
         ("/data/suggest?q=map", 200),
         ("/data/company/maple-auto-supply-inc", 200),
+        ("/data/company/maple-auto-supply-inc/export.csv", 200),
         ("/api/intelligence/health", 200),
         ("/api/intelligence/sources", 200),
     ]
