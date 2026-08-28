@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 """Promote normalized FMCSA evidence onto canonical U.S. company entities.
 
 The bulk FMCSA ingest intentionally stays lean. This second resumable pass turns
@@ -7,14 +5,15 @@ stored Company Census source-record attributes into canonical status plus a smal
 cached fleet summary used by search cards and company profiles.
 """
 
+from __future__ import annotations
+
 import argparse
 import time
 from typing import Any
 
 from sqlalchemy import and_, func, insert, select, update
 
-from intelligence.database import connect, entities, source_records, sync_checkpoints, sync_runs
-from intelligence.database import json_safe
+from intelligence.database import connect, entities, json_safe, source_records, sync_checkpoints, sync_runs
 
 
 SOURCE_KEY = "fmcsa_company_census"
