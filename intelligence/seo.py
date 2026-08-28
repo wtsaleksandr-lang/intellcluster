@@ -167,8 +167,13 @@ def install_seo_middleware(app) -> None:
                 with connect() as conn:
                     company = get_entity_by_slug(conn, slug)
                 if company:
-                    schema = json.dumps(_organization_schema(company, canonical), ensure_ascii=False, separators=(",", ":"))
-                    head_bits.append(f'<script type="application/ld+json">{schema.replace("</", "<\\/")}</script>')
+                    schema = json.dumps(
+                        _organization_schema(company, canonical),
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    )
+                    safe_schema = schema.replace("</", "<\\/")
+                    head_bits.append(f'<script type="application/ld+json">{safe_schema}</script>')
             except Exception:
                 pass
 
