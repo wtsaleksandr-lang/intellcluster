@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import Any
 
 from sqlalchemy import and_, exists, func, insert, or_, select, update
@@ -274,8 +274,74 @@ def search_entities(
         stmt = stmt.order_by(entities.c.incorporated_year.desc().nullslast(), entities.c.canonical_name)
     else:
         stmt = stmt.order_by(entities.c.is_importer.desc(), entities.c.canonical_name)
-    rows = conn.execute(stmt.limit(limit).offset(offset)).mappings().all()
-    return [_decorate_company(conn, dict(row)) for row in rows]
+    rows = [dict(row) for row in conn.execute(stmt.limit(limit).offset(offset)).mappings().all()]
+    return _decorate_search_companies(conn, rows)
+
+
+def _decorate_search_companies(conn: Connection, companies: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Decorate a result page in a handful of bulk queries instead of N+1 queries."""
+    if not companies:
+        return []
+
+    ids = [int(company["id"]) for company in companies]
+    relationships_by_entity: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    relationship_rows = conn.execute(
+        select(
+            importer_relationships.c.entity_id,
+            importer_relationships.c.hs6,
+            importer_relationships.c.hs10,
+            importer_relationships.c.origin_country,
+            importer_relationships.c.product_description,
+        )
+        .where(importer_relationships.c.entity_id.in_(ids))
+        .order_by(importer_relationships.c.entity_id)
+    ).mappings().all()
+    for row in relationship_rows:
+        relationships_by_entity[int(row["entity_id"])].append(dict(row))
+
+    source_stats = conn.execute(
+        select(
+            source_records.c.entity_id,
+            func.count(source_records.c.id).label("record_count"),
+            func.count(func.distinct(source_records.c.source)).label("source_count"),
+        )
+        .where(source_records.c.entity_id.in_(ids))
+        .group_by(source_records.c.entity_id)
+    ).mappings().all()
+    source_by_entity = {
+        int(row["entity_id"]): (int(row["source_count"] or 0), int(row["record_count"] or 0))
+        for row in source_stats
+    }
+
+    decorated: list[dict[str, Any]] = []
+    for company in companies:
+        entity_id = int(company["id"])
+        relationships = relationships_by_entity.get(entity_id, [])
+        hs_codes = sorted({str(r["hs10"] or r["hs6"]) for r in relationships if r["hs10"] or r["hs6"]})
+        origins = sorted({str(r["origin_country"]) for r in relationships if r["origin_country"]})
+        products = sorted({str(r["product_description"]) for r in relationships if r["product_description"]})
+        source_count, source_records_count = source_by_entity.get(entity_id, (0, 0))
+        enrichment = company.get("enrichment") if isinstance(company.get("enrichment"), dict) else {}
+        company.update(
+            name=company.pop("canonical_name"),
+            kind="Importer" if company.get("is_importer") else "Company",
+            province=company.get("region") or "",
+            status=(company.get("corporate_status") or "Unknown").title(),
+            incorporated=str(company.get("incorporated_year") or ""),
+            hs_codes=hs_codes,
+            origins=origins,
+            products=products,
+            source_count=source_count,
+            source_records_count=source_records_count,
+            relationship_count=len(relationships),
+            buyer_score=int(company.get("buyer_score") or 0),
+            hs_breakdown=[],
+            origin_breakdown=[],
+            dataset_breakdown=[],
+            importyeti=enrichment.get("importyeti") if isinstance(enrichment, dict) else None,
+        )
+        decorated.append(company)
+    return decorated
 
 
 def get_entity_by_slug(conn: Connection, slug: str) -> dict[str, Any] | None:
