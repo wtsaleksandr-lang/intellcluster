@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from intelligence.country_intelligence import normalize_country, profile_capabilities
+from intelligence.enrichment.fmcsa import FMCSAClient
 from intelligence.enrichment.importyeti import ImportYetiClient, live_importyeti_enabled
 from intelligence.enrichment.usaspending import USAspendingClient
 from intelligence.entity_resolution import normalize_company_name, score_company_match
@@ -52,8 +53,6 @@ def run() -> int:
     )
     assert not score_company_match(registry, unrelated).is_likely_match
 
-    # Canada and USA share one profile skeleton while explicitly describing
-    # the evidence level available in each module.
     assert normalize_country("Canada") == "CA"
     assert normalize_country("USA") == "US"
     ca = profile_capabilities(
@@ -70,8 +69,6 @@ def run() -> int:
     us_contracts = profile_capabilities({"country": "US", "enrichment": {"usaspending": {"contract_awards_shown": 2}}})
     assert us_contracts["sections"]["contracts"]["status"] == "cached"
 
-    # ImportYeti development/tests are cached-only. Reuse one fixture and prove
-    # no live opt-in is present before exercising profile/search helpers.
     previous_fixture = os.environ.get("IMPORTYETI_FIXTURE_PATH")
     previous_live = os.environ.pop("IMPORTYETI_ALLOW_LIVE", None)
     try:
@@ -111,6 +108,29 @@ def run() -> int:
             os.environ.pop("USASPENDING_FIXTURE_PATH", None)
         else:
             os.environ["USASPENDING_FIXTURE_PATH"] = previous_usaspending_fixture
+
+    previous_fmcsa_fixture = os.environ.get("FMCSA_FIXTURE_PATH")
+    try:
+        fixture = Path(__file__).parent / "fixtures" / "fmcsa_company.json"
+        os.environ["FMCSA_FIXTURE_PATH"] = str(fixture)
+        client = FMCSAClient()
+        companies = asyncio.run(client.search("IntellCluster Logistics"))
+        assert len(companies) == 1
+        company = companies[0]
+        assert company.dot_number == "1234567"
+        assert company.country == "US"
+        assert company.power_units == 42
+        assert company.total_drivers == 48
+        source_record = company.to_source_record()
+        assert source_record.source == "fmcsa_company_census"
+        assert source_record.country == "US"
+        assert source_record.region == "TX"
+        assert source_record.attributes["usdot_number"] == "1234567"
+    finally:
+        if previous_fmcsa_fixture is None:
+            os.environ.pop("FMCSA_FIXTURE_PATH", None)
+        else:
+            os.environ["FMCSA_FIXTURE_PATH"] = previous_fmcsa_fixture
 
     print("INTELLIGENCE UNIT OK")
     return 0
