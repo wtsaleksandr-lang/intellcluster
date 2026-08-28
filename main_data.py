@@ -10,6 +10,7 @@ from intelligence.api import router as intelligence_api_router
 from intelligence.hs import router as intelligence_hs_router
 from intelligence.location_explorer import router as intelligence_location_router
 from intelligence.origin_explorer import router as intelligence_origin_router
+from intelligence.supplier_directory import router as intelligence_supplier_directory_router
 from intelligence.supplier_explorer import router as intelligence_supplier_router
 from intelligence.ui import router as intelligence_ui_router
 
@@ -19,6 +20,7 @@ app.include_router(intelligence_hs_router)
 app.include_router(intelligence_origin_router)
 app.include_router(intelligence_location_router)
 app.include_router(intelligence_supplier_router)
+app.include_router(intelligence_supplier_directory_router)
 
 
 _PROFILE_POLISH = r'''
@@ -92,6 +94,8 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
     });
   }
 
+  const supplierExplore=document.querySelector('#suppliers .data-action');
+  if(supplierExplore){supplierExplore.href='/data/suppliers';supplierExplore.textContent='↗ Explore Suppliers';}
   document.querySelectorAll('a.supplier-link').forEach(a=>{
     const supplier=(a.textContent||'').trim();
     if(supplier&&supplier!=='—'){a.href=`/data/supplier/${encodeURIComponent(supplier)}`;a.title=`Open cached supplier intelligence for ${supplier}`;}
