@@ -14,6 +14,7 @@ from fastapi.templating import Jinja2Templates
 
 from intelligence.country_intelligence import profile_capabilities
 from intelligence.database import connect
+from intelligence.enrichment.epa_echo import EPAEchoClient, EchoFacility, compact_echo_profile
 from intelligence.enrichment.fmcsa import FMCSAClient, FMCSACompany
 from intelligence.enrichment.importyeti import (
     ImportYetiClient,
@@ -160,6 +161,23 @@ def _choose_usaspending(company: dict, matches: list[USARecipientMatch]) -> USAR
     return None
 
 
+def _choose_echo_facilities(company: dict, matches: list[EchoFacility]) -> list[EchoFacility]:
+    company_name = str(company.get("name") or "")
+    state = str(company.get("province") or "").strip().upper()
+    city = str(company.get("city") or "").strip().casefold()
+    chosen: list[EchoFacility] = []
+    for match in matches:
+        if not _confident_importyeti_match(company_name, match.name):
+            continue
+        if state and match.state and state != match.state.upper():
+            continue
+        if city and match.city and city == match.city.casefold():
+            chosen.insert(0, match)
+        else:
+            chosen.append(match)
+    return chosen[:25]
+
+
 async def _maybe_enrich_importyeti(company: dict) -> dict:
     """Attach shipment intelligence without spending credits during normal browsing."""
     if not company.get("id"):
@@ -206,14 +224,17 @@ async def _enrich_us_public(company: dict) -> tuple[dict, dict]:
     marker = enrichment.get("us_public_lookup") if isinstance(enrichment, dict) else None
     need_fmcsa = not isinstance(enrichment.get("fmcsa"), dict)
     need_spending = not isinstance(enrichment.get("usaspending"), dict)
-    if not need_fmcsa and not need_spending:
-        return company, {"status": "cached", "fmcsa": "cached", "usaspending": "cached"}
-    if _marker_is_recent(marker):
+    need_echo = not isinstance(enrichment.get("epa_echo"), dict)
+    if not need_fmcsa and not need_spending and not need_echo:
+        return company, {"status": "cached", "fmcsa": "cached", "usaspending": "cached", "epa_echo": "cached"}
+    marker_has_echo = isinstance(marker, dict) and "epa_echo" in marker
+    if _marker_is_recent(marker) and (marker_has_echo or not need_echo):
         return company, {"status": "recently_checked", **marker}
 
     result: dict[str, str] = {"status": "checked"}
     fmcsa_profile: dict | None = None
     spending_profile: dict | None = None
+    echo_profile: dict | None = None
 
     if need_fmcsa:
         try:
@@ -245,10 +266,31 @@ async def _enrich_us_public(company: dict) -> tuple[dict, dict]:
     else:
         result["usaspending"] = "cached"
 
+    if need_echo:
+        try:
+            client = EPAEchoClient(timeout=12)
+            matches = await client.search_facilities(
+                str(company.get("name") or ""),
+                state=str(company.get("province") or "") or None,
+                city=str(company.get("city") or "") or None,
+                limit=25,
+            )
+            chosen = _choose_echo_facilities(company, matches)
+            if chosen:
+                echo_profile = compact_echo_profile(chosen)
+                result["epa_echo"] = "matched"
+            else:
+                result["epa_echo"] = "no_confident_match"
+        except (httpx.HTTPError, RuntimeError, ValueError):
+            result["epa_echo"] = "unavailable"
+    else:
+        result["epa_echo"] = "cached"
+
     marker_payload = {
         "checked_at": datetime.now(UTC).isoformat(),
         "fmcsa": result.get("fmcsa", "unknown"),
         "usaspending": result.get("usaspending", "unknown"),
+        "epa_echo": result.get("epa_echo", "unknown"),
         "source": "free_public_us_enrichment",
     }
     with connect() as conn:
@@ -257,6 +299,8 @@ async def _enrich_us_public(company: dict) -> tuple[dict, dict]:
             set_entity_enrichment(conn, entity_id, "fmcsa", fmcsa_profile)
         if spending_profile:
             set_entity_enrichment(conn, entity_id, "usaspending", spending_profile)
+        if echo_profile:
+            set_entity_enrichment(conn, entity_id, "epa_echo", echo_profile)
         set_entity_enrichment(conn, entity_id, "us_public_lookup", marker_payload)
         refreshed = get_entity_by_slug(conn, company["slug"])
     return refreshed or company, {**result, **marker_payload}
@@ -403,6 +447,12 @@ async def intelligence_company_export(slug: str):
         writer.writerow(["contracts", "awarding_agencies", _csv_cell(spending.get("awarding_agencies") or []), "USAspending.gov"])
         for award in (spending.get("awards") or [])[:25]:
             writer.writerow(["contract_award", award.get("award_id", ""), award.get("amount", ""), award.get("awarding_agency", "")])
+    echo = enrichment.get("epa_echo") if isinstance(enrichment.get("epa_echo"), dict) else None
+    if echo:
+        for field in ("facility_count", "major_facility_count", "active_facility_count", "inspections_5y", "formal_actions_5y", "informal_actions_5y", "penalty_events_5y", "total_penalties"):
+            writer.writerow(["environmental_compliance", field, echo.get(field, ""), "EPA ECHO"])
+        for facility in (echo.get("facilities") or [])[:25]:
+            writer.writerow(["epa_facility", facility.get("registry_id", ""), facility.get("name", ""), facility.get("address", "")])
     safe_name = re.sub(r"[^a-zA-Z0-9._-]+", "-", company.get("name") or slug).strip("-")[:100] or "company"
     headers = {"Content-Disposition": f'attachment; filename="{safe_name}-intelligence.csv"'}
     return Response(output.getvalue(), media_type="text/csv; charset=utf-8", headers=headers)
