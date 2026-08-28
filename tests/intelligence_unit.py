@@ -23,55 +23,162 @@ def run() -> int:
     assert normalize_company_name("ABC Automotive Inc.") == "abc automotive"
     assert normalize_company_name("ABC AUTOMOTIVE CORPORATION") == "abc automotive"
 
-    registry = SourceRecord(source="corporations_canada", source_record_id="123", name="ABC Automotive Inc.", country="CA", region="ON", city="Mississauga", postal_code="L5T 1A1")
-    importer = SourceRecord(source="canadian_importers", source_record_id="abc|870892", name="ABC AUTOMOTIVE LTD", country="CA", region="ON", city="Mississauga", postal_code="L5T1A1")
+    registry = SourceRecord(
+        source="corporations_canada",
+        source_record_id="123",
+        name="ABC Automotive Inc.",
+        country="CA",
+        region="ON",
+        city="Mississauga",
+        postal_code="L5T 1A1",
+    )
+    importer = SourceRecord(
+        source="canadian_importers",
+        source_record_id="abc|870892",
+        name="ABC AUTOMOTIVE LTD",
+        country="CA",
+        region="ON",
+        city="Mississauga",
+        postal_code="L5T1A1",
+    )
     result = score_company_match(registry, importer)
     assert result.is_likely_match, result
     assert "exact_normalized_name" in result.reasons
     assert "postal_match" in result.reasons
 
-    unrelated = SourceRecord(source="canadian_importers", source_record_id="other", name="Northern Foods Limited", country="CA", city="Toronto")
+    unrelated = SourceRecord(
+        source="canadian_importers",
+        source_record_id="other",
+        name="Northern Foods Limited",
+        country="CA",
+        city="Toronto",
+    )
     assert not score_company_match(registry, unrelated).is_likely_match
 
-    # Common names must not auto-merge across countries or contradictory domains.
-    cross_border = SourceRecord(source="fmcsa_company_census", source_record_id="1", name="ABC Automotive LLC", country="US", region="MI", city="Detroit")
+    cross_border = SourceRecord(
+        source="fmcsa_company_census",
+        source_record_id="1",
+        name="ABC Automotive LLC",
+        country="US",
+        region="MI",
+        city="Detroit",
+    )
     conflict = score_company_match(registry, cross_border)
     assert conflict.hard_conflict and not conflict.is_likely_match
-    domain_left = SourceRecord(source="source_a", source_record_id="d1", name="Acme Logistics North", country="US", region="TX", website="acme-one.com")
-    domain_right = SourceRecord(source="source_b", source_record_id="d2", name="Acme Logistics North America", country="US", region="TX", website="different-acme.com")
+
+    domain_left = SourceRecord(
+        source="source_a",
+        source_record_id="d1",
+        name="Acme Logistics North",
+        country="US",
+        region="TX",
+        website="acme-one.com",
+    )
+    domain_right = SourceRecord(
+        source="source_b",
+        source_record_id="d2",
+        name="Acme Logistics North America",
+        country="US",
+        region="TX",
+        website="different-acme.com",
+    )
     domain_conflict = score_company_match(domain_left, domain_right)
-    assert domain_conflict.hard_conflict and "domain_conflict" in domain_conflict.reasons
-    same_domain_left = SourceRecord(source="source_a", source_record_id="s1", name="Example Freight Inc.", country="US", region="TX", city="Houston", website="https://www.examplefreight.com/about")
-    same_domain_right = SourceRecord(source="source_b", source_record_id="s2", name="Example Freight LLC", country="USA", region="TX", city="Houston", website="examplefreight.com")
+    assert domain_conflict.hard_conflict
+    assert "domain_conflict" in domain_conflict.reasons
+
+    same_domain_left = SourceRecord(
+        source="source_a",
+        source_record_id="s1",
+        name="Example Freight Inc.",
+        country="US",
+        region="TX",
+        city="Houston",
+        website="https://www.examplefreight.com/about",
+    )
+    same_domain_right = SourceRecord(
+        source="source_b",
+        source_record_id="s2",
+        name="Example Freight LLC",
+        country="USA",
+        region="TX",
+        city="Houston",
+        website="examplefreight.com",
+    )
     same_domain = score_company_match(same_domain_left, same_domain_right)
-    assert same_domain.is_likely_match and "domain_match" in same_domain.reasons
-    name_only_left = SourceRecord(source="source_a", source_record_id="n1", name="General Transport Inc.", country="US")
-    name_only_right = SourceRecord(source="source_b", source_record_id="n2", name="General Transport LLC", country="US")
+    assert same_domain.is_likely_match
+    assert "domain_match" in same_domain.reasons
+
+    name_only_left = SourceRecord(
+        source="source_a",
+        source_record_id="n1",
+        name="General Transport Inc.",
+        country="US",
+    )
+    name_only_right = SourceRecord(
+        source="source_b",
+        source_record_id="n2",
+        name="General Transport LLC",
+        country="US",
+    )
     assert not score_company_match(name_only_left, name_only_right).is_likely_match
 
     assert normalize_country("Canada") == "CA"
     assert normalize_country("USA") == "US"
-    ca = profile_capabilities({"country": "CA", "is_importer": True, "hs_codes": ["870892"], "origins": ["China"], "relationship_count": 4})
+
+    ca = profile_capabilities(
+        {
+            "country": "CA",
+            "is_importer": True,
+            "hs_codes": ["870892"],
+            "origins": ["China"],
+            "relationship_count": 4,
+        }
+    )
     assert ca["sections"]["trade"]["status"] == "market_context"
     assert ca["sections"]["suppliers"]["status"] == "not_available"
     assert ca["sections"]["relationships"]["status"] == "available"
-    us = profile_capabilities({"country": "US", "importyeti": {"total_shipments": 248, "suppliers_table": [{"supplier_name": "A"}]}})
+
+    us = profile_capabilities(
+        {
+            "country": "US",
+            "importyeti": {
+                "total_shipments": 248,
+                "suppliers_table": [{"supplier_name": "A"}],
+            },
+        }
+    )
     assert us["sections"]["trade"]["status"] == "cached"
     assert us["sections"]["suppliers"]["status"] == "cached"
     assert us["sections"]["relationships"]["status"] == "cached"
+
     us_uncached = profile_capabilities({"country": "US"})
     assert us_uncached["sections"]["trade"]["status"] == "unlockable"
     assert us_uncached["sections"]["contracts"]["status"] == "on_demand"
     assert us_uncached["sections"]["facilities"]["status"] == "on_demand"
     assert us_uncached["sections"]["compliance"]["status"] == "on_demand"
-    us_contracts = profile_capabilities({"country": "US", "enrichment": {"usaspending": {"contract_awards_shown": 2}}})
+
+    us_contracts = profile_capabilities(
+        {"country": "US", "enrichment": {"usaspending": {"contract_awards_shown": 2}}}
+    )
     assert us_contracts["sections"]["contracts"]["status"] == "cached"
-    us_fleet = profile_capabilities({"country": "US", "enrichment": {"fmcsa": {"dot_number": "1234567", "power_units": 42}}})
+
+    us_fleet = profile_capabilities(
+        {
+            "country": "US",
+            "enrichment": {"fmcsa": {"dot_number": "1234567", "power_units": 42}},
+        }
+    )
     assert us_fleet["sections"]["fleet"]["status"] == "cached"
-    us_epa = profile_capabilities({"country": "US", "enrichment": {"epa_echo": {"facility_count": 2}}})
+
+    us_epa = profile_capabilities(
+        {"country": "US", "enrichment": {"epa_echo": {"facility_count": 2}}}
+    )
     assert us_epa["sections"]["facilities"]["status"] == "cached"
     assert us_epa["sections"]["compliance"]["status"] == "cached"
-    us_contacts = profile_capabilities({"country": "US", "enrichment": {"web": {"website": "https://example.com"}}})
+
+    us_contacts = profile_capabilities(
+        {"country": "US", "enrichment": {"web": {"website": "https://example.com"}}}
+    )
     assert us_contacts["sections"]["contacts"]["status"] == "cached"
 
     previous_fixture = os.environ.get("IMPORTYETI_FIXTURE_PATH")
@@ -89,9 +196,12 @@ def run() -> int:
         assert profile["total_shipments"] == 248
         assert profile["_fixture"] is True
     finally:
-        if previous_fixture is None: os.environ.pop("IMPORTYETI_FIXTURE_PATH", None)
-        else: os.environ["IMPORTYETI_FIXTURE_PATH"] = previous_fixture
-        if previous_live is not None: os.environ["IMPORTYETI_ALLOW_LIVE"] = previous_live
+        if previous_fixture is None:
+            os.environ.pop("IMPORTYETI_FIXTURE_PATH", None)
+        else:
+            os.environ["IMPORTYETI_FIXTURE_PATH"] = previous_fixture
+        if previous_live is not None:
+            os.environ["IMPORTYETI_ALLOW_LIVE"] = previous_live
 
     previous_usaspending_fixture = os.environ.get("USASPENDING_FIXTURE_PATH")
     try:
@@ -105,8 +215,10 @@ def run() -> int:
         assert profile["locations"][0]["state"] == "TX"
         assert "Department of Defense" in profile["awarding_agencies"]
     finally:
-        if previous_usaspending_fixture is None: os.environ.pop("USASPENDING_FIXTURE_PATH", None)
-        else: os.environ["USASPENDING_FIXTURE_PATH"] = previous_usaspending_fixture
+        if previous_usaspending_fixture is None:
+            os.environ.pop("USASPENDING_FIXTURE_PATH", None)
+        else:
+            os.environ["USASPENDING_FIXTURE_PATH"] = previous_usaspending_fixture
 
     previous_fmcsa_fixture = os.environ.get("FMCSA_FIXTURE_PATH")
     try:
@@ -119,21 +231,29 @@ def run() -> int:
         assert company.dot_number == "1234567" and company.country == "US"
         assert company.power_units == 42 and company.total_drivers == 48
         source_record = company.to_source_record()
-        assert source_record.source == "fmcsa_company_census" and source_record.country == "US" and source_record.region == "TX"
+        assert source_record.source == "fmcsa_company_census"
+        assert source_record.country == "US"
+        assert source_record.region == "TX"
     finally:
-        if previous_fmcsa_fixture is None: os.environ.pop("FMCSA_FIXTURE_PATH", None)
-        else: os.environ["FMCSA_FIXTURE_PATH"] = previous_fmcsa_fixture
+        if previous_fmcsa_fixture is None:
+            os.environ.pop("FMCSA_FIXTURE_PATH", None)
+        else:
+            os.environ["FMCSA_FIXTURE_PATH"] = previous_fmcsa_fixture
 
     previous_epa_fixture = os.environ.get("EPA_ECHO_FIXTURE_PATH")
     try:
         fixture = Path(__file__).parent / "fixtures" / "epa_echo_company.json"
         os.environ["EPA_ECHO_FIXTURE_PATH"] = str(fixture)
-        facilities = asyncio.run(EPAEchoClient().search_facilities("IntellCluster", state="TX"))
+        facilities = asyncio.run(
+            EPAEchoClient().search_facilities("IntellCluster", state="TX")
+        )
         profile = compact_echo_profile(facilities)
         assert profile["facility_count"] >= 1
     finally:
-        if previous_epa_fixture is None: os.environ.pop("EPA_ECHO_FIXTURE_PATH", None)
-        else: os.environ["EPA_ECHO_FIXTURE_PATH"] = previous_epa_fixture
+        if previous_epa_fixture is None:
+            os.environ.pop("EPA_ECHO_FIXTURE_PATH", None)
+        else:
+            os.environ["EPA_ECHO_FIXTURE_PATH"] = previous_epa_fixture
 
     previous_osha_fixture = os.environ.get("OSHA_FIXTURE_PATH")
     try:
@@ -143,8 +263,10 @@ def run() -> int:
         profile = compact_osha_profile(inspections)
         assert profile["inspection_count_shown"] >= 1
     finally:
-        if previous_osha_fixture is None: os.environ.pop("OSHA_FIXTURE_PATH", None)
-        else: os.environ["OSHA_FIXTURE_PATH"] = previous_osha_fixture
+        if previous_osha_fixture is None:
+            os.environ.pop("OSHA_FIXTURE_PATH", None)
+        else:
+            os.environ["OSHA_FIXTURE_PATH"] = previous_osha_fixture
 
     print("Intelligence unit checks OK")
     return 0
