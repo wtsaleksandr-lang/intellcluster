@@ -46,6 +46,8 @@ async def company_directory(
         if condition is not None:
             count_stmt = count_stmt.where(condition)
         total = int(conn.execute(count_stmt).scalar_one() or 0)
+        pages = max(1, math.ceil(total / PAGE_SIZE))
+        page = min(page, pages)
 
         stmt = select(
             entities.c.slug,
@@ -67,9 +69,6 @@ async def company_directory(
             .offset((page - 1) * PAGE_SIZE)
         ).mappings().all()
 
-    pages = max(1, math.ceil(total / PAGE_SIZE))
-    if page > pages and total:
-        page = pages
     companies = [
         {
             "slug": row["slug"],
