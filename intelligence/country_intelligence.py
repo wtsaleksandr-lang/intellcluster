@@ -72,6 +72,9 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
     importyeti = company.get("importyeti") if isinstance(company.get("importyeti"), dict) else None
     if importyeti is None and isinstance(enrichment, dict) and isinstance(enrichment.get("importyeti"), dict):
         importyeti = enrichment["importyeti"]
+    usaspending = enrichment.get("usaspending") if isinstance(enrichment, dict) else None
+    if not isinstance(usaspending, dict):
+        usaspending = None
 
     is_importer = bool(company.get("is_importer") or company.get("kind") == "Importer")
     hs_codes = company.get("hs_codes") or []
@@ -117,7 +120,11 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
             )
         sections["facilities"] = _state("planned", label="Facilities", source="EPA ECHO / public records")
         sections["compliance"] = _state("planned", label="Compliance", source="OSHA / EPA")
-        sections["contracts"] = _state("planned", label="Contracts", source="USASpending / SAM.gov")
+        sections["contracts"] = (
+            _state("cached", label="Contracts", source="USAspending.gov cache")
+            if usaspending
+            else _state("on_demand", label="Contracts", source="USAspending.gov")
+        )
         sections["fleet"] = _state("planned", label="Fleet", source="FMCSA")
         sections["patents"] = _state("planned", label="Patents", source="USPTO")
     elif code == "CA":
