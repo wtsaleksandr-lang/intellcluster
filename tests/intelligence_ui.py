@@ -114,6 +114,7 @@ def run() -> int:
             (f"/data/company/{slug}", 200),
             (f"/data/company/{slug}/export.csv", 200),
             ("/api/intelligence/health", 200),
+            ("/api/intelligence/freshness", 200),
             ("/api/intelligence/sources", 200),
         ]
         failed = []
@@ -121,6 +122,9 @@ def run() -> int:
             response = client.get(path, follow_redirects=False)
             if response.status_code != expected:
                 failed.append(f"{path}: {response.status_code} != {expected}")
+        freshness = client.get("/api/intelligence/freshness").json()
+        if freshness.get("company_count", 0) < 1 or "delta_available" not in freshness:
+            failed.append("/api/intelligence/freshness: invalid payload")
         if failed:
             print("Intelligence UI smoke FAILED")
             print("\n".join(failed))
