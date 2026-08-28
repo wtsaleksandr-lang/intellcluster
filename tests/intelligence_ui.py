@@ -116,6 +116,7 @@ def run() -> int:
             ("/robots.txt", 200),
             ("/sitemap.xml", 200),
             ("/sitemaps/static.xml", 200),
+            ("/sitemaps/intelligence.xml", 200),
             ("/sitemaps/companies-1.xml", 200),
             ("/api/intelligence/health", 200),
             ("/api/intelligence/freshness", 200),
@@ -148,9 +149,16 @@ def run() -> int:
         robots = client.get("/robots.txt").text
         if "Sitemap: https://intellcluster.com/sitemap.xml" not in robots:
             failed.append("/robots.txt: sitemap directive missing")
+        sitemap_index = client.get("/sitemap.xml").text
+        if "/sitemaps/intelligence.xml" not in sitemap_index:
+            failed.append("/sitemap.xml: intelligence sitemap missing")
         sitemap = client.get("/sitemaps/companies-1.xml").text
         if f"/data/company/{slug}" not in sitemap:
             failed.append("/sitemaps/companies-1.xml: seeded company missing")
+        intelligence_sitemap = client.get("/sitemaps/intelligence.xml").text
+        for expected_path in ("/data/hs/870892", "/data/origin/China", "/data/location/ON", "/data/location/ON/Hamilton"):
+            if expected_path not in intelligence_sitemap:
+                failed.append(f"/sitemaps/intelligence.xml: {expected_path} missing")
         freshness = client.get("/api/intelligence/freshness").json()
         if freshness.get("company_count", 0) < 1 or "delta_available" not in freshness:
             failed.append("/api/intelligence/freshness: invalid payload")
