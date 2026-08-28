@@ -192,6 +192,7 @@ def search_entities(
     conn: Connection,
     *,
     q: str | None = None,
+    country: str | None = None,
     company_type: str | None = None,
     province: str | None = None,
     city: str | None = None,
@@ -218,6 +219,11 @@ def search_entities(
             )
         )
         conditions.append(or_(func.lower(entities.c.canonical_name).like(term), rel_text))
+    if country:
+        normalized_country = country.strip().upper()
+        aliases = {"CANADA": "CA", "CAN": "CA", "USA": "US", "UNITED STATES": "US", "UNITED STATES OF AMERICA": "US"}
+        normalized_country = aliases.get(normalized_country, normalized_country)
+        conditions.append(func.upper(func.coalesce(entities.c.country, "")) == normalized_country)
     if province:
         conditions.append(func.lower(entities.c.region) == province.casefold())
     if city:
