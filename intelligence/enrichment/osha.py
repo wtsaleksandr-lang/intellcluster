@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import html
-import json
 import os
 import re
 from dataclasses import dataclass
@@ -86,8 +85,6 @@ def _rows_from_html(text: str, limit: int) -> list[OSHAInspection]:
         scope = cells[5] if len(cells) > 5 else ""
         sic = cells[6] if len(cells) > 6 else ""
         naics = cells[7] if len(cells) > 7 else ""
-        # OSHA currently displays Violations before Establishment Name. Some rows
-        # omit a violation value, so use the final cell as the establishment.
         establishment_name = cells[-1]
         violations = _int(cells[-2]) if len(cells) >= 10 else 0
         if not establishment_name or establishment_name.lower() == "establishment name":
