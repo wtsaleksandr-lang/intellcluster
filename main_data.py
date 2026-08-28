@@ -1,8 +1,8 @@
 """IntellCluster application entrypoint with the business-intelligence layer enabled.
 
 This imports the existing application unchanged, then mounts the data API and
-directory UI. Small response enhancers keep drill-down behavior centralized while
-the intelligence templates are still evolving quickly.
+directory UI. A small response enhancer is kept here so company-profile polish can
+be rolled out independently of the ingestion pipeline.
 """
 
 from main import app
@@ -10,6 +10,7 @@ from intelligence.api import router as intelligence_api_router
 from intelligence.hs import router as intelligence_hs_router
 from intelligence.location_explorer import router as intelligence_location_router
 from intelligence.origin_explorer import router as intelligence_origin_router
+from intelligence.supplier_explorer import router as intelligence_supplier_router
 from intelligence.ui import router as intelligence_ui_router
 
 app.include_router(intelligence_api_router)
@@ -17,6 +18,7 @@ app.include_router(intelligence_ui_router)
 app.include_router(intelligence_hs_router)
 app.include_router(intelligence_origin_router)
 app.include_router(intelligence_location_router)
+app.include_router(intelligence_supplier_router)
 
 
 _PROFILE_POLISH = r'''
@@ -43,10 +45,38 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
 </style>
 <script id="intellcluster-profile-enhancer">
 (()=>{
-  const match=location.pathname.match(/^\/data\/company\/([^/]+)\/?$/);
-  if(!match)return;
+  const profileMatch=location.pathname.match(/^\/data\/company\/([^/]+)\/?$/);
+  const searchPage=location.pathname==='/data/search';
+  if(!profileMatch&&!searchPage)return;
+
+  const upgradeHs=(root=document)=>root.querySelectorAll('a[href^="/data/search?hs="]').forEach(a=>{
+    try{
+      const u=new URL(a.getAttribute('href'),location.origin);
+      const code=(u.searchParams.get('hs')||'').replace(/\D/g,'').slice(0,10);
+      if(code.length>=2){a.href=`/data/hs/${code}`;a.title=a.title||`Explore HS ${code}`;}
+    }catch{}
+  });
+  const upgradeOrigins=(root=document)=>root.querySelectorAll('a[href*="/data/search?origin="]').forEach(a=>{
+    try{
+      const u=new URL(a.getAttribute('href'),location.origin);
+      const country=(u.searchParams.get('origin')||'').trim();
+      if(country){a.href=`/data/origin/${encodeURIComponent(country)}`;a.title=a.title||`Explore sourcing from ${country}`;}
+    }catch{}
+  });
+  const upgradeLocations=(root=document)=>root.querySelectorAll('a.location-link[href^="/data/search?"]').forEach(a=>{
+    try{
+      const u=new URL(a.getAttribute('href'),location.origin);
+      const province=(u.searchParams.get('province')||'').trim();
+      const city=(u.searchParams.get('city')||'').trim();
+      if(province){a.href=city?`/data/location/${encodeURIComponent(province)}/${encodeURIComponent(city)}`:`/data/location/${encodeURIComponent(province)}`;a.title=a.title||`Explore ${city?city+', ':''}${province}`;}
+    }catch{}
+  });
+
+  upgradeHs();upgradeOrigins();upgradeLocations();
+  if(searchPage)return;
+
   document.body.dataset.intellProfile='1';
-  const slug=match[1];
+  const slug=profileMatch[1];
 
   const actions=document.querySelector('.profile-actions');
   if(actions){
@@ -62,20 +92,18 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
     });
   }
 
-  document.querySelectorAll('a[href^="/data/search?hs="]').forEach(a=>{
-    try{
-      const u=new URL(a.getAttribute('href'),location.origin);
-      const code=(u.searchParams.get('hs')||'').replace(/\D/g,'').slice(0,10);
-      if(code.length>=2){a.href=`/data/hs/${code}`;a.title=a.title||`Explore HS ${code}`;}
-    }catch{}
+  document.querySelectorAll('a.supplier-link').forEach(a=>{
+    const supplier=(a.textContent||'').trim();
+    if(supplier&&supplier!=='—'){a.href=`/data/supplier/${encodeURIComponent(supplier)}`;a.title=`Open cached supplier intelligence for ${supplier}`;}
   });
-  document.querySelectorAll('a[href*="/data/search?origin="]').forEach(a=>{
-    try{
-      const u=new URL(a.getAttribute('href'),location.origin);
-      const country=(u.searchParams.get('origin')||'').trim();
-      if(country){a.href=`/data/origin/${encodeURIComponent(country)}`;a.title=a.title||`Explore sourcing from ${country}`;}
-    }catch{}
-  });
+  document.addEventListener('click',event=>{
+    const node=event.target.closest?.('g.rel-node.supplier');
+    if(!node)return;
+    const supplier=(node.querySelector('text')?.textContent||'').replace(/…$/,'').trim();
+    if(!supplier)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    location.href=`/data/supplier/${encodeURIComponent(supplier)}`;
+  },true);
 
   const source=document.querySelector('.source-line');
   if(source){
@@ -114,37 +142,33 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
 </script>
 '''
 
-_SEARCH_POLISH = r'''
-<script id="intellcluster-search-drilldowns">
-(()=>{
-  if(location.pathname!='/data/search')return;
-  const upgrade=(a)=>{
-    try{
-      const u=new URL(a.getAttribute('href'),location.origin);
-      const hs=(u.searchParams.get('hs')||'').replace(/\D/g,'').slice(0,10);
-      const origin=(u.searchParams.get('origin')||'').trim();
-      const province=(u.searchParams.get('province')||'').trim().toUpperCase();
-      const city=(u.searchParams.get('city')||'').trim();
-      if(hs.length>=2){a.href=`/data/hs/${hs}`;return;}
-      if(origin){a.href=`/data/origin/${encodeURIComponent(origin)}`;return;}
-      if(province&&city){a.href=`/data/location/${encodeURIComponent(province)}/${encodeURIComponent(city)}`;return;}
-      if(province&&a.classList.contains('location-link'))a.href=`/data/location/${encodeURIComponent(province)}`;
-    }catch{}
-  };
-  document.querySelectorAll('.facet[href],.location-link[href]').forEach(upgrade);
-})();
-</script>
-'''
-
 
 @app.middleware("http")
-async def enhance_intelligence_pages(request, call_next):
-    """Inject lightweight progressive enhancement into intelligence HTML pages."""
+async def enhance_intelligence_company_profiles(request, call_next):
+    """Inject UI polish and keep the cached supplier index synchronized."""
     response = await call_next(request)
     path = request.url.path
-    is_company = path.startswith("/data/company/") and not path.endswith(".csv")
-    is_search = path == "/data/search"
-    if not is_company and not is_search:
+    profile_match = path.startswith("/data/company/") and path.count("/") == 3
+
+    if profile_match and response.status_code == 200:
+        slug = path.rsplit("/", 1)[-1]
+        try:
+            from intelligence.database import connect
+            from intelligence.repository import get_entity_by_slug
+            from intelligence.supplier_explorer import sync_supplier_relationships
+
+            with connect() as conn:
+                company = get_entity_by_slug(conn, slug)
+                profile = company.get("importyeti") if company and isinstance(company.get("importyeti"), dict) else None
+                if company and profile:
+                    sync_supplier_relationships(conn, int(company["id"]), profile)
+        except Exception:
+            # Supplier indexing is a derived-cache optimization and must never
+            # make a company profile unavailable if indexing encounters bad data.
+            pass
+
+    should_enhance = profile_match or path == "/data/search"
+    if not should_enhance:
         return response
     content_type = response.headers.get("content-type", "")
     if "text/html" not in content_type:
@@ -153,8 +177,7 @@ async def enhance_intelligence_pages(request, call_next):
     async for chunk in response.body_iterator:
         body += chunk
     text = body.decode("utf-8")
-    injection = _PROFILE_POLISH if is_company else _SEARCH_POLISH
-    text = text.replace("</body>", injection + "</body>")
+    text = text.replace("</body>", _PROFILE_POLISH + "</body>")
     headers = dict(response.headers)
     headers.pop("content-length", None)
     from starlette.responses import Response
