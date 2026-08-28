@@ -46,6 +46,7 @@ async def intelligence_sources() -> dict[str, object]:
 @router.get("/search")
 async def intelligence_search_api(
     q: str | None = Query(default=None),
+    country: str | None = Query(default=None),
     type: str | None = Query(default=None),
     province: str | None = Query(default=None),
     origin: str | None = Query(default=None),
@@ -59,6 +60,7 @@ async def intelligence_search_api(
         rows = search_entities(
             conn,
             q=q,
+            country=country,
             company_type=type,
             province=province,
             origin=origin,
@@ -68,7 +70,13 @@ async def intelligence_search_api(
             limit=limit,
             offset=offset,
         )
-    return {"results": rows, "count": len(rows), "offset": offset, "limit": limit}
+    return {
+        "results": rows,
+        "count": len(rows),
+        "offset": offset,
+        "limit": limit,
+        "country": country or "all",
+    }
 
 
 @router.get("/company/{slug}")
