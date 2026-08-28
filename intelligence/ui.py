@@ -11,6 +11,7 @@ from fastapi import APIRouter, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
+from intelligence.country_intelligence import profile_capabilities
 from intelligence.database import connect
 from intelligence.enrichment.importyeti import (
     ImportYetiClient,
@@ -194,7 +195,12 @@ async def intelligence_company(request: Request, slug: str):
         company = next((row for row in DEMO_COMPANIES if row["slug"] == slug), DEMO_COMPANIES[0])
     elif not demo_mode:
         company = await _maybe_enrich_importyeti(company)
-    return templates.TemplateResponse(request=request,name="company.html",context={"active":"company","company":company,"demo_mode":demo_mode})
+    capabilities = profile_capabilities(company)
+    return templates.TemplateResponse(
+        request=request,
+        name="company.html",
+        context={"active":"company","company":company,"capabilities":capabilities,"demo_mode":demo_mode},
+    )
 
 
 @router.get("/data/company/{slug}/export.csv")
