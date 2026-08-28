@@ -1,0 +1,61 @@
+name: Nightly U.S. Compliance Enrichment
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Maximum U.S. companies to refresh"
+        required: false
+        default: "100"
+      max_age_days:
+        description: "Only refresh compliance cache older than this many days"
+        required: false
+        default: "30"
+
+concurrency:
+  group: nightly-us-compliance-enrichment
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  enrich:
+    name: Refresh EPA/OSHA cache
+    if: ${{ vars.INTELLIGENCE_NIGHTLY_US_COMPLIANCE == 'enabled' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DATABASE_URL: ${{ secrets.INTELLIGENCE_PRODUCTION_DATABASE_URL }}
+      ENRICH_LIMIT: ${{ inputs.limit || '100' }}
+      ENRICH_MAX_AGE_DAYS: ${{ inputs.max_age_days || '30' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/intelligence-directory-platform
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify production database secret
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "INTELLIGENCE_PRODUCTION_DATABASE_URL is not configured; refusing to run."
+            exit 1
+          fi
+
+      - name: Refresh stale U.S. compliance evidence
+        run: |
+          python -m intelligence.compliance_sync \
+            --limit "$ENRICH_LIMIT" \
+            --max-age-days "$ENRICH_MAX_AGE_DAYS"
