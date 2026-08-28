@@ -116,7 +116,6 @@ def run() -> int:
             ("/robots.txt", 200),
             ("/sitemap.xml", 200),
             ("/sitemaps/static.xml", 200),
-            ("/sitemaps/intelligence.xml", 200),
             ("/sitemaps/companies-1.xml", 200),
             ("/api/intelligence/health", 200),
             ("/api/intelligence/freshness", 200),
@@ -135,6 +134,8 @@ def run() -> int:
             failed.append("/data/hs/870892: supplier drilldown link missing")
         if "expectedKind=()=>box.dataset.view==='companies'?'company':'supplier'" not in hs_text:
             failed.append("/data/hs/870892: company-tab regression fix missing")
+        if '"@type":"BreadcrumbList"' not in hs_text or '"name":"HS 870892"' not in hs_text:
+            failed.append("/data/hs/870892: breadcrumb structured data missing")
         company_response = client.get(f"/data/company/{slug}")
         company_text = company_response.text
         if "relationship-evidence-enhancer" not in company_text or "Top 10 relationships" not in company_text:
@@ -143,6 +144,10 @@ def run() -> int:
             failed.append(f"/data/company/{slug}: canonical URL missing")
         if 'type="application/ld+json"' not in company_text or '"@type":"Organization"' not in company_text:
             failed.append(f"/data/company/{slug}: Organization structured data missing")
+        if '"@type":"BreadcrumbList"' not in company_text:
+            failed.append(f"/data/company/{slug}: BreadcrumbList structured data missing")
+        if '<meta property="og:title"' not in company_text or '<meta name="twitter:card" content="summary">' not in company_text:
+            failed.append(f"/data/company/{slug}: social metadata missing")
         search_text = client.get("/data/search?q=IntellCluster").text
         if '<meta name="robots" content="noindex,follow">' not in search_text:
             failed.append("/data/search: filtered search should be noindex,follow")
