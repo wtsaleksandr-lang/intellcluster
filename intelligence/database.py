@@ -52,8 +52,12 @@ entities = Table(
     Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now()),
 )
 Index("ix_intel_entities_name", entities.c.name_normalized)
+Index("ix_intel_entities_country_name", entities.c.country, entities.c.name_normalized)
 Index("ix_intel_entities_region_city", entities.c.region, entities.c.city)
 Index("ix_intel_entities_importer", entities.c.is_importer)
+Index("ix_intel_entities_corporation_number", entities.c.corporation_number)
+Index("ix_intel_entities_status_year", entities.c.corporate_status, entities.c.incorporated_year)
+Index("ix_intel_entities_year", entities.c.incorporated_year)
 
 source_records = Table(
     "intel_source_records",
@@ -86,6 +90,8 @@ Index("ix_intel_importer_entity", importer_relationships.c.entity_id)
 Index("ix_intel_importer_hs6", importer_relationships.c.hs6)
 Index("ix_intel_importer_hs10", importer_relationships.c.hs10)
 Index("ix_intel_importer_origin", importer_relationships.c.origin_country)
+Index("ix_intel_importer_entity_hs", importer_relationships.c.entity_id, importer_relationships.c.hs6, importer_relationships.c.hs10)
+Index("ix_intel_importer_entity_origin", importer_relationships.c.entity_id, importer_relationships.c.origin_country)
 
 sync_runs = Table(
     "intel_sync_runs",
