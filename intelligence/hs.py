@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from datetime import datetime
 from typing import Any
 
 from fastapi import APIRouter, Request
@@ -51,6 +52,23 @@ def _bol_hs_matches(bol: dict[str, Any], code: str) -> bool:
     return bool(digits and digits.startswith(code))
 
 
+def _as_number(value: Any) -> float | None:
+    try:
+        return float(value) if value not in (None, "") else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _date_sort_key(value: str) -> datetime:
+    text = str(value or "").strip()
+    for fmt in ("%m/%d/%Y", "%d/%m/%Y", "%Y-%m-%d", "%Y/%m/%d"):
+        try:
+            return datetime.strptime(text[:10], fmt)
+        except ValueError:
+            continue
+    return datetime.min
+
+
 def _cached_suppliers_for_hs(rows: list[dict[str, Any]], code: str) -> list[dict[str, Any]]:
     ranked: dict[str, dict[str, Any]] = {}
     for row in rows:
@@ -93,6 +111,68 @@ def _cached_suppliers_for_hs(rows: list[dict[str, Any]], code: str) -> list[dict
     return sorted(results, key=lambda row: (row["matched_bols"], row["shipments"]), reverse=True)[:40]
 
 
+def _recent_bols_for_hs(rows: list[dict[str, Any]], code: str) -> list[dict[str, Any]]:
+    """Collect cached recent BOL evidence for one HS prefix without any live API call."""
+    seen: set[str] = set()
+    results: list[dict[str, Any]] = []
+    for row in rows:
+        bols = row.get("recent_bols") if isinstance(row.get("recent_bols"), list) else []
+        for bol in bols:
+            if not isinstance(bol, dict) or not _bol_hs_matches(bol, code):
+                continue
+            number = str(bol.get("Bill_of_Lading") or bol.get("bill_of_lading") or "").strip()
+            dedupe = number or "|".join(
+                str(bol.get(key) or "")
+                for key in ("date_formatted", "Shipper_Name", "Weight_in_KG", "Product_Description")
+            )
+            if dedupe in seen:
+                continue
+            seen.add(dedupe)
+            supplier = str(bol.get("Shipper_Name") or row.get("supplier_name") or "Unknown supplier").strip()
+            country = str(
+                bol.get("supplier_address_country")
+                or bol.get("Country")
+                or row.get("supplier_country")
+                or ""
+            ).strip()
+            bill_type = str(bol.get("Bill_Type_Code") or bol.get("bill_type") or "").strip().upper()
+            weight = _as_number(bol.get("Weight_in_KG") or bol.get("weight_kg"))
+            freight = _as_number(bol.get("shipping_cost") or bol.get("freight_cost"))
+            quantity = bol.get("Quantity") or bol.get("quantity")
+            containers = bol.get("containers_count") or bol.get("Containers") or bol.get("container_count")
+            description = str(bol.get("Product_Description") or bol.get("product_description") or "").strip()
+            hs_raw = str(bol.get("HS_Code") or bol.get("hs_code") or "").strip()
+            route = str(
+                bol.get("trade_route")
+                or bol.get("route")
+                or bol.get("shipping_route")
+                or ""
+            ).strip()
+            importer_name = str(row.get("importer_name") or "").strip()
+            importer_slug = str(row.get("importer_slug") or "").strip()
+            results.append(
+                {
+                    "date": str(bol.get("date_formatted") or bol.get("Arrival_Date") or bol.get("date") or ""),
+                    "bol": number,
+                    "bill_type": bill_type,
+                    "supplier": supplier,
+                    "country": country,
+                    "weight_kg": weight,
+                    "quantity": quantity,
+                    "quantity_unit": str(bol.get("Quantity_Unit") or bol.get("quantity_unit") or ""),
+                    "containers": containers,
+                    "description": description,
+                    "hs": hs_raw,
+                    "freight_cost": freight,
+                    "route": route,
+                    "importer_name": importer_name,
+                    "importer_slug": importer_slug,
+                }
+            )
+    results.sort(key=lambda row: _date_sort_key(row["date"]), reverse=True)
+    return results[:120]
+
+
 def get_hs_intelligence(code: str) -> dict[str, Any]:
     with connect() as conn:
         condition = _hs_condition(code)
@@ -100,18 +180,14 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
             conn.execute(select(func.count(importer_relationships.c.id)).where(condition)).scalar_one() or 0
         )
         company_count = int(
-            conn.execute(
-                select(func.count(func.distinct(importer_relationships.c.entity_id))).where(condition)
-            ).scalar_one()
-            or 0
+            conn.execute(select(func.count(func.distinct(importer_relationships.c.entity_id))).where(condition)).scalar_one() or 0
         )
         origin_count = int(
             conn.execute(
                 select(func.count(func.distinct(importer_relationships.c.origin_country))).where(
                     and_(condition, importer_relationships.c.origin_country.is_not(None))
                 )
-            ).scalar_one()
-            or 0
+            ).scalar_one() or 0
         )
 
         company_rows = conn.execute(
@@ -143,10 +219,7 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
         ).mappings().all()
 
         origin_rows = conn.execute(
-            select(
-                importer_relationships.c.origin_country.label("label"),
-                func.count(importer_relationships.c.id).label("count"),
-            )
+            select(importer_relationships.c.origin_country.label("label"), func.count(importer_relationships.c.id).label("count"))
             .where(and_(condition, importer_relationships.c.origin_country.is_not(None)))
             .group_by(importer_relationships.c.origin_country)
             .order_by(func.count(importer_relationships.c.id).desc())
@@ -154,10 +227,7 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
         ).mappings().all()
 
         description_rows = conn.execute(
-            select(
-                importer_relationships.c.product_description.label("label"),
-                func.count(importer_relationships.c.id).label("count"),
-            )
+            select(importer_relationships.c.product_description.label("label"), func.count(importer_relationships.c.id).label("count"))
             .where(and_(condition, importer_relationships.c.product_description.is_not(None)))
             .group_by(importer_relationships.c.product_description)
             .order_by(func.count(importer_relationships.c.id).desc())
@@ -165,10 +235,7 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
         ).mappings().all()
 
         year_rows = conn.execute(
-            select(
-                importer_relationships.c.activity_year.label("year"),
-                func.count(importer_relationships.c.id).label("count"),
-            )
+            select(importer_relationships.c.activity_year.label("year"), func.count(importer_relationships.c.id).label("count"))
             .where(and_(condition, importer_relationships.c.activity_year.is_not(None)))
             .group_by(importer_relationships.c.activity_year)
             .order_by(importer_relationships.c.activity_year)
@@ -188,11 +255,9 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
             ).mappings().all()
 
         all_hs_rows = conn.execute(
-            select(
-                importer_relationships.c.hs6,
-                importer_relationships.c.hs10,
-                importer_relationships.c.product_description,
-            ).where(condition).limit(10000)
+            select(importer_relationships.c.hs6, importer_relationships.c.hs10, importer_relationships.c.product_description)
+            .where(condition)
+            .limit(10000)
         ).mappings().all()
 
         cached_supplier_rows = conn.execute(
@@ -205,12 +270,7 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
                 entities.c.slug.label("importer_slug"),
                 entities.c.canonical_name.label("importer_name"),
             )
-            .select_from(
-                supplier_relationships.join(
-                    entities,
-                    supplier_relationships.c.importer_entity_id == entities.c.id,
-                )
-            )
+            .select_from(supplier_relationships.join(entities, supplier_relationships.c.importer_entity_id == entities.c.id))
             .where(supplier_relationships.c.source == "importyeti")
             .order_by(supplier_relationships.c.total_shipments.desc())
             .limit(5000)
@@ -278,7 +338,9 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
             }
         )
 
-    suppliers = _cached_suppliers_for_hs([dict(row) for row in cached_supplier_rows], code)
+    cached_rows = [dict(row) for row in cached_supplier_rows]
+    suppliers = _cached_suppliers_for_hs(cached_rows, code)
+    recent_bols = _recent_bols_for_hs(cached_rows, code)
 
     return {
         "code": code,
@@ -291,6 +353,8 @@ def get_hs_intelligence(code: str) -> dict[str, Any]:
         "companies": companies,
         "suppliers": suppliers,
         "supplier_count": len(suppliers),
+        "recent_bols": recent_bols,
+        "recent_bol_count": len(recent_bols),
         "origins": origins,
         "descriptions": descriptions,
         "years": years,
@@ -303,13 +367,13 @@ async def hs_explorer(request: Request, code: str):
     if len(clean) < 2:
         return templates.TemplateResponse(
             request=request,
-            name="hs.html",
+            name="hs_enhanced.html",
             context={"active": "search", "hs": None, "error": "Enter at least two HS digits."},
             status_code=400,
         )
     data = get_hs_intelligence(clean)
     return templates.TemplateResponse(
         request=request,
-        name="hs.html",
+        name="hs_enhanced.html",
         context={"active": "search", "hs": data, "error": None},
     )
