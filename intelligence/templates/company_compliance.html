@@ -1,0 +1,59 @@
+{% extends "company_core.html" %}
+{% block body %}
+{{ super() }}
+{% if company.country == 'US' %}
+{% set enrich = company.enrichment if company.enrichment else {} %}
+{% set echo = enrich.get('epa_echo', {}) %}
+{% set osha = enrich.get('osha', {}) %}
+<style>
+  .us-compliance{margin:26px 0;border:1px solid #d7e1e6;border-radius:8px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.025)}
+  .us-comp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:15px 17px;background:#f7fafb;border-bottom:1px solid #dfe7eb}
+  .us-comp-kicker{font-size:7px;font-weight:800;letter-spacing:.7px;color:#147e98;text-transform:uppercase}.us-comp-head h2{margin:4px 0 0;color:#073f56;font-size:17px}.us-comp-head p{margin:4px 0 0;color:#71828a;font-size:8px;line-height:1.45}
+  .us-comp-source{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.us-comp-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid #d4e0e5;background:#fff;border-radius:999px;padding:4px 7px;font-size:7px;font-weight:750;color:#4d6570}.us-comp-chip i{width:5px;height:5px;border-radius:50%;background:#1b9b73}
+  .us-comp-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:13px 15px}.us-comp-kpi{border:1px solid #dce4e8;border-top:3px solid var(--tone,#1595a8);border-radius:6px;padding:9px 10px;background:#fff;min-height:74px}.us-comp-kpi small{display:block;color:#77878f;font-size:7px;text-transform:uppercase;letter-spacing:.35px}.us-comp-kpi strong{display:block;color:#123f50;font-size:17px;margin-top:4px}.us-comp-kpi span{display:block;color:#8a969c;font-size:7px;margin-top:3px;line-height:1.3}
+  .us-comp-tabs{display:flex;gap:4px;padding:0 15px 10px}.us-comp-tab{border:1px solid #cfdce2;background:#fff;color:#5e747f;border-radius:4px;padding:6px 9px;font-size:8px;font-weight:750;cursor:pointer}.us-comp-tab.active,.us-comp-tab:hover{background:#075a70;border-color:#075a70;color:#fff}
+  .us-comp-panel{display:none;border-top:1px solid #e2e9ec;padding:12px 14px 14px}.us-comp-panel.active{display:block}.us-comp-panel h3{margin:0 0 9px;color:#164d61;font-size:12px}.us-comp-tools{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}.us-comp-tools input{height:30px;min-width:240px;flex:1;border:1px solid #d0dce2;border-radius:4px;padding:0 9px;font-size:8px;outline:none}.us-comp-tools input:focus{border-color:#64a7bd;box-shadow:0 0 0 2px rgba(36,142,174,.08)}.us-comp-count{margin-left:auto;color:#7d8c93;font-size:7px}
+  .us-comp-table-wrap{max-height:370px;overflow:auto;border:1px solid #dce4e8;border-radius:5px}.us-comp-table{width:100%;border-collapse:collapse;font-size:8px}.us-comp-table th{position:sticky;top:0;z-index:2;text-align:left;background:#eef5f7;color:#67828e;font-size:7px;padding:7px 8px;border-bottom:1px solid #d7e2e7}.us-comp-table td{padding:8px;border-bottom:1px solid #e8edef;vertical-align:top;color:#354b54}.us-comp-table tbody tr:nth-child(even){background:#fafcfd}.us-comp-table tbody tr:hover{background:#edf7fa}.us-comp-table tr:last-child td{border-bottom:0}.us-comp-name{font-weight:800;color:#075a70}.us-comp-sub{display:block;color:#8a969c;font-size:7px;margin-top:2px}.us-comp-money{font-weight:800;color:#075a70;white-space:nowrap}.us-comp-risk{display:inline-flex;min-width:24px;justify-content:center;border-radius:10px;padding:3px 6px;font-weight:800;background:#edf1f2;color:#687880}.us-comp-risk.hot{background:#fde9e6;color:#b7473e}.us-comp-link{color:#006bc5;font-weight:750}.us-comp-empty{margin:13px 15px 15px;padding:18px;border:1px dashed #bdcfd7;border-radius:6px;background:#f8fbfc;text-align:center;color:#6c7e87;font-size:9px;line-height:1.55}.us-comp-empty strong{display:block;color:#315563;font-size:10px;margin-bottom:3px}.us-comp-note{padding:8px 14px;border-top:1px solid #e3e9ec;background:#fbfcfc;color:#7a878e;font-size:7px;line-height:1.45}
+  @media(max-width:900px){.us-comp-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:620px){.us-comp-head{flex-direction:column}.us-comp-source{justify-content:flex-start}.us-comp-grid{grid-template-columns:repeat(2,1fr)}.us-comp-tools input{min-width:100%}}
+</style>
+<section id="us-compliance-intelligence" class="us-compliance profile-anchor">
+  <div class="us-comp-head">
+    <div><div class="us-comp-kicker">U.S. Public Intelligence</div><h2>Facilities & Compliance</h2><p>Cached government-source evidence from EPA ECHO and OSHA. Missing matches are not treated as zero activity.</p></div>
+    <div class="us-comp-source">{% if echo %}<span class="us-comp-chip"><i></i> EPA ECHO cached</span>{% endif %}{% if osha %}<span class="us-comp-chip"><i></i> OSHA cached</span>{% endif %}</div>
+  </div>
+  {% if echo or osha %}
+  <div class="us-comp-grid">
+    <div class="us-comp-kpi" style="--tone:#1595a8"><small>EPA Facilities</small><strong>{{ echo.get('facility_count',0) }}</strong><span>{{ echo.get('active_facility_count',0) }} active · {{ echo.get('major_facility_count',0) }} major</span></div>
+    <div class="us-comp-kpi" style="--tone:#4286d9"><small>EPA Inspections</small><strong>{{ echo.get('inspections_5y',0) }}</strong><span>past 5 years</span></div>
+    <div class="us-comp-kpi" style="--tone:#d59b28"><small>Enforcement</small><strong>{{ echo.get('formal_actions_5y',0)+echo.get('informal_actions_5y',0) }}</strong><span>{{ echo.get('formal_actions_5y',0) }} formal · {{ echo.get('informal_actions_5y',0) }} informal</span></div>
+    <div class="us-comp-kpi" style="--tone:#d95555"><small>EPA Penalties</small><strong>${{ '{:,.0f}'.format(echo.get('total_penalties',0)|float) }}</strong><span>{{ echo.get('penalty_events_5y',0) }} penalty events</span></div>
+    <div class="us-comp-kpi" style="--tone:#7962b5"><small>OSHA Inspections</small><strong>{{ osha.get('inspection_count_shown',0) }}</strong><span>{{ osha.get('latest_inspection','No cached inspection date') }}</span></div>
+    <div class="us-comp-kpi" style="--tone:#d96f69"><small>OSHA Violations</small><strong>{{ osha.get('violations_shown',0) }}</strong><span>across cached inspections</span></div>
+  </div>
+  <div class="us-comp-tabs" role="tablist">
+    <button class="us-comp-tab active" type="button" data-comp-tab="epa">EPA Facilities</button>
+    <button class="us-comp-tab" type="button" data-comp-tab="osha">OSHA Inspections</button>
+  </div>
+  <div class="us-comp-panel active" data-comp-panel="epa">
+    <h3>EPA Facility Evidence</h3>
+    {% if echo.get('facilities') %}<div class="us-comp-tools"><input type="search" placeholder="Filter facility or location" data-comp-filter="epa"><span class="us-comp-count" data-comp-count="epa"></span></div><div class="us-comp-table-wrap"><table class="us-comp-table"><thead><tr><th>Facility</th><th>Location</th><th>Inspections</th><th>Actions</th><th>Penalties</th><th>Source</th></tr></thead><tbody>{% for f in echo.get('facilities',[]) %}<tr data-comp-row="epa"><td><span class="us-comp-name">{{ f.get('name','Facility') }}</span><span class="us-comp-sub">Registry {{ f.get('registry_id','—') }}</span></td><td>{{ f.get('city','') }}{% if f.get('city') and f.get('state') %}, {% endif %}{{ f.get('state','') }}<span class="us-comp-sub">{{ f.get('address','') }}</span></td><td>{{ f.get('inspections_5y',0) }}</td><td>{{ f.get('formal_actions_5y',0)+f.get('informal_actions_5y',0) }}</td><td class="us-comp-money">${{ '{:,.0f}'.format(f.get('total_penalties',0)|float) }}</td><td>{% if f.get('detail_url') %}<a class="us-comp-link" href="{{ f.get('detail_url') }}" target="_blank" rel="noopener">ECHO ↗</a>{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="us-comp-empty"><strong>No confident EPA facility match cached</strong>IntellCluster does not interpret this as proof that the company has no regulated facilities.</div>{% endif %}
+  </div>
+  <div class="us-comp-panel" data-comp-panel="osha">
+    <h3>OSHA Inspection History</h3>
+    {% if osha.get('inspections') %}<div class="us-comp-tools"><input type="search" placeholder="Filter establishment, state, type or NAICS" data-comp-filter="osha"><span class="us-comp-count" data-comp-count="osha"></span></div><div class="us-comp-table-wrap"><table class="us-comp-table"><thead><tr><th>Opened</th><th>Establishment</th><th>State</th><th>Type / Scope</th><th>NAICS</th><th>Violations</th><th>Source</th></tr></thead><tbody>{% for i in osha.get('inspections',[]) %}<tr data-comp-row="osha"><td>{{ i.get('date_opened','') }}</td><td><span class="us-comp-name">{{ i.get('establishment_name','') }}</span><span class="us-comp-sub">Activity {{ i.get('activity','—') }}</span></td><td>{{ i.get('state','') }}</td><td>{{ i.get('type','') }}<span class="us-comp-sub">{{ i.get('scope','') }}</span></td><td>{{ i.get('naics','') }}</td><td><span class="us-comp-risk {% if i.get('violations',0) %}hot{% endif %}">{{ i.get('violations',0) }}</span></td><td><a class="us-comp-link" href="{{ i.get('detail_url','#') }}" target="_blank" rel="noopener">OSHA ↗</a></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="us-comp-empty"><strong>No confident OSHA inspection match cached</strong>This may mean there is no matching cached OSHA establishment evidence, not that the company has never been inspected.</div>{% endif %}
+  </div>
+  {% else %}
+  <div class="us-comp-empty"><strong>Compliance intelligence has not been cached yet.</strong>Free EPA/OSHA enrichment can populate this module without calling the paid ImportYeti API.</div>
+  {% endif %}
+  <div class="us-comp-note">Evidence is entity-matched conservatively by company name and location. Use official source links for regulatory due diligence and current legal status.</div>
+</section>
+<script>
+(() => {
+  const root=document.getElementById('us-compliance-intelligence');if(!root)return;
+  const tabs=[...root.querySelectorAll('[data-comp-tab]')],panels=[...root.querySelectorAll('[data-comp-panel]')];
+  tabs.forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.compTab;tabs.forEach(b=>b.classList.toggle('active',b===btn));panels.forEach(p=>p.classList.toggle('active',p.dataset.compPanel===key));}));
+  root.querySelectorAll('[data-comp-filter]').forEach(input=>{const key=input.dataset.compFilter,rows=[...root.querySelectorAll(`[data-comp-row="${key}"]`)],count=root.querySelector(`[data-comp-count="${key}"]`);const apply=()=>{const q=input.value.trim().toLowerCase();let shown=0;rows.forEach(row=>{const visible=!q||row.textContent.toLowerCase().includes(q);row.style.display=visible?'':'none';if(visible)shown++});if(count)count.textContent=`${shown} of ${rows.length} rows`;};input.addEventListener('input',apply);apply();});
+})();
+</script>
+{% endif %}
+{% endblock %}
