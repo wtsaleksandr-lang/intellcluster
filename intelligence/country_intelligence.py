@@ -78,6 +78,8 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
     fmcsa = fmcsa if isinstance(fmcsa, dict) else None
     epa_echo = enrichment.get("epa_echo") if isinstance(enrichment, dict) else None
     epa_echo = epa_echo if isinstance(epa_echo, dict) else None
+    osha = enrichment.get("osha") if isinstance(enrichment, dict) else None
+    osha = osha if isinstance(osha, dict) else None
     web = enrichment.get("web") if isinstance(enrichment, dict) else None
     web = web if isinstance(web, dict) else None
     hunter = enrichment.get("hunter") if isinstance(enrichment, dict) else None
@@ -136,11 +138,19 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
                 source="ImportYeti API",
                 message="Supplier shipment intelligence has not been cached for this company yet.",
             )
-        if epa_echo:
-            sections["facilities"] = _state("cached", label="Facilities", source="EPA ECHO cache")
-            sections["compliance"] = _state("cached", label="Compliance", source="EPA ECHO cache")
+        sections["facilities"] = (
+            _state("cached", label="Facilities", source="EPA ECHO cache")
+            if epa_echo
+            else _state("on_demand", label="Facilities", source="EPA ECHO")
+        )
+        if epa_echo or osha:
+            sources = []
+            if epa_echo:
+                sources.append("EPA ECHO")
+            if osha:
+                sources.append("OSHA")
+            sections["compliance"] = _state("cached", label="Compliance", source=" + ".join(sources) + " cache")
         else:
-            sections["facilities"] = _state("on_demand", label="Facilities", source="EPA ECHO")
             sections["compliance"] = _state("on_demand", label="Compliance", source="EPA ECHO / OSHA")
         sections["contracts"] = (
             _state("cached", label="Contracts", source="USAspending.gov cache")
