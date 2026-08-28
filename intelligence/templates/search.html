@@ -3,113 +3,64 @@
 {% block body %}
 <style>
   .search-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:14px 0 10px}.search-toolbar h1{font-size:17px;margin:0;color:#171719;letter-spacing:-.25px}.search-toolbar small{display:block;color:#888991;margin-top:4px}
+  .market-switch{display:inline-flex;align-items:center;border:1px solid #d8dfe3;background:#f7f9fa;padding:3px;border-radius:7px;gap:2px}.market-switch a{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:5px;color:#64727b;font-size:10px;font-weight:650;white-space:nowrap}.market-switch a:hover{background:#fff;color:#17232b}.market-switch a.active{background:#fff;color:#101820;box-shadow:0 1px 4px rgba(18,39,51,.08)}.market-flag{font-size:14px;line-height:1}
   .filter-shell{position:sticky;top:0;z-index:15;border:1px solid #dedee1;border-radius:10px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);padding:10px;margin-bottom:10px;box-shadow:0 1px 0 rgba(0,0,0,.02)}.filters{margin:0}.advanced-toggle{margin-left:auto;border:0;background:transparent;color:#343541;font-weight:700;font-size:11px;cursor:pointer;padding:8px}.advanced-panel{display:none;border-top:1px solid #ececee;margin-top:10px;padding-top:10px}.advanced-panel.open{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:8px}.advanced-panel .filter{width:100%;min-width:0;padding-right:10px}
   .filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 13px}.filter-chip{display:inline-flex;align-items:center;gap:6px;background:#f4f4f5;border:1px solid #dedee1;border-radius:999px;padding:5px 8px;font-size:9px;color:#565861}.filter-chip b{color:#202123}.clear-link{font-size:9px;color:#777982;padding:5px 4px}.clear-link:hover{color:#202123}
   .result-meta{display:flex;justify-content:space-between;align-items:center;gap:10px}.result-meta .hint{color:#aaa;font-size:9px}
   .cards{gap:9px}.card{position:relative;transition:border-color .14s ease,box-shadow .14s ease,background .14s ease}.card:hover{transform:none;background:#fdfdfd;border-color:#bfc0c5;box-shadow:0 5px 18px rgba(0,0,0,.055)}.card-body{padding:13px 15px}.card-title{font-size:15px;letter-spacing:-.1px}.card-address{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#686970}.dot{width:3px;height:3px;background:#b8b8bd;border-radius:50%;display:inline-block}.card .mini-value{max-width:285px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card:hover .card-title{color:#000}.card-arrow{position:absolute;right:14px;top:14px;color:#b3b3b8;font-size:18px;transition:transform .15s ease,color .15s ease}.card:hover .card-arrow{transform:translateX(2px);color:#202123}
-  .score{display:inline-flex;align-items:center;gap:5px}.score-dot{width:7px;height:7px;border-radius:50%;background:#d0d0d4}.score-dot.hot{background:#202123}
+  .country-badge{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:650;color:#5c6a72;background:#f4f7f8;border:1px solid #e1e7ea;border-radius:4px;padding:3px 6px}.score{display:inline-flex;align-items:center;gap:5px}.score-dot{width:7px;height:7px;border-radius:50%;background:#d0d0d4}.score-dot.hot{background:#202123}
   .facet-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}.facet{display:inline-flex;align-items:center;gap:4px;min-height:23px;padding:3px 7px;border:1px solid #e1e1e4;border-radius:6px;background:#f7f7f8;color:#55565d;font-size:9px;transition:background .13s ease,border-color .13s ease,color .13s ease}.facet:hover{background:#fff;border-color:#aeb0b5;color:#111214}.facet svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.facet.more{color:#8a8a91;background:#fff}
   .source-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid #dedee1;background:#fff;border-radius:999px;padding:3px 7px;font-size:8px;color:#777982}.source-pill svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.8}.location-link{color:#5e5f66}.location-link:hover{color:#111214;text-decoration:underline;text-underline-offset:2px}
   .pagination{display:flex;justify-content:center;gap:8px;margin:22px 0}.page-btn{border:1px solid #d8d8dc;border-radius:7px;padding:8px 12px;background:#fff;font-size:10px;color:#444654}.page-btn:hover{background:#f6f6f7;border-color:#b9b9bd}.page-num{font-size:10px;color:#8a8a91;padding:8px}
-  @media(max-width:850px){.filter-shell{position:static}.advanced-panel.open{grid-template-columns:repeat(2,1fr)}.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.mini-stat{margin:0;padding:0;border:0}.card-arrow{display:none}.result-meta .hint{display:none}}
-  @media(max-width:520px){.advanced-panel.open{grid-template-columns:1fr}.filter-shell .filters>.filter{flex:1 1 42%}.facet-row{margin-top:8px}}
+  @media(max-width:850px){.search-toolbar{align-items:flex-start;flex-direction:column}.filter-shell{position:static}.advanced-panel.open{grid-template-columns:repeat(2,1fr)}.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.mini-stat{margin:0;padding:0;border:0}.card-arrow{display:none}.result-meta .hint{display:none}}
+  @media(max-width:520px){.market-switch{width:100%}.market-switch a{flex:1;justify-content:center}.advanced-panel.open{grid-template-columns:1fr}.filter-shell .filters>.filter{flex:1 1 42%}.facet-row{margin-top:8px}}
 </style>
 <main class="page wide">
-  <div class="subnav">
-    <a class="active" href="/data/search">Companies & Importers</a>
-    <a href="/data/search?province=ON">Addresses</a>
-    <a href="/data/search?hs=8708">Product Finder by HS Code</a>
-    <a href="/data/search">Product Finder</a>
-  </div>
-
+  <div class="subnav"><a class="active" href="/data/search">Companies & Importers</a><a href="/data/search?province=ON">Addresses</a><a href="/data/search?hs=8708">Product Finder by HS Code</a><a href="/data/search">Product Finder</a></div>
   {% if demo_mode %}<div class="notice">Preview fallback — no live rows matched this query.</div>{% endif %}
-
   <div class="search-toolbar">
-    <div><h1>Business Intelligence Search</h1><small>Filter companies, importers, products and public-record relationships</small></div>
+    <div><h1>Business Intelligence Search</h1><small>One entity graph across Canadian and U.S. public records, trade and company intelligence</small></div>
+    <nav class="market-switch" aria-label="Data market">
+      <a class="{% if not filters.country %}active{% endif %}" href="/data/search?q={{ q|urlencode }}">All markets</a>
+      <a class="{% if filters.country=='CA' %}active{% endif %}" href="/data/search?q={{ q|urlencode }}&country=CA"><span class="market-flag">🇨🇦</span>Canada</a>
+      <a class="{% if filters.country=='US' %}active{% endif %}" href="/data/search?q={{ q|urlencode }}&country=US"><span class="market-flag">🇺🇸</span>USA</a>
+    </nav>
   </div>
-
   <div class="filter-shell">
     <form method="get" action="/data/search" class="filters" id="filterForm">
-      <input type="hidden" name="q" value="{{ q }}">
+      <input type="hidden" name="q" value="{{ q }}"><input type="hidden" name="country" value="{{ filters.country }}">
       <select class="filter" name="type" onchange="this.form.submit()"><option value="">Type</option><option value="Importer" {% if filters.type=='Importer' %}selected{% endif %}>Importer</option><option value="Company" {% if filters.type=='Company' %}selected{% endif %}>Company</option></select>
-      <select class="filter" name="province" onchange="this.form.submit()"><option value="">Province</option>{% for p in ['AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT'] %}<option value="{{ p }}" {% if filters.province==p %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
-      <select class="filter" name="status" onchange="this.form.submit()"><option value="">Corporate Status</option><option value="Active" {% if filters.status=='Active' %}selected{% endif %}>Active</option><option value="Inactive" {% if filters.status=='Inactive' %}selected{% endif %}>Inactive</option></select>
-      <input class="filter" name="origin" value="{{ filters.origin }}" placeholder="Origin country">
-      <input class="filter" name="hs" value="{{ filters.hs }}" placeholder="HS code">
-      <select class="filter" name="sort" onchange="this.form.submit()"><option value="relevance" {% if filters.sort=='relevance' %}selected{% endif %}>Relevance</option><option value="buyer_score" {% if filters.sort=='buyer_score' %}selected{% endif %}>AI Buyer Score</option><option value="newest" {% if filters.sort=='newest' %}selected{% endif %}>Newest corporations</option><option value="name" {% if filters.sort=='name' %}selected{% endif %}>Company Name</option></select>
-      <button class="small-btn" type="submit">Apply</button>
-      <button class="advanced-toggle" type="button" id="advancedToggle">Advanced filters ▾</button>
-
+      <input class="filter" name="province" value="{{ filters.province }}" placeholder="State / province">
+      <select class="filter" name="status" onchange="this.form.submit()"><option value="">Status</option><option value="Active" {% if filters.status=='Active' %}selected{% endif %}>Active</option><option value="Inactive" {% if filters.status=='Inactive' %}selected{% endif %}>Inactive</option></select>
+      <input class="filter" name="origin" value="{{ filters.origin }}" placeholder="Origin country"><input class="filter" name="hs" value="{{ filters.hs }}" placeholder="HS code">
+      <select class="filter" name="sort" onchange="this.form.submit()"><option value="relevance" {% if filters.sort=='relevance' %}selected{% endif %}>Relevance</option><option value="buyer_score" {% if filters.sort=='buyer_score' %}selected{% endif %}>AI Buyer Score</option><option value="newest" {% if filters.sort=='newest' %}selected{% endif %}>Newest entities</option><option value="name" {% if filters.sort=='name' %}selected{% endif %}>Company Name</option></select>
+      <button class="small-btn" type="submit">Apply</button><button class="advanced-toggle" type="button" id="advancedToggle">Advanced filters ▾</button>
       <div class="advanced-panel {% if filters.city or filters.incorporated_from or filters.incorporated_to or filters.website %}open{% endif %}" id="advancedPanel">
-        <input class="filter" name="city" value="{{ filters.city }}" placeholder="City">
-        <input class="filter" name="incorporated_from" value="{{ filters.incorporated_from }}" inputmode="numeric" placeholder="Incorporated from">
-        <input class="filter" name="incorporated_to" value="{{ filters.incorporated_to }}" inputmode="numeric" placeholder="Incorporated to">
-        <select class="filter" name="website"><option value="">Website availability</option><option value="yes" {% if filters.website=='yes' %}selected{% endif %}>Website available</option><option value="no" {% if filters.website=='no' %}selected{% endif %}>No website</option></select>
-        <button class="small-btn" type="submit">Apply advanced</button>
+        <input class="filter" name="city" value="{{ filters.city }}" placeholder="City"><input class="filter" name="incorporated_from" value="{{ filters.incorporated_from }}" inputmode="numeric" placeholder="Established from"><input class="filter" name="incorporated_to" value="{{ filters.incorporated_to }}" inputmode="numeric" placeholder="Established to">
+        <select class="filter" name="website"><option value="">Website availability</option><option value="yes" {% if filters.website=='yes' %}selected{% endif %}>Website available</option><option value="no" {% if filters.website=='no' %}selected{% endif %}>No website</option></select><button class="small-btn" type="submit">Apply advanced</button>
       </div>
     </form>
   </div>
-
-  {% if q or filters.type or filters.province or filters.status or filters.origin or filters.hs or filters.city or filters.incorporated_from or filters.incorporated_to or filters.website %}
-  <div class="filter-chips">
-    {% if q %}<span class="filter-chip"><b>Search</b>{{ q }}</span>{% endif %}
-    {% if filters.type %}<span class="filter-chip"><b>Type</b>{{ filters.type }}</span>{% endif %}
-    {% if filters.province %}<span class="filter-chip"><b>Province</b>{{ filters.province }}</span>{% endif %}
-    {% if filters.city %}<span class="filter-chip"><b>City</b>{{ filters.city }}</span>{% endif %}
-    {% if filters.status %}<span class="filter-chip"><b>Status</b>{{ filters.status }}</span>{% endif %}
-    {% if filters.origin %}<span class="filter-chip"><b>Origin</b>{{ filters.origin }}</span>{% endif %}
-    {% if filters.hs %}<span class="filter-chip"><b>HS</b>{{ filters.hs }}</span>{% endif %}
-    {% if filters.incorporated_from or filters.incorporated_to %}<span class="filter-chip"><b>Incorporated</b>{{ filters.incorporated_from or '…' }}–{{ filters.incorporated_to or '…' }}</span>{% endif %}
-    {% if filters.website %}<span class="filter-chip"><b>Website</b>{{ 'Available' if filters.website=='yes' else 'Missing' }}</span>{% endif %}
-    <a class="clear-link" href="/data/search">Clear all</a>
-  </div>
+  {% if q or filters.country or filters.type or filters.province or filters.status or filters.origin or filters.hs or filters.city or filters.incorporated_from or filters.incorporated_to or filters.website %}
+  <div class="filter-chips">{% if q %}<span class="filter-chip"><b>Search</b>{{ q }}</span>{% endif %}{% if filters.country %}<span class="filter-chip"><b>Market</b>{{ 'Canada' if filters.country=='CA' else 'USA' }}</span>{% endif %}{% if filters.type %}<span class="filter-chip"><b>Type</b>{{ filters.type }}</span>{% endif %}{% if filters.province %}<span class="filter-chip"><b>State / Province</b>{{ filters.province }}</span>{% endif %}{% if filters.city %}<span class="filter-chip"><b>City</b>{{ filters.city }}</span>{% endif %}{% if filters.status %}<span class="filter-chip"><b>Status</b>{{ filters.status }}</span>{% endif %}{% if filters.origin %}<span class="filter-chip"><b>Origin</b>{{ filters.origin }}</span>{% endif %}{% if filters.hs %}<span class="filter-chip"><b>HS</b>{{ filters.hs }}</span>{% endif %}{% if filters.incorporated_from or filters.incorporated_to %}<span class="filter-chip"><b>Established</b>{{ filters.incorporated_from or '…' }}–{{ filters.incorporated_to or '…' }}</span>{% endif %}{% if filters.website %}<span class="filter-chip"><b>Website</b>{{ 'Available' if filters.website=='yes' else 'Missing' }}</span>{% endif %}<a class="clear-link" href="/data/search">Clear all</a></div>
   {% endif %}
-
-  <div class="result-meta"><span>Page {{ page }} · showing {{ companies|length }} business profiles{% if q %} matching “{{ q }}”{% endif %}</span><span class="hint">Click any HS code, country or location to drill down</span></div>
+  <div class="result-meta"><span>Page {{ page }} · showing {{ companies|length }} business profiles{% if q %} matching “{{ q }}”{% endif %}</span><span class="hint">Click HS codes, sourcing countries and locations to drill down</span></div>
   <div class="cards">
   {% for c in companies %}
-    <article class="card {% if c.kind != 'Importer' %}supplier{% endif %}">
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <a class="card-title" href="/data/company/{{ c.slug }}">{{ c.name }} <span class="badge {% if c.kind != 'Importer' %}dark{% endif %}">{{ c.kind }}</span>{% if c.status=='Active' %}<span class="badge green">Active</span>{% endif %}</a>
-        <a class="card-arrow" href="/data/company/{{ c.slug }}" aria-label="Open company">›</a>
-        <div class="card-address">
-          {% if c.city %}<a class="location-link" href="/data/search?city={{ c.city|urlencode }}{% if c.province %}&province={{ c.province }}{% endif %}">{{ c.city }}{% if c.province %}, {{ c.province }}{% endif %}</a>{% elif c.province %}<a class="location-link" href="/data/search?province={{ c.province }}">{{ c.province }}</a>{% endif %}{% if c.country %}<span>{{ c.country }}</span>{% endif %}
-          {% if c.incorporated %}<span class="dot"></span><span>Incorporated {{ c.incorporated }}</span>{% endif %}
-          {% if c.website %}<span class="dot"></span><span>Website available</span>{% endif %}
-          <span class="dot"></span><span class="source-pill"><svg viewBox="0 0 16 16"><ellipse cx="8" cy="4" rx="5" ry="2"></ellipse><path d="M3 4v7c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 7.5c0 1.1 2.2 2 5 2s5-.9 5-2"></path></svg>{{ c.source_records_count }} evidence records</span>
-        </div>
-        <div class="stats-row">
-          <div class="mini-stat"><div class="mini-label">AI Buyer Score</div><div class="mini-value score"><span class="score-dot {% if c.buyer_score and c.buyer_score >= 70 %}hot{% endif %}"></span>{% if c.buyer_score %}{{ c.buyer_score }}/100{% else %}Pending{% endif %}</div></div>
-          <div class="mini-stat"><div class="mini-label">HS Codes</div><div class="mini-value">{{ c.hs_codes|length }} linked codes</div></div>
-          <div class="mini-stat"><div class="mini-label">Source Countries</div><div class="mini-value">{{ c.origins|length }} markets</div></div>
-          <div class="mini-stat"><div class="mini-label">Matched Sources</div><div class="mini-value">{{ c.source_count }}</div></div>
-        </div>
-        {% if c.hs_codes or c.origins %}
-        <div class="facet-row">
-          {% for hs in c.hs_codes[:5] %}<a class="facet" href="/data/search?hs={{ hs }}" title="Find companies linked to HS {{ hs }}"><svg viewBox="0 0 16 16"><path d="M3 2.5h7l3 3V13.5H3z"></path><path d="M10 2.5v3h3M5.5 8h5M5.5 10.5h3.5"></path></svg>HS {{ hs }}</a>{% endfor %}
-          {% if c.hs_codes|length > 5 %}<span class="facet more">+{{ c.hs_codes|length-5 }} HS</span>{% endif %}
-          {% for origin in c.origins[:4] %}<a class="facet" href="/data/search?origin={{ origin|urlencode }}" title="Find companies sourcing from {{ origin }}"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"></circle><path d="M2.8 8h10.4M8 2.5c1.7 1.6 2.5 3.5 2.5 5.5S9.7 11.9 8 13.5C6.3 11.9 5.5 10 5.5 8S6.3 4.1 8 2.5Z"></path></svg>{{ origin }}</a>{% endfor %}
-          {% if c.origins|length > 4 %}<span class="facet more">+{{ c.origins|length-4 }} markets</span>{% endif %}
-        </div>
-        {% endif %}
+    {% set iy = c.importyeti if c.importyeti else {} %}{% set us = c.enrichment if c.enrichment else {} %}{% set fmcsa = us.get('fmcsa', {}) %}{% set spending = us.get('usaspending', {}) %}
+    <article class="card {% if c.kind != 'Importer' %}supplier{% endif %}"><div class="card-accent"></div><div class="card-body">
+      <a class="card-title" href="/data/company/{{ c.slug }}">{{ c.name }} <span class="country-badge"><span>{{ '🇺🇸' if c.country=='US' else '🇨🇦' if c.country=='CA' else '🌐' }}</span>{{ c.country }}</span><span class="badge {% if c.kind != 'Importer' %}dark{% endif %}">{{ c.kind }}</span>{% if c.status=='Active' %}<span class="badge green">Active</span>{% endif %}</a><a class="card-arrow" href="/data/company/{{ c.slug }}" aria-label="Open company">›</a>
+      <div class="card-address">{% if c.city %}<a class="location-link" href="/data/search?country={{ c.country }}&city={{ c.city|urlencode }}{% if c.province %}&province={{ c.province }}{% endif %}">{{ c.city }}{% if c.province %}, {{ c.province }}{% endif %}</a>{% elif c.province %}<a class="location-link" href="/data/search?country={{ c.country }}&province={{ c.province }}">{{ c.province }}</a>{% endif %}{% if c.incorporated %}<span class="dot"></span><span>Established {{ c.incorporated }}</span>{% endif %}{% if c.website %}<span class="dot"></span><span>Website available</span>{% endif %}<span class="dot"></span><span class="source-pill"><svg viewBox="0 0 16 16"><ellipse cx="8" cy="4" rx="5" ry="2"></ellipse><path d="M3 4v7c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 7.5c0 1.1 2.2 2 5 2s5-.9 5-2"></path></svg>{{ c.source_records_count }} evidence records</span></div>
+      <div class="stats-row">
+        <div class="mini-stat"><div class="mini-label">AI Buyer Score</div><div class="mini-value score"><span class="score-dot {% if c.buyer_score and c.buyer_score >= 70 %}hot{% endif %}"></span>{% if c.buyer_score %}{{ c.buyer_score }}/100{% else %}Pending{% endif %}</div></div>
+        {% if c.country=='US' and iy %}<div class="mini-stat"><div class="mini-label">Ocean Shipments</div><div class="mini-value">{{ iy.get('total_shipments', 0) }}</div></div><div class="mini-stat"><div class="mini-label">Suppliers</div><div class="mini-value">{{ iy.get('suppliers_table', [])|length }} cached</div></div><div class="mini-stat"><div class="mini-label">Fleet / Contracts</div><div class="mini-value">{{ fmcsa.get('power_units', '—') }} units · {{ spending.get('contract_awards_shown', 0) }} awards</div></div>
+        {% else %}<div class="mini-stat"><div class="mini-label">HS Codes</div><div class="mini-value">{{ c.hs_codes|length }} linked codes</div></div><div class="mini-stat"><div class="mini-label">Source Countries</div><div class="mini-value">{{ c.origins|length }} markets</div></div><div class="mini-stat"><div class="mini-label">Matched Sources</div><div class="mini-value">{{ c.source_count }}</div></div>{% endif %}
       </div>
-    </article>
-  {% else %}
-    <div class="notice">No matching profiles. Clear some filters or try another search.</div>
-  {% endfor %}
+      {% if c.hs_codes or c.origins %}<div class="facet-row">{% for hs in c.hs_codes[:5] %}<a class="facet" href="/data/search?country={{ c.country }}&hs={{ hs }}" title="Find companies linked to HS {{ hs }}"><svg viewBox="0 0 16 16"><path d="M3 2.5h7l3 3V13.5H3z"></path><path d="M10 2.5v3h3M5.5 8h5M5.5 10.5h3.5"></path></svg>HS {{ hs }}</a>{% endfor %}{% if c.hs_codes|length > 5 %}<span class="facet more">+{{ c.hs_codes|length-5 }} HS</span>{% endif %}{% for origin in c.origins[:4] %}<a class="facet" href="/data/search?country={{ c.country }}&origin={{ origin|urlencode }}" title="Find companies sourcing from {{ origin }}"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"></circle><path d="M2.8 8h10.4M8 2.5c1.7 1.6 2.5 3.5 2.5 5.5S9.7 11.9 8 13.5C6.3 11.9 5.5 10 5.5 8S6.3 4.1 8 2.5Z"></path></svg>{{ origin }}</a>{% endfor %}{% if c.origins|length > 4 %}<span class="facet more">+{{ c.origins|length-4 }} markets</span>{% endif %}</div>{% endif %}
+    </div></article>
+  {% else %}<div class="notice">No matching profiles. Clear some filters or try another search.</div>{% endfor %}
   </div>
-
-  {% if page > 1 or has_next %}
-  <nav class="pagination" aria-label="Search pages">
-    {% if page > 1 %}<a class="page-btn" href="?q={{ q|urlencode }}&type={{ filters.type|urlencode }}&province={{ filters.province|urlencode }}&city={{ filters.city|urlencode }}&origin={{ filters.origin|urlencode }}&hs={{ filters.hs|urlencode }}&status={{ filters.status|urlencode }}&incorporated_from={{ filters.incorporated_from }}&incorporated_to={{ filters.incorporated_to }}&website={{ filters.website }}&sort={{ filters.sort }}&page={{ page-1 }}">← Previous</a>{% endif %}
-    <span class="page-num">Page {{ page }}</span>
-    {% if has_next %}<a class="page-btn" href="?q={{ q|urlencode }}&type={{ filters.type|urlencode }}&province={{ filters.province|urlencode }}&city={{ filters.city|urlencode }}&origin={{ filters.origin|urlencode }}&hs={{ filters.hs|urlencode }}&status={{ filters.status|urlencode }}&incorporated_from={{ filters.incorporated_from }}&incorporated_to={{ filters.incorporated_to }}&website={{ filters.website }}&sort={{ filters.sort }}&page={{ page+1 }}">Next →</a>{% endif %}
-  </nav>
-  {% endif %}
+  {% if page > 1 or has_next %}<nav class="pagination" aria-label="Search pages">{% if page > 1 %}<a class="page-btn" href="?q={{ q|urlencode }}&country={{ filters.country }}&type={{ filters.type|urlencode }}&province={{ filters.province|urlencode }}&city={{ filters.city|urlencode }}&origin={{ filters.origin|urlencode }}&hs={{ filters.hs|urlencode }}&status={{ filters.status|urlencode }}&incorporated_from={{ filters.incorporated_from }}&incorporated_to={{ filters.incorporated_to }}&website={{ filters.website }}&sort={{ filters.sort }}&page={{ page-1 }}">← Previous</a>{% endif %}<span class="page-num">Page {{ page }}</span>{% if has_next %}<a class="page-btn" href="?q={{ q|urlencode }}&country={{ filters.country }}&type={{ filters.type|urlencode }}&province={{ filters.province|urlencode }}&city={{ filters.city|urlencode }}&origin={{ filters.origin|urlencode }}&hs={{ filters.hs|urlencode }}&status={{ filters.status|urlencode }}&incorporated_from={{ filters.incorporated_from }}&incorporated_to={{ filters.incorporated_to }}&website={{ filters.website }}&sort={{ filters.sort }}&page={{ page+1 }}">Next →</a>{% endif %}</nav>{% endif %}
 </main>
-<script>
-  const toggle=document.getElementById('advancedToggle');const panel=document.getElementById('advancedPanel');
-  toggle?.addEventListener('click',()=>{panel.classList.toggle('open');toggle.textContent=panel.classList.contains('open')?'Advanced filters ▴':'Advanced filters ▾'});
-</script>
+<script>const toggle=document.getElementById('advancedToggle');const panel=document.getElementById('advancedPanel');toggle?.addEventListener('click',()=>{panel.classList.toggle('open');toggle.textContent=panel.classList.contains('open')?'Advanced filters ▴':'Advanced filters ▾'});</script>
 {% endblock %}
