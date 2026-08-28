@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import re
 from datetime import UTC, datetime, timedelta
 
 import httpx
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, func, select
 
 from intelligence.database import connect, entities
 from intelligence.enrichment.epa_echo import EPAEchoClient, EchoFacility, compact_echo_profile
@@ -14,8 +15,6 @@ from intelligence.repository import get_entity_enrichment, set_entity_enrichment
 
 
 def _name_key(value: str) -> str:
-    import re
-
     value = value.casefold().replace("&", " and ")
     value = re.sub(r"\b(incorporated|inc|corporation|corp|limited|ltd|llc|company|co|usa)\b", " ", value)
     return " ".join(re.findall(r"[a-z0-9]+", value))
