@@ -122,6 +122,12 @@ def run() -> int:
             response = client.get(path, follow_redirects=False)
             if response.status_code != expected:
                 failed.append(f"{path}: {response.status_code} != {expected}")
+        hs_response = client.get("/data/hs/870892")
+        hs_text = hs_response.text
+        if "Cached Supplier One" not in hs_text or "Cached Suppliers Linked to HS 870892" not in hs_text:
+            failed.append("/data/hs/870892: cached supplier ranking missing")
+        if "/data/supplier/Cached%20Supplier%20One" not in hs_text:
+            failed.append("/data/hs/870892: supplier drilldown link missing")
         freshness = client.get("/api/intelligence/freshness").json()
         if freshness.get("company_count", 0) < 1 or "delta_available" not in freshness:
             failed.append("/api/intelligence/freshness: invalid payload")
