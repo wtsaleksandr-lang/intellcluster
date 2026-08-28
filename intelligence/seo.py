@@ -5,7 +5,7 @@ import math
 import os
 import re
 from html import escape as html_escape
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 from xml.sax.saxutils import escape as xml_escape
 
 from fastapi import APIRouter, Request
@@ -118,8 +118,6 @@ async def sitemap_intelligence() -> Response:
         raw = "".join(ch for ch in str(row.get("code") or "") if ch.isdigit())[:10]
         if len(raw) < 2:
             continue
-        # Include the exact code plus its Chapter/Heading parents to build a
-        # crawlable HS hierarchy from the strongest indexed evidence.
         for size in (2, 4, 6, 10):
             if len(raw) < size:
                 continue
@@ -142,7 +140,6 @@ async def sitemap_intelligence() -> Response:
         if province and city:
             urls.append(_url_entry(f"/data/location/{quote(province, safe='')}/{quote(city, safe='')}"))
 
-    # XML sitemaps allow up to 50k URLs. Keep ample headroom for new facets.
     urls = urls[:45_000]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(urls) + "</urlset>"
     return _xml_response(body)
@@ -200,6 +197,61 @@ def _organization_schema(company: dict, canonical: str) -> dict[str, object]:
     return schema
 
 
+def _breadcrumb_schema(path: str, *, company_name: str | None = None) -> dict[str, object] | None:
+    base = _base_url()
+    path = _canonical_path(path)
+    crumbs: list[tuple[str, str]] = [("IntellCluster Data", "/data")]
+    match = re.fullmatch(r"/data/company/([^/]+)", path)
+    if match:
+        crumbs.extend([("Companies", "/data"), (company_name or unquote(match.group(1)).replace("-", " ").title(), path)])
+    else:
+        match = re.fullmatch(r"/data/hs/(\d{2,10})", path)
+        if match:
+            code = match.group(1)
+            crumbs.extend([("HS Code Intelligence", "/data"), (f"HS {code}", path)])
+        else:
+            match = re.fullmatch(r"/data/origin/(.+)", path)
+            if match:
+                origin = unquote(match.group(1))
+                crumbs.extend([("Origin Markets", "/data"), (origin, path)])
+            else:
+                match = re.fullmatch(r"/data/location/([^/]+)(?:/(.+))?", path)
+                if match:
+                    province = unquote(match.group(1))
+                    city = unquote(match.group(2)) if match.group(2) else ""
+                    crumbs.append(("Locations", "/data"))
+                    crumbs.append((province, f"/data/location/{quote(province, safe='')}"))
+                    if city:
+                        crumbs.append((city, path))
+                else:
+                    return None
+    return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": index,
+                "name": name,
+                "item": base + item_path,
+            }
+            for index, (name, item_path) in enumerate(crumbs, start=1)
+        ],
+    }
+
+
+def _rendered_meta(text: str) -> tuple[str, str]:
+    title_match = re.search(r"<title[^>]*>(.*?)</title>", text, flags=re.IGNORECASE | re.DOTALL)
+    desc_match = re.search(
+        r'<meta\s+name=["\']description["\']\s+content=["\'](.*?)["\']',
+        text,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    title = re.sub(r"\s+", " ", title_match.group(1)).strip() if title_match else "IntellCluster Data"
+    description = re.sub(r"\s+", " ", desc_match.group(1)).strip() if desc_match else "Public business intelligence and company data."
+    return title, description
+
+
 def install_seo_middleware(app) -> None:
     if getattr(app.state, "intellcluster_seo_installed", False):
         return
@@ -208,8 +260,6 @@ def install_seo_middleware(app) -> None:
     @app.middleware("http")
     async def intellcluster_seo_metadata(request: Request, call_next):
         path = request.url.path
-        # The underlying product already owns these root-level routes. Intercept
-        # them here so the directory's discovery endpoints are authoritative.
         if path == "/robots.txt":
             return await robots_txt()
         if path == "/sitemap.xml":
@@ -227,23 +277,32 @@ def install_seo_middleware(app) -> None:
             body += chunk
         text = body.decode("utf-8", errors="replace")
         base = _base_url()
-        canonical = base + _canonical_path(path)
+        clean_path = _canonical_path(path)
+        canonical = base + clean_path
         noindex = path.startswith("/data/search") or path.startswith("/data/suggest")
         robots = "noindex,follow" if noindex else "index,follow,max-image-preview:large,max-snippet:-1"
+        title, description = _rendered_meta(text)
         head_bits = [
             f'<link rel="canonical" href="{html_escape(canonical, quote=True)}">',
             f'<meta name="robots" content="{robots}">',
             f'<meta property="og:url" content="{html_escape(canonical, quote=True)}">',
             '<meta property="og:type" content="website">',
+            f'<meta property="og:title" content="{html_escape(title, quote=True)}">',
+            f'<meta property="og:description" content="{html_escape(description, quote=True)}">',
+            '<meta name="twitter:card" content="summary">',
+            f'<meta name="twitter:title" content="{html_escape(title, quote=True)}">',
+            f'<meta name="twitter:description" content="{html_escape(description, quote=True)}">',
         ]
 
-        company_match = re.fullmatch(r"/data/company/([^/]+)", _canonical_path(path))
+        company_name: str | None = None
+        company_match = re.fullmatch(r"/data/company/([^/]+)", clean_path)
         if company_match and response.status_code == 200:
             slug = company_match.group(1)
             try:
                 with connect() as conn:
                     company = get_entity_by_slug(conn, slug)
                 if company:
+                    company_name = str(company.get("name") or company.get("canonical_name") or "Company")
                     schema = json.dumps(
                         _organization_schema(company, canonical),
                         ensure_ascii=False,
@@ -253,6 +312,13 @@ def install_seo_middleware(app) -> None:
                     head_bits.append(f'<script type="application/ld+json">{safe_schema}</script>')
             except Exception:
                 pass
+
+        if not noindex and response.status_code == 200:
+            breadcrumb = _breadcrumb_schema(clean_path, company_name=company_name)
+            if breadcrumb:
+                schema = json.dumps(breadcrumb, ensure_ascii=False, separators=(",", ":"))
+                safe_schema = schema.replace("</", "<\\/")
+                head_bits.append(f'<script type="application/ld+json">{safe_schema}</script>')
 
         injection = "\n".join(head_bits)
         if "</head>" in text:
