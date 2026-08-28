@@ -1,8 +1,8 @@
 """IntellCluster application entrypoint with the business-intelligence layer enabled.
 
 This imports the existing application unchanged, then mounts the data API and
-directory UI. A small response enhancer is kept here so company-profile polish can
-be rolled out independently of the ingestion pipeline.
+directory UI. Small response enhancers keep drill-down behavior centralized while
+the intelligence templates are still evolving quickly.
 """
 
 from main import app
@@ -62,7 +62,6 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
     });
   }
 
-  // HS and origin links open analytical explorer pages instead of generic search.
   document.querySelectorAll('a[href^="/data/search?hs="]').forEach(a=>{
     try{
       const u=new URL(a.getAttribute('href'),location.origin);
@@ -115,12 +114,37 @@ body[data-intell-profile] .ic-export-link{display:inline-flex;align-items:center
 </script>
 '''
 
+_SEARCH_POLISH = r'''
+<script id="intellcluster-search-drilldowns">
+(()=>{
+  if(location.pathname!='/data/search')return;
+  const upgrade=(a)=>{
+    try{
+      const u=new URL(a.getAttribute('href'),location.origin);
+      const hs=(u.searchParams.get('hs')||'').replace(/\D/g,'').slice(0,10);
+      const origin=(u.searchParams.get('origin')||'').trim();
+      const province=(u.searchParams.get('province')||'').trim().toUpperCase();
+      const city=(u.searchParams.get('city')||'').trim();
+      if(hs.length>=2){a.href=`/data/hs/${hs}`;return;}
+      if(origin){a.href=`/data/origin/${encodeURIComponent(origin)}`;return;}
+      if(province&&city){a.href=`/data/location/${encodeURIComponent(province)}/${encodeURIComponent(city)}`;return;}
+      if(province&&a.classList.contains('location-link'))a.href=`/data/location/${encodeURIComponent(province)}`;
+    }catch{}
+  };
+  document.querySelectorAll('.facet[href],.location-link[href]').forEach(upgrade);
+})();
+</script>
+'''
+
 
 @app.middleware("http")
-async def enhance_intelligence_company_profiles(request, call_next):
-    """Inject lightweight progressive enhancement into company HTML responses."""
+async def enhance_intelligence_pages(request, call_next):
+    """Inject lightweight progressive enhancement into intelligence HTML pages."""
     response = await call_next(request)
-    if not request.url.path.startswith("/data/company/") or request.url.path.endswith(".csv"):
+    path = request.url.path
+    is_company = path.startswith("/data/company/") and not path.endswith(".csv")
+    is_search = path == "/data/search"
+    if not is_company and not is_search:
         return response
     content_type = response.headers.get("content-type", "")
     if "text/html" not in content_type:
@@ -129,7 +153,8 @@ async def enhance_intelligence_company_profiles(request, call_next):
     async for chunk in response.body_iterator:
         body += chunk
     text = body.decode("utf-8")
-    text = text.replace("</body>", _PROFILE_POLISH + "</body>")
+    injection = _PROFILE_POLISH if is_company else _SEARCH_POLISH
+    text = text.replace("</body>", injection + "</body>")
     headers = dict(response.headers)
     headers.pop("content-length", None)
     from starlette.responses import Response
