@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import func, select
 
 from intelligence.database import connect, entities
+from intelligence.freshness import directory_freshness
 from intelligence.registry import list_sources
 from intelligence.repository import get_entity_by_slug, search_entities
 
@@ -19,6 +20,11 @@ async def intelligence_health() -> dict[str, object]:
         "registered_sources": len(list_sources()),
         "entities": int(entity_count or 0),
     }
+
+
+@router.get("/freshness")
+async def intelligence_freshness() -> dict[str, object]:
+    return directory_freshness()
 
 
 @router.get("/sources")
