@@ -108,6 +108,8 @@ def run() -> int:
             ("/data/origin/China", 200),
             ("/data/location/ON", 200),
             ("/data/location/ON/Hamilton", 200),
+            ("/data/suppliers", 200),
+            ("/data/suppliers?q=Cached&country=China&sort=importers", 200),
             ("/data/supplier/Cached%20Supplier%20One", 200),
             (f"/data/company/{slug}", 200),
             (f"/data/company/{slug}/export.csv", 200),
