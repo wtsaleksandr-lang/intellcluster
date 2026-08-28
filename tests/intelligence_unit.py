@@ -8,6 +8,7 @@ from intelligence.country_intelligence import normalize_country, profile_capabil
 from intelligence.enrichment.epa_echo import EPAEchoClient, compact_echo_profile
 from intelligence.enrichment.fmcsa import FMCSAClient
 from intelligence.enrichment.importyeti import ImportYetiClient, live_importyeti_enabled
+from intelligence.enrichment.osha import OSHAClient, compact_osha_profile
 from intelligence.enrichment.usaspending import USAspendingClient
 from intelligence.entity_resolution import normalize_company_name, score_company_match
 from intelligence.models import SourceRecord
@@ -69,6 +70,8 @@ def run() -> int:
     us_uncached = profile_capabilities({"country": "US"})
     assert us_uncached["sections"]["trade"]["status"] == "unlockable"
     assert us_uncached["sections"]["contracts"]["status"] == "on_demand"
+    assert us_uncached["sections"]["facilities"]["status"] == "on_demand"
+    assert us_uncached["sections"]["compliance"]["status"] == "on_demand"
     us_contracts = profile_capabilities({"country": "US", "enrichment": {"usaspending": {"contract_awards_shown": 2}}})
     assert us_contracts["sections"]["contracts"]["status"] == "cached"
     us_fleet = profile_capabilities({"country": "US", "enrichment": {"fmcsa": {"dot_number": "1234567", "power_units": 42}}})
@@ -162,6 +165,27 @@ def run() -> int:
             os.environ.pop("EPA_ECHO_FIXTURE_PATH", None)
         else:
             os.environ["EPA_ECHO_FIXTURE_PATH"] = previous_echo_fixture
+
+    previous_osha_fixture = os.environ.get("OSHA_FIXTURE_PATH")
+    try:
+        fixture = Path(__file__).parent / "fixtures" / "osha_company.html"
+        os.environ["OSHA_FIXTURE_PATH"] = str(fixture)
+        inspections = asyncio.run(OSHAClient().search("IntellCluster Logistics", state="TX"))
+        assert len(inspections) == 2
+        assert inspections[0].activity == "1892797.015"
+        assert inspections[0].date_opened == "04/15/2026"
+        assert inspections[0].naics == "484121"
+        assert inspections[0].violations == 3
+        profile = compact_osha_profile(inspections)
+        assert profile["inspection_count_shown"] == 2
+        assert profile["violations_shown"] == 4
+        assert profile["latest_inspection"] == "04/15/2026"
+        assert profile["states"] == ["TX"]
+    finally:
+        if previous_osha_fixture is None:
+            os.environ.pop("OSHA_FIXTURE_PATH", None)
+        else:
+            os.environ["OSHA_FIXTURE_PATH"] = previous_osha_fixture
 
     print("INTELLIGENCE UNIT OK")
     return 0
