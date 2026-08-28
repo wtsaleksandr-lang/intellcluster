@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{% if hs %}HS {{ hs.code }} Intelligence{% else %}HS Explorer{% endif %} | IntellCluster{% endblock %}
+{% block meta_desc %}{% if hs %}Explore companies, sourcing countries and product relationships for HS {{ hs.code }}.{% else %}Explore HS-code market intelligence.{% endif %}{% endblock %}
+{% block body %}
+<style>
+  .hs-shell{padding-top:16px}.hs-crumbs{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 14px}.hs-crumb{display:inline-flex;gap:5px;align-items:center;border:1px solid #dedee1;border-radius:999px;background:#fff;padding:6px 9px;font-size:9px;color:#5f6067}.hs-crumb:hover{border-color:#aeb0b5;background:#f7f7f8}.hs-crumb b{color:#202123}
+  .hs-hero{border:1px solid #d9dbde;border-radius:11px;background:#fff;padding:20px;margin-bottom:14px;display:flex;justify-content:space-between;gap:24px;align-items:flex-end}.hs-eyebrow{font-size:9px;color:#818289;text-transform:uppercase;letter-spacing:.65px}.hs-title{font-size:28px;font-weight:800;letter-spacing:-.8px;color:#202123;margin-top:5px}.hs-sub{font-size:11px;color:#6e7077;margin-top:7px;max-width:650px}.hs-actions{display:flex;gap:7px;flex-wrap:wrap}.hs-action{border:1px solid #d5d6d9;border-radius:7px;padding:8px 10px;background:#fff;font-size:9px;font-weight:700}.hs-action:hover{background:#f7f7f8;border-color:#aaa}
+  .hs-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 18px}.hs-kpi{border:1px solid #dedee1;border-radius:9px;padding:13px;background:#fff}.hs-kpi span{font-size:8px;color:#85868d;text-transform:uppercase;letter-spacing:.45px}.hs-kpi strong{display:block;font-size:20px;color:#202123;margin-top:4px}.hs-kpi small{display:block;font-size:8px;color:#8a8b91;margin-top:3px}
+  .hs-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-bottom:16px}.hs-panel{border:1px solid #dadddf;border-radius:9px;background:#fff;overflow:hidden}.hs-panel-head{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:#f8f8f9;border-bottom:1px solid #e1e2e4}.hs-panel-head strong{font-size:12px;color:#202123}.hs-panel-head span{font-size:8px;color:#888990}.hs-panel-body{padding:12px}
+  .origin-row{display:grid;grid-template-columns:150px 1fr 62px;gap:9px;align-items:center;padding:6px 0}.origin-row a{font-size:9px;font-weight:700;color:#234b59}.origin-bar{height:12px;background:#eef1f2;border-radius:3px;overflow:hidden}.origin-bar i{display:block;height:100%;background:#075a70}.origin-val{font-size:8px;color:#686b70;text-align:right}.origin-row:hover .origin-bar i{background:#003f50}
+  .year-chart{height:210px;display:flex;align-items:flex-end;gap:5px;border-bottom:1px solid #d9dcde;padding:14px 4px 0}.year-col{flex:1;min-width:12px;max-width:46px;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative}.year-col i{display:block;width:100%;height:var(--h);background:#075a70;border-radius:3px 3px 0 0;transition:.12s}.year-col:hover i{background:#003f50}.year-col small{position:absolute;bottom:-19px;font-size:7px;color:#81838a;white-space:nowrap}.year-note{margin-top:26px;font-size:8px;color:#888b90}
+  .desc-list{display:flex;flex-direction:column;gap:7px}.desc-item{border:1px solid #e0e1e3;border-radius:7px;padding:9px 10px;display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.desc-item:hover{background:#fafafa;border-color:#c9cacf}.desc-copy{font-size:9px;color:#34363a;line-height:1.45}.desc-count{font-size:8px;color:#70727a;white-space:nowrap}
+  .company-panel{margin-top:16px}.company-table{width:100%;border-collapse:collapse;font-size:9px}.company-table th{text-align:left;padding:8px 9px;background:#f5f6f7;color:#72747a;font-size:7px;border-bottom:1px solid #dfe1e3;position:sticky;top:0}.company-table td{padding:9px;border-bottom:1px solid #e7e8ea}.company-table tbody tr:nth-child(even){background:#fafafa}.company-table tbody tr:hover{background:#f1f7f8}.company-name{font-weight:750;color:#0069c8}.company-meta{font-size:7px;color:#85878e;margin-top:3px}.share-track{height:6px;background:#eceeef;border-radius:999px;overflow:hidden;margin-top:4px}.share-track i{display:block;height:100%;background:#075a70}.score-pill{display:inline-flex;border:1px solid #d9dade;background:#f7f7f8;border-radius:999px;padding:3px 6px;font-size:7px}.empty{padding:30px;text-align:center;color:#777;font-size:11px}
+  @media(max-width:780px){.hs-hero{align-items:flex-start;flex-direction:column}.hs-kpis{grid-template-columns:repeat(2,1fr)}.hs-grid{grid-template-columns:1fr}.company-table{min-width:760px}.company-panel{overflow:auto}.origin-row{grid-template-columns:105px 1fr 50px}}
+  @media(max-width:480px){.hs-kpis{grid-template-columns:1fr 1fr}.hs-title{font-size:23px}.hs-hero{padding:15px}}
+</style>
+<main class="page wide hs-shell">
+  {% if error %}<div class="notice">{{ error }}</div>{% elif hs %}
+  <div class="hs-crumbs">
+    {% for item in hs.hierarchy %}<a class="hs-crumb" href="/data/hs/{{ item.code }}"><span>{{ item.label }}</span><b>{{ item.code }}</b></a>{% endfor %}
+  </div>
+
+  <section class="hs-hero">
+    <div><div class="hs-eyebrow">HS Code Intelligence</div><div class="hs-title">HS {{ hs.code }}</div><div class="hs-sub">Public importer relationships associated with this HS prefix. Use the rankings below to move directly into companies, sourcing countries and related product descriptions.</div></div>
+    <div class="hs-actions"><a class="hs-action" href="/data/search?hs={{ hs.code }}">View all companies</a><a class="hs-action" href="/data/search?hs={{ hs.code }}&sort=buyer_score">Rank by AI score</a></div>
+  </section>
+
+  <section class="hs-kpis">
+    <div class="hs-kpi"><span>Matched companies</span><strong>{{ '{:,}'.format(hs.company_count) }}</strong><small>unique business entities</small></div>
+    <div class="hs-kpi"><span>Importer relationships</span><strong>{{ '{:,}'.format(hs.total_relationships) }}</strong><small>public-data relationships</small></div>
+    <div class="hs-kpi"><span>Origin countries</span><strong>{{ hs.origin_count }}</strong><small>distinct sourcing markets</small></div>
+    <div class="hs-kpi"><span>Top-company coverage</span><strong>{{ hs.companies|length }}</strong><small>ranked profiles displayed</small></div>
+  </section>
+
+  <div class="hs-grid">
+    <section class="hs-panel"><div class="hs-panel-head"><strong>Top Sourcing Countries</strong><span>share of matched relationships</span></div><div class="hs-panel-body">
+      {% set max_origin=(hs.origins[0].count if hs.origins else 1) %}
+      {% for row in hs.origins %}<div class="origin-row"><a href="/data/search?hs={{ hs.code }}&origin={{ row.label|urlencode }}">{{ row.label }}</a><div class="origin-bar"><i style="width:{{ (row.count*100/max_origin) if max_origin else 0 }}%"></i></div><div class="origin-val">{{ row.percent }}%</div></div>{% else %}<div class="empty">No origin-country data for this HS code.</div>{% endfor %}
+    </div></section>
+
+    <section class="hs-panel"><div class="hs-panel-head"><strong>Relationship Activity by Year</strong><span>where source year is available</span></div><div class="hs-panel-body">
+      {% if hs.years %}{% set max_year=hs.years|max(attribute='count') %}<div class="year-chart">{% for row in hs.years %}<a class="year-col" href="/data/search?hs={{ hs.code }}" title="{{ row.year }}: {{ row.count }} relationships"><i style="--h:{{ (row.count*100/max_year.count) if max_year.count else 1 }}%"></i><small>{{ row.year }}</small></a>{% endfor %}</div><div class="year-note">Activity reflects relationship records in the loaded public datasets, not customs value.</div>{% else %}<div class="empty">No activity-year field is available for these records.</div>{% endif %}
+    </div></section>
+  </div>
+
+  <section class="hs-panel"><div class="hs-panel-head"><strong>Common Product Descriptions</strong><span>click to find related businesses</span></div><div class="hs-panel-body desc-list">
+    {% for row in hs.descriptions %}<a class="desc-item" href="/data/search?q={{ row.label|urlencode }}&hs={{ hs.code }}"><span class="desc-copy">{{ row.label }}</span><span class="desc-count">{{ row.count }} · {{ row.percent }}%</span></a>{% else %}<div class="empty">No product descriptions are available for this HS code.</div>{% endfor %}
+  </div></section>
+
+  <section class="hs-panel company-panel"><div class="hs-panel-head"><strong>Top Companies for HS {{ hs.code }}</strong><span>ranked by matched public-data relationships</span></div>
+    {% if hs.companies %}<table class="company-table"><thead><tr><th>Company</th><th>Location</th><th>Relationships</th><th>Origin Markets</th><th>Share</th><th>AI Buyer Score</th></tr></thead><tbody>
+    {% for c in hs.companies %}<tr><td><a class="company-name" href="/data/company/{{ c.slug }}">{{ c.name }}</a><div class="company-meta">{{ c.status }}</div></td><td>{{ c.city }}{% if c.city and c.province %}, {% endif %}{{ c.province }}</td><td><strong>{{ c.relationships }}</strong></td><td>{{ c.origins }}</td><td>{{ c.share }}%<div class="share-track"><i style="width:{{ c.share }}%"></i></div></td><td>{% if c.buyer_score %}<span class="score-pill">{{ c.buyer_score }}/100</span>{% else %}<span class="score-pill">Pending</span>{% endif %}</td></tr>{% endfor %}
+    </tbody></table>{% else %}<div class="empty">No companies are currently associated with HS {{ hs.code }}.</div>{% endif %}
+  </section>
+  {% endif %}
+</main>
+{% endblock %}
