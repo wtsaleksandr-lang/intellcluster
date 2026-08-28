@@ -57,6 +57,20 @@ body[data-intell-profile] .ic-capability[data-state="market_context"] .ic-capabi
 body[data-intell-profile] .ic-capability[data-state="unlockable"] .ic-capability-dot,body[data-intell-profile] .ic-capability[data-state="on_demand"] .ic-capability-dot{background:#bd8b23}
 body[data-intell-profile] .ic-capability[data-state="not_available"] .ic-capability-dot{background:#c2c7ca}
 body[data-intell-profile] .ic-capability-copy{margin-top:5px;color:#7a858b;font-size:7px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body[data-intell-profile] .ic-hs-tree{display:flex!important;gap:5px!important;padding:5px!important;background:#f5f7f8!important;overflow:visible!important}
+body[data-intell-profile] .ic-hs-chapter{position:relative;min-width:82px;display:flex;flex-direction:column;border:4px solid var(--hs-tone);border-radius:6px;background:color-mix(in srgb,var(--hs-tone) 12%,white);overflow:visible;transition:filter .12s ease,transform .12s ease,box-shadow .12s ease}
+body[data-intell-profile] .ic-hs-chapter:hover{z-index:10;filter:saturate(1.06);transform:translateY(-1px);box-shadow:0 8px 20px rgba(12,48,61,.14)}
+body[data-intell-profile] .ic-hs-chapter-head{display:block;padding:5px 7px;background:var(--hs-tone);color:#fff;font-size:9px;font-weight:800;line-height:1.15;text-align:center}
+body[data-intell-profile] .ic-hs-heading-grid{display:flex;flex:1;gap:4px;padding:4px;min-height:0}
+body[data-intell-profile] .ic-hs-heading{position:relative;display:flex;flex-direction:column;min-width:54px;border:2px solid color-mix(in srgb,var(--hs-tone) 80%,white);border-radius:4px;background:color-mix(in srgb,var(--hs-tone) 18%,white);overflow:visible;transition:transform .12s ease,filter .12s ease}
+body[data-intell-profile] .ic-hs-heading:hover{z-index:12;transform:scale(1.012);filter:brightness(.98)}
+body[data-intell-profile] .ic-hs-heading-head{display:block;padding:4px 5px;background:color-mix(in srgb,var(--hs-tone) 82%,white);color:#fff;font-size:7px;font-weight:750;text-align:center}
+body[data-intell-profile] .ic-hs-leaves{display:flex;flex:1;flex-wrap:wrap;align-content:stretch;gap:3px;padding:3px}
+body[data-intell-profile] .ic-hs-leaf{position:relative;display:flex;flex:1 1 42%;min-width:42px;min-height:52px;align-items:center;justify-content:center;text-align:center;padding:5px;border-radius:4px;background:color-mix(in srgb,var(--hs-tone) 28%,white);color:#17313b;font-size:7px;line-height:1.25;overflow:visible;transition:transform .12s ease,filter .12s ease,box-shadow .12s ease}
+body[data-intell-profile] .ic-hs-leaf:hover,body[data-intell-profile] .ic-hs-leaf:focus{z-index:20;transform:scale(1.025);filter:brightness(.97) saturate(1.08);box-shadow:0 6px 16px rgba(0,0,0,.14);outline:none}
+body[data-intell-profile] .ic-hs-leaf b{display:block;font-size:8px;margin-bottom:3px}.ic-hs-tip{position:absolute;z-index:50;left:50%;bottom:calc(100% + 7px);width:300px;padding:8px 9px;background:#f8fafb;border:1px solid #97a6ae;color:#1e2d34;box-shadow:0 9px 24px rgba(0,0,0,.16);font-size:8px;line-height:1.4;text-align:left;opacity:0;pointer-events:none;transform:translate(-50%,4px);transition:.12s}
+body[data-intell-profile] .ic-hs-leaf:hover .ic-hs-tip,body[data-intell-profile] .ic-hs-leaf:focus .ic-hs-tip,body[data-intell-profile] .ic-hs-heading:hover>.ic-hs-tip,body[data-intell-profile] .ic-hs-chapter:hover>.ic-hs-tip{opacity:1;transform:translate(-50%,0)}
+body[data-intell-profile] .ic-hs-tip strong{display:block;font-size:9px;margin-bottom:3px}.ic-hs-tip em{display:block;font-style:normal;color:#718087;margin-top:4px}
 
 /* Premium search language: original, lightweight and inspired by modern logistics SaaS. */
 body[data-intell-search]{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:#14171a;font-feature-settings:"kern" 1,"tnum" 1;background:#fff}
@@ -106,7 +120,7 @@ body[data-intell-search] .ic-help:hover::before,body[data-intell-search] .ic-hel
 body[data-intell-search] .ic-coverage-help{display:inline-flex;align-items:center;gap:5px;color:#60717a;font-size:9px}
 @media(max-width:900px){body[data-intell-profile] .ic-capability-strip{grid-template-columns:repeat(4,minmax(0,1fr))}body[data-intell-profile] .ic-capability:nth-child(6n){border-right:1px solid #e6ebee}body[data-intell-profile] .ic-capability:nth-child(4n){border-right:0}}
 @media(max-width:700px){body[data-intell-search] .mini-stat{padding:0 8px!important;border-right:0!important}body[data-intell-search] .stats-row{gap:10px!important}body[data-intell-search] .ic-help::after{left:auto;right:-8px;transform:translateY(5px);width:210px}body[data-intell-search] .ic-help:hover::after,body[data-intell-search] .ic-help:focus::after{transform:translateY(0)}body[data-intell-profile] .ic-capability-strip{grid-template-columns:repeat(2,minmax(0,1fr))}body[data-intell-profile] .ic-capability:nth-child(4n){border-right:1px solid #e6ebee}body[data-intell-profile] .ic-capability:nth-child(2n){border-right:0}}
-@media(max-width:600px){body[data-intell-profile] .profile-actions{width:100%}body[data-intell-profile] .profile-actions .small-btn,body[data-intell-profile] .ic-export-link{flex:1;justify-content:center}}
+@media(max-width:600px){body[data-intell-profile] .profile-actions{width:100%}body[data-intell-profile] .profile-actions .small-btn,body[data-intell-profile] .ic-export-link{flex:1;justify-content:center}body[data-intell-profile] .ic-hs-tree{overflow-x:auto!important}body[data-intell-profile] .ic-hs-chapter{min-width:220px}}
 </style>
 <script id="intellcluster-profile-enhancer">
 (()=>{
@@ -141,6 +155,27 @@ body[data-intell-search] .ic-coverage-help{display:inline-flex;align-items:cente
 
   document.body.dataset.intellProfile='1';
   const slug=profileMatch[1];
+
+  const hsData=document.getElementById('iy-profile');
+  const hsMap=document.getElementById('hsTreemap');
+  if(hsData&&hsMap){
+    try{
+      const profile=JSON.parse(hsData.textContent||'{}');
+      const palette=['#075a70','#22a83f','#0b69d6','#e14e47','#eb7b17','#111111','#7754aa','#bd8c00'];
+      const leaves=[];
+      const walk=(nodes)=>{for(const n of nodes||[]){const code=String(n.hs_code||n.code||'').replace(/\D/g,'');if(n.children?.length)walk(n.children);else if(code){leaves.push({code,desc:String(n.description||''),ship:Number(n.shipments||0)});}}};
+      walk(profile.hs_codes||[]);
+      const valid=leaves.filter(x=>x.ship>0).sort((a,b)=>b.ship-a.ship).slice(0,60);
+      if(valid.length){
+        const total=valid.reduce((s,x)=>s+x.ship,0)||1;
+        const chapters=new Map();
+        valid.forEach(x=>{const ch=x.code.slice(0,2)||'00',hd=x.code.slice(0,4)||ch;let c=chapters.get(ch);if(!c){c={code:ch,total:0,heads:new Map()};chapters.set(ch,c)}c.total+=x.ship;let h=c.heads.get(hd);if(!h){h={code:hd,total:0,leaves:[]};c.heads.set(hd,h)}h.total+=x.ship;h.leaves.push(x)});
+        hsMap.innerHTML='';hsMap.classList.add('ic-hs-tree');
+        [...chapters.values()].sort((a,b)=>b.total-a.total).forEach((ch,ci)=>{const chapter=document.createElement('section');chapter.className='ic-hs-chapter';chapter.style.setProperty('--hs-tone',palette[ci%palette.length]);chapter.style.flexGrow=String(Math.max(1,ch.total/total*10));chapter.style.flexBasis=`${Math.max(12,ch.total/total*100)}%`;const head=document.createElement('a');head.className='ic-hs-chapter-head';head.href=`/data/hs/${ch.code}`;head.textContent=`${ch.code} · Chapter`;const ctip=document.createElement('span');ctip.className='ic-hs-tip';ctip.innerHTML=`<strong>Chapter ${ch.code}</strong>${ch.total.toLocaleString()} cached shipments across ${ch.heads.size} headings.<em>Click the chapter header for full HS intelligence.</em>`;chapter.append(head,ctip);const grid=document.createElement('div');grid.className='ic-hs-heading-grid';[...ch.heads.values()].sort((a,b)=>b.total-a.total).forEach(h=>{const heading=document.createElement('div');heading.className='ic-hs-heading';heading.style.flexGrow=String(Math.max(1,h.total/ch.total*10));const hh=document.createElement('a');hh.className='ic-hs-heading-head';hh.href=`/data/hs/${h.code}`;hh.textContent=h.code;const htip=document.createElement('span');htip.className='ic-hs-tip';htip.innerHTML=`<strong>Heading ${h.code}</strong>${h.total.toLocaleString()} cached shipments · ${h.leaves.length} product codes.<em>Click the heading header for companies, suppliers and sourcing intelligence.</em>`;heading.append(hh,htip);const leafWrap=document.createElement('div');leafWrap.className='ic-hs-leaves';h.leaves.forEach(x=>{const a=document.createElement('a');a.className='ic-hs-leaf';a.href=`/data/hs/${x.code}`;a.style.flexGrow=String(Math.max(1,x.ship/h.total*10));a.innerHTML=`<span><b>${x.code}</b>${x.desc?x.desc.slice(0,80):'Product code'}</span><span class="ic-hs-tip"><strong>HS ${x.code}</strong>${x.desc||'Description unavailable.'}<br>${x.ship.toLocaleString()} cached shipments · ${(x.ship/total*100).toFixed(1)}% of company HS activity.<em>Click to open biggest companies/importers, cached suppliers, origins and activity for this code.</em></span>`;leafWrap.appendChild(a)});heading.appendChild(leafWrap);grid.appendChild(heading)});chapter.appendChild(grid);hsMap.appendChild(chapter)});
+      }
+    }catch{}
+  }
+
   const actions=document.querySelector('.profile-actions');
   if(actions){[...actions.querySelectorAll('.small-btn')].forEach(btn=>{if(/export/i.test(btn.textContent||'')){const a=document.createElement('a');a.className='small-btn ic-export-link';a.href=`/data/company/${encodeURIComponent(slug)}/export.csv`;a.setAttribute('download','');a.innerHTML='⇩&nbsp; Export CSV';btn.replaceWith(a);}});}
 
