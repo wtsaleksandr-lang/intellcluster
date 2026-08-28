@@ -102,7 +102,7 @@ supplier_relationships = Table(
     Column("supplier_normalized", String(500), nullable=False),
     Column("supplier_country", String(180)),
     Column("supplier_address", Text),
-    Column("total_shipments", Integer),
+    Column("total_shipments", Integer, nullable=False, default=0),
     Column("product_descriptions", JSON, nullable=False, default=list),
     Column("recent_bols", JSON, nullable=False, default=list),
     Column("source", String(80), nullable=False, default="importyeti"),
@@ -118,7 +118,7 @@ Index(
 )
 Index("ix_intel_supplier_name", supplier_relationships.c.supplier_normalized)
 Index("ix_intel_supplier_country", supplier_relationships.c.supplier_country)
-Index("ix_intel_supplier_importer", supplier_relationships.c.importer_entity_id)
+Index("ix_intel_supplier_shipments", supplier_relationships.c.total_shipments)
 
 sync_runs = Table(
     "intel_sync_runs",
@@ -131,6 +131,16 @@ sync_runs = Table(
     Column("message", Text),
     Column("started_at", DateTime(timezone=True), server_default=func.now()),
     Column("finished_at", DateTime(timezone=True)),
+)
+
+sync_checkpoints = Table(
+    "intel_sync_checkpoints",
+    metadata,
+    Column("source", String(80), primary_key=True),
+    Column("position", Integer, nullable=False, default=0),
+    Column("status", String(30), nullable=False, default="interrupted"),
+    Column("message", Text),
+    Column("updated_at", DateTime(timezone=True), server_default=func.now(), onupdate=func.now()),
 )
 
 
