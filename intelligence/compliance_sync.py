@@ -69,40 +69,53 @@ def _checked_at(value: object) -> datetime | None:
 
 
 def _candidates(limit: int, max_age_days: int) -> list[dict]:
+    """Return stale U.S. entities without getting trapped in the first database page."""
     cutoff = datetime.now(UTC) - timedelta(days=max_age_days)
+    page_size = max(250, min(2000, limit * 5))
+    result: list[dict] = []
+    last_id = 0
     with connect() as conn:
-        rows = conn.execute(
-            select(
-                entities.c.id,
-                entities.c.name,
-                entities.c.slug,
-                entities.c.country,
-                entities.c.region,
-                entities.c.city,
-            )
-            .where(and_(func.upper(entities.c.country) == "US", entities.c.name.is_not(None)))
-            .order_by(entities.c.id.asc())
-            .limit(max(limit * 5, limit))
-        ).mappings().all()
-        result: list[dict] = []
-        for row in rows:
-            enrichment = get_entity_enrichment(conn, int(row["id"]))
-            marker = enrichment.get("us_compliance_lookup") if isinstance(enrichment, dict) else None
-            checked = _checked_at(marker)
-            if checked is not None and checked > cutoff:
-                continue
-            result.append(
-                {
-                    "id": int(row["id"]),
-                    "name": row["name"],
-                    "slug": row["slug"],
-                    "country": row["country"],
-                    "province": row["region"],
-                    "city": row["city"],
-                }
-            )
-            if len(result) >= limit:
+        while len(result) < limit:
+            rows = conn.execute(
+                select(
+                    entities.c.id,
+                    entities.c.name,
+                    entities.c.slug,
+                    entities.c.country,
+                    entities.c.region,
+                    entities.c.city,
+                )
+                .where(
+                    and_(
+                        func.upper(entities.c.country) == "US",
+                        entities.c.name.is_not(None),
+                        entities.c.id > last_id,
+                    )
+                )
+                .order_by(entities.c.id.asc())
+                .limit(page_size)
+            ).mappings().all()
+            if not rows:
                 break
+            last_id = int(rows[-1]["id"])
+            for row in rows:
+                enrichment = get_entity_enrichment(conn, int(row["id"]))
+                marker = enrichment.get("us_compliance_lookup") if isinstance(enrichment, dict) else None
+                checked = _checked_at(marker)
+                if checked is not None and checked > cutoff:
+                    continue
+                result.append(
+                    {
+                        "id": int(row["id"]),
+                        "name": row["name"],
+                        "slug": row["slug"],
+                        "country": row["country"],
+                        "province": row["region"],
+                        "city": row["city"],
+                    }
+                )
+                if len(result) >= limit:
+                    break
     return result
 
 
@@ -151,16 +164,18 @@ async def _refresh(company: dict) -> dict[str, str]:
     return result
 
 
-async def sync(limit: int = 100, max_age_days: int = 30) -> dict[str, int]:
+async def sync(limit: int = 100, max_age_days: int = 30, delay_seconds: float = 0.25) -> dict[str, int]:
     companies = _candidates(max(1, limit), max(1, max_age_days))
     stats = {"checked": 0, "epa_matches": 0, "osha_matches": 0, "unavailable": 0}
-    for company in companies:
+    for index, company in enumerate(companies):
         result = await _refresh(company)
         stats["checked"] += 1
         stats["epa_matches"] += int(result.get("epa_echo") == "matched")
         stats["osha_matches"] += int(result.get("osha") == "matched")
         stats["unavailable"] += int("unavailable" in result.values())
         print(f"[{stats['checked']}/{len(companies)}] {company['name']}: {result}", flush=True)
+        if delay_seconds > 0 and index < len(companies) - 1:
+            await asyncio.sleep(delay_seconds)
     print(stats, flush=True)
     return stats
 
@@ -169,8 +184,15 @@ def run() -> int:
     parser = argparse.ArgumentParser(description="Refresh cached EPA ECHO and OSHA evidence for U.S. companies.")
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--max-age-days", type=int, default=30)
+    parser.add_argument("--delay-seconds", type=float, default=0.25)
     args = parser.parse_args()
-    asyncio.run(sync(limit=args.limit, max_age_days=args.max_age_days))
+    asyncio.run(
+        sync(
+            limit=args.limit,
+            max_age_days=args.max_age_days,
+            delay_seconds=max(0.0, args.delay_seconds),
+        )
+    )
     return 0
 
 
