@@ -113,6 +113,10 @@ def run() -> int:
             ("/data/supplier/Cached%20Supplier%20One", 200),
             (f"/data/company/{slug}", 200),
             (f"/data/company/{slug}/export.csv", 200),
+            ("/robots.txt", 200),
+            ("/sitemap.xml", 200),
+            ("/sitemaps/static.xml", 200),
+            ("/sitemaps/companies-1.xml", 200),
             ("/api/intelligence/health", 200),
             ("/api/intelligence/freshness", 200),
             ("/api/intelligence/sources", 200),
@@ -134,6 +138,19 @@ def run() -> int:
         company_text = company_response.text
         if "relationship-evidence-enhancer" not in company_text or "Top 10 relationships" not in company_text:
             failed.append(f"/data/company/{slug}: relationship evidence drilldown enhancer missing")
+        if f'<link rel="canonical" href="https://intellcluster.com/data/company/{slug}">' not in company_text:
+            failed.append(f"/data/company/{slug}: canonical URL missing")
+        if 'type="application/ld+json"' not in company_text or '"@type":"Organization"' not in company_text:
+            failed.append(f"/data/company/{slug}: Organization structured data missing")
+        search_text = client.get("/data/search?q=IntellCluster").text
+        if '<meta name="robots" content="noindex,follow">' not in search_text:
+            failed.append("/data/search: filtered search should be noindex,follow")
+        robots = client.get("/robots.txt").text
+        if "Sitemap: https://intellcluster.com/sitemap.xml" not in robots:
+            failed.append("/robots.txt: sitemap directive missing")
+        sitemap = client.get("/sitemaps/companies-1.xml").text
+        if f"/data/company/{slug}" not in sitemap:
+            failed.append("/sitemaps/companies-1.xml: seeded company missing")
         freshness = client.get("/api/intelligence/freshness").json()
         if freshness.get("company_count", 0) < 1 or "delta_available" not in freshness:
             failed.append("/api/intelligence/freshness: invalid payload")
