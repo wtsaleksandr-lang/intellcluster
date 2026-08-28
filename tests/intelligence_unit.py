@@ -6,6 +6,7 @@ from pathlib import Path
 
 from intelligence.country_intelligence import normalize_country, profile_capabilities
 from intelligence.enrichment.importyeti import ImportYetiClient, live_importyeti_enabled
+from intelligence.enrichment.usaspending import USAspendingClient
 from intelligence.entity_resolution import normalize_company_name, score_company_match
 from intelligence.models import SourceRecord
 from intelligence.registry import list_sources
@@ -65,6 +66,9 @@ def run() -> int:
     assert us["sections"]["suppliers"]["status"] == "cached"
     us_uncached = profile_capabilities({"country": "US"})
     assert us_uncached["sections"]["trade"]["status"] == "unlockable"
+    assert us_uncached["sections"]["contracts"]["status"] == "on_demand"
+    us_contracts = profile_capabilities({"country": "US", "enrichment": {"usaspending": {"contract_awards_shown": 2}}})
+    assert us_contracts["sections"]["contracts"]["status"] == "cached"
 
     # ImportYeti development/tests are cached-only. Reuse one fixture and prove
     # no live opt-in is present before exercising profile/search helpers.
@@ -89,6 +93,24 @@ def run() -> int:
             os.environ["IMPORTYETI_FIXTURE_PATH"] = previous_fixture
         if previous_live is not None:
             os.environ["IMPORTYETI_ALLOW_LIVE"] = previous_live
+
+    previous_usaspending_fixture = os.environ.get("USASPENDING_FIXTURE_PATH")
+    try:
+        fixture = Path(__file__).parent / "fixtures" / "usaspending_company.json"
+        os.environ["USASPENDING_FIXTURE_PATH"] = str(fixture)
+        client = USAspendingClient()
+        profile = asyncio.run(client.company_profile("IntellCluster USA Test Company"))
+        assert profile is not None
+        assert profile["uei"] == "FIXTUREUEI123"
+        assert profile["contract_awards_shown"] == 2
+        assert profile["contract_award_value_shown"] == 2700000.0
+        assert profile["locations"][0]["state"] == "TX"
+        assert "Department of Defense" in profile["awarding_agencies"]
+    finally:
+        if previous_usaspending_fixture is None:
+            os.environ.pop("USASPENDING_FIXTURE_PATH", None)
+        else:
+            os.environ["USASPENDING_FIXTURE_PATH"] = previous_usaspending_fixture
 
     print("INTELLIGENCE UNIT OK")
     return 0
