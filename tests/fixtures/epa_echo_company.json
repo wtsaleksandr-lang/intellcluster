@@ -1,0 +1,45 @@
+{
+  "Results": {
+    "Message": "Working",
+    "QueryRows": "2",
+    "Facilities": [
+      {
+        "RegistryID": "110000000001",
+        "FacName": "INTELLCLUSTER INDUSTRIES LLC",
+        "FacStreet": "100 INDUSTRIAL WAY",
+        "FacCity": "HOUSTON",
+        "FacState": "TX",
+        "FacZip": "77015",
+        "FacLat": "29.745",
+        "FacLong": "-95.220",
+        "FacMajorFlag": "Y",
+        "FacActiveFlag": "Y",
+        "FacInspectionCount": "7",
+        "FacDateLastInspection": "05/20/2026",
+        "FacInformalCount": "2",
+        "FacFormalActionCount": "1",
+        "FacDateLastFormalAction": "03/11/2025",
+        "FacPenaltyCount": "1",
+        "FacTotalPenalties": "$12500"
+      },
+      {
+        "RegistryID": "110000000002",
+        "FacName": "INTELLCLUSTER INDUSTRIES - BAYTOWN",
+        "FacStreet": "200 PORT ROAD",
+        "FacCity": "BAYTOWN",
+        "FacState": "TX",
+        "FacZip": "77520",
+        "FacLat": "29.735",
+        "FacLong": "-94.977",
+        "FacMajorFlag": "N",
+        "FacActiveFlag": "Y",
+        "FacInspectionCount": "3",
+        "FacDateLastInspection": "11/14/2025",
+        "FacInformalCount": "0",
+        "FacFormalActionCount": "0",
+        "FacPenaltyCount": "0",
+        "FacTotalPenalties": "0"
+      }
+    ]
+  }
+}
