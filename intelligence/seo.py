@@ -10,9 +10,9 @@ from xml.sax.saxutils import escape as xml_escape
 
 from fastapi import APIRouter, Request
 from fastapi.responses import Response
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, select
 
-from intelligence.database import connect, entities
+from intelligence.database import connect, entities, importer_relationships
 from intelligence.repository import get_entity_by_slug
 
 router = APIRouter(tags=["seo"])
@@ -31,6 +31,12 @@ def _iso_date(value: object) -> str:
     text = str(value or "")
     match = re.match(r"(\d{4}-\d{2}-\d{2})", text)
     return match.group(1) if match else ""
+
+
+def _url_entry(path: str, *, changefreq: str = "weekly", lastmod: str = "") -> str:
+    loc = xml_escape(_base_url() + path)
+    mod = f"<lastmod>{lastmod}</lastmod>" if lastmod else ""
+    return f"<url><loc>{loc}</loc>{mod}<changefreq>{changefreq}</changefreq></url>"
 
 
 @router.get("/robots.txt")
@@ -57,21 +63,88 @@ async def sitemap_index() -> Response:
     with connect() as conn:
         total = int(conn.execute(select(func.count()).select_from(entities)).scalar_one() or 0)
     pages = max(1, math.ceil(total / SITEMAP_PAGE_SIZE))
-    entries = [f"<sitemap><loc>{xml_escape(base + '/sitemaps/static.xml')}</loc></sitemap>"]
-    entries.extend(
-        f"<sitemap><loc>{xml_escape(base + f'/sitemaps/companies-{page}.xml')}</loc></sitemap>"
-        for page in range(1, pages + 1)
-    )
+    paths = ["/sitemaps/static.xml", "/sitemaps/intelligence.xml"]
+    paths.extend(f"/sitemaps/companies-{page}.xml" for page in range(1, pages + 1))
+    entries = [f"<sitemap><loc>{xml_escape(base + path)}</loc></sitemap>" for path in paths]
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(entries) + "</sitemapindex>"
     return _xml_response(body)
 
 
 @router.get("/sitemaps/static.xml")
 async def sitemap_static() -> Response:
-    base = _base_url()
     paths = ["/data", "/data/suppliers"]
-    urls = "".join(f"<url><loc>{xml_escape(base + path)}</loc></url>" for path in paths)
+    urls = "".join(_url_entry(path) for path in paths)
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>"
+    return _xml_response(body)
+
+
+@router.get("/sitemaps/intelligence.xml")
+async def sitemap_intelligence() -> Response:
+    """Expose high-value analytical landing pages without indexing search-result permutations."""
+    with connect() as conn:
+        code_expr = func.coalesce(importer_relationships.c.hs10, importer_relationships.c.hs6)
+        hs_rows = conn.execute(
+            select(code_expr.label("code"), func.count(importer_relationships.c.id).label("count"))
+            .where(code_expr.is_not(None))
+            .group_by(code_expr)
+            .order_by(func.count(importer_relationships.c.id).desc())
+            .limit(20_000)
+        ).mappings().all()
+        origin_rows = conn.execute(
+            select(importer_relationships.c.origin_country.label("origin"), func.count(importer_relationships.c.id).label("count"))
+            .where(importer_relationships.c.origin_country.is_not(None))
+            .group_by(importer_relationships.c.origin_country)
+            .order_by(func.count(importer_relationships.c.id).desc())
+            .limit(1_000)
+        ).mappings().all()
+        province_rows = conn.execute(
+            select(entities.c.region.label("province"), func.count(entities.c.id).label("count"))
+            .where(entities.c.region.is_not(None))
+            .group_by(entities.c.region)
+            .order_by(func.count(entities.c.id).desc())
+            .limit(500)
+        ).mappings().all()
+        city_rows = conn.execute(
+            select(entities.c.region.label("province"), entities.c.city.label("city"), func.count(entities.c.id).label("count"))
+            .where(and_(entities.c.region.is_not(None), entities.c.city.is_not(None)))
+            .group_by(entities.c.region, entities.c.city)
+            .order_by(func.count(entities.c.id).desc())
+            .limit(10_000)
+        ).mappings().all()
+
+    urls: list[str] = []
+    seen_hs: set[str] = set()
+    for row in hs_rows:
+        raw = "".join(ch for ch in str(row.get("code") or "") if ch.isdigit())[:10]
+        if len(raw) < 2:
+            continue
+        # Include the exact code plus its Chapter/Heading parents to build a
+        # crawlable HS hierarchy from the strongest indexed evidence.
+        for size in (2, 4, 6, 10):
+            if len(raw) < size:
+                continue
+            code = raw[:size]
+            if code in seen_hs:
+                continue
+            seen_hs.add(code)
+            urls.append(_url_entry(f"/data/hs/{code}"))
+    for row in origin_rows:
+        origin = str(row.get("origin") or "").strip()
+        if origin:
+            urls.append(_url_entry(f"/data/origin/{quote(origin, safe='')}"))
+    for row in province_rows:
+        province = str(row.get("province") or "").strip()
+        if province:
+            urls.append(_url_entry(f"/data/location/{quote(province, safe='')}"))
+    for row in city_rows:
+        province = str(row.get("province") or "").strip()
+        city = str(row.get("city") or "").strip()
+        if province and city:
+            urls.append(_url_entry(f"/data/location/{quote(province, safe='')}/{quote(city, safe='')}"))
+
+    # XML sitemaps allow up to 50k URLs. Keep ample headroom for new facets.
+    urls = urls[:45_000]
+    body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(urls) + "</urlset>"
     return _xml_response(body)
 
 
@@ -79,7 +152,6 @@ async def sitemap_static() -> Response:
 async def sitemap_companies(page: int) -> Response:
     page = max(1, page)
     offset = (page - 1) * SITEMAP_PAGE_SIZE
-    base = _base_url()
     with connect() as conn:
         rows = conn.execute(
             select(entities.c.slug, entities.c.updated_at)
@@ -90,10 +162,8 @@ async def sitemap_companies(page: int) -> Response:
         ).mappings().all()
     urls = []
     for row in rows:
-        loc = xml_escape(f"{base}/data/company/{quote(str(row['slug']), safe='-')}")
-        lastmod = _iso_date(row.get("updated_at"))
-        mod = f"<lastmod>{lastmod}</lastmod>" if lastmod else ""
-        urls.append(f"<url><loc>{loc}</loc>{mod}<changefreq>weekly</changefreq></url>")
+        slug = quote(str(row["slug"]), safe="-")
+        urls.append(_url_entry(f"/data/company/{slug}", lastmod=_iso_date(row.get("updated_at"))))
     body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(urls) + "</urlset>"
     return _xml_response(body)
 
