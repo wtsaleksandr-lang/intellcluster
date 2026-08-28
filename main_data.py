@@ -8,6 +8,7 @@ be rolled out independently of the ingestion pipeline.
 from main import app
 from intelligence.api import router as intelligence_api_router
 from intelligence.hs import router as intelligence_hs_router
+from intelligence.location_explorer import router as intelligence_location_router
 from intelligence.origin_explorer import router as intelligence_origin_router
 from intelligence.ui import router as intelligence_ui_router
 
@@ -15,6 +16,7 @@ app.include_router(intelligence_api_router)
 app.include_router(intelligence_ui_router)
 app.include_router(intelligence_hs_router)
 app.include_router(intelligence_origin_router)
+app.include_router(intelligence_location_router)
 
 
 _PROFILE_POLISH = r'''
