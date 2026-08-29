@@ -64,10 +64,15 @@ def run() -> int:
         assert matches[0].cik == "0001234567"
         assert matches[0].ticker == "ICST"
         submissions = asyncio.run(sec.submissions(matches[0].cik))
-        profile = compact_sec_profile(matches[0], submissions)
+        companyfacts = asyncio.run(sec.companyfacts(matches[0].cik))
+        profile = compact_sec_profile(matches[0], submissions, companyfacts)
         assert profile["latest_filing_form"] == "10-Q"
         assert profile["latest_filing_date"] == "2026-08-15"
         assert profile["recent_filings"][0]["filing_url"].endswith("/icst-20260630.htm")
+        assert profile["financials"]["revenue"]["value"] == 875000000
+        assert profile["financials"]["net_income"]["value"] == 62000000
+        assert profile["financials"]["assets"]["value"] == 4200000000
+        assert profile["financials"]["revenue"]["form"] == "10-Q"
 
         us_id, us_slug = _seed(
             "IntellCluster SEC Test Company Inc.",
@@ -93,7 +98,9 @@ def run() -> int:
         payload = response.json()
         assert payload.get("paid_sources_called") is False
         assert payload.get("lookup", {}).get("sec_edgar") == "matched"
-        assert payload.get("company", {}).get("enrichment", {}).get("sec_edgar", {}).get("cik") == "0001234567"
+        sec_payload = payload.get("company", {}).get("enrichment", {}).get("sec_edgar", {})
+        assert sec_payload.get("cik") == "0001234567"
+        assert sec_payload.get("financials", {}).get("cash", {}).get("value") == 510000000
 
         cached = client.post(
             f"/api/intelligence/company/{us_slug}/enrich/sec-edgar"
@@ -123,6 +130,7 @@ def run() -> int:
         assert profile_page.status_code == 200
         assert "intellcluster-sec-profile-ui" in profile_page.text
         assert "SEC EDGAR Intelligence" in profile_page.text
+        assert "Latest Revenue" in profile_page.text
         assert "Export SEC CSV" in profile_page.text
         assert "sec_edgar_lookup" in payload.get("company", {}).get("enrichment", {})
 
@@ -130,6 +138,8 @@ def run() -> int:
         assert export.status_code == 200
         assert "text/csv" in export.headers.get("content-type", "")
         assert "sec_summary,cik,0001234567" in export.text
+        assert "sec_financial_fact,revenue,875000000" in export.text
+        assert "concept=RevenueFromContractWithCustomerExcludingAssessedTax" in export.text
         assert "sec_filing,10-Q,2026-08-15" in export.text
         assert "icst-20260630.htm" in export.text
 
