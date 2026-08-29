@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from html import escape
-from urllib.parse import unquote
+from urllib.parse import quote, unquote
 
 from fastapi import Request
 from fastapi.responses import HTMLResponse
@@ -10,13 +10,13 @@ from fastapi.responses import HTMLResponse
 from intelligence.database import connect
 from intelligence.repository import get_entity_by_slug
 
-DEMO_PROFILE_SLUGS = {"maple-auto-supply-inc"}
 _PROFILE_PATH = re.compile(r"^/data/company/([^/]+)$")
 
 
 def _not_found_page(slug: str) -> str:
     query = unquote(slug).replace("-", " ").strip()
     safe_query = escape(query or "company")
+    search_query = quote(query or "company", safe="")
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -43,7 +43,7 @@ def _not_found_page(slug: str) -> str:
       <h1>No indexed profile for “{safe_query}”</h1>
       <p>The profile may not be in the current public-data index yet, or the link may be outdated. Search the directory for the company name or browse the company index.</p>
       <div class="nf-actions">
-        <a class="primary" href="/data/search?q={escape(query)}">Search companies</a>
+        <a class="primary" href="/data/search?q={search_query}">Search companies</a>
         <a href="/data/companies">Browse company directory</a>
       </div>
     </section>
@@ -64,9 +64,6 @@ def install_profile_guard(app) -> None:
             return await call_next(request)
 
         slug = unquote(match.group(1))
-        if slug in DEMO_PROFILE_SLUGS:
-            return await call_next(request)
-
         with connect() as conn:
             company = get_entity_by_slug(conn, slug)
         if company is None:
