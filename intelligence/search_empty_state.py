@@ -11,10 +11,11 @@ _EMPTY_NOTICE = (
     "No matching company profiles were found. Try a broader company name, remove a filter, "
     "or switch between Canada and USA."
 )
+_EMPTY_HEADER = "x-intellcluster-empty-search"
 
 
 def install_search_empty_state(app) -> None:
-    """Prevent demo companies from appearing as if they matched a real search."""
+    """Render a useful zero-result state while guaranteeing no demo result card appears."""
     if getattr(app.state, "intellcluster_search_empty_state_installed", False):
         return
     app.state.intellcluster_search_empty_state_installed = True
@@ -34,33 +35,47 @@ def install_search_empty_state(app) -> None:
         async for chunk in response.body_iterator:
             body += chunk
         text = body.decode("utf-8", errors="replace")
-        if _DEMO_NOTICE not in text:
-            headers = dict(response.headers)
-            headers.pop("content-length", None)
-            return Response(
-                content=text,
-                status_code=response.status_code,
-                headers=headers,
-                media_type="text/html",
+        explicit_empty = response.headers.get(_EMPTY_HEADER) == "1"
+        legacy_demo = _DEMO_NOTICE in text
+
+        if explicit_empty:
+            notice = f'<div class="notice">{_EMPTY_NOTICE}</div>'
+            text = text.replace(
+                '<div class="search-toolbar">',
+                notice + '<div class="search-toolbar">',
+                1,
+            )
+            text = re.sub(
+                r'(<div\s+class="result-meta"[^>]*>\s*<span>).*?(</span>)',
+                r"\1No matching business profiles found\2",
+                text,
+                count=1,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+        elif legacy_demo:
+            # Backward-compatible protection for any older deployment that still
+            # renders the historical demo fallback. The new canonical search route
+            # does not emit it, but keeping this guard prevents fake results during
+            # rolling deployments.
+            text = text.replace(_DEMO_NOTICE, _EMPTY_NOTICE, 1)
+            text = re.sub(
+                r'<article\s+class="card[^>]*>.*?</article>',
+                "",
+                text,
+                count=1,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+            text = re.sub(
+                r'(<div\s+class="result-meta"[^>]*>\s*<span>).*?(</span>)',
+                r"\1No matching business profiles found\2",
+                text,
+                count=1,
+                flags=re.DOTALL | re.IGNORECASE,
             )
 
-        text = text.replace(_DEMO_NOTICE, _EMPTY_NOTICE, 1)
-        text = re.sub(
-            r'<article\s+class="card[^>]*>.*?</article>',
-            "",
-            text,
-            count=1,
-            flags=re.DOTALL | re.IGNORECASE,
-        )
-        text = re.sub(
-            r'(<div\s+class="result-meta"[^>]*>\s*<span>).*?(</span>)',
-            r"\1No matching business profiles found\2",
-            text,
-            count=1,
-            flags=re.DOTALL | re.IGNORECASE,
-        )
         headers = dict(response.headers)
         headers.pop("content-length", None)
+        headers.pop("x-intellcluster-empty-search", None)
         return Response(
             content=text,
             status_code=response.status_code,
