@@ -4,7 +4,7 @@ import asyncio
 from datetime import UTC, datetime, timedelta
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from intelligence.database import connect
 from intelligence.enrichment.sec_edgar import SECEDGARClient, compact_sec_profile
@@ -36,8 +36,11 @@ def _marker(status: str) -> dict[str, str]:
 
 
 @router.post("/api/intelligence/company/{slug}/enrich/sec-edgar")
-async def intelligence_company_sec_edgar_enrichment(slug: str) -> dict[str, object]:
-    """Cache a conservative SEC EDGAR public-company match without paid data calls."""
+async def intelligence_company_sec_edgar_enrichment(
+    slug: str,
+    refresh: bool = Query(default=False),
+) -> dict[str, object]:
+    """Cache a conservative SEC EDGAR match; network refresh is always explicit."""
     with connect() as conn:
         company = get_entity_by_slug(conn, slug)
     if company is None:
@@ -50,7 +53,7 @@ async def intelligence_company_sec_edgar_enrichment(slug: str) -> dict[str, obje
 
     enrichment = company.get("enrichment") if isinstance(company.get("enrichment"), dict) else {}
     cached = enrichment.get("sec_edgar") if isinstance(enrichment, dict) else None
-    if isinstance(cached, dict):
+    if isinstance(cached, dict) and not refresh:
         return {
             "company": company,
             "lookup": {"sec_edgar": "cached"},
@@ -58,7 +61,7 @@ async def intelligence_company_sec_edgar_enrichment(slug: str) -> dict[str, obje
         }
 
     previous_lookup = enrichment.get("sec_edgar_lookup") if isinstance(enrichment, dict) else None
-    if _recent_marker(previous_lookup):
+    if not refresh and _recent_marker(previous_lookup):
         return {
             "company": company,
             "lookup": {
@@ -100,7 +103,7 @@ async def intelligence_company_sec_edgar_enrichment(slug: str) -> dict[str, obje
             refreshed = get_entity_by_slug(conn, slug)
         return {
             "company": refreshed or company,
-            "lookup": {"sec_edgar": "matched"},
+            "lookup": {"sec_edgar": "refreshed" if refresh else "matched"},
             "paid_sources_called": False,
         }
     except (httpx.HTTPError, RuntimeError, ValueError):
