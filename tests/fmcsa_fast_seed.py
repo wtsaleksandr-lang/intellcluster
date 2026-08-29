@@ -7,6 +7,9 @@ from intelligence.fmcsa_fast_seed import SOURCE_KEY, fast_seed_fmcsa_records
 from intelligence.models import SourceRecord
 from intelligence.repository import upsert_source_record
 
+TEST_DOTS = {"9100001", "9100002", "9100003"}
+FOREIGN_SOURCE = "fmcsa-fast-seed-foreign"
+
 
 def _fmcsa_record(dot: str, name: str, *, status: str = "A") -> SourceRecord:
     return SourceRecord(
@@ -29,13 +32,26 @@ def _fmcsa_record(dot: str, name: str, *, status: str = "A") -> SourceRecord:
     )
 
 
-def _cleanup_source(source: str) -> None:
+def _cleanup_test_rows() -> None:
     with connect() as conn:
         entity_ids = conn.execute(
-            select(source_records.c.entity_id).where(source_records.c.source == source)
+            select(source_records.c.entity_id).where(
+                (source_records.c.source == SOURCE_KEY)
+                & (source_records.c.source_record_id.in_(TEST_DOTS))
+            )
         ).scalars().all()
-        conn.execute(source_records.delete().where(source_records.c.source == source))
-        for entity_id in set(int(value) for value in entity_ids):
+        foreign_ids = conn.execute(
+            select(source_records.c.entity_id).where(source_records.c.source == FOREIGN_SOURCE)
+        ).scalars().all()
+        all_ids = {int(value) for value in [*entity_ids, *foreign_ids]}
+        conn.execute(
+            source_records.delete().where(
+                (source_records.c.source == SOURCE_KEY)
+                & (source_records.c.source_record_id.in_(TEST_DOTS))
+            )
+        )
+        conn.execute(source_records.delete().where(source_records.c.source == FOREIGN_SOURCE))
+        for entity_id in all_ids:
             remaining = conn.execute(
                 select(source_records.c.id).where(source_records.c.entity_id == entity_id).limit(1)
             ).scalar_one_or_none()
@@ -44,8 +60,7 @@ def _cleanup_source(source: str) -> None:
 
 
 def run() -> int:
-    _cleanup_source(SOURCE_KEY)
-    _cleanup_source("fmcsa-fast-seed-foreign")
+    _cleanup_test_rows()
     records = [
         _fmcsa_record("9100001", "Fast Seed Logistics One LLC"),
         _fmcsa_record("9100002", "Fast Seed Logistics Two LLC", status="I"),
@@ -65,7 +80,10 @@ def run() -> int:
                     source_records.c.source_record_id,
                 )
                 .select_from(source_records.join(entities, source_records.c.entity_id == entities.c.id))
-                .where(source_records.c.source == SOURCE_KEY)
+                .where(
+                    (source_records.c.source == SOURCE_KEY)
+                    & (source_records.c.source_record_id.in_({"9100001", "9100002"}))
+                )
                 .order_by(source_records.c.source_record_id)
             ).mappings().all()
         assert len(rows) == 2
@@ -80,7 +98,7 @@ def run() -> int:
         assert resumed["existing"] == 2
 
         foreign = SourceRecord(
-            source="fmcsa-fast-seed-foreign",
+            source=FOREIGN_SOURCE,
             source_record_id="FOREIGN-US-1",
             name="Existing U.S. Cross Source Entity Inc.",
             entity_type="company",
@@ -110,8 +128,7 @@ def run() -> int:
         print("FMCSA fast seed checks OK")
         return 0
     finally:
-        _cleanup_source(SOURCE_KEY)
-        _cleanup_source("fmcsa-fast-seed-foreign")
+        _cleanup_test_rows()
 
 
 if __name__ == "__main__":
