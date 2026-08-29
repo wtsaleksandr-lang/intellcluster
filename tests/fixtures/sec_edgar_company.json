@@ -1,0 +1,45 @@
+{
+  "tickers": {
+    "fields": ["cik", "name", "ticker", "exchange"],
+    "data": [
+      [1234567, "IntellCluster SEC Test Company Inc.", "ICST", "NYSE"]
+    ]
+  },
+  "submissions": {
+    "cik": "0001234567",
+    "entityType": "operating",
+    "sic": "4213",
+    "sicDescription": "Trucking, Except Local",
+    "name": "IntellCluster SEC Test Company Inc.",
+    "tickers": ["ICST"],
+    "exchanges": ["NYSE"],
+    "stateOfIncorporation": "DE",
+    "fiscalYearEnd": "1231",
+    "formerNames": [
+      {
+        "name": "IntellCluster SEC Test Logistics Inc.",
+        "from": "2018-01-01T00:00:00.000Z",
+        "to": "2021-12-31T00:00:00.000Z"
+      }
+    ],
+    "filings": {
+      "recent": {
+        "accessionNumber": ["0001234567-26-000010", "0001234567-26-000005"],
+        "filingDate": ["2026-08-15", "2026-05-10"],
+        "reportDate": ["2026-06-30", "2026-03-31"],
+        "acceptanceDateTime": ["20260815120000", "20260510120000"],
+        "act": ["34", "34"],
+        "form": ["10-Q", "8-K"],
+        "fileNumber": ["001-12345", "001-12345"],
+        "filmNumber": ["261234567", "261111111"],
+        "items": ["", "2.02"],
+        "size": [123456, 45678],
+        "isXBRL": [1, 1],
+        "isInlineXBRL": [1, 1],
+        "primaryDocument": ["icst-20260630.htm", "icst-20260510.htm"],
+        "primaryDocDescription": ["FORM 10-Q", "FORM 8-K"]
+      },
+      "files": []
+    }
+  }
+}
