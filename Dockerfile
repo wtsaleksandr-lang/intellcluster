@@ -23,4 +23,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -fsS http://localhost:${PORT:-5000}/api/health || exit 1
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-5000}"]
+# main_data mounts the business-intelligence directory on top of the core app.
+CMD ["sh", "-c", "uvicorn main_data:app --host 0.0.0.0 --port ${PORT:-5000}"]
