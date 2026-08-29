@@ -53,9 +53,17 @@ def run() -> int:
         with connect() as conn:
             set_entity_enrichment(conn, us_id, "fmcsa", {"dot_number": "1234567", "power_units": 12})
             set_entity_enrichment(conn, us_id, "usaspending", {"name": "IntellCluster API Regression Logistics LLC", "awards": []})
+            assert get_entity_by_slug(conn, us_slug) is not None
+
+        profile = client.get(f"/data/company/{us_slug}")
+        assert profile.status_code == 200, profile.text
+        assert "data-free-compliance-enrich" in profile.text
+        assert "Check missing free public sources" in profile.text
+        assert "never calls paid ImportYeti" in profile.text
+
+        with connect() as conn:
             set_entity_enrichment(conn, us_id, "epa_echo", {"facility_count": 1, "facilities": []})
             set_entity_enrichment(conn, us_id, "osha", {"inspection_count_shown": 0, "inspections": []})
-            assert get_entity_by_slug(conn, us_slug) is not None
 
         response = client.post(f"/api/intelligence/company/{us_slug}/enrich/us-public")
         assert response.status_code == 200, response.text
