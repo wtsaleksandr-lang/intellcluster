@@ -122,6 +122,7 @@ def post_ingest_readiness() -> dict[str, Any]:
             "Wait until Canada ingestion reports complete and no sync is running.",
             "Pull/deploy the latest main branch.",
             "Run python -m intelligence.post_ingest_readiness --strict.",
+            "Run python -m intelligence.data_quality --strict and investigate any blocking integrity findings.",
             "Run python -m intelligence.supplier_backfill to index existing cached suppliers.",
             "Run python -m intelligence.fmcsa_ingest --validate-fast-seed.",
             "If safe, validate with python -m intelligence.fmcsa_ingest --fast-seed --limit 1000.",
