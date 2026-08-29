@@ -3,16 +3,18 @@ from __future__ import annotations
 from typing import Any
 
 LEGACY_US_PUBLIC_PATH = "/api/intelligence/company/{slug}/enrich/us-public"
+LEGACY_COMPANY_PATH = "/data/company/{slug}"
+LEGACY_BOL_PATH = "/data/company/{slug}/bol/{bol_number}"
 
 
 def prune_shadowed_legacy_routes(app: Any) -> int:
-    """Remove the obsolete UI-layer copy of the U.S. enrichment POST route.
+    """Remove legacy UI routes superseded by focused canonical implementations.
 
-    ``main_data_core`` historically mounted both ``intelligence.api`` and
-    ``intelligence.ui`` implementations for the same path. The API implementation
-    is the canonical free-only endpoint and is mounted first, so the UI copy was
-    unreachable but remained technical debt. Pruning it after core app import
-    keeps runtime routing unambiguous without rewriting the large legacy UI module.
+    ``main_data_core`` still mounts ``intelligence.ui`` because it contains several
+    historical directory pages. Newer focused modules own company profiles, cached
+    BOL detail and the free-only U.S. enrichment action. Pruning only the exact
+    superseded routes keeps the remaining legacy UI pages working while preventing
+    duplicate registrations and accidental execution of old live-enrichment code.
     """
     kept = []
     removed = 0
@@ -21,7 +23,15 @@ def prune_shadowed_legacy_routes(app: Any) -> int:
         module = str(getattr(endpoint, "__module__", ""))
         path = str(getattr(route, "path", ""))
         methods = set(getattr(route, "methods", set()) or set())
-        if path == LEGACY_US_PUBLIC_PATH and "POST" in methods and module == "intelligence.ui":
+        legacy_ui = module == "intelligence.ui"
+        superseded = (
+            path == LEGACY_US_PUBLIC_PATH and "POST" in methods
+        ) or (
+            path == LEGACY_COMPANY_PATH and "GET" in methods
+        ) or (
+            path == LEGACY_BOL_PATH and "GET" in methods
+        )
+        if legacy_ui and superseded:
             removed += 1
             continue
         kept.append(route)
