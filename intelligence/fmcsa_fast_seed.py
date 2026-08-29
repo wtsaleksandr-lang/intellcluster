@@ -21,10 +21,13 @@ def _chunks(values: list[str], size: int = 500) -> Iterable[list[str]]:
 def _fleet_payload(record: SourceRecord) -> dict[str, Any]:
     attrs = record.attributes if isinstance(record.attributes, dict) else {}
     code = str(attrs.get("status") or "").strip().upper()
+    dot_number = str(attrs.get("usdot_number") or record.source_record_id).strip() or None
     return {
-        "dot_number": str(attrs.get("usdot_number") or record.source_record_id).strip() or None,
+        "dot_number": dot_number,
+        "usdot_number": dot_number,
         "status_code": code or None,
         "status": STATUS_MAP.get(code, code or None),
+        "legal_name": record.name,
         "dba_name": attrs.get("dba_name"),
         "phone": attrs.get("phone"),
         "cell_phone": attrs.get("cell_phone"),
