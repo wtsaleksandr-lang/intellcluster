@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
 
-from sqlalchemy import and_, exists, insert, select
+from sqlalchemy import and_, exists, func, insert, select
 from sqlalchemy.engine import Connection
 
 from intelligence.database import entities, json_safe, normalize_name, slugify, source_records
@@ -34,6 +34,38 @@ def _fleet_payload(record: SourceRecord) -> dict[str, Any]:
         "add_date": attrs.get("add_date"),
         "carrier_operation": attrs.get("carrier_operation"),
         "dataset": attrs.get("dataset") or "FMCSA Company Census File",
+    }
+
+
+def fast_seed_readiness(conn: Connection) -> dict[str, int | bool | str]:
+    """Report whether the current canonical graph is safe for fast FMCSA bootstrap."""
+    total_us = int(
+        conn.execute(
+            select(func.count()).select_from(entities).where(entities.c.country == "US")
+        ).scalar_one()
+        or 0
+    )
+    fmcsa_us = int(
+        conn.execute(
+            select(func.count(func.distinct(source_records.c.entity_id)))
+            .select_from(source_records.join(entities, source_records.c.entity_id == entities.c.id))
+            .where(source_records.c.source == SOURCE_KEY, entities.c.country == "US")
+        ).scalar_one()
+        or 0
+    )
+    non_fmcsa_us = max(0, total_us - fmcsa_us)
+    safe = non_fmcsa_us == 0
+    reason = (
+        "fresh_or_resumable_fmcsa_graph"
+        if safe
+        else "mixed_source_us_entities_require_conservative_resolution"
+    )
+    return {
+        "safe": safe,
+        "total_us_entities": total_us,
+        "fmcsa_linked_us_entities": fmcsa_us,
+        "non_fmcsa_us_entities": non_fmcsa_us,
+        "reason": reason,
     }
 
 
