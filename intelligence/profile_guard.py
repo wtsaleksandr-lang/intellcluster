@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from html import escape
 from urllib.parse import quote, unquote
@@ -11,6 +12,7 @@ from intelligence.database import connect
 from intelligence.repository import get_entity_by_slug
 
 _PROFILE_PATH = re.compile(r"^/data/company/([^/]+)$")
+_LEGACY_DEMO_SLUG = "maple-auto-supply-inc"
 
 
 def _not_found_page(slug: str) -> str:
@@ -64,6 +66,10 @@ def install_profile_guard(app) -> None:
             return await call_next(request)
 
         slug = unquote(match.group(1))
+        demo_enabled = os.getenv("INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE", "") == "1"
+        if demo_enabled and slug == _LEGACY_DEMO_SLUG:
+            return await call_next(request)
+
         with connect() as conn:
             company = get_entity_by_slug(conn, slug)
         if company is None:
