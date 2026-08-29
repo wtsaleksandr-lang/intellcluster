@@ -41,5 +41,105 @@
       },
       "files": []
     }
+  },
+  "companyfacts": {
+    "cik": 1234567,
+    "entityName": "IntellCluster SEC Test Company Inc.",
+    "facts": {
+      "us-gaap": {
+        "RevenueFromContractWithCustomerExcludingAssessedTax": {
+          "label": "Revenue",
+          "description": "Revenue from contracts with customers",
+          "units": {
+            "USD": [
+              {
+                "start": "2026-04-01",
+                "end": "2026-06-30",
+                "val": 875000000,
+                "accn": "0001234567-26-000010",
+                "fy": 2026,
+                "fp": "Q2",
+                "form": "10-Q",
+                "filed": "2026-08-15",
+                "frame": "CY2026Q2"
+              }
+            ]
+          }
+        },
+        "NetIncomeLoss": {
+          "label": "Net Income (Loss)",
+          "description": "Net income or loss",
+          "units": {
+            "USD": [
+              {
+                "start": "2026-04-01",
+                "end": "2026-06-30",
+                "val": 62000000,
+                "accn": "0001234567-26-000010",
+                "fy": 2026,
+                "fp": "Q2",
+                "form": "10-Q",
+                "filed": "2026-08-15",
+                "frame": "CY2026Q2"
+              }
+            ]
+          }
+        },
+        "Assets": {
+          "label": "Assets",
+          "description": "Total assets",
+          "units": {
+            "USD": [
+              {
+                "end": "2026-06-30",
+                "val": 4200000000,
+                "accn": "0001234567-26-000010",
+                "fy": 2026,
+                "fp": "Q2",
+                "form": "10-Q",
+                "filed": "2026-08-15",
+                "frame": "CY2026Q2I"
+              }
+            ]
+          }
+        },
+        "Liabilities": {
+          "label": "Liabilities",
+          "description": "Total liabilities",
+          "units": {
+            "USD": [
+              {
+                "end": "2026-06-30",
+                "val": 2300000000,
+                "accn": "0001234567-26-000010",
+                "fy": 2026,
+                "fp": "Q2",
+                "form": "10-Q",
+                "filed": "2026-08-15",
+                "frame": "CY2026Q2I"
+              }
+            ]
+          }
+        },
+        "CashAndCashEquivalentsAtCarryingValue": {
+          "label": "Cash and Cash Equivalents",
+          "description": "Cash and cash equivalents",
+          "units": {
+            "USD": [
+              {
+                "end": "2026-06-30",
+                "val": 510000000,
+                "accn": "0001234567-26-000010",
+                "fy": 2026,
+                "fp": "Q2",
+                "form": "10-Q",
+                "filed": "2026-08-15",
+                "frame": "CY2026Q2I"
+              }
+            ]
+          }
+        }
+      }
+    }
   }
 }
