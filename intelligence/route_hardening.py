@@ -5,6 +5,7 @@ from typing import Any
 LEGACY_US_PUBLIC_PATH = "/api/intelligence/company/{slug}/enrich/us-public"
 LEGACY_COMPANY_PATH = "/data/company/{slug}"
 LEGACY_BOL_PATH = "/data/company/{slug}/bol/{bol_number}"
+LEGACY_SEARCH_PATH = "/data/search"
 
 
 def prune_shadowed_legacy_routes(app: Any) -> int:
@@ -12,9 +13,10 @@ def prune_shadowed_legacy_routes(app: Any) -> int:
 
     ``main_data_core`` still mounts ``intelligence.ui`` because it contains several
     historical directory pages. Newer focused modules own company profiles, cached
-    BOL detail and the free-only U.S. enrichment action. Pruning only the exact
-    superseded routes keeps the remaining legacy UI pages working while preventing
-    duplicate registrations and accidental execution of old live-enrichment code.
+    BOL detail, truthful search results and the free-only U.S. enrichment action.
+    Pruning only the exact superseded routes keeps the remaining legacy UI pages
+    working while preventing duplicate registrations and accidental execution of
+    old demo/live-enrichment code.
     """
     kept = []
     removed = 0
@@ -30,6 +32,8 @@ def prune_shadowed_legacy_routes(app: Any) -> int:
             path == LEGACY_COMPANY_PATH and "GET" in methods
         ) or (
             path == LEGACY_BOL_PATH and "GET" in methods
+        ) or (
+            path == LEGACY_SEARCH_PATH and "GET" in methods
         )
         if legacy_ui and superseded:
             removed += 1
