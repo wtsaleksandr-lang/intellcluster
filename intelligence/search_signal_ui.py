@@ -182,7 +182,11 @@ def install_search_signal_ui(app) -> None:
             if (signals := _signals(dict(row)))
         }
         if payload and "</body>" in text:
-            encoded = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
+            encoded = json.dumps(
+                payload,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).replace("</", "<\\/")
             enhancer = f"""
 <style id="intellcluster-us-search-signals">
 body[data-intell-search] .ic-us-signal-row{{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}}
