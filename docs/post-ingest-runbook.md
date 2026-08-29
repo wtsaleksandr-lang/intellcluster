@@ -41,7 +41,17 @@ After deployment, authenticated administrators can inspect the same read-only st
 
 Both endpoints require the signed admin session.
 
-## 4. Populate the supplier index from existing cache
+## 4. Run the database-only quality audit
+
+```bash
+python -m intelligence.data_quality --strict
+```
+
+This checks the canonical intelligence graph for structural problems without making network calls. It reports orphan source/importer/supplier rows, duplicate source identities, duplicate corporation numbers, Canada records linked to the wrong country, importer-flag inconsistencies, source-less entities and unexpected country codes.
+
+Blocking integrity findings should be investigated before a multi-million-row U.S. bootstrap. Some findings, such as duplicate corporation numbers or source-less entities, are reported as warnings because they can have legitimate explanations and should be reviewed rather than automatically treated as corruption.
+
+## 5. Populate the supplier index from existing cache
 
 The Canada public datasets do not provide named foreign suppliers. Supplier relationships are built only from already-cached ImportYeti company profiles.
 
@@ -69,7 +79,7 @@ python -m intelligence.supplier_backfill
 
 The second command resumes from the saved entity-ID checkpoint.
 
-## 5. Validate FMCSA bootstrap safety without downloading data
+## 6. Validate FMCSA bootstrap safety without downloading data
 
 ```bash
 python -m intelligence.fmcsa_ingest --validate-fast-seed
@@ -77,7 +87,7 @@ python -m intelligence.fmcsa_ingest --validate-fast-seed
 
 Fast seed is intended only for a fresh or previously FMCSA-only U.S. canonical graph. If unrelated U.S. entities already exist, the preflight intentionally fails and the conservative entity-resolution path should be used instead.
 
-## 6. Run a 1,000-record FMCSA validation
+## 7. Run a 1,000-record FMCSA validation
 
 If fast-seed preflight is safe:
 
@@ -96,7 +106,7 @@ Then review:
 
 Do not proceed directly from preflight to a multi-million-row run without reviewing this sample.
 
-## 7. Start the full FMCSA bootstrap only after validation
+## 8. Start the full FMCSA bootstrap only after validation
 
 If the 1,000-record result is correct:
 
@@ -114,4 +124,4 @@ Keep:
 IMPORTYETI_ALLOW_LIVE=false
 ```
 
-unless an authenticated administrator is intentionally purchasing missing ImportYeti intelligence through the dedicated acquisition endpoint. Normal profile views, BOL views, supplier indexing, Canada ingestion, readiness checks and FMCSA ingestion do not require live ImportYeti access.
+unless an authenticated administrator is intentionally purchasing missing ImportYeti intelligence through the dedicated acquisition endpoint. Normal profile views, BOL views, supplier indexing, Canada ingestion, readiness checks, data-quality auditing and FMCSA ingestion do not require live ImportYeti access.
