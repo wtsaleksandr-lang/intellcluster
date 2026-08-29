@@ -48,29 +48,18 @@ def _signals(row: dict[str, Any]) -> list[dict[str, str]]:
         dot = str(fmcsa.get("dot_number") or fmcsa.get("usdot_number") or "").strip()
         power_units = _number(fmcsa.get("power_units"))
         drivers = _number(fmcsa.get("total_drivers") or fmcsa.get("drivers"))
-        if dot:
-            signals.append(
-                {
-                    "label": "USDOT",
-                    "value": dot,
-                    "target": "us-public-intelligence",
-                    "kind": "fleet",
-                }
-            )
+        parts: list[str] = []
         if power_units is not None:
+            parts.append(f"{power_units:,} units")
+        elif drivers is not None:
+            parts.append(f"{drivers:,} drivers")
+        if dot:
+            parts.append(f"USDOT {dot}")
+        if parts:
             signals.append(
                 {
                     "label": "Fleet",
-                    "value": f"{power_units:,} power units",
-                    "target": "us-public-intelligence",
-                    "kind": "fleet",
-                }
-            )
-        elif drivers is not None:
-            signals.append(
-                {
-                    "label": "Drivers",
-                    "value": f"{drivers:,}",
+                    "value": " · ".join(parts),
                     "target": "us-public-intelligence",
                     "kind": "fleet",
                 }
@@ -142,7 +131,8 @@ def _signals(row: dict[str, Any]) -> list[dict[str, str]]:
                 }
             )
 
-    # Four concise, highest-signal facts keep cards scannable on mobile and desktop.
+    # One signal per evidence layer gives users a broader picture than repeating
+    # several facts from the same fleet source. Keep cards compact at four signals.
     return signals[:4]
 
 
