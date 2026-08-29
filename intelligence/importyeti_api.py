@@ -4,7 +4,7 @@ import os
 from datetime import UTC, datetime
 
 import httpx
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
 from intelligence.database import connect
@@ -18,6 +18,7 @@ from intelligence.enrichment.importyeti import (
 from intelligence.entity_resolution import normalize_company_name
 from intelligence.repository import get_entity_by_slug, set_entity_enrichment
 from intelligence.supplier_explorer import sync_supplier_relationships
+from shared.admin import require_admin
 
 router = APIRouter(tags=["intelligence-importyeti"])
 
@@ -74,16 +75,18 @@ def _cached_profile(company: dict) -> dict | None:
 
 @router.post("/api/intelligence/company/{slug}/enrich/importyeti")
 async def intelligence_company_importyeti_enrichment(
+    request: Request,
     slug: str,
     refresh: bool = Query(default=False),
     confirm_paid: bool = Query(default=False),
 ):
     """Explicitly acquire and cache ImportYeti intelligence.
 
-    Normal page views never call this endpoint. Existing cache is returned for free.
-    A real network acquisition requires all of: an explicit POST, ``confirm_paid``
-    on that POST, the process-level live master switch, and a configured API key.
-    Test fixtures bypass the paid-network gates because they never make a request.
+    Existing cache and deterministic fixtures are cost-free and can be reused without
+    admin authorization. Any path capable of making a paid network request requires
+    an authenticated IntellCluster admin session *before* checking the paid switches.
+    A real acquisition then additionally requires caller confirmation, the process
+    master switch, a configured API key, and an explicit live-enabled client.
     """
     with connect() as conn:
         company = get_entity_by_slug(conn, slug)
@@ -124,6 +127,9 @@ async def intelligence_company_importyeti_enrichment(
     fixture = load_importyeti_fixture()
     fixture_mode = fixture is not None
     if not fixture_mode:
+        # Intent confirmation is not authorization. Check the existing signed admin
+        # session before creating any network-capable paid client.
+        require_admin(request)
         if not confirm_paid:
             return JSONResponse(
                 {
