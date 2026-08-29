@@ -36,6 +36,8 @@ jobs:
           python -m tests.smoke
           python -m tests.intelligence_unit
           python -m tests.intelligence_persistence
+          python -m tests.route_hardening
+          python -m tests.company_routes
           INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE=1 python -m tests.intelligence_ui
           python -m tests.intelligence_compliance_export
           python -m tests.fmcsa_fast_seed
@@ -47,8 +49,6 @@ jobs:
           python -m tests.importyeti_cost_guard
           python -m tests.sync_observability
           python -m tests.post_ingest_readiness
-          python -m tests.route_hardening
-          python -m tests.company_routes
           python -m tests.deployment_entrypoint
 
   lint:
