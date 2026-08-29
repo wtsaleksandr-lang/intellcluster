@@ -48,6 +48,7 @@ jobs:
           python -m tests.sync_observability
           python -m tests.post_ingest_readiness
           python -m tests.route_hardening
+          python -m tests.company_routes
           python -m tests.deployment_entrypoint
 
   lint:
@@ -62,4 +63,4 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Run correctness lint on new intelligence layer
-        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_persistence.py tests/intelligence_ui.py tests/intelligence_compliance_export.py tests/fmcsa_fast_seed.py tests/intelligence_api.py tests/sec_edgar.py tests/evidence_sitemap.py tests/search_empty_state.py tests/search_us_signals.py tests/importyeti_cost_guard.py tests/sync_observability.py tests/post_ingest_readiness.py tests/route_hardening.py tests/deployment_entrypoint.py --select F,E4,E7,E9 --output-format=github
+        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_persistence.py tests/intelligence_ui.py tests/intelligence_compliance_export.py tests/fmcsa_fast_seed.py tests/intelligence_api.py tests/sec_edgar.py tests/evidence_sitemap.py tests/search_empty_state.py tests/search_us_signals.py tests/importyeti_cost_guard.py tests/sync_observability.py tests/post_ingest_readiness.py tests/route_hardening.py tests/company_routes.py tests/deployment_entrypoint.py --select F,E4,E7,E9 --output-format=github
