@@ -123,6 +123,21 @@ def run() -> int:
         assert profile_page.status_code == 200
         assert "intellcluster-sec-profile-ui" in profile_page.text
         assert "SEC EDGAR Intelligence" in profile_page.text
+        assert "Export SEC CSV" in profile_page.text
+        assert "sec_edgar_lookup" in payload.get("company", {}).get("enrichment", {})
+
+        export = client.get(f"/data/company/{us_slug}/sec-edgar.csv")
+        assert export.status_code == 200
+        assert "text/csv" in export.headers.get("content-type", "")
+        assert "sec_summary,cik,0001234567" in export.text
+        assert "sec_filing,10-Q,2026-08-15" in export.text
+        assert "icst-20260630.htm" in export.text
+
+        unmatched_export = client.get(
+            f"/data/company/{unmatched_slug}/sec-edgar.csv"
+        )
+        assert unmatched_export.status_code == 200
+        assert "sec_lookup,status,no_confident_match" in unmatched_export.text
 
         with connect() as conn:
             refreshed = get_entity_by_slug(conn, us_slug)
