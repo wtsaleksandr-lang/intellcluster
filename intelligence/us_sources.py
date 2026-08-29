@@ -39,8 +39,11 @@ US_SOURCE_ROADMAP = (
         layer="fleet",
         access="public_data",
         cost="free",
-        cache_policy="resumable bulk census sync plus on-demand canonical-company lookup",
-        status="implemented",
+        cache_policy=(
+            "guarded resumable bulk census bootstrap plus conservative mixed-source "
+            "resolution and on-demand company lookup"
+        ),
+        status="implemented_fast_seed_guarded",
     ),
     USIntelligenceSource(
         key="epa_echo",
