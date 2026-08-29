@@ -48,12 +48,15 @@ def _save_checkpoint(position: int, status: str, message: str | None = None) -> 
             )
 
 
-def _fleet_payload(attrs: dict[str, Any]) -> dict[str, Any]:
+def _fleet_payload(attrs: dict[str, Any], *, legal_name: str | None = None) -> dict[str, Any]:
     code = str(attrs.get("status") or "").strip().upper()
+    dot_number = str(attrs.get("usdot_number") or "").strip() or None
     return {
-        "dot_number": str(attrs.get("usdot_number") or "").strip() or None,
+        "dot_number": dot_number,
+        "usdot_number": dot_number,
         "status_code": code or None,
         "status": STATUS_MAP.get(code, code or None),
+        "legal_name": legal_name or None,
         "dba_name": attrs.get("dba_name"),
         "phone": attrs.get("phone"),
         "cell_phone": attrs.get("cell_phone"),
@@ -66,7 +69,12 @@ def _fleet_payload(attrs: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def promote_fmcsa(*, resume: bool = True, limit: int | None = None, batch_size: int = 5000) -> dict[str, int | str]:
+def promote_fmcsa(
+    *,
+    resume: bool = True,
+    limit: int | None = None,
+    batch_size: int = 5000,
+) -> dict[str, int | str]:
     started = time.monotonic()
     last_id = _load_checkpoint() if resume else 0
     start_id = last_id
@@ -101,6 +109,7 @@ def promote_fmcsa(*, resume: bool = True, limit: int | None = None, batch_size: 
                         source_records.c.id,
                         source_records.c.entity_id,
                         source_records.c.attributes,
+                        entities.c.canonical_name,
                         entities.c.enrichment,
                     )
                     .select_from(source_records.join(entities, entities.c.id == source_records.c.entity_id))
@@ -120,7 +129,10 @@ def promote_fmcsa(*, resume: bool = True, limit: int | None = None, batch_size: 
 
                 for row in rows:
                     attrs = row["attributes"] if isinstance(row["attributes"], dict) else {}
-                    fleet = _fleet_payload(attrs)
+                    fleet = _fleet_payload(
+                        attrs,
+                        legal_name=str(row["canonical_name"] or "") or None,
+                    )
                     enrichment = dict(row["enrichment"] or {}) if isinstance(row["enrichment"], dict) else {}
                     previous = enrichment.get("fmcsa") if isinstance(enrichment.get("fmcsa"), dict) else None
                     status = fleet.get("status")
@@ -136,7 +148,10 @@ def promote_fmcsa(*, resume: bool = True, limit: int | None = None, batch_size: 
 
             processed += len(rows)
             _save_checkpoint(last_id, "running", f"Run #{run_id} committed through source-record id {last_id:,}")
-            print(f"[fmcsa-promote] {processed:,} processed · {changed:,} changed · source id {last_id:,}", flush=True)
+            print(
+                f"[fmcsa-promote] {processed:,} processed · {changed:,} changed · source id {last_id:,}",
+                flush=True,
+            )
             if len(rows) < page_limit:
                 break
 
@@ -181,7 +196,9 @@ def promote_fmcsa(*, resume: bool = True, limit: int | None = None, batch_size: 
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Promote FMCSA source records into canonical status/fleet intelligence")
+    parser = argparse.ArgumentParser(
+        description="Promote FMCSA source records into canonical status/fleet intelligence"
+    )
     parser.add_argument("--fresh", action="store_true", help="Ignore the saved promotion checkpoint")
     parser.add_argument("--limit", type=int, default=None, help="Maximum FMCSA source rows to promote")
     parser.add_argument("--batch-size", type=int, default=5000)
