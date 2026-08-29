@@ -137,6 +137,20 @@ def run() -> int:
     assert ca["sections"]["trade"]["status"] == "market_context"
     assert ca["sections"]["suppliers"]["status"] == "not_available"
     assert ca["sections"]["relationships"]["status"] == "available"
+    assert (
+        "Shipment-level intelligence — Not currently available for this Canadian company."
+        in str(ca["sections"]["trade"]["message"])
+    )
+    assert "Market-level trade context is shown instead." in str(
+        ca["sections"]["trade"]["message"]
+    )
+
+    ca_registry_only = profile_capabilities({"country": "CA"})
+    assert ca_registry_only["sections"]["trade"]["status"] == "not_available"
+    assert (
+        ca_registry_only["sections"]["trade"]["message"]
+        == "Shipment-level intelligence — Not currently available for this Canadian company."
+    )
 
     us = profile_capabilities(
         {
