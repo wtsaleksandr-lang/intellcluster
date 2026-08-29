@@ -78,6 +78,22 @@ def supplier_countries(limit: int = 40) -> list[dict]:
     ]
 
 
+def supplier_index_summary() -> dict[str, int]:
+    """Return global cached supplier-index counts without any external calls."""
+    with connect() as conn:
+        relationships = int(
+            conn.execute(select(func.count()).select_from(supplier_relationships)).scalar_one()
+            or 0
+        )
+        suppliers = int(
+            conn.execute(
+                select(func.count(distinct(supplier_relationships.c.supplier_normalized)))
+            ).scalar_one()
+            or 0
+        )
+    return {"relationships": relationships, "suppliers": suppliers}
+
+
 @router.get("/data/suppliers", response_class=HTMLResponse)
 async def supplier_directory_page(
     request: Request,
@@ -96,6 +112,7 @@ async def supplier_directory_page(
     )
     has_next = len(rows) > page_size
     rows = rows[:page_size]
+    index_summary = supplier_index_summary()
     return templates.TemplateResponse(
         request=request,
         name="supplier_search.html",
@@ -108,5 +125,7 @@ async def supplier_directory_page(
             "sort": sort,
             "page": page,
             "has_next": has_next,
+            "supplier_index_relationships": index_summary["relationships"],
+            "supplier_index_suppliers": index_summary["suppliers"],
         },
     )
