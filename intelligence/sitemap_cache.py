@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from time import monotonic
 
 from fastapi import Request
@@ -10,15 +11,26 @@ _CACHE_TTLS = {
     "/sitemaps/intelligence.xml": 21_600,
     "/sitemaps/suppliers.xml": 21_600,
 }
+_COMPANY_SITEMAP = re.compile(r"^/sitemaps/companies-\d+\.xml$")
 _CACHE: dict[str, tuple[float, bytes, dict[str, str], str]] = {}
 
 
-def install_sitemap_cache(app) -> None:
-    """Cache aggregate-heavy sitemap responses in each application worker.
+def _ttl(path: str) -> int | None:
+    direct = _CACHE_TTLS.get(path)
+    if direct is not None:
+        return direct
+    if _COMPANY_SITEMAP.fullmatch(path):
+        return 3_600
+    return None
 
-    Company sitemap pages remain uncached because their indexed rows can change
-    quickly during ingestion. The analytical and supplier sitemaps are expensive
-    aggregate queries and are safe to refresh on a slower cadence.
+
+def install_sitemap_cache(app) -> None:
+    """Cache sitemap responses in each application worker.
+
+    Aggregate-heavy analytical/supplier sitemaps refresh every six hours. Company
+    sitemap pages refresh hourly, which avoids repeatedly running large paginated
+    queries while still allowing an actively growing directory to surface new
+    entities on a predictable cadence.
     """
     if getattr(app.state, "intellcluster_sitemap_cache_installed", False):
         return
@@ -27,7 +39,7 @@ def install_sitemap_cache(app) -> None:
     @app.middleware("http")
     async def sitemap_response_cache(request: Request, call_next):
         path = request.url.path
-        ttl = _CACHE_TTLS.get(path)
+        ttl = _ttl(path)
         if ttl is None or request.method != "GET" or request.query_params:
             return await call_next(request)
 
