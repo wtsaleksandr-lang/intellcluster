@@ -143,6 +143,16 @@ def run() -> int:
             failed.append("/data/hs/870892: company-tab regression fix missing")
         if '"@type":"BreadcrumbList"' not in hs_text or '"name":"HS 870892"' not in hs_text:
             failed.append("/data/hs/870892: breadcrumb structured data missing")
+        supplier_response = client.get("/data/supplier/Cached%20Supplier%20One")
+        supplier_text = supplier_response.text
+        if f'/data/company/{slug}' not in supplier_text or "IntellCluster UI Test Importer Inc." not in supplier_text:
+            failed.append("/data/supplier: linked importer drilldown missing")
+        if f'/data/company/{slug}/bol/UITESTBOL0001' not in supplier_text:
+            failed.append("/data/supplier: cached BOL importer drilldown missing")
+        if "Cached supplier intelligence for Cached Supplier One" not in supplier_text:
+            failed.append("/data/supplier: supplier-specific meta description missing")
+        if '"@type":"BreadcrumbList"' not in supplier_text or '"name":"Suppliers"' not in supplier_text:
+            failed.append("/data/supplier: supplier breadcrumb structured data missing")
         company_response = client.get(f"/data/company/{slug}")
         company_text = company_response.text
         if "relationship-evidence-enhancer" not in company_text or "Top 10 relationships" not in company_text:
