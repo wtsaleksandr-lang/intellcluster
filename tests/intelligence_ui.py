@@ -145,7 +145,7 @@ def run() -> int:
         company_text = company_response.text
         if "relationship-evidence-enhancer" not in company_text or "Top 10 relationships" not in company_text:
             failed.append(f"/data/company/{slug}: relationship evidence drilldown enhancer missing")
-        if "rel-bol-filter" not in company_text or "Clear filter" not in company_text:
+        if "rel-filter-bar" not in company_text or "Clear filter" not in company_text:
             failed.append(f"/data/company/{slug}: relationship BOL clear-filter control missing")
         if "profile-source-freshness" not in company_text:
             failed.append(f"/data/company/{slug}: source freshness enhancer missing")
