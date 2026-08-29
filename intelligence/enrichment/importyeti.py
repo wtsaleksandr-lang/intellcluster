@@ -20,12 +20,19 @@ class ImportYetiMatch:
 
 
 def live_importyeti_enabled() -> bool:
-    """Return true only when paid/live ImportYeti network access is explicitly enabled.
+    """Return whether the environment master switch allows paid ImportYeti access.
 
-    Cached data is the normal operating mode. This opt-in prevents ordinary page
-    views, smoke tests, CI and UI development from accidentally consuming credits.
+    This flag is necessary but not sufficient. A network-capable client must also
+    be constructed with ``allow_live=True``. The double opt-in makes ordinary page
+    views cached-only even when the production environment keeps the master switch
+    enabled for an explicit paid acquisition endpoint.
     """
-    return os.getenv("IMPORTYETI_ALLOW_LIVE", "").strip().casefold() in {"1", "true", "yes", "on"}
+    return os.getenv("IMPORTYETI_ALLOW_LIVE", "").strip().casefold() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
 
 
 def load_importyeti_fixture() -> dict[str, Any] | None:
@@ -54,17 +61,30 @@ def load_importyeti_fixture() -> dict[str, Any] | None:
 class ImportYetiClient:
     """Async client for controlled ImportYeti enrichment.
 
-    Network access is intentionally disabled unless IMPORTYETI_ALLOW_LIVE=1.
-    Development and tests should use persisted cache or IMPORTYETI_FIXTURE_PATH.
+    Live paid network access requires two independent gates:
+
+    1. the process-level ``IMPORTYETI_ALLOW_LIVE`` master switch; and
+    2. an explicit ``ImportYetiClient(allow_live=True)`` call site.
+
+    The default constructor is therefore always cached/fixture-only. This prevents
+    profile views, BOL views, tests, CI, crawlers, and future incidental callers
+    from consuming paid credits just because a production environment variable is
+    enabled for a dedicated acquisition action.
     """
 
     BASE_URL = "https://data.importyeti.com/v1.0"
 
-    def __init__(self, api_key: str | None = None, *, allow_live: bool | None = None) -> None:
+    def __init__(
+        self,
+        api_key: str | None = None,
+        *,
+        allow_live: bool | None = None,
+    ) -> None:
         self.api_key = api_key or os.getenv("IMPORTYETI_API_KEY")
-        self.allow_live = live_importyeti_enabled() if allow_live is None else allow_live
+        self.live_requested = allow_live is True
+        self.allow_live = self.live_requested and live_importyeti_enabled()
         self.fixture = load_importyeti_fixture()
-        if self.allow_live and not self.api_key:
+        if self.allow_live and not self.fixture and not self.api_key:
             raise RuntimeError("IMPORTYETI_API_KEY is not configured")
 
     @property
@@ -76,8 +96,9 @@ class ImportYetiClient:
     def _assert_live_allowed(self) -> None:
         if not self.allow_live:
             raise RuntimeError(
-                "Live ImportYeti requests are disabled. Use cached data or set "
-                "IMPORTYETI_ALLOW_LIVE=1 for an intentional paid refresh."
+                "Live ImportYeti requests require both IMPORTYETI_ALLOW_LIVE=1 "
+                "and an explicit ImportYetiClient(allow_live=True) call. Use "
+                "cached data for normal page views."
             )
 
     async def _get(
@@ -103,15 +124,24 @@ class ImportYetiClient:
         data["_cachedAt"] = datetime.now(UTC).isoformat()
         return data
 
-    async def search_company(self, name: str, page_size: int = 5) -> list[ImportYetiMatch]:
+    async def search_company(
+        self,
+        name: str,
+        page_size: int = 5,
+    ) -> list[ImportYetiMatch]:
         if self.fixture is not None:
-            title = str(self.fixture.get("title") or self.fixture.get("_matchedTitle") or name)
+            title = str(
+                self.fixture.get("title")
+                or self.fixture.get("_matchedTitle")
+                or name
+            )
             slug = str(self.fixture.get("_slug") or "cached-test-company")
             return [
                 ImportYetiMatch(
                     slug=slug,
                     title=title,
-                    address=self.fixture.get("address") or self.fixture.get("address_plain"),
+                    address=self.fixture.get("address")
+                    or self.fixture.get("address_plain"),
                     total_shipments=self.fixture.get("total_shipments"),
                     most_recent_shipment=None,
                 )
@@ -120,7 +150,11 @@ class ImportYetiClient:
         async with httpx.AsyncClient(timeout=30, headers=self.headers) as client:
             response = await client.get(
                 f"{self.BASE_URL}/company/search",
-                params={"name": name, "page_size": max(1, min(page_size, 10)), "offset": 0},
+                params={
+                    "name": name,
+                    "page_size": max(1, min(page_size, 10)),
+                    "offset": 0,
+                },
             )
             response.raise_for_status()
             payload = response.json()
@@ -144,13 +178,22 @@ class ImportYetiClient:
         return await self._get(f"/company/{slug}")
 
     async def bol_detail(self, bol_number: str) -> dict[str, Any]:
-        clean = "".join(ch for ch in bol_number if ch.isalnum() or ch in {"-", "_"})
+        clean = "".join(
+            ch for ch in bol_number if ch.isalnum() or ch in {"-", "_"}
+        )
         if not clean:
             raise ValueError("Invalid BOL number")
         return await self._get(f"/bol/{clean}")
 
+    async def bill_of_lading(self, bol_number: str) -> dict[str, Any]:
+        """Backward-compatible alias used by the legacy BOL route."""
+        return await self.bol_detail(bol_number)
 
-def cache_is_fresh(cache: dict[str, Any] | None, max_age_days: int = 30) -> bool:
+
+def cache_is_fresh(
+    cache: dict[str, Any] | None,
+    max_age_days: int = 30,
+) -> bool:
     """Stale data remains usable; false only means it is eligible for refresh."""
     if not cache:
         return False
@@ -215,5 +258,7 @@ def compact_profile(data: dict[str, Any]) -> dict[str, Any]:
     if isinstance(result.get("notify_party_table"), list):
         result["notify_party_table"] = result["notify_party_table"][:40]
     if isinstance(result.get("other_addresses_contact_info"), list):
-        result["other_addresses_contact_info"] = result["other_addresses_contact_info"][:60]
+        result["other_addresses_contact_info"] = result[
+            "other_addresses_contact_info"
+        ][:60]
     return result
