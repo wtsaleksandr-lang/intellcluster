@@ -12,6 +12,7 @@ from intelligence.enrichment.importyeti import ImportYetiClient
 from intelligence.models import SourceRecord
 from intelligence.repository import get_entity_by_slug, upsert_source_record
 from main_data import app
+from shared.admin import ADMIN_COOKIE, create_admin_token
 
 client = TestClient(app)
 SOURCE = "importyeti-cost-guard-test"
@@ -66,11 +67,15 @@ def run() -> int:
         "IMPORTYETI_ALLOW_LIVE",
         "IMPORTYETI_API_KEY",
         "IMPORTYETI_FIXTURE_PATH",
+        "ADMIN_USERNAME",
+        "ADMIN_SECRET_KEY",
     )
     previous = {key: os.environ.get(key) for key in keys}
     try:
-        for key in keys:
+        for key in ("IMPORTYETI_ALLOW_LIVE", "IMPORTYETI_API_KEY", "IMPORTYETI_FIXTURE_PATH"):
             os.environ.pop(key, None)
+        os.environ["ADMIN_USERNAME"] = "cost-guard-admin"
+        os.environ["ADMIN_SECRET_KEY"] = "cost-guard-admin-secret-key-2026-strong"
 
         # A default client is always network-disabled, even when the environment
         # master switch and an API key exist. This protects incidental page views.
@@ -122,6 +127,7 @@ def run() -> int:
             == 248
         )
 
+        # Cached intelligence remains reusable without admin authentication.
         cached = client.post(
             f"/api/intelligence/company/{fixture_slug}/enrich/importyeti"
         )
@@ -129,8 +135,6 @@ def run() -> int:
         assert cached.json().get("lookup", {}).get("importyeti") == "cached"
         assert cached.json().get("paid_sources_called") is False
 
-        # With no fixture, the dedicated endpoint refuses paid acquisition unless
-        # the caller explicitly confirms it and the environment master switch is on.
         os.environ.pop("IMPORTYETI_FIXTURE_PATH", None)
         os.environ["IMPORTYETI_ALLOW_LIVE"] = "false"
         os.environ["IMPORTYETI_API_KEY"] = "test-key-never-sent"
@@ -138,13 +142,30 @@ def run() -> int:
             "Paid Network Guard Logistics LLC",
             "IY-GUARD-1002",
         )
-        unconfirmed = client.post(
+
+        # A public caller cannot reach any network-capable paid path. The admin
+        # session check happens before confirmation/master-switch/API-key checks.
+        anonymous = client.post(
+            f"/api/intelligence/company/{guarded_slug}/enrich/importyeti?confirm_paid=true"
+        )
+        assert anonymous.status_code == 401
+        assert anonymous.json().get("detail") == "Admin access required"
+
+        admin_client = TestClient(app)
+        admin_client.cookies.set(
+            ADMIN_COOKIE,
+            create_admin_token(os.environ["ADMIN_USERNAME"]),
+        )
+
+        # Authorization alone is not enough: the caller must explicitly confirm
+        # paid acquisition, and the server master switch must independently allow it.
+        unconfirmed = admin_client.post(
             f"/api/intelligence/company/{guarded_slug}/enrich/importyeti"
         )
         assert unconfirmed.status_code == 409
         assert unconfirmed.json().get("paid_sources_called") is False
 
-        master_disabled = client.post(
+        master_disabled = admin_client.post(
             f"/api/intelligence/company/{guarded_slug}/enrich/importyeti?confirm_paid=true"
         )
         assert master_disabled.status_code == 409
