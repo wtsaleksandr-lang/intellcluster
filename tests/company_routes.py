@@ -67,8 +67,10 @@ def run() -> int:
     entity_id, slug = _seed()
     old_live = os.environ.get("IMPORTYETI_ALLOW_LIVE")
     old_key = os.environ.get("IMPORTYETI_API_KEY")
+    old_demo = os.environ.get("INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE")
     os.environ["IMPORTYETI_ALLOW_LIVE"] = "true"
     os.environ["IMPORTYETI_API_KEY"] = "should-never-be-used-by-page-routes"
+    os.environ["INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE"] = "1"
     try:
         profile = client.get(f"/data/company/{slug}")
         assert profile.status_code == 200, profile.text
@@ -85,8 +87,12 @@ def run() -> int:
         assert missing_bol.status_code == 200, missing_bol.text
         assert "never triggers a paid data request" in missing_bol.text
 
+        demo = client.get("/data/company/maple-auto-supply-inc")
+        assert demo.status_code == 200, demo.text
+        assert "Maple Auto Supply Inc." in demo.text
+
         missing_company = client.get("/data/company/company-route-definitely-missing")
-        assert missing_company.status_code == 404
+        assert missing_company.status_code == 404, missing_company.text
         assert "Company profile not found" in missing_company.text
 
         print("Cached-only company route checks OK")
@@ -100,6 +106,10 @@ def run() -> int:
             os.environ.pop("IMPORTYETI_API_KEY", None)
         else:
             os.environ["IMPORTYETI_API_KEY"] = old_key
+        if old_demo is None:
+            os.environ.pop("INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE", None)
+        else:
+            os.environ["INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE"] = old_demo
         _cleanup(entity_id)
 
 
