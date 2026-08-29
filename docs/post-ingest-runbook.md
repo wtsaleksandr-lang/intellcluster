@@ -34,14 +34,25 @@ A strict preflight exits with status 2 if a Canada ingestion blocker remains. Th
 
 Only after the active ingestion is finished should production pull/redeploy the application code.
 
-After deployment, authenticated administrators can inspect the same read-only state at:
+After deployment, authenticated administrators can use the read-only operations console:
+
+```text
+/admin/intelligence
+```
+
+It summarizes sync progress, readiness blockers, supplier-index state and the recommended post-ingestion sequence. The data-quality audit is deliberately manual because it can scan large tables.
+
+Raw administrator endpoints are also available:
 
 - `GET /api/intelligence/admin/sync-status`
 - `GET /api/intelligence/admin/post-ingest-readiness`
+- `GET /api/intelligence/admin/data-quality`
 
-Both endpoints require the signed admin session.
+All require the signed admin session. None calls paid sources.
 
 ## 4. Run the database-only quality audit
+
+From the operations console, click **Run data-quality audit**, or use the CLI:
 
 ```bash
 python -m intelligence.data_quality --strict
