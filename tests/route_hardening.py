@@ -24,16 +24,19 @@ def run() -> int:
     assert _owners("/data/company/{slug}/bol/{bol_number}", "GET") == [
         "intelligence.company_routes"
     ]
+    assert _owners("/data/search", "GET") == ["intelligence.search_routes"]
 
+    superseded = {
+        "/api/intelligence/company/{slug}/enrich/us-public",
+        "/data/company/{slug}",
+        "/data/company/{slug}/bol/{bol_number}",
+        "/data/search",
+    }
     for route in app.router.routes:
         endpoint = getattr(route, "endpoint", None)
         module = str(getattr(endpoint, "__module__", ""))
         path = str(getattr(route, "path", ""))
-        if module == "intelligence.ui" and path in {
-            "/api/intelligence/company/{slug}/enrich/us-public",
-            "/data/company/{slug}",
-            "/data/company/{slug}/bol/{bol_number}",
-        }:
+        if module == "intelligence.ui" and path in superseded:
             raise AssertionError(f"Legacy UI route still mounted: {path}")
 
     print("Route hardening checks OK")
