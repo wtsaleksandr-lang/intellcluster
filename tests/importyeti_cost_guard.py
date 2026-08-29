@@ -72,10 +72,14 @@ def run() -> int:
     )
     previous = {key: os.environ.get(key) for key in keys}
     try:
-        for key in ("IMPORTYETI_ALLOW_LIVE", "IMPORTYETI_API_KEY", "IMPORTYETI_FIXTURE_PATH"):
+        for key in (
+            "IMPORTYETI_ALLOW_LIVE",
+            "IMPORTYETI_API_KEY",
+            "IMPORTYETI_FIXTURE_PATH",
+        ):
             os.environ.pop(key, None)
         os.environ["ADMIN_USERNAME"] = "cost-guard-admin"
-        os.environ["ADMIN_SECRET_KEY"] = "cost-guard-admin-secret-key-2026-strong"
+        os.environ["ADMIN_SECRET_KEY"] = "c0stguard-2026-A7f9Q2m8L4p6X1z3"
 
         # A default client is always network-disabled, even when the environment
         # master switch and an API key exist. This protects incidental page views.
@@ -91,7 +95,9 @@ def run() -> int:
         except RuntimeError as exc:
             assert "explicit ImportYetiClient(allow_live=True)" in str(exc)
         else:
-            raise AssertionError("Default ImportYeti client unexpectedly allowed network access")
+            raise AssertionError(
+                "Default ImportYeti client unexpectedly allowed network access"
+            )
 
         explicit_client = ImportYetiClient(allow_live=True)
         assert explicit_client.allow_live is True
