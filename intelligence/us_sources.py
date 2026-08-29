@@ -22,9 +22,9 @@ US_SOURCE_ROADMAP = (
         access="API",
         cost="paid_on_demand",
         cache_policy=(
-            "explicit paid acquisition only; environment master switch + call-site "
-            "opt-in + caller confirmation; cache purchased company/shipment "
-            "intelligence and never call live from normal page views"
+            "explicit admin-authorized paid acquisition only; environment master "
+            "switch + call-site opt-in + caller confirmation; cache purchased "
+            "company/shipment intelligence and never call live from normal page views"
         ),
         status="implemented_guarded_cache",
     ),
