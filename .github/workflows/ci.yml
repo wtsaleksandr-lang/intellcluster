@@ -38,6 +38,7 @@ jobs:
           python -m tests.intelligence_persistence
           python -m tests.intelligence_ui
           python -m tests.intelligence_compliance_export
+          python -m tests.intelligence_api
 
   lint:
     name: Lint intelligence changes
@@ -51,4 +52,4 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Run correctness lint on new intelligence layer
-        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_persistence.py tests/intelligence_ui.py tests/intelligence_compliance_export.py --select F,E4,E7,E9 --output-format=github
+        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_persistence.py tests/intelligence_ui.py tests/intelligence_compliance_export.py tests/intelligence_api.py --select F,E4,E7,E9 --output-format=github
