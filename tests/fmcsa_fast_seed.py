@@ -99,7 +99,10 @@ def run() -> int:
         assert len(rows) == 2
         assert rows[0]["slug"].endswith("usdot9100001")
         assert rows[0]["corporate_status"] == "Active"
-        assert rows[0]["enrichment"]["fmcsa"]["dot_number"] == "9100001"
+        fleet = rows[0]["enrichment"]["fmcsa"]
+        assert fleet["dot_number"] == "9100001"
+        assert fleet["usdot_number"] == "9100001"
+        assert fleet["legal_name"] == "Fast Seed Logistics One LLC"
         assert rows[1]["corporate_status"] == "Inactive"
         assert resumed_readiness["safe"] is True
         assert resumed_readiness["fmcsa_linked_us_entities"] >= 2
