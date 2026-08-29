@@ -173,9 +173,10 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
                 label="Trade",
                 source="Canadian Importers + Statistics Canada market context" if is_importer or hs_codes else None,
                 message=(
-                    "Company-level Canadian shipment records are not currently available; market-level trade context is shown instead."
+                    "Shipment-level intelligence — Not currently available for this Canadian company. "
+                    "Market-level trade context is shown instead."
                     if is_importer or hs_codes
-                    else "Company-level Canadian shipment intelligence is not currently available."
+                    else "Shipment-level intelligence — Not currently available for this Canadian company."
                 ),
             )
             sections["suppliers"] = _state(
