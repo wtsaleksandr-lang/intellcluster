@@ -7,11 +7,11 @@ coupling SEO work to ingestion or the core directory UI.
 
 from main_data_core import app
 from intelligence.company_directory import router as company_directory_router
+from intelligence.company_routes import router as company_page_router
 from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
 from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.post_ingest_readiness import router as post_ingest_readiness_router
-from intelligence.profile_guard import install_profile_guard
 from intelligence.route_hardening import prune_shadowed_legacy_routes
 from intelligence.search_empty_state import install_search_empty_state
 from intelligence.search_signal_ui import install_search_signal_ui
@@ -22,11 +22,11 @@ from intelligence.seo import install_seo_middleware, router as seo_router
 from intelligence.sitemap_cache import install_sitemap_cache
 from intelligence.sync_observability import router as sync_observability_router
 
-# ``main_data_core`` still imports the historical UI router for its page routes.
-# Remove the old duplicate U.S.-enrichment POST before mounting newer layers so
-# only the canonical free-only implementation in ``intelligence.api`` is active.
+# ``main_data_core`` still imports the historical UI router for pages not yet
+# migrated. Remove only exact superseded routes before mounting focused modules.
 prune_shadowed_legacy_routes(app)
 
+app.include_router(company_page_router)
 app.include_router(company_directory_router)
 app.include_router(compliance_export_router)
 app.include_router(importyeti_api_router)
@@ -35,7 +35,6 @@ app.include_router(sec_export_router)
 app.include_router(sync_observability_router)
 app.include_router(post_ingest_readiness_router)
 app.include_router(seo_router)
-install_profile_guard(app)
 install_sec_profile_ui(app)
 install_search_empty_state(app)
 install_search_signal_ui(app)
