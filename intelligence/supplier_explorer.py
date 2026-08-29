@@ -218,7 +218,10 @@ def supplier_intelligence(name: str) -> dict:
             hs = str(bol.get("HS_Code") or bol.get("hs_code") or "").strip()
             if hs:
                 hs_counter[hs] += 1
-            recent_bols.append(bol)
+            evidence = dict(bol)
+            evidence["_importer_slug"] = str(row["slug"] or "")
+            evidence["_importer_name"] = str(row["canonical_name"] or "")
+            recent_bols.append(evidence)
         if row["source_cached_at"]:
             cached_dates.append(str(row["source_cached_at"]))
         importers.append(
@@ -234,7 +237,10 @@ def supplier_intelligence(name: str) -> dict:
             }
         )
 
-    recent_bols.sort(key=lambda item: str(item.get("date_formatted") or item.get("Arrival_Date") or ""), reverse=True)
+    recent_bols.sort(
+        key=lambda item: str(item.get("date_formatted") or item.get("Arrival_Date") or ""),
+        reverse=True,
+    )
     display_name = name_counter.most_common(1)[0][0]
     primary_country = country_counter.most_common(1)[0][0] if country_counter else ""
     return {
