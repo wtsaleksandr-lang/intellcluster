@@ -21,7 +21,11 @@ US_SOURCE_ROADMAP = (
         layer="trade",
         access="API",
         cost="paid_on_demand",
-        cache_policy="cache purchased company/shipment intelligence; no live page-view calls",
+        cache_policy=(
+            "explicit paid acquisition only; environment master switch + call-site "
+            "opt-in + caller confirmation; cache purchased company/shipment "
+            "intelligence and never call live from normal page views"
+        ),
         status="implemented_guarded_cache",
     ),
     USIntelligenceSource(
@@ -70,20 +74,20 @@ US_SOURCE_ROADMAP = (
         access="public_api",
         cost="free",
         cache_policy=(
-            "on-demand ticker/CIK association and submissions lookup; cache filing evidence; "
-            "no SEC network calls on normal profile views"
+            "explicit on-demand ticker/CIK lookup; persist filings and standardized "
+            "XBRL facts; cache negative matches to avoid repeated network calls"
         ),
         status="implemented_on_demand",
     ),
     USIntelligenceSource(
         key="uspto",
-        name="USPTO PatentsView / Open Data Portal",
+        name="USPTO",
         layer="patents",
         access="public_data",
         cost="free",
         cache_policy=(
-            "defer company-linked API integration until the 2026 PatentsView migration to "
-            "USPTO Open Data Portal stabilizes; bulk datasets remain a future option"
+            "defer implementation while PatentsView transitions to the USPTO Open "
+            "Data Portal; add company-linked IP cache after the replacement API is stable"
         ),
         status="blocked_external_transition",
     ),
