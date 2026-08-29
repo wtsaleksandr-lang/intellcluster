@@ -108,6 +108,13 @@ def run() -> int:
         assert cached.status_code == 200
         assert cached.json().get("lookup", {}).get("sec_edgar") == "cached"
 
+        forced = client.post(
+            f"/api/intelligence/company/{us_slug}/enrich/sec-edgar?refresh=1"
+        )
+        assert forced.status_code == 200
+        assert forced.json().get("lookup", {}).get("sec_edgar") == "refreshed"
+        assert forced.json().get("paid_sources_called") is False
+
         no_match = client.post(
             f"/api/intelligence/company/{unmatched_slug}/enrich/sec-edgar"
         )
@@ -120,6 +127,12 @@ def run() -> int:
         repeated_payload = repeated_no_match.json()
         assert repeated_payload.get("lookup", {}).get("sec_edgar") == "no_confident_match"
         assert repeated_payload.get("lookup", {}).get("recently_checked") is True
+        forced_no_match = client.post(
+            f"/api/intelligence/company/{unmatched_slug}/enrich/sec-edgar?refresh=1"
+        )
+        assert forced_no_match.status_code == 200
+        assert forced_no_match.json().get("lookup", {}).get("sec_edgar") == "no_confident_match"
+        assert forced_no_match.json().get("lookup", {}).get("recently_checked") is None
 
         ca_response = client.post(
             f"/api/intelligence/company/{ca_slug}/enrich/sec-edgar"
@@ -131,6 +144,7 @@ def run() -> int:
         assert "intellcluster-sec-profile-ui" in profile_page.text
         assert "SEC EDGAR Intelligence" in profile_page.text
         assert "Latest Revenue" in profile_page.text
+        assert "Refresh SEC" in profile_page.text
         assert "Export SEC CSV" in profile_page.text
         assert "sec_edgar_lookup" in payload.get("company", {}).get("enrichment", {})
 
