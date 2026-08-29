@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +15,24 @@ from intelligence.repository import get_entity_by_slug, get_entity_enrichment
 
 router = APIRouter(tags=["intelligence-company-pages"])
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+
+_LEGACY_DEMO = {
+    "slug": "maple-auto-supply-inc",
+    "name": "Maple Auto Supply Inc.",
+    "kind": "Importer",
+    "city": "Mississauga",
+    "province": "ON",
+    "country": "CA",
+    "status": "Active",
+    "incorporated": "2011",
+    "hs_codes": ["870892", "851220"],
+    "products": ["Motor vehicle exhaust parts", "Automotive lighting equipment"],
+    "origins": ["China", "Taiwan"],
+    "source_count": 2,
+    "source_records_count": 2,
+    "buyer_score": 94,
+    "is_importer": True,
+}
 
 
 def _first(row: dict[str, Any], *keys: str) -> Any:
@@ -98,11 +117,23 @@ def _cached_bol(company: dict[str, Any], enrichment: dict[str, Any], bol_number:
     return None
 
 
+def _test_demo(slug: str) -> dict[str, Any] | None:
+    if os.getenv("INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE", "") != "1":
+        return None
+    if slug != _LEGACY_DEMO["slug"]:
+        return None
+    return dict(_LEGACY_DEMO)
+
+
 @router.get("/data/company/{slug}", response_class=HTMLResponse)
 async def intelligence_company_page(request: Request, slug: str):
     """Render a canonical company profile from persisted data only."""
     with connect() as conn:
         company = get_entity_by_slug(conn, slug)
+    demo_mode = False
+    if company is None:
+        company = _test_demo(slug)
+        demo_mode = company is not None
     if company is None:
         return HTMLResponse(_not_found_page(slug), status_code=404)
     return templates.TemplateResponse(
@@ -112,7 +143,7 @@ async def intelligence_company_page(request: Request, slug: str):
             "active": "company",
             "company": company,
             "capabilities": profile_capabilities(company),
-            "demo_mode": False,
+            "demo_mode": demo_mode,
         },
     )
 
