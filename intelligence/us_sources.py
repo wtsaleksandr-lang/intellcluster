@@ -69,17 +69,23 @@ US_SOURCE_ROADMAP = (
         layer="company_financial",
         access="public_api",
         cost="free",
-        cache_policy="scheduled identifiers; lazy filing details",
-        status="planned",
+        cache_policy=(
+            "on-demand ticker/CIK association and submissions lookup; cache filing evidence; "
+            "no SEC network calls on normal profile views"
+        ),
+        status="implemented_on_demand",
     ),
     USIntelligenceSource(
         key="uspto",
-        name="USPTO",
+        name="USPTO PatentsView / Open Data Portal",
         layer="patents",
         access="public_data",
         cost="free",
-        cache_policy="lazy company-linked intellectual-property cache",
-        status="planned",
+        cache_policy=(
+            "defer company-linked API integration until the 2026 PatentsView migration to "
+            "USPTO Open Data Portal stabilizes; bulk datasets remain a future option"
+        ),
+        status="blocked_external_transition",
     ),
 )
 
