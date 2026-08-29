@@ -19,6 +19,12 @@ def run() -> int:
     assert "Preview fallback — no live rows matched this query." not in text
     assert "Maple Auto Supply Inc." not in text
     assert '<meta name="robots" content="noindex,follow">' in text
+
+    legacy_demo = client.get("/data/company/maple-auto-supply-inc")
+    assert legacy_demo.status_code == 404
+    assert "No indexed profile" in legacy_demo.text
+    assert '<meta name="robots" content="noindex,follow">' in legacy_demo.text
+
     print("Search empty-state checks OK")
     return 0
 
