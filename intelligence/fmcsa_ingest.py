@@ -9,7 +9,7 @@ from sqlalchemy import func, insert, select, update
 
 from intelligence.database import connect, sync_checkpoints, sync_runs
 from intelligence.enrichment.fmcsa import RESOURCE_URL, SELECT_FIELDS, _company
-from intelligence.fmcsa_fast_seed import fast_seed_fmcsa_records
+from intelligence.fmcsa_fast_seed import fast_seed_fmcsa_records, fast_seed_readiness
 from intelligence.incremental import upsert_source_record_incremental
 
 
@@ -89,6 +89,16 @@ async def sync_fmcsa(
     created = 0
 
     mode_label = "fast bootstrap" if fast_seed else "conservative entity resolution"
+    if fast_seed:
+        with connect() as conn:
+            readiness = fast_seed_readiness(conn)
+        if not readiness["safe"]:
+            raise RuntimeError(
+                "FMCSA fast seed preflight failed: "
+                f"{readiness['non_fmcsa_us_entities']:,} U.S. entities are not linked to FMCSA. "
+                "Use conservative ingestion for a mixed-source U.S. graph."
+            )
+
     with connect() as conn:
         result = conn.execute(
             insert(sync_runs).values(
@@ -261,7 +271,21 @@ def main() -> None:
             "unrelated U.S. entities already exist; use conservative mode for mixed-source U.S. data."
         ),
     )
+    parser.add_argument(
+        "--validate-fast-seed",
+        action="store_true",
+        help="Check database safety for fast seed without downloading or writing FMCSA data",
+    )
     args = parser.parse_args()
+
+    if args.validate_fast_seed:
+        with connect() as conn:
+            readiness = fast_seed_readiness(conn)
+        print(readiness)
+        if not readiness["safe"]:
+            raise SystemExit(2)
+        return
+
     result = asyncio.run(
         sync_fmcsa(
             resume=not args.fresh,
