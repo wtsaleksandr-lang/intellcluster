@@ -73,6 +73,7 @@ source_records = Table(
 )
 Index("ux_intel_source_record", source_records.c.source, source_records.c.source_record_id, unique=True)
 Index("ix_intel_source_entity", source_records.c.entity_id)
+Index("ix_intel_source_entity_source", source_records.c.entity_id, source_records.c.source)
 
 importer_relationships = Table(
     "intel_importer_relationships",
