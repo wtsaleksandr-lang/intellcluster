@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from fastapi.testclient import TestClient
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -25,13 +27,19 @@ def run() -> int:
     assert "main_data:app" in start_command
     assert "uvicorn main:app" not in start_command
 
-    # Importing the deployment entrypoint must expose both core + intelligence routes.
+    # Request through the actual deployment entrypoint rather than relying on
+    # route-list internals. This confirms both the core product and intelligence
+    # directory are reachable from the same ASGI application.
     from main_data import app
 
-    paths = {str(getattr(route, "path", "")) for route in app.router.routes}
-    assert "/api/health" in paths
-    assert "/api/intelligence/health" in paths
-    assert "/data" in paths
+    client = TestClient(app)
+    core = client.get("/api/health")
+    assert core.status_code == 200, core.text
+    data = client.get("/data")
+    assert data.status_code == 200, data.text
+    intelligence = client.get("/api/intelligence/health")
+    assert intelligence.status_code == 200, intelligence.text
+    assert intelligence.json().get("status") == "ok"
 
     print("Deployment entrypoint checks OK")
     return 0
