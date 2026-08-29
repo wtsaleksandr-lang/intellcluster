@@ -46,6 +46,7 @@ def _same_place(
 def _fmcsa_profile(company) -> dict[str, object]:
     return {
         "dot_number": company.dot_number,
+        "usdot_number": company.dot_number,
         "status_code": company.status_code,
         "legal_name": company.legal_name,
         "dba_name": company.dba_name,
