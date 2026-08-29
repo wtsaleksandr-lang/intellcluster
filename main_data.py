@@ -14,6 +14,7 @@ from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.post_ingest_readiness import router as post_ingest_readiness_router
 from intelligence.route_hardening import prune_shadowed_legacy_routes
 from intelligence.search_empty_state import install_search_empty_state
+from intelligence.search_routes import router as search_page_router
 from intelligence.search_signal_ui import install_search_signal_ui
 from intelligence.sec_api import router as sec_api_router
 from intelligence.sec_export import router as sec_export_router
@@ -27,6 +28,7 @@ from intelligence.sync_observability import router as sync_observability_router
 prune_shadowed_legacy_routes(app)
 
 app.include_router(company_page_router)
+app.include_router(search_page_router)
 app.include_router(company_directory_router)
 app.include_router(compliance_export_router)
 app.include_router(importyeti_api_router)
