@@ -9,6 +9,7 @@ from sqlalchemy import func, insert, select, update
 
 from intelligence.database import connect, sync_checkpoints, sync_runs
 from intelligence.enrichment.fmcsa import RESOURCE_URL, SELECT_FIELDS, _company
+from intelligence.fmcsa_fast_seed import fast_seed_fmcsa_records
 from intelligence.incremental import upsert_source_record_incremental
 
 
@@ -76,6 +77,7 @@ async def sync_fmcsa(
     active_only: bool = True,
     limit: int | None = None,
     page_size: int = 5000,
+    fast_seed: bool = False,
 ) -> dict[str, int | str]:
     started = time.monotonic()
     last_dot = _load_checkpoint() if resume else 0
@@ -86,6 +88,7 @@ async def sync_fmcsa(
     unchanged = 0
     created = 0
 
+    mode_label = "fast bootstrap" if fast_seed else "conservative entity resolution"
     with connect() as conn:
         result = conn.execute(
             insert(sync_runs).values(
@@ -95,12 +98,13 @@ async def sync_fmcsa(
                 records_written=0,
                 message=(
                     f"FMCSA keyset sync after USDOT {last_dot:,}; "
-                    f"{'active US entities only' if active_only else 'all US statuses'}"
+                    f"{'active US entities only' if active_only else 'all US statuses'}; "
+                    f"mode={mode_label}"
                 ),
             )
         )
         run_id = int(result.inserted_primary_key[0])
-    _save_checkpoint(last_dot, "running", f"Started FMCSA run #{run_id}")
+    _save_checkpoint(last_dot, "running", f"Started FMCSA run #{run_id}; {mode_label}")
 
     try:
         while True:
@@ -122,12 +126,19 @@ async def sync_fmcsa(
                 records.append(company.to_source_record())
 
             if not records:
-                # Advance across malformed/non-US rows so a bad page cannot loop forever.
-                raw_dots = [int(str(row.get("dot_number"))) for row in rows if str(row.get("dot_number") or "").isdigit()]
+                raw_dots = [
+                    int(str(row.get("dot_number")))
+                    for row in rows
+                    if str(row.get("dot_number") or "").isdigit()
+                ]
                 if not raw_dots:
                     break
                 last_dot = max(raw_dots)
-                _save_checkpoint(last_dot, "running", f"Run #{run_id} skipped a page with no usable records")
+                _save_checkpoint(
+                    last_dot,
+                    "running",
+                    f"Run #{run_id} skipped a page with no usable records",
+                )
                 continue
 
             if limit is not None:
@@ -138,24 +149,34 @@ async def sync_fmcsa(
                 page_last_dot = int(records[-1].source_record_id)
 
             with connect() as conn:
-                for record in records:
-                    _, entity_created, state = upsert_source_record_incremental(conn, record)
-                    created += int(entity_created)
-                    if state == "new":
-                        new += 1
-                    elif state == "updated":
-                        updated += 1
-                    else:
-                        unchanged += 1
+                if fast_seed:
+                    stats = fast_seed_fmcsa_records(conn, records)
+                    created += stats["created"]
+                    new += stats["created"]
+                    unchanged += stats["existing"]
+                else:
+                    for record in records:
+                        _, entity_created, state = upsert_source_record_incremental(conn, record)
+                        created += int(entity_created)
+                        if state == "new":
+                            new += 1
+                        elif state == "updated":
+                            updated += 1
+                        else:
+                            unchanged += 1
 
             seen += len(records)
             last_dot = page_last_dot
-            _save_checkpoint(last_dot, "running", f"Run #{run_id} committed through USDOT {last_dot:,}")
+            _save_checkpoint(
+                last_dot,
+                "running",
+                f"Run #{run_id} committed through USDOT {last_dot:,}; {mode_label}",
+            )
             elapsed = time.monotonic() - started
             print(
                 f"[fmcsa] USDOT {last_dot:,} · {seen:,} processed · {new:,} new · "
                 f"{updated:,} updated · {unchanged:,} unchanged · {created:,} new entities · "
-                f"elapsed {_fmt_elapsed(elapsed)}",
+                f"{mode_label} · elapsed {_fmt_elapsed(elapsed)}",
                 flush=True,
             )
 
@@ -170,7 +191,7 @@ async def sync_fmcsa(
         _save_checkpoint(
             last_dot,
             status,
-            f"Run #{run_id} {'completed current query' if completed else 'paused at requested limit'}",
+            f"Run #{run_id} {'completed current query' if completed else 'paused at requested limit'}; {mode_label}",
         )
         with connect() as conn:
             conn.execute(
@@ -182,7 +203,7 @@ async def sync_fmcsa(
                     records_written=new + updated,
                     message=(
                         f"USDOT {initial_dot:,}->{last_dot:,}; {new:,} new, {updated:,} updated, "
-                        f"{unchanged:,} unchanged; elapsed {_fmt_elapsed(elapsed)}"
+                        f"{unchanged:,} unchanged; {mode_label}; elapsed {_fmt_elapsed(elapsed)}"
                     ),
                     finished_at=func.now(),
                 )
@@ -198,7 +219,7 @@ async def sync_fmcsa(
                     status="failed",
                     records_seen=seen,
                     records_written=new + updated,
-                    message=f"{str(exc)[:1500]} | elapsed {_fmt_elapsed(elapsed)}",
+                    message=f"{str(exc)[:1500]} | {mode_label} | elapsed {_fmt_elapsed(elapsed)}",
                     finished_at=func.now(),
                 )
             )
@@ -206,6 +227,7 @@ async def sync_fmcsa(
 
     return {
         "source": SOURCE_KEY,
+        "mode": "fast_seed" if fast_seed else "conservative",
         "start_usdot": initial_dot,
         "end_usdot": last_dot,
         "processed": seen,
@@ -219,10 +241,26 @@ async def sync_fmcsa(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Resumable FMCSA Company Census ingestion")
-    parser.add_argument("--fresh", action="store_true", help="Ignore the saved USDOT checkpoint and start from zero")
-    parser.add_argument("--all-statuses", action="store_true", help="Include inactive and pending U.S. entities")
+    parser.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Ignore the saved USDOT checkpoint and start from zero",
+    )
+    parser.add_argument(
+        "--all-statuses",
+        action="store_true",
+        help="Include inactive and pending U.S. entities",
+    )
     parser.add_argument("--limit", type=int, default=None, help="Maximum records to process in this run")
     parser.add_argument("--page-size", type=int, default=5000)
+    parser.add_argument(
+        "--fast-seed",
+        action="store_true",
+        help=(
+            "Use high-throughput one-entity-per-USDOT bootstrap. This refuses to run when "
+            "unrelated U.S. entities already exist; use conservative mode for mixed-source U.S. data."
+        ),
+    )
     args = parser.parse_args()
     result = asyncio.run(
         sync_fmcsa(
@@ -230,6 +268,7 @@ def main() -> None:
             active_only=not args.all_statuses,
             limit=args.limit,
             page_size=args.page_size,
+            fast_seed=args.fast_seed,
         )
     )
     print(result)
