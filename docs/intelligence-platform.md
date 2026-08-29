@@ -28,7 +28,7 @@ The platform separates four concerns:
 
 ### Selective paid trade intelligence
 - ImportYeti cached company, supplier, shipment and BOL evidence
-- paid acquisition is explicit and optional; it is never required for public directory browsing
+- paid acquisition is explicit, admin-authorized and optional; it is never required for public directory browsing
 
 ### Later / external-transition sources
 - USPTO company-linked intellectual property after the Open Data replacement interface is stable
@@ -51,13 +51,14 @@ The platform separates four concerns:
 ImportYeti uses a deliberate multi-gate acquisition model:
 
 1. **Normal GET/page-view code uses cached-only clients.** The default `ImportYetiClient()` cannot make a paid network request.
-2. **The environment master switch must be enabled.** `IMPORTYETI_ALLOW_LIVE=true` only makes paid acquisition possible; it does not cause spending by itself.
-3. **The call site must explicitly request live access.** Only `ImportYetiClient(allow_live=True)` can pass the client-level live gate.
-4. **The acquisition endpoint requires caller confirmation.** A real network acquisition uses `POST /api/intelligence/company/{slug}/enrich/importyeti?confirm_paid=true`.
-5. **Existing cache is returned without another purchase.** A repeat acquisition requires an explicit refresh rather than being triggered by browsing.
-6. **Negative lookup results are persisted.** A failed/ambiguous lookup is reused until an explicit refresh, preventing repeated paid searches for the same unresolved company.
+2. **A paid network path requires a signed admin session.** Public visitors cannot authorize spending by POSTing query parameters directly.
+3. **The environment master switch must be enabled.** `IMPORTYETI_ALLOW_LIVE=true` only makes paid acquisition possible; it does not cause spending by itself.
+4. **The call site must explicitly request live access.** Only `ImportYetiClient(allow_live=True)` can pass the client-level live gate.
+5. **The acquisition request requires explicit spending confirmation.** A real network acquisition uses `POST /api/intelligence/company/{slug}/enrich/importyeti?confirm_paid=true` from an authenticated admin session.
+6. **Existing cache is returned without another purchase.** A repeat acquisition requires an explicit refresh rather than being triggered by browsing.
+7. **Negative lookup results are persisted.** A failed/ambiguous lookup is reused until an explicit refresh, preventing repeated paid searches for the same unresolved company.
 
-A fixture can exercise the same normalization/cache path in CI without making a network request or consuming credits.
+The authorization check occurs before a network-capable ImportYeti client is created. `confirm_paid=true` records intent; it is not treated as authorization. Fixtures can exercise the same normalization/cache path in CI without making a network request or consuming credits.
 
 ## Registered bulk sources
 
@@ -94,7 +95,7 @@ IMPORTYETI_ALLOW_LIVE=false
 SEC_EDGAR_USER_AGENT=IntellCluster/1.0 contact@intellcluster.com
 ```
 
-Never commit live credentials to the repository.
+Paid ImportYeti acquisition also relies on the existing signed admin-session configuration (`ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_SECRET_KEY`). Never commit live credentials to the repository.
 
 ## Production sequencing
 
