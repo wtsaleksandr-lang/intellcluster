@@ -63,6 +63,28 @@ async def intelligence_company_sec_export(slug: str) -> Response:
                 "SEC EDGAR",
                 _cell(sec.get("source_url")),
             ])
+        financials = sec.get("financials") if isinstance(sec.get("financials"), dict) else {}
+        for metric, fact in financials.items():
+            if not isinstance(fact, dict):
+                continue
+            detail = " | ".join(
+                part
+                for part in (
+                    f"unit={fact.get('unit')}" if fact.get("unit") else "",
+                    f"form={fact.get('form')}" if fact.get("form") else "",
+                    f"period_end={fact.get('period_end')}" if fact.get("period_end") else "",
+                    f"filed={fact.get('filed')}" if fact.get("filed") else "",
+                    f"concept={fact.get('concept')}" if fact.get("concept") else "",
+                )
+                if part
+            )
+            writer.writerow([
+                "sec_financial_fact",
+                metric,
+                _cell(fact.get("value")),
+                detail,
+                _cell(sec.get("source_url")),
+            ])
         for filing in (sec.get("recent_filings") or [])[:100]:
             if not isinstance(filing, dict):
                 continue
