@@ -12,6 +12,7 @@ from intelligence.evidence_sitemap import install_evidence_sitemaps
 from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.post_ingest_readiness import router as post_ingest_readiness_router
 from intelligence.profile_guard import install_profile_guard
+from intelligence.route_hardening import prune_shadowed_legacy_routes
 from intelligence.search_empty_state import install_search_empty_state
 from intelligence.search_signal_ui import install_search_signal_ui
 from intelligence.sec_api import router as sec_api_router
@@ -20,6 +21,11 @@ from intelligence.sec_profile_ui import install_sec_profile_ui
 from intelligence.seo import install_seo_middleware, router as seo_router
 from intelligence.sitemap_cache import install_sitemap_cache
 from intelligence.sync_observability import router as sync_observability_router
+
+# ``main_data_core`` still imports the historical UI router for its page routes.
+# Remove the old duplicate U.S.-enrichment POST before mounting newer layers so
+# only the canonical free-only implementation in ``intelligence.api`` is active.
+prune_shadowed_legacy_routes(app)
 
 app.include_router(company_directory_router)
 app.include_router(compliance_export_router)
