@@ -79,7 +79,12 @@ def run() -> int:
             "CA",
             "SEC-CA-1001",
         )
-        assert us_id != ca_id
+        unmatched_id, unmatched_slug = _seed(
+            "IntellCluster Unlisted Private Logistics LLC",
+            "US",
+            "SEC-US-UNMATCHED",
+        )
+        assert len({us_id, ca_id, unmatched_id}) == 3
 
         response = client.post(
             f"/api/intelligence/company/{us_slug}/enrich/sec-edgar"
@@ -96,6 +101,19 @@ def run() -> int:
         assert cached.status_code == 200
         assert cached.json().get("lookup", {}).get("sec_edgar") == "cached"
 
+        no_match = client.post(
+            f"/api/intelligence/company/{unmatched_slug}/enrich/sec-edgar"
+        )
+        assert no_match.status_code == 200
+        assert no_match.json().get("lookup", {}).get("sec_edgar") == "no_confident_match"
+        repeated_no_match = client.post(
+            f"/api/intelligence/company/{unmatched_slug}/enrich/sec-edgar"
+        )
+        assert repeated_no_match.status_code == 200
+        repeated_payload = repeated_no_match.json()
+        assert repeated_payload.get("lookup", {}).get("sec_edgar") == "no_confident_match"
+        assert repeated_payload.get("lookup", {}).get("recently_checked") is True
+
         ca_response = client.post(
             f"/api/intelligence/company/{ca_slug}/enrich/sec-edgar"
         )
@@ -108,8 +126,11 @@ def run() -> int:
 
         with connect() as conn:
             refreshed = get_entity_by_slug(conn, us_slug)
+            unmatched = get_entity_by_slug(conn, unmatched_slug)
         assert refreshed is not None
         assert refreshed.get("enrichment", {}).get("sec_edgar", {}).get("ticker") == "ICST"
+        assert unmatched is not None
+        assert unmatched.get("enrichment", {}).get("sec_edgar_lookup", {}).get("status") == "no_confident_match"
 
         print("SEC EDGAR enrichment checks OK")
         return 0
