@@ -11,6 +11,7 @@ from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
 from intelligence.profile_guard import install_profile_guard
 from intelligence.search_empty_state import install_search_empty_state
+from intelligence.search_signal_ui import install_search_signal_ui
 from intelligence.sec_api import router as sec_api_router
 from intelligence.sec_export import router as sec_export_router
 from intelligence.sec_profile_ui import install_sec_profile_ui
@@ -25,6 +26,7 @@ app.include_router(seo_router)
 install_profile_guard(app)
 install_sec_profile_ui(app)
 install_search_empty_state(app)
+install_search_signal_ui(app)
 install_seo_middleware(app)
 install_evidence_sitemaps(app)
 # Install the cache last so it is the outermost sitemap middleware and can cache
