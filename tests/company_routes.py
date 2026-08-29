@@ -4,9 +4,15 @@ import os
 
 from fastapi.testclient import TestClient
 
+from intelligence.company_routes import _cached_bol
 from intelligence.database import connect, entities, source_records
 from intelligence.models import SourceRecord
-from intelligence.repository import set_entity_enrichment, upsert_source_record
+from intelligence.repository import (
+    get_entity_by_slug,
+    get_entity_enrichment,
+    set_entity_enrichment,
+    upsert_source_record,
+)
 from main_data import app
 
 client = TestClient(app)
@@ -72,20 +78,28 @@ def run() -> int:
     os.environ["IMPORTYETI_API_KEY"] = "should-never-be-used-by-page-routes"
     os.environ["INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE"] = "1"
     try:
+        with connect() as conn:
+            company = get_entity_by_slug(conn, slug)
+            assert company is not None
+            enrichment = get_entity_enrichment(conn, entity_id)
+        cached = _cached_bol(company, enrichment, "CACHEBOL1234")
+        assert cached is not None, {"company_importyeti": company.get("importyeti"), "enrichment": enrichment}
+        assert cached.get("supplier_name") == "Cached Supplier Co", cached
+
         profile = client.get(f"/data/company/{slug}")
         assert profile.status_code == 200, profile.text
         assert "Cached Route Logistics LLC" in profile.text
 
         bol = client.get(f"/data/company/{slug}/bol/CACHEBOL1234")
         assert bol.status_code == 200, bol.text
-        assert "CACHEBOL1234" in bol.text
-        assert "Cached Supplier Co" in bol.text
-        assert "Machine components" in bol.text
-        assert "12,500 kg" in bol.text
+        assert "CACHEBOL1234" in bol.text, bol.text[:1500]
+        assert "Cached Supplier Co" in bol.text, bol.text[:3000]
+        assert "Machine components" in bol.text, bol.text[:3000]
+        assert "12,500 kg" in bol.text, bol.text[:3000]
 
         missing_bol = client.get(f"/data/company/{slug}/bol/NOTCACHED9999")
         assert missing_bol.status_code == 200, missing_bol.text
-        assert "never triggers a paid data request" in missing_bol.text
+        assert "never triggers a paid data request" in missing_bol.text, missing_bol.text[:3000]
 
         demo = client.get("/data/company/maple-auto-supply-inc")
         assert demo.status_code == 200, demo.text
