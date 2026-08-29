@@ -18,12 +18,14 @@ from intelligence.sec_export import router as sec_export_router
 from intelligence.sec_profile_ui import install_sec_profile_ui
 from intelligence.seo import install_seo_middleware, router as seo_router
 from intelligence.sitemap_cache import install_sitemap_cache
+from intelligence.sync_observability import router as sync_observability_router
 
 app.include_router(company_directory_router)
 app.include_router(compliance_export_router)
 app.include_router(importyeti_api_router)
 app.include_router(sec_api_router)
 app.include_router(sec_export_router)
+app.include_router(sync_observability_router)
 app.include_router(seo_router)
 install_profile_guard(app)
 install_sec_profile_ui(app)
