@@ -189,7 +189,7 @@ def sync_status_snapshot(
                 "Named supplier relationships are derived from cached ImportYeti company profiles. "
                 "Corporations Canada and Canadian Importers ingestion does not populate this table."
             ),
-            "safe_backfill_command": "python -m intelligence.supplier_explorer",
+            "safe_backfill_command": "python -m intelligence.supplier_backfill",
             "backfill_network_calls": False,
         },
         "notes": [
