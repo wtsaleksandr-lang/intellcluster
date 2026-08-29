@@ -1,0 +1,63 @@
+{
+  "title": "Cached ImportYeti Test Company",
+  "_slug": "cached-importyeti-test-company",
+  "address": "100 Test Harbor Rd, Long Beach, CA",
+  "website": "example.com",
+  "phone_number": "+1 555 0100",
+  "total_shipments": 248,
+  "country": "United States",
+  "country_code": "US",
+  "time_series": {
+    "01/01/2026": {"shipments": 12, "teu": 18, "weight": 125000},
+    "01/02/2026": {"shipments": 15, "teu": 21, "weight": 142000},
+    "01/03/2026": {"shipments": 19, "teu": 27, "weight": 181000}
+  },
+  "hs_codes": [
+    {"hs_code": "8708", "description": "Motor vehicle parts", "shipments": 140},
+    {"hs_code": "8512", "description": "Vehicle lighting equipment", "shipments": 108}
+  ],
+  "suppliers_table": [
+    {
+      "supplier_name": "Cached Supplier One",
+      "country": "China",
+      "supplier_address_country": "China",
+      "total_shipments_company": 96,
+      "product_descriptions": ["automotive parts", "lighting assemblies"]
+    },
+    {
+      "supplier_name": "Cached Supplier Two",
+      "country": "Taiwan",
+      "supplier_address_country": "Taiwan",
+      "total_shipments_company": 54,
+      "product_descriptions": ["vehicle components"]
+    }
+  ],
+  "map_table": {"shipments_by_country": {"China": 160, "Taiwan": 88}},
+  "lane_permutations": [
+    {"exit_port": "Shanghai", "exit_port_country": "China", "entry_port": "Long Beach", "shipments": 82}
+  ],
+  "recent_bols": [
+    {
+      "date_formatted": "01/03/2026",
+      "Bill_of_Lading": "TESTBOL000001",
+      "Shipper_Name": "Cached Supplier One",
+      "supplier_address_country": "China",
+      "Product_Description": "automotive parts",
+      "HS_Code": "8708",
+      "Weight_in_KG": 18000,
+      "Quantity": 1200,
+      "Quantity_Unit": "PCS",
+      "containers_count": 1
+    }
+  ],
+  "containers_load": {
+    "full": {"shipments": 220, "shipments_perc": 88.7},
+    "less": {"shipments": 28, "shipments_perc": 11.3}
+  },
+  "bill_type_shipments": {"regular": 230, "house": 18},
+  "notify_party_shipments_perc": 23.4,
+  "avg_teu_per_shipment": {"12m": 1.4},
+  "avg_teu_per_month": {"12m": 28.7},
+  "total_shipping_cost": 420000,
+  "_cachedAt": "2026-08-27T00:00:00+00:00"
+}

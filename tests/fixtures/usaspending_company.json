@@ -1,0 +1,58 @@
+{
+  "recipient_search": [
+    {
+      "id": "fixture-recipient-R",
+      "duns": "123456789",
+      "uei": "FIXTUREUEI123",
+      "name": "INTELLCLUSTER USA TEST COMPANY",
+      "recipient_level": "R",
+      "amount": 4250000.0
+    }
+  ],
+  "awards": [
+    {
+      "Award ID": "W91TEST0001",
+      "Recipient Name": "INTELLCLUSTER USA TEST COMPANY",
+      "Recipient UEI": "FIXTUREUEI123",
+      "Recipient Location": {
+        "address_line1": "100 Test Industrial Rd",
+        "city_name": "Houston",
+        "state_code": "TX",
+        "zip5": "77001",
+        "country_code": "USA"
+      },
+      "Award Amount": 1750000.0,
+      "Start Date": "2026-01-15",
+      "End Date": "2027-01-14",
+      "Awarding Agency": "Department of Defense",
+      "Awarding Sub Agency": "Department of the Army",
+      "Funding Agency": "Department of Defense",
+      "NAICS": "336390",
+      "PSC": "2590",
+      "Description": "Vehicle components",
+      "Last Modified Date": "2026-08-20"
+    },
+    {
+      "Award ID": "W91TEST0002",
+      "Recipient Name": "INTELLCLUSTER USA TEST COMPANY",
+      "Recipient UEI": "FIXTUREUEI123",
+      "Recipient Location": {
+        "address_line1": "100 Test Industrial Rd",
+        "city_name": "Houston",
+        "state_code": "TX",
+        "zip5": "77001",
+        "country_code": "USA"
+      },
+      "Award Amount": 950000.0,
+      "Start Date": "2025-11-01",
+      "End Date": "2026-10-31",
+      "Awarding Agency": "General Services Administration",
+      "Awarding Sub Agency": "Federal Acquisition Service",
+      "Funding Agency": "General Services Administration",
+      "NAICS": "336390",
+      "PSC": "2590",
+      "Description": "Automotive replacement parts",
+      "Last Modified Date": "2026-07-18"
+    }
+  ]
+}

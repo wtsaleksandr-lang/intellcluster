@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}{% if supplier %}{{ supplier.name }} Supplier Intelligence | IntellCluster{% else %}Supplier Not Found | IntellCluster{% endif %}{% endblock %}
+{% block meta_desc %}{% if supplier %}Cached supplier intelligence for {{ supplier.name }}: linked importers, observed shipments, products, HS codes and sourcing evidence.{% else %}Supplier intelligence profile not found in the cached IntellCluster relationship index.{% endif %}{% endblock %}
+{% block body %}
+<style>
+  .supplier-page{max-width:1180px;margin:0 auto;padding:22px 18px 48px}.crumbs{font-size:9px;color:#8b8c92;margin-bottom:13px}.crumbs a{color:#5f6067}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:1px solid #e4e4e7;padding-bottom:18px}.eyebrow{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:#7c7d83}.hero h1{font-size:27px;line-height:1.05;letter-spacing:-.8px;margin:7px 0 6px}.hero p{margin:0;color:#71727a;font-size:11px}.cache-badge{display:inline-flex;border:1px solid #dedee1;border-radius:999px;padding:5px 8px;background:#f7f7f8;font-size:8px;color:#666870;white-space:nowrap}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:16px 0}.kpi{border:1px solid #e0e0e3;border-radius:9px;padding:13px;background:#fff}.kpi small{font-size:8px;text-transform:uppercase;letter-spacing:.45px;color:#919198;font-weight:750}.kpi strong{display:block;margin-top:5px;font-size:20px;letter-spacing:-.4px;color:#202123}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}.panel{border:1px solid #e1e1e4;border-radius:10px;background:#fff;padding:14px;margin-bottom:12px}.panel h2{font-size:13px;margin:0 0 3px;color:#202123}.panel .sub{font-size:9px;color:#92939a;margin-bottom:12px}.rows{display:flex;flex-direction:column;gap:7px}.bar-row{display:grid;grid-template-columns:minmax(145px,1fr) minmax(100px,2fr) 52px;gap:8px;align-items:center;font-size:9px}.bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#44454d}.bar-track{height:7px;border-radius:999px;background:#f0f0f1;overflow:hidden}.bar-fill{height:100%;background:#075a70;border-radius:999px}.bar-value{text-align:right;color:#7b7c82;font-variant-numeric:tabular-nums}.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{display:inline-flex;align-items:center;border:1px solid #dedee1;border-radius:6px;background:#f7f7f8;padding:5px 7px;font-size:9px;color:#53545b}.chip:hover{background:#fff;border-color:#aeb0b5;color:#111214}.table-wrap{overflow:auto;border:1px solid #e6e6e8;border-radius:8px}table{width:100%;border-collapse:collapse;font-size:9px;min-width:720px}th{text-align:left;background:#f7f7f8;color:#797a81;font-weight:800;padding:8px;border-bottom:1px solid #e3e3e5;white-space:nowrap}td{padding:9px 8px;border-bottom:1px solid #eeeeef;vertical-align:top;color:#56575f}tbody tr:hover{background:#fbfbfc}.company-link,.bol-link{font-weight:750;color:#202123}.company-link:hover,.bol-link:hover{text-decoration:underline;text-underline-offset:2px}.location{color:#73747b}.products{max-width:300px;line-height:1.35}.score{font-variant-numeric:tabular-nums;font-weight:750}.empty{border:1px solid #dedee1;border-radius:9px;padding:22px;color:#72737b;background:#fafafa}.source-note{font-size:8px;line-height:1.45;color:#96979d;margin-top:10px}.hs-link{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.desc{max-width:330px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric-pill{display:inline-flex;border:1px solid #e0e0e2;border-radius:999px;padding:3px 6px;background:#fff;font-variant-numeric:tabular-nums}.section-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.section-head a{font-size:8px;color:#777982}
+  @media(max-width:800px){.hero{flex-direction:column}.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.bar-row{grid-template-columns:minmax(115px,1fr) minmax(90px,1.5fr) 44px}}
+  @media(max-width:480px){.supplier-page{padding:15px 12px 35px}.kpis{grid-template-columns:1fr 1fr}.hero h1{font-size:22px}}
+</style>
+<main class="supplier-page">
+  <div class="crumbs"><a href="/data">IntellCluster Data</a> / <a href="/data/suppliers">Suppliers</a> / Supplier Intelligence</div>
+  {% if error %}
+    <div class="empty"><strong>Supplier intelligence unavailable.</strong><br>{{ error }}<br><br><a href="/data/suppliers">Return to supplier directory</a></div>
+  {% else %}
+    <section class="hero">
+      <div><div class="eyebrow">Cached Supplier Intelligence</div><h1>{{ supplier.name }}</h1><p>{% if supplier.country %}<a href="/data/origin/{{ supplier.country|urlencode }}">{{ supplier.country }}</a> · {% endif %}Derived from previously cached shipment intelligence across linked importers.</p></div>
+      <span class="cache-badge">No live API call{% if supplier.cached_at %} · cached {{ supplier.cached_at[:10] }}{% endif %}</span>
+    </section>
+
+    <section class="kpis">
+      <div class="kpi"><small>Linked Importers</small><strong>{{ supplier.importer_count }}</strong></div>
+      <div class="kpi"><small>Observed Shipments</small><strong>{{ "{:,}".format(supplier.total_shipments) }}</strong></div>
+      <div class="kpi"><small>Product Signals</small><strong>{{ supplier.products|length }}</strong></div>
+      <div class="kpi"><small>HS Signals</small><strong>{{ supplier.hs_codes|length }}</strong></div>
+    </section>
+
+    <div class="grid">
+      <div>
+        <section class="panel">
+          <div class="section-head"><div><h2>Linked Importers</h2><div class="sub">Companies in our cached dataset that have sourced from this supplier</div></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Importer</th><th>Location</th><th>Shipments</th><th>Buyer Score</th><th>Products</th></tr></thead>
+              <tbody>
+              {% for row in supplier.importers %}
+                <tr>
+                  <td><a class="company-link" href="/data/company/{{ row.slug }}">{{ row.name }}</a></td>
+                  <td class="location">{% if row.city and row.province %}<a href="/data/location/{{ row.province|urlencode }}/{{ row.city|urlencode }}">{{ row.city }}, {{ row.province }}</a>{% elif row.province %}<a href="/data/location/{{ row.province|urlencode }}">{{ row.province }}</a>{% else %}{{ row.country }}{% endif %}</td>
+                  <td><span class="metric-pill">{{ "{:,}".format(row.shipments) }}</span></td>
+                  <td class="score">{% if row.buyer_score %}{{ row.buyer_score }}/100{% else %}—{% endif %}</td>
+                  <td class="products">{{ row.products|join(' · ') if row.products else '—' }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {% if supplier.recent_bols %}
+        <section class="panel">
+          <h2>Recent Cached Shipment Evidence</h2><div class="sub">BOL rows already stored in importer profile caches</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>BOL</th><th>Importer</th><th>Product</th><th>HS</th><th>Weight</th><th>Qty</th></tr></thead>
+              <tbody>
+              {% for bol in supplier.recent_bols %}
+                {% set bol_number = bol.Bill_of_Lading or bol.bill_of_lading or '' %}
+                <tr>
+                  <td>{{ bol.date_formatted or bol.Arrival_Date or '—' }}</td>
+                  <td>{% if bol_number and bol._importer_slug %}<a class="bol-link" href="/data/company/{{ bol._importer_slug }}/bol/{{ bol_number|urlencode }}">{{ bol_number }}</a>{% else %}{{ bol_number or '—' }}{% endif %}</td>
+                  <td>{% if bol._importer_slug %}<a class="company-link" href="/data/company/{{ bol._importer_slug }}">{{ bol._importer_name or 'Importer' }}</a>{% else %}—{% endif %}</td>
+                  <td class="desc" title="{{ bol.Product_Description or '' }}">{{ bol.Product_Description or '—' }}</td>
+                  <td>{% if bol.HS_Code %}<a class="hs-link" href="/data/hs/{{ bol.HS_Code }}">{{ bol.HS_Code }}</a>{% else %}—{% endif %}</td>
+                  <td>{{ bol.Weight_in_KG or '—' }}</td>
+                  <td>{{ bol.Quantity or '—' }} {{ bol.Quantity_Unit or '' }}</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        {% endif %}
+      </div>
+
+      <aside>
+        {% if supplier.products %}
+        <section class="panel"><h2>Product Signals</h2><div class="sub">Descriptions associated with this supplier across linked importers</div><div class="rows">
+          {% set max_product = supplier.products[0].count %}
+          {% for item in supplier.products %}<div class="bar-row"><span class="bar-label" title="{{ item.label }}">{{ item.label }}</span><span class="bar-track"><span class="bar-fill" style="width:{{ (item.count * 100 / max_product)|round(1) }}%"></span></span><span class="bar-value">{{ item.count }}</span></div>{% endfor %}
+        </div></section>
+        {% endif %}
+
+        {% if supplier.hs_codes %}
+        <section class="panel"><h2>HS Evidence</h2><div class="sub">HS codes found in cached recent shipment rows</div><div class="chips">{% for item in supplier.hs_codes %}<a class="chip hs-link" href="/data/hs/{{ item.label }}">HS {{ item.label }} · {{ item.count }}</a>{% endfor %}</div></section>
+        {% endif %}
+
+        {% if supplier.countries %}
+        <section class="panel"><h2>Supplier Geography</h2><div class="sub">Country signals weighted by observed supplier shipments</div><div class="chips">{% for item in supplier.countries %}<a class="chip" href="/data/origin/{{ item.label|urlencode }}">{{ item.label }} · {{ item.count }}</a>{% endfor %}</div></section>
+        {% endif %}
+
+        <div class="source-note">Source: previously purchased/cached ImportYeti company-profile data stored in IntellCluster. This page performs no live ImportYeti request and does not consume API credits.</div>
+      </aside>
+    </div>
+  {% endif %}
+</main>
+{% endblock %}

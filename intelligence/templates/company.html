@@ -1,0 +1,55 @@
+{% extends "company_compliance.html" %}
+{% block body %}
+{{ super() }}
+<style>
+  .rel-top10{margin-top:14px;padding-top:12px;border-top:1px solid #e5ecef}.rel-top10-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.rel-top10-head strong{margin:0!important;color:#315563!important;font-size:9px!important}.rel-top10-head span{font-size:7px;color:#8b989e}.rel-top10-list{display:flex;flex-direction:column;gap:3px}.rel-top10-item{display:grid;grid-template-columns:17px 1fr auto;gap:6px;align-items:center;padding:5px 6px;border-radius:4px;color:#3a5662;font-size:7px;cursor:pointer;transition:background .12s ease}.rel-top10-item:hover{background:#eef7fa}.rel-top10-rank{display:grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#e6f0f4;color:#075a70;font-weight:800}.rel-top10-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rel-top10-value{font-weight:800;color:#075a70}.rel-evidence-toast{position:fixed;z-index:1600;left:50%;bottom:22px;transform:translate(-50%,12px);padding:8px 11px;border:1px solid #9bb5c0;border-radius:5px;background:#fff;color:#26424e;font-size:8px;box-shadow:0 10px 28px rgba(0,0,0,.16);opacity:0;pointer-events:none;transition:.15s}.rel-evidence-toast.show{opacity:1;transform:translate(-50%,0)}.rel-line{cursor:pointer}.rel-line:hover{stroke:#008fba!important;opacity:1!important}
+  .rel-filter-bar{display:none;align-items:center;justify-content:space-between;gap:10px;margin:8px 0;padding:7px 9px;border:1px solid #b9d7e2;border-radius:5px;background:#f2f9fb;color:#315563;font-size:8px}.rel-filter-bar.visible{display:flex}.rel-filter-bar button{border:1px solid #9fc5d4;background:#fff;color:#075a70;border-radius:4px;padding:5px 7px;font-size:8px;font-weight:700;cursor:pointer}.rel-filter-bar button:hover{background:#e7f4f8}
+  .ic-capability.ic-jumpable{cursor:pointer;transition:background .12s ease,box-shadow .12s ease}.ic-capability.ic-jumpable:hover{background:#f3f9fb!important;box-shadow:inset 0 -2px #168aac}.ic-capability.ic-jumpable .ic-capability-label:after{content:'↘';margin-left:auto;color:#168aac;font-size:8px}
+  .ic-source-badge.ic-freshness{background:#f2f8f5!important;border-color:#c9dfd3!important;color:#34725a!important;font-weight:650!important}.ic-source-badge.ic-freshness .ic-source-dot{background:#32956c!important}.ic-source-badge.ic-freshness.stale{background:#fbf7ee!important;border-color:#e5d6ad!important;color:#8b6a26!important}.ic-source-badge.ic-freshness.stale .ic-source-dot{background:#bd8b23!important}
+</style>
+<script id="relationship-evidence-enhancer">
+(() => {
+  const stage=document.querySelector('.relationship-stage'),svg=document.getElementById('relationshipSvg');
+  if(!stage||!svg)return;
+  const legend=stage.querySelector('.relationship-legend');
+  const supplierRows=[...document.querySelectorAll('#supplierTable tbody tr')];
+  const parseCount=row=>{const cell=row.cells?.[3];if(!cell)return 0;const strong=cell.querySelector('strong');const n=Number(String(strong?.textContent||'').replace(/[^0-9.]/g,''));return Number.isFinite(n)?n:0;};
+  const suppliers=supplierRows.map(row=>({name:(row.querySelector('.supplier-link')?.textContent||'').trim(),href:row.querySelector('.supplier-link')?.getAttribute('href')||'',count:parseCount(row)})).filter(x=>x.name).sort((a,b)=>b.count-a.count).slice(0,10);
+  if(legend&&suppliers.length&&!legend.querySelector('.rel-top10')){const box=document.createElement('div');box.className='rel-top10';box.innerHTML=`<div class="rel-top10-head"><strong>Top 10 relationships</strong><span>cached evidence</span></div><div class="rel-top10-list"></div>`;const list=box.querySelector('.rel-top10-list');suppliers.forEach((s,i)=>{const a=document.createElement('a');a.className='rel-top10-item';a.href=s.href||`/data/supplier/${encodeURIComponent(s.name)}`;a.innerHTML=`<span class="rel-top10-rank">${i+1}</span><span class="rel-top10-name">${s.name.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</span><span class="rel-top10-value">${s.count.toLocaleString()}</span>`;list.appendChild(a)});legend.appendChild(box);}
+
+  let toast=document.querySelector('.rel-evidence-toast');if(!toast){toast=document.createElement('div');toast.className='rel-evidence-toast';document.body.appendChild(toast);}let toastTimer;
+  const notify=text=>{toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2400);};
+  const supplierFromKey=key=>String(key||'').startsWith('supplier:')?String(key).slice(9):'';
+  const clearBolFilter=()=>{document.querySelectorAll('[data-bol-row]').forEach(row=>{row.style.display='';});const bar=document.querySelector('.rel-filter-bar');if(bar)bar.classList.remove('visible');notify('Relationship shipment filter cleared.');};
+  const showFilterBar=(supplier,shown)=>{const section=document.getElementById('recent-bols');if(!section)return;let bar=section.querySelector('.rel-filter-bar');if(!bar){bar=document.createElement('div');bar.className='rel-filter-bar';bar.innerHTML='<span></span><button type="button">Clear filter</button>';bar.querySelector('button').addEventListener('click',clearBolFilter);const anchor=section.querySelector('.panel-head,.section-title-row,h2,h3');if(anchor)anchor.insertAdjacentElement('afterend',bar);else section.prepend(bar);}bar.querySelector('span').textContent=`Showing ${shown} cached BOL record${shown===1?'':'s'} linked to ${supplier}`;bar.classList.add('visible');};
+  const filterBols=supplier=>{const rows=[...document.querySelectorAll('[data-bol-row]')];if(!rows.length)return false;const needle=supplier.trim().toLowerCase();let shown=0;rows.forEach(row=>{const hit=(row.dataset.supplier||'').trim().toLowerCase()===needle;row.style.display=hit?'':'none';if(hit)shown++;});if(!shown)return false;showFilterBar(supplier,shown);document.getElementById('recent-bols')?.scrollIntoView({behavior:'smooth',block:'start'});notify(`${shown} cached BOL record${shown===1?'':'s'} for ${supplier}`);return true;};
+  const wireLines=()=>svg.querySelectorAll('.rel-line').forEach(line=>{if(line.dataset.evidenceWired==='1')return;line.dataset.evidenceWired='1';line.setAttribute('tabindex','0');line.setAttribute('role','link');const activate=event=>{event.preventDefault();event.stopPropagation();const supplier=supplierFromKey(line.dataset.target)||supplierFromKey(line.dataset.source);if(supplier&&filterBols(supplier))return;if(supplier){location.href=`/data/supplier/${encodeURIComponent(supplier)}`;return;}notify('Open either connected node for underlying evidence.');};line.addEventListener('click',activate);line.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){activate(e);}});});
+  wireLines();
+  new MutationObserver(wireLines).observe(svg,{childList:true,subtree:true});
+})();
+</script>
+<script id="profile-compliance-placement">
+(() => {
+  const compliance=document.getElementById('us-compliance-intelligence');if(!compliance)return;
+  const place=()=>{const usPublic=document.getElementById('us-public-intelligence');const coverage=document.querySelector('.ic-capability-wrap');const anchor=usPublic||coverage;if(anchor&&compliance.previousElementSibling!==anchor)anchor.insertAdjacentElement('afterend',compliance);document.querySelectorAll('.ic-capability').forEach(cell=>{const label=cell.querySelector('.ic-capability-label')?.textContent?.replace('↘','').trim();if(!['Facilities','Compliance'].includes(label||''))return;cell.classList.add('ic-jumpable');cell.title=(cell.title?cell.title+' · ':'')+'Open Facilities & Compliance';if(cell.dataset.compJumpWired==='1')return;cell.dataset.compJumpWired='1';cell.addEventListener('click',()=>compliance.scrollIntoView({behavior:'smooth',block:'start'}));});const source=document.querySelector('.source-line');if(source){const existing=[...source.querySelectorAll('.ic-source-badge')].map(x=>x.textContent||'');const add=label=>{if(existing.some(x=>x.includes(label)))return;const b=document.createElement('span');b.className='ic-source-badge';b.innerHTML=`<i class="ic-source-dot"></i>${label}`;source.appendChild(b);};if(compliance.querySelector('.us-comp-chip:nth-child(1)'))add('EPA ECHO');if([...compliance.querySelectorAll('.us-comp-chip')].some(x=>(x.textContent||'').includes('OSHA')))add('OSHA');}}
+  };
+  place();setTimeout(place,180);setTimeout(place,900);
+})();
+</script>
+{% set enrich = company.enrichment if company.enrichment else {} %}
+{% set iy = company.importyeti if company.importyeti else enrich.get('importyeti', {}) %}
+<script id="profile-source-freshness">
+(() => {
+  const dates={
+    importyeti:{{ (iy.get('_cachedAt','') if iy else '')|tojson }},
+    usPublic:{{ (enrich.get('us_public_lookup',{}).get('checked_at','') if enrich else '')|tojson }},
+    compliance:{{ (enrich.get('us_compliance_lookup',{}).get('checked_at','') if enrich else '')|tojson }}
+  };
+  const pretty=value=>{if(!value)return'';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});};
+  const days=value=>{if(!value)return null;const d=new Date(value);return Number.isNaN(d.getTime())?null:Math.floor((Date.now()-d.getTime())/86400000);};
+  const sync=()=>{const source=document.querySelector('.source-line');if(!source)return;source.querySelectorAll('[data-source-freshness]').forEach(x=>x.remove());const add=(key,label,value)=>{const date=pretty(value);if(!date)return;const age=days(value),badge=document.createElement('span');badge.className='ic-source-badge ic-freshness'+(age!==null&&age>45?' stale':'');badge.dataset.sourceFreshness=key;badge.title=age===null?'Cached source evidence':`Cached ${age} day${age===1?'':'s'} ago`;badge.innerHTML=`<i class="ic-source-dot"></i>${label} · ${date}`;source.appendChild(badge);};add('importyeti','Trade cache',dates.importyeti);add('us-public','U.S. public data',dates.usPublic);add('compliance','Compliance check',dates.compliance);};
+  sync();setTimeout(sync,350);setTimeout(sync,1100);
+  document.querySelectorAll('#contacts a[href]').forEach(a=>{let href=a.getAttribute('href')||'';href=href.replace(/^https:\/\/https?:\/\//i,m=>m.slice(8));if(/^https:\/\/www\./i.test(href)||/^https:\/\/[^/]+/i.test(href)){a.setAttribute('href',href);}if(!/^https?:\/\//i.test(href)&&href&&!href.startsWith('/'))a.setAttribute('href','https://'+href);a.setAttribute('rel','nofollow noopener');if(a.getAttribute('target')==='_blank')a.setAttribute('rel','nofollow noopener');});
+})();
+</script>
+{% endblock %}

@@ -87,8 +87,8 @@ PUBLIC_ROUTES = [
     # Tag page for the live article's tags
     ("/blog/tag/methodology", 200),
     ("/blog/tag/does-not-exist", 404),
-    # Scheduled posts remain 404 until their publish_date
-    ("/blog/multi-model-research-vs-single-llm", 404),
+    # This scheduled post is now published and should resolve normally.
+    ("/blog/multi-model-research-vs-single-llm", 200),
     # 404 path returns a templated 404 with status 404
     ("/compare/definitely-does-not-exist", 404),
     # Legacy redirects

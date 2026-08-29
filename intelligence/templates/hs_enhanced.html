@@ -1,0 +1,50 @@
+{% extends "hs_enhanced_core.html" %}
+{% block body %}
+{{ super() }}
+<script id="hs-ranking-interaction-fix">
+(() => {
+  const box=document.getElementById('hsRankBox');if(!box)return;
+  const rows=[...box.querySelectorAll('[data-hs-rank-row]')];
+  const search=document.getElementById('hsRankSearch');
+  const fast=document.getElementById('hsFastGrowing');
+  const top=document.getElementById('hsTopOnly');
+  const newer=document.getElementById('hsNewOnly');
+  const show=document.getElementById('hsRankShow');
+  const empty=document.getElementById('hsRankEmpty');
+  const tabs=[...document.querySelectorAll('[data-hs-rank-view]')];
+  let expanded=false;
+
+  const expectedKind=()=>box.dataset.view==='companies'?'company':'supplier';
+  function apply(){
+    const kind=expectedKind(),q=(search?.value||'').trim().toLowerCase();
+    let eligible=0,visible=0;
+    rows.forEach(row=>{
+      const viewOk=row.dataset.kind===kind;
+      const qOk=!q||(row.dataset.name||'').includes(q)||(row.dataset.products||'').includes(q);
+      const fastOk=!fast?.checked||row.dataset.fast==='1';
+      const newOk=!newer?.checked||row.dataset.new==='1';
+      const topOk=!top?.checked||Number(row.dataset.rank||999)<=10;
+      let ok=viewOk&&qOk&&fastOk&&newOk&&topOk;
+      if(ok){eligible++;if(!expanded&&eligible>7)ok=false;}
+      row.classList.toggle('hidden-rank',!ok);
+      if(ok)visible++;
+    });
+    if(empty)empty.style.display=visible?'none':'block';
+    if(show){show.style.display=eligible>7?'block':'none';show.textContent=expanded?'Show Less':`Show More (${eligible-7})`;}
+  }
+
+  tabs.forEach(tab=>tab.addEventListener('click',event=>{
+    event.preventDefault();event.stopImmediatePropagation();
+    box.dataset.view=tab.dataset.hsRankView||'suppliers';expanded=false;
+    tabs.forEach(btn=>btn.classList.toggle('active',btn===tab));
+    apply();
+  },true));
+  [search,fast,top,newer].filter(Boolean).forEach(control=>{
+    const type=control.tagName==='INPUT'&&control.type==='search'?'input':'change';
+    control.addEventListener(type,event=>{event.stopImmediatePropagation();expanded=false;apply();},true);
+  });
+  if(show)show.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();expanded=!expanded;apply();},true);
+  apply();
+})();
+</script>
+{% endblock %}

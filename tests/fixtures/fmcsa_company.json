@@ -1,0 +1,20 @@
+[
+  {
+    "dot_number": "1234567",
+    "status_code": "A",
+    "legal_name": "INTELLCLUSTER LOGISTICS USA LLC",
+    "dba_name": "IC LOGISTICS",
+    "phy_street": "500 PORT RD",
+    "phy_city": "HOUSTON",
+    "phy_state": "TX",
+    "phy_zip": "77029",
+    "phy_country": "US",
+    "phone": "7135550100",
+    "cell_phone": "7135550199",
+    "power_units": "42",
+    "total_drivers": "48",
+    "mcs150_date": "20260801 0000",
+    "add_date": "20180115",
+    "carrier_operation": "A"
+  }
+]
