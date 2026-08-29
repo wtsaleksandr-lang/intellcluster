@@ -3,7 +3,11 @@ from __future__ import annotations
 from sqlalchemy import select
 
 from intelligence.database import connect, entities, source_records
-from intelligence.fmcsa_fast_seed import SOURCE_KEY, fast_seed_fmcsa_records
+from intelligence.fmcsa_fast_seed import (
+    SOURCE_KEY,
+    fast_seed_fmcsa_records,
+    fast_seed_readiness,
+)
 from intelligence.models import SourceRecord
 from intelligence.repository import upsert_source_record
 
@@ -67,6 +71,11 @@ def run() -> int:
     ]
     try:
         with connect() as conn:
+            initial = fast_seed_readiness(conn)
+        assert initial["safe"] is True
+        assert initial["non_fmcsa_us_entities"] == 0
+
+        with connect() as conn:
             first = fast_seed_fmcsa_records(conn, records)
         assert first["created"] == 2
         assert first["existing"] == 0
@@ -86,11 +95,14 @@ def run() -> int:
                 )
                 .order_by(source_records.c.source_record_id)
             ).mappings().all()
+            resumed_readiness = fast_seed_readiness(conn)
         assert len(rows) == 2
         assert rows[0]["slug"].endswith("usdot9100001")
         assert rows[0]["corporate_status"] == "Active"
         assert rows[0]["enrichment"]["fmcsa"]["dot_number"] == "9100001"
         assert rows[1]["corporate_status"] == "Inactive"
+        assert resumed_readiness["safe"] is True
+        assert resumed_readiness["fmcsa_linked_us_entities"] >= 2
 
         with connect() as conn:
             resumed = fast_seed_fmcsa_records(conn, records)
@@ -111,6 +123,9 @@ def run() -> int:
             foreign_id, _ = upsert_source_record(conn, foreign)
         try:
             with connect() as conn:
+                blocked = fast_seed_readiness(conn)
+                assert blocked["safe"] is False
+                assert blocked["non_fmcsa_us_entities"] >= 1
                 try:
                     fast_seed_fmcsa_records(
                         conn,
