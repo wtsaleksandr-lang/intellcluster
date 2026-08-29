@@ -45,6 +45,7 @@ jobs:
           python -m tests.search_empty_state
           python -m tests.search_us_signals
           python -m tests.importyeti_cost_guard
+          python -m tests.sync_observability
 
   lint:
     name: Lint intelligence changes
@@ -58,4 +59,4 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Run correctness lint on new intelligence layer
-        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_persistence.py tests/intelligence_ui.py tests/intelligence_compliance_export.py tests/fmcsa_fast_seed.py tests/intelligence_api.py tests/sec_edgar.py tests/evidence_sitemap.py tests/search_empty_state.py tests/search_us_signals.py tests/importyeti_cost_guard.py --select F,E4,E7,E9 --output-format=github
+        run: ruff check intelligence main_data.py tests/intelligence_unit.py tests/intelligence_persistence.py tests/intelligence_ui.py tests/intelligence_compliance_export.py tests/fmcsa_fast_seed.py tests/intelligence_api.py tests/sec_edgar.py tests/evidence_sitemap.py tests/search_empty_state.py tests/search_us_signals.py tests/importyeti_cost_guard.py tests/sync_observability.py --select F,E4,E7,E9 --output-format=github
