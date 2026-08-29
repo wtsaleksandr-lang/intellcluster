@@ -14,6 +14,7 @@ from intelligence.entity_resolution import normalize_company_name
 
 TICKERS_URL = "https://www.sec.gov/files/company_tickers_exchange.json"
 SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik}.json"
+COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
 _CACHE_TTL_SECONDS = 86_400
 _TICKER_CACHE: tuple[float, list[dict[str, Any]]] | None = None
 
@@ -112,10 +113,90 @@ def _recent_filings(submissions: dict[str, Any], limit: int = 20) -> list[dict[s
     return filings
 
 
-def compact_sec_profile(match: SECCompanyMatch, submissions: dict[str, Any]) -> dict[str, Any]:
+def _latest_fact(
+    companyfacts: dict[str, Any],
+    concepts: tuple[str, ...],
+) -> dict[str, Any] | None:
+    facts = companyfacts.get("facts")
+    us_gaap = facts.get("us-gaap") if isinstance(facts, dict) else None
+    if not isinstance(us_gaap, dict):
+        return None
+
+    allowed_forms = {"10-K", "10-Q", "10-K/A", "10-Q/A", "20-F", "40-F"}
+    for concept in concepts:
+        fact = us_gaap.get(concept)
+        units = fact.get("units") if isinstance(fact, dict) else None
+        if not isinstance(units, dict):
+            continue
+        candidates: list[tuple[str, str, dict[str, Any], str]] = []
+        for unit, entries in units.items():
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                if not isinstance(entry, dict) or entry.get("val") is None:
+                    continue
+                form = str(entry.get("form") or "")
+                if form and form not in allowed_forms:
+                    continue
+                filed = str(entry.get("filed") or "")
+                end = str(entry.get("end") or "")
+                candidates.append((filed, end, entry, str(unit)))
+        if not candidates:
+            continue
+        candidates.sort(key=lambda item: (item[0], item[1]), reverse=True)
+        _, _, entry, unit = candidates[0]
+        return {
+            "concept": concept,
+            "label": str(fact.get("label") or concept),
+            "description": str(fact.get("description") or ""),
+            "value": entry.get("val"),
+            "unit": unit,
+            "period_end": entry.get("end"),
+            "filed": entry.get("filed"),
+            "form": entry.get("form"),
+            "fiscal_year": entry.get("fy"),
+            "fiscal_period": entry.get("fp"),
+            "frame": entry.get("frame"),
+        }
+    return None
+
+
+def _financial_snapshot(companyfacts: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+    if not isinstance(companyfacts, dict):
+        return {}
+    concepts = {
+        "revenue": (
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "Revenues",
+            "SalesRevenueNet",
+        ),
+        "net_income": ("NetIncomeLoss", "ProfitLoss"),
+        "operating_income": ("OperatingIncomeLoss",),
+        "assets": ("Assets",),
+        "liabilities": ("Liabilities",),
+        "equity": ("StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"),
+        "cash": (
+            "CashAndCashEquivalentsAtCarryingValue",
+            "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+        ),
+    }
+    snapshot: dict[str, dict[str, Any]] = {}
+    for key, alternatives in concepts.items():
+        fact = _latest_fact(companyfacts, alternatives)
+        if fact:
+            snapshot[key] = fact
+    return snapshot
+
+
+def compact_sec_profile(
+    match: SECCompanyMatch,
+    submissions: dict[str, Any],
+    companyfacts: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     tickers = submissions.get("tickers") if isinstance(submissions.get("tickers"), list) else []
     exchanges = submissions.get("exchanges") if isinstance(submissions.get("exchanges"), list) else []
     recent = _recent_filings(submissions)
+    financials = _financial_snapshot(companyfacts)
     return {
         "cik": match.cik,
         "name": str(submissions.get("name") or match.name),
@@ -132,9 +213,14 @@ def compact_sec_profile(match: SECCompanyMatch, submissions: dict[str, Any]) -> 
         "latest_filing_date": recent[0].get("filingDate") if recent else None,
         "latest_filing_form": recent[0].get("form") if recent else None,
         "recent_filings": recent,
+        "financials": financials,
         "source": "SEC EDGAR",
         "source_url": f"https://www.sec.gov/edgar/browse/?CIK={match.cik}",
-        "coverage_note": "Ticker-associated SEC filers; a missing match does not prove the company has no SEC filings.",
+        "coverage_note": (
+            "Ticker-associated SEC filers; a missing match does not prove the company has no SEC filings. "
+            "Financial facts are the latest standardized XBRL facts filed for each concept and may represent "
+            "annual, quarterly or year-to-date periods depending on the filing."
+        ),
     }
 
 
@@ -228,10 +314,38 @@ class SECEDGARClient:
             raise ValueError("SEC submissions returned an unexpected payload")
         return payload
 
+    async def companyfacts(self, cik: str) -> dict[str, Any]:
+        digits = "".join(ch for ch in str(cik) if ch.isdigit()).zfill(10)
+        if not digits.strip("0"):
+            raise ValueError("A valid SEC CIK is required")
+
+        fixture = _fixture()
+        if fixture is not None:
+            payload = fixture.get("companyfacts")
+            if not isinstance(payload, dict):
+                return {}
+            return payload
+
+        async with httpx.AsyncClient(
+            timeout=self.timeout,
+            headers=self.headers,
+            follow_redirects=True,
+        ) as client:
+            response = await client.get(COMPANYFACTS_URL.format(cik=digits))
+            response.raise_for_status()
+            payload = response.json()
+        if not isinstance(payload, dict):
+            raise ValueError("SEC company facts returned an unexpected payload")
+        return payload
+
     async def company_profile(self, query: str) -> dict[str, Any] | None:
         matches = await self.search(query, limit=5)
         if len(matches) != 1:
             return None
         match = matches[0]
         submissions = await self.submissions(match.cik)
-        return compact_sec_profile(match, submissions)
+        try:
+            companyfacts = await self.companyfacts(match.cik)
+        except (httpx.HTTPError, RuntimeError, ValueError):
+            companyfacts = {}
+        return compact_sec_profile(match, submissions, companyfacts)
