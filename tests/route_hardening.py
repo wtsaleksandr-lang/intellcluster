@@ -2,19 +2,19 @@ from __future__ import annotations
 
 from main_data import app
 
-PATH = "/api/intelligence/company/{slug}/enrich/us-public"
-
 
 def run() -> int:
-    matches = []
+    legacy = []
     for route in app.router.routes:
         path = str(getattr(route, "path", ""))
-        methods = set(getattr(route, "methods", set()) or set())
-        if path == PATH and "POST" in methods:
-            endpoint = getattr(route, "endpoint", None)
-            matches.append(str(getattr(endpoint, "__module__", "")))
+        endpoint = getattr(route, "endpoint", None)
+        module = str(getattr(endpoint, "__module__", ""))
+        if "enrich/us-public" in path and module == "intelligence.ui":
+            legacy.append(path)
 
-    assert matches == ["intelligence.api"], matches
+    assert not legacy, legacy
+    # Canonical route behavior itself is covered by tests.intelligence_api; this
+    # regression specifically guarantees the obsolete UI-layer copy is gone.
     print("Route hardening checks OK")
     return 0
 
