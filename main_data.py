@@ -9,12 +9,16 @@ from main_data_core import app
 from intelligence.company_directory import router as company_directory_router
 from intelligence.compliance_export import router as compliance_export_router
 from intelligence.profile_guard import install_profile_guard
+from intelligence.sec_api import router as sec_api_router
+from intelligence.sec_profile_ui import install_sec_profile_ui
 from intelligence.seo import install_seo_middleware, router as seo_router
 from intelligence.sitemap_cache import install_sitemap_cache
 
 app.include_router(company_directory_router)
 app.include_router(compliance_export_router)
+app.include_router(sec_api_router)
 app.include_router(seo_router)
 install_profile_guard(app)
+install_sec_profile_ui(app)
 install_sitemap_cache(app)
 install_seo_middleware(app)
