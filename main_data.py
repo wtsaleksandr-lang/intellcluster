@@ -9,6 +9,7 @@ from main_data_core import app
 from intelligence.company_directory import router as company_directory_router
 from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
+from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.profile_guard import install_profile_guard
 from intelligence.search_empty_state import install_search_empty_state
 from intelligence.search_signal_ui import install_search_signal_ui
@@ -20,6 +21,7 @@ from intelligence.sitemap_cache import install_sitemap_cache
 
 app.include_router(company_directory_router)
 app.include_router(compliance_export_router)
+app.include_router(importyeti_api_router)
 app.include_router(sec_api_router)
 app.include_router(sec_export_router)
 app.include_router(seo_router)
