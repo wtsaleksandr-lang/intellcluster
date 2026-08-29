@@ -278,7 +278,8 @@ def install_seo_middleware(app) -> None:
         clean_path = _canonical_path(path)
         canonical = base + clean_path
         noindex = (
-            path.startswith("/data/search")
+            response.status_code >= 400
+            or path.startswith("/data/search")
             or path.startswith("/data/suggest")
             or (clean_path == "/data/companies" and bool(request.query_params))
         )
