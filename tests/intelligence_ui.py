@@ -145,6 +145,10 @@ def run() -> int:
         company_text = company_response.text
         if "relationship-evidence-enhancer" not in company_text or "Top 10 relationships" not in company_text:
             failed.append(f"/data/company/{slug}: relationship evidence drilldown enhancer missing")
+        if "rel-bol-filter" not in company_text or "Clear filter" not in company_text:
+            failed.append(f"/data/company/{slug}: relationship BOL clear-filter control missing")
+        if "profile-source-freshness" not in company_text:
+            failed.append(f"/data/company/{slug}: source freshness enhancer missing")
         if f'<link rel="canonical" href="https://intellcluster.com/data/company/{slug}">' not in company_text:
             failed.append(f"/data/company/{slug}: canonical URL missing")
         if 'type="application/ld+json"' not in company_text or '"@type":"Organization"' not in company_text:
@@ -156,6 +160,9 @@ def run() -> int:
         search_text = client.get("/data/search?q=IntellCluster").text
         if '<meta name="robots" content="noindex,follow">' not in search_text:
             failed.append("/data/search: filtered search should be noindex,follow")
+        error_response = client.get("/data/company/this-profile-does-not-exist")
+        if error_response.status_code >= 400 and '<meta name="robots" content="noindex,follow">' not in error_response.text:
+            failed.append("/data error page: HTTP error HTML should be noindex,follow")
         robots = client.get("/robots.txt").text
         if "Sitemap: https://intellcluster.com/sitemap.xml" not in robots:
             failed.append("/robots.txt: sitemap directive missing")
