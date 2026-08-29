@@ -114,10 +114,12 @@ def run() -> int:
             ("/data/suppliers?q=Cached&country=China&sort=importers", 200),
             ("/data/supplier/Cached%20Supplier%20One", 200),
             (f"/data/company/{slug}", 200),
+            ("/data/company/maple-auto-supply-inc", 200),
             (f"/data/company/{slug}/export.csv", 200),
             ("/robots.txt", 200),
             ("/sitemap.xml", 200),
             ("/sitemaps/static.xml", 200),
+            ("/sitemaps/suppliers.xml", 200),
             ("/sitemaps/companies-1.xml", 200),
             ("/api/intelligence/health", 200),
             ("/api/intelligence/freshness", 200),
@@ -161,7 +163,9 @@ def run() -> int:
         if '<meta name="robots" content="noindex,follow">' not in search_text:
             failed.append("/data/search: filtered search should be noindex,follow")
         error_response = client.get("/data/company/this-profile-does-not-exist")
-        if error_response.status_code >= 400 and '<meta name="robots" content="noindex,follow">' not in error_response.text:
+        if error_response.status_code != 404:
+            failed.append("/data/company unknown slug: expected strict HTTP 404")
+        if '<meta name="robots" content="noindex,follow">' not in error_response.text:
             failed.append("/data error page: HTTP error HTML should be noindex,follow")
         robots = client.get("/robots.txt").text
         if "Sitemap: https://intellcluster.com/sitemap.xml" not in robots:
@@ -169,9 +173,14 @@ def run() -> int:
         sitemap_index = client.get("/sitemap.xml").text
         if "/sitemaps/intelligence.xml" not in sitemap_index:
             failed.append("/sitemap.xml: intelligence sitemap missing")
+        if "/sitemaps/suppliers.xml" not in sitemap_index:
+            failed.append("/sitemap.xml: supplier sitemap missing")
         sitemap = client.get("/sitemaps/companies-1.xml").text
         if f"/data/company/{slug}" not in sitemap:
             failed.append("/sitemaps/companies-1.xml: seeded company missing")
+        supplier_sitemap = client.get("/sitemaps/suppliers.xml").text
+        if "/data/supplier/Cached%20Supplier%20One" not in supplier_sitemap:
+            failed.append("/sitemaps/suppliers.xml: cached supplier missing")
         intelligence_sitemap = client.get("/sitemaps/intelligence.xml").text
         for expected_path in ("/data/hs/870892", "/data/origin/China", "/data/location/ON", "/data/location/ON/Hamilton"):
             if expected_path not in intelligence_sitemap:
