@@ -3,8 +3,9 @@ from __future__ import annotations
 import os
 
 from fastapi.testclient import TestClient
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 
+from intelligence.data_quality import data_quality_report
 from intelligence.database import (
     connect,
     entities,
@@ -114,10 +115,11 @@ def run() -> int:
         with connect() as conn:
             relationship_count = int(
                 conn.execute(
-                    select(supplier_relationships.c.id).where(
-                        supplier_relationships.c.importer_entity_id.in_([first, second])
-                    )
-                ).scalars().all().__len__()
+                    select(func.count())
+                    .select_from(supplier_relationships)
+                    .where(supplier_relationships.c.importer_entity_id.in_([first, second]))
+                ).scalar_one()
+                or 0
             )
         assert relationship_count == 2
 
@@ -126,6 +128,12 @@ def run() -> int:
         assert report["paid_sources_called"] is False
         assert "recommended_sequence" in report
         assert report["supplier_index"]["recommended_command"] == "python -m intelligence.supplier_backfill"
+
+        quality = data_quality_report()
+        assert quality["network_calls"] == 0
+        assert quality["paid_sources_called"] is False
+        assert quality["checks"]["orphan_source_records"] == 0
+        assert quality["checks"]["orphan_supplier_relationships"] == 0
 
         anonymous = TestClient(app).get("/api/intelligence/admin/post-ingest-readiness")
         assert anonymous.status_code == 401
