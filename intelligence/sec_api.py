@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime, timedelta
 
 import httpx
@@ -81,9 +82,18 @@ async def intelligence_company_sec_edgar_enrichment(slug: str) -> dict[str, obje
                 "lookup": {"sec_edgar": status},
                 "paid_sources_called": False,
             }
+
         match = strong[0]
-        submissions = await client.submissions(match.cik)
-        profile = compact_sec_profile(match, submissions)
+        submissions_result, facts_result = await asyncio.gather(
+            client.submissions(match.cik),
+            client.companyfacts(match.cik),
+            return_exceptions=True,
+        )
+        if isinstance(submissions_result, Exception):
+            raise submissions_result
+        submissions = submissions_result
+        companyfacts = {} if isinstance(facts_result, Exception) else facts_result
+        profile = compact_sec_profile(match, submissions, companyfacts)
         with connect() as conn:
             set_entity_enrichment(conn, int(company["id"]), "sec_edgar", profile)
             set_entity_enrichment(conn, int(company["id"]), "sec_edgar_lookup", _marker("matched"))
