@@ -6,6 +6,7 @@ coupling SEO work to ingestion or the core directory UI.
 """
 
 from main_data_core import app
+from intelligence.bol_cache_compat import install_cached_bol_compat
 from intelligence.company_directory import router as company_directory_router
 from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
@@ -36,6 +37,7 @@ app.include_router(sync_observability_router)
 app.include_router(post_ingest_readiness_router)
 app.include_router(seo_router)
 install_profile_guard(app)
+install_cached_bol_compat(app)
 install_sec_profile_ui(app)
 install_search_empty_state(app)
 install_search_signal_ui(app)
