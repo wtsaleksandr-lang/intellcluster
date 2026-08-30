@@ -6,7 +6,7 @@ from typing import Any
 
 from sqlalchemy import func, select, text
 
-from intelligence.database import get_engine, sync_checkpoints
+from intelligence.database import connect, get_engine, sync_checkpoints
 
 TRIGRAM_EXTENSION = "pg_trgm"
 SEARCH_INDEXES = (
@@ -44,8 +44,9 @@ SEARCH_INDEXES = (
 
 
 def _running_sync_count() -> int:
-    engine = get_engine()
-    with engine.connect() as conn:
+    # ``connect()`` also initializes an empty local/CI database, so a standalone
+    # status command is safe before any ingestion has been run.
+    with connect() as conn:
         return int(
             conn.execute(
                 select(func.count())
@@ -58,9 +59,9 @@ def _running_sync_count() -> int:
 
 def search_index_status() -> dict[str, Any]:
     """Inspect optional text-search acceleration without changing the database."""
+    running_syncs = _running_sync_count()
     engine = get_engine()
     dialect = str(engine.dialect.name or "").lower()
-    running_syncs = _running_sync_count()
     result: dict[str, Any] = {
         "dialect": dialect,
         "supported": dialect == "postgresql",
