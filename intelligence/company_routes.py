@@ -15,6 +15,7 @@ from intelligence.repository import get_entity_by_slug, get_entity_enrichment
 
 router = APIRouter(tags=["intelligence-company-pages"])
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+_ROUTE_HEADER = "X-IntellCluster-Page-Route"
 
 _LEGACY_DEMO = {
     "slug": "maple-auto-supply-inc",
@@ -135,8 +136,10 @@ async def intelligence_company_page(request: Request, slug: str):
         company = _test_demo(slug)
         demo_mode = company is not None
     if company is None:
-        return HTMLResponse(_not_found_page(slug), status_code=404)
-    return templates.TemplateResponse(
+        response = HTMLResponse(_not_found_page(slug), status_code=404)
+        response.headers[_ROUTE_HEADER] = "company"
+        return response
+    response = templates.TemplateResponse(
         request=request,
         name="company.html",
         context={
@@ -146,6 +149,8 @@ async def intelligence_company_page(request: Request, slug: str):
             "demo_mode": demo_mode,
         },
     )
+    response.headers[_ROUTE_HEADER] = "company"
+    return response
 
 
 @router.get("/data/company/{slug}/bol/{bol_number}", response_class=HTMLResponse)
@@ -155,7 +160,7 @@ async def intelligence_cached_bol_page(request: Request, slug: str, bol_number: 
         company = get_entity_by_slug(conn, slug)
         enrichment = get_entity_enrichment(conn, int(company["id"])) if company else {}
     if company is None:
-        return templates.TemplateResponse(
+        response = templates.TemplateResponse(
             request=request,
             name="bol.html",
             context={
@@ -166,9 +171,11 @@ async def intelligence_cached_bol_page(request: Request, slug: str, bol_number: 
             },
             status_code=404,
         )
+        response.headers[_ROUTE_HEADER] = "cached-bol"
+        return response
 
     bol = _cached_bol(company, enrichment, bol_number)
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         request=request,
         name="bol.html",
         context={
@@ -183,3 +190,5 @@ async def intelligence_cached_bol_page(request: Request, slug: str, bol_number: 
         },
         status_code=200,
     )
+    response.headers[_ROUTE_HEADER] = "cached-bol"
+    return response
