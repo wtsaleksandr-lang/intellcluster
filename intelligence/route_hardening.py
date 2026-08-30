@@ -7,20 +7,29 @@ LEGACY_COMPANY_PATH = "/data/company/{slug}"
 LEGACY_BOL_PATH = "/data/company/{slug}/bol/{bol_number}"
 LEGACY_SEARCH_PATH = "/data/search"
 
-_SUPERSEDED = {
-    (LEGACY_US_PUBLIC_PATH, "POST"),
+_PAGE_REPLACEMENTS = {
     (LEGACY_COMPANY_PATH, "GET"),
     (LEGACY_BOL_PATH, "GET"),
     (LEGACY_SEARCH_PATH, "GET"),
 }
 
 
-def _prune_routes(routes: list[Any]) -> int:
-    """Recursively remove superseded routes owned by ``intelligence.ui``.
+def _route_path(route: Any) -> str:
+    return str(getattr(route, "path", None) or getattr(route, "path_format", None) or "")
 
-    FastAPI 0.141 keeps included routers as nested ``_IncludedRouter`` objects,
-    while older versions flatten them. Walking ``.routes`` recursively works with
-    both representations and avoids relying on framework-version-specific layout.
+
+def _prune_routes(routes: list[Any]) -> int:
+    """Recursively remove routes that are superseded before focused mounts.
+
+    ``main_data.py`` calls this after importing ``main_data_core`` but before it
+    mounts the focused company/search routers. Therefore every pre-existing GET
+    registration for those exact page paths is obsolete, regardless of how the
+    installed FastAPI version wraps the originating router. This is deliberately
+    path/method based instead of relying on ``endpoint.__module__`` metadata.
+
+    The U.S. public enrichment route is different: the canonical implementation
+    from ``intelligence.api`` is already mounted by ``main_data_core`` and must be
+    preserved. Only competing registrations for that POST are removed.
     """
     kept: list[Any] = []
     removed = 0
@@ -31,25 +40,27 @@ def _prune_routes(routes: list[Any]) -> int:
 
         endpoint = getattr(route, "endpoint", None)
         module = str(getattr(endpoint, "__module__", ""))
-        path = str(getattr(route, "path", ""))
+        path = _route_path(route)
         methods = set(getattr(route, "methods", set()) or set())
-        is_superseded = any(path == target and method in methods for target, method in _SUPERSEDED)
-        if module == "intelligence.ui" and is_superseded:
+
+        replace_page = any(
+            path == target and method in methods
+            for target, method in _PAGE_REPLACEMENTS
+        )
+        replace_us_public = (
+            path == LEGACY_US_PUBLIC_PATH
+            and "POST" in methods
+            and module != "intelligence.api"
+        )
+        if replace_page or replace_us_public:
             removed += 1
             continue
         kept.append(route)
 
-    if removed:
-        routes[:] = kept
+    routes[:] = kept
     return removed
 
 
 def prune_shadowed_legacy_routes(app: Any) -> int:
-    """Remove only legacy UI routes replaced by focused canonical modules.
-
-    ``main_data_core`` still mounts ``intelligence.ui`` for older pages that have
-    not yet been migrated. Company profiles, cached BOL detail, truthful search and
-    the U.S. public-enrichment action have focused implementations, so their old UI
-    registrations are removed before those focused page routers are mounted.
-    """
+    """Remove superseded registrations before focused canonical routes mount."""
     return _prune_routes(app.router.routes)
