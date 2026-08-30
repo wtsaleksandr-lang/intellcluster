@@ -69,6 +69,14 @@ def _cleanup(entity_id: int) -> None:
         conn.execute(entities.delete().where(entities.c.id == entity_id))
 
 
+def _load_cached(entity_id: int, slug: str):
+    with connect() as conn:
+        company = get_entity_by_slug(conn, slug)
+        assert company is not None
+        enrichment = get_entity_enrichment(conn, entity_id)
+    return company, enrichment, _cached_bol(company, enrichment, "CACHEBOL1234")
+
+
 def run() -> int:
     entity_id, slug = _seed()
     old_live = os.environ.get("IMPORTYETI_ALLOW_LIVE")
@@ -78,20 +86,26 @@ def run() -> int:
     os.environ["IMPORTYETI_API_KEY"] = "should-never-be-used-by-page-routes"
     os.environ["INTELLIGENCE_ALLOW_LEGACY_DEMO_PROFILE"] = "1"
     try:
-        with connect() as conn:
-            company = get_entity_by_slug(conn, slug)
-            assert company is not None
-            enrichment = get_entity_enrichment(conn, entity_id)
-        cached = _cached_bol(company, enrichment, "CACHEBOL1234")
+        company, enrichment, cached = _load_cached(entity_id, slug)
         assert cached is not None, {"company_importyeti": company.get("importyeti"), "enrichment": enrichment}
         assert cached.get("supplier_name") == "Cached Supplier Co", cached
 
         profile = client.get(f"/data/company/{slug}")
         assert profile.status_code == 200, profile.text
+        assert profile.headers.get("x-intellcluster-page-route") == "company", profile.headers
         assert "Cached Route Logistics LLC" in profile.text
+
+        # A normal profile view must not consume or erase the BOL cache.
+        company_after, enrichment_after, cached_after = _load_cached(entity_id, slug)
+        assert cached_after is not None, {
+            "company_importyeti": company_after.get("importyeti"),
+            "enrichment": enrichment_after,
+        }
+        assert cached_after.get("supplier_name") == "Cached Supplier Co", cached_after
 
         bol = client.get(f"/data/company/{slug}/bol/CACHEBOL1234")
         assert bol.status_code == 200, bol.text
+        assert bol.headers.get("x-intellcluster-page-route") == "cached-bol", bol.headers
         assert "CACHEBOL1234" in bol.text, bol.text[:1500]
         assert "Cached Supplier Co" in bol.text, bol.text[:3000]
         assert "Machine components" in bol.text, bol.text[:3000]
@@ -99,14 +113,17 @@ def run() -> int:
 
         missing_bol = client.get(f"/data/company/{slug}/bol/NOTCACHED9999")
         assert missing_bol.status_code == 200, missing_bol.text
+        assert missing_bol.headers.get("x-intellcluster-page-route") == "cached-bol"
         assert "never triggers a paid data request" in missing_bol.text, missing_bol.text[:3000]
 
         demo = client.get("/data/company/maple-auto-supply-inc")
         assert demo.status_code == 200, demo.text
+        assert demo.headers.get("x-intellcluster-page-route") == "company"
         assert "Maple Auto Supply Inc." in demo.text
 
         missing_company = client.get("/data/company/company-route-definitely-missing")
         assert missing_company.status_code == 404, missing_company.text
+        assert missing_company.headers.get("x-intellcluster-page-route") == "company"
         assert "Company profile not found" in missing_company.text
 
         print("Cached-only company route checks OK")
