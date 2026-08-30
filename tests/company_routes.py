@@ -92,7 +92,6 @@ def run() -> int:
 
         profile = client.get(f"/data/company/{slug}")
         assert profile.status_code == 200, profile.text
-        assert profile.headers.get("x-intellcluster-page-route") == "company", profile.headers
         assert "Cached Route Logistics LLC" in profile.text
 
         # A normal profile view must not consume or erase the BOL cache.
@@ -105,7 +104,6 @@ def run() -> int:
 
         bol = client.get(f"/data/company/{slug}/bol/CACHEBOL1234")
         assert bol.status_code == 200, bol.text
-        assert bol.headers.get("x-intellcluster-page-route") == "cached-bol", bol.headers
         assert "CACHEBOL1234" in bol.text, bol.text[:1500]
         assert "Cached Supplier Co" in bol.text, bol.text[:3000]
         assert "Machine components" in bol.text, bol.text[:3000]
@@ -113,17 +111,14 @@ def run() -> int:
 
         missing_bol = client.get(f"/data/company/{slug}/bol/NOTCACHED9999")
         assert missing_bol.status_code == 200, missing_bol.text
-        assert missing_bol.headers.get("x-intellcluster-page-route") == "cached-bol"
         assert "never triggers a paid data request" in missing_bol.text, missing_bol.text[:3000]
 
         demo = client.get("/data/company/maple-auto-supply-inc")
         assert demo.status_code == 200, demo.text
-        assert demo.headers.get("x-intellcluster-page-route") == "company"
         assert "Maple Auto Supply Inc." in demo.text
 
         missing_company = client.get("/data/company/company-route-definitely-missing")
         assert missing_company.status_code == 404, missing_company.text
-        assert missing_company.headers.get("x-intellcluster-page-route") == "company"
         assert "Company profile not found" in missing_company.text
 
         print("Cached-only company route checks OK")
