@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 
 from intelligence.database import connect, entities, source_records, sync_checkpoints
 from intelligence.fmcsa_fast_seed import fast_seed_readiness
+from intelligence.search_indexing import search_index_status
 from intelligence.sync_observability import sync_status_snapshot
 from shared.admin import require_admin
 
@@ -94,6 +95,12 @@ def post_ingest_readiness() -> dict[str, Any]:
             "Supplier index is empty; run the cached-only supplier backfill after Canada ingestion completes."
         )
 
+    search_indexes = search_index_status()
+    if search_indexes.get("supported") and not search_indexes.get("all_installed"):
+        warnings.append(
+            "Optional PostgreSQL trigram search indexes are not fully installed. Build them after planned bulk ingestion is complete, not while Canada/FMFCSA ingestion is running."
+        )
+
     importyeti_live = os.environ.get("IMPORTYETI_ALLOW_LIVE", "").strip().casefold() in {
         "1",
         "true",
@@ -118,6 +125,7 @@ def post_ingest_readiness() -> dict[str, Any]:
             "recommended_command": "python -m intelligence.supplier_backfill",
         },
         "fmcsa_fast_seed": fmcsa,
+        "search_indexes": search_indexes,
         "recommended_sequence": [
             "Wait until Canada ingestion reports complete and no sync is running.",
             "Pull/deploy the latest main branch.",
@@ -127,6 +135,8 @@ def post_ingest_readiness() -> dict[str, Any]:
             "Run python -m intelligence.fmcsa_ingest --validate-fast-seed.",
             "If safe, validate with python -m intelligence.fmcsa_ingest --fast-seed --limit 1000.",
             "Review the 1,000-row validation before starting a full FMCSA bootstrap.",
+            "After all planned bulk ingestion is finished, run python -m intelligence.search_indexing to inspect search acceleration status.",
+            "On PostgreSQL, install missing optional text indexes with python -m intelligence.search_indexing --apply --confirm while no sync is running.",
         ],
         "network_calls": 0,
         "paid_sources_called": False,
