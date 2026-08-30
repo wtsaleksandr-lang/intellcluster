@@ -1,0 +1,1 @@
+- [Long-running ingestion](ingestion-workflow.md) — use a managed console workflow so checkpointed ingestion survives workspace restarts.
