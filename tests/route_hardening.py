@@ -15,12 +15,12 @@ _SUPERSEDED = {
 }
 
 
-def _walk(routes: Any):
+def _walk(routes: Any, depth: int = 0):
     for route in routes or []:
-        yield route
+        yield depth, route
         children = getattr(route, "routes", None)
         if children is not None:
-            yield from _walk(children)
+            yield from _walk(children, depth + 1)
 
 
 def _path(route: Any) -> str:
@@ -28,7 +28,7 @@ def _path(route: Any) -> str:
 
 
 def _router_has(router: Any, path: str, method: str, module: str) -> bool:
-    for route in _walk(getattr(router, "routes", [])):
+    for _depth, route in _walk(getattr(router, "routes", [])):
         if _path(route) != path:
             continue
         if method not in set(getattr(route, "methods", set()) or set()):
@@ -40,27 +40,9 @@ def _router_has(router: Any, path: str, method: str, module: str) -> bool:
 
 
 def run() -> int:
-    # Focused routers must own the canonical implementations themselves. This is
-    # more stable than assuming FastAPI will always flatten included routers into
-    # the application with identical internal route objects.
-    assert _router_has(
-        company_router,
-        "/data/company/{slug}",
-        "GET",
-        "intelligence.company_routes",
-    )
-    assert _router_has(
-        company_router,
-        "/data/company/{slug}/bol/{bol_number}",
-        "GET",
-        "intelligence.company_routes",
-    )
-    assert _router_has(
-        search_router,
-        "/data/search",
-        "GET",
-        "intelligence.search_routes",
-    )
+    assert _router_has(company_router, "/data/company/{slug}", "GET", "intelligence.company_routes")
+    assert _router_has(company_router, "/data/company/{slug}/bol/{bol_number}", "GET", "intelligence.company_routes")
+    assert _router_has(search_router, "/data/search", "GET", "intelligence.search_routes")
     assert _router_has(
         intelligence_api_router,
         "/api/intelligence/company/{slug}/enrich/us-public",
@@ -68,15 +50,29 @@ def run() -> int:
         "intelligence.api",
     )
 
-    # No superseded route may remain mounted from the legacy monolithic UI
-    # router. Focused behavior is covered separately by company/search/API tests.
     legacy = []
-    for route in _walk(getattr(app.router, "routes", [])):
+    interesting = []
+    for depth, route in _walk(getattr(app.router, "routes", [])):
         endpoint = getattr(route, "endpoint", None)
         module = str(getattr(endpoint, "__module__", ""))
+        name = str(getattr(endpoint, "__name__", ""))
         path = _path(route)
+        methods = sorted(set(getattr(route, "methods", set()) or set()))
+        if "company" in path or "bol" in path or path == "/data/search":
+            interesting.append(
+                {
+                    "depth": depth,
+                    "type": type(route).__name__,
+                    "path": path,
+                    "methods": methods,
+                    "module": module,
+                    "endpoint": name,
+                    "name": str(getattr(route, "name", "")),
+                }
+            )
         if module == "intelligence.ui" and path in _SUPERSEDED:
-            legacy.append((path, sorted(set(getattr(route, "methods", set()) or set()))))
+            legacy.append((path, methods, name))
+    print("INTELLIGENCE ROUTE DIAGNOSTICS:", interesting)
     assert not legacy, legacy
 
     print("Route hardening checks OK")
