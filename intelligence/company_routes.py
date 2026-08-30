@@ -98,7 +98,9 @@ def _cached_bol(company: dict[str, Any], enrichment: dict[str, Any], bol_number:
     key = f"importyeti_bol:{bol_number}"
     direct = enrichment.get(key) if isinstance(enrichment, dict) else None
     if isinstance(direct, dict):
-        return dict(direct)
+        normalized = _normalize_cached_bol(direct, company=company)
+        normalized["_cache_source"] = "direct_bol_cache"
+        return normalized
 
     iy = company.get("importyeti") if isinstance(company.get("importyeti"), dict) else None
     if not iy and isinstance(enrichment, dict) and isinstance(enrichment.get("importyeti"), dict):
