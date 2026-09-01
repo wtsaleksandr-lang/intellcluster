@@ -9,6 +9,7 @@ from xml.sax.saxutils import escape as xml_escape
 from fastapi import Request
 from fastapi.responses import Response
 from sqlalchemy import and_, exists, func, or_, select
+from sqlalchemy.engine import Connection
 
 from intelligence.database import (
     connect,
@@ -36,6 +37,11 @@ def _iso_date(value: object) -> str:
 
 
 def _indexable_company_condition():
+    """Return the canonical evidence threshold used for company indexing.
+
+    Registry-only entities remain browseable and linkable, but they should not
+    compete in search results until IntellCluster has a stronger business signal.
+    """
     strong_source = exists(
         select(source_records.c.id).where(
             and_(
@@ -66,6 +72,16 @@ def _indexable_company_condition():
     )
 
 
+def company_is_indexable(conn: Connection, slug: str) -> bool:
+    """Check whether a company profile meets the same threshold as sitemaps."""
+    value = conn.execute(
+        select(func.count())
+        .select_from(entities)
+        .where(entities.c.slug == slug, _indexable_company_condition())
+    ).scalar_one()
+    return bool(value)
+
+
 def _sitemap_index() -> Response:
     with connect() as conn:
         total = int(
@@ -77,6 +93,7 @@ def _sitemap_index() -> Response:
     pages = max(1, math.ceil(total / SITEMAP_PAGE_SIZE))
     paths = [
         "/sitemaps/static.xml",
+        "/sitemaps/markets.xml",
         "/sitemaps/intelligence.xml",
         "/sitemaps/suppliers.xml",
     ]
