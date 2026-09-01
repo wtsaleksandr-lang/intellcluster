@@ -89,8 +89,35 @@ def run() -> int:
         assert index.status_code == 200
         assert "/sitemaps/companies-1.xml" in index.text
         assert "/sitemaps/suppliers.xml" in index.text
+        assert "/sitemaps/markets.xml" in index.text
 
-        print("Evidence-tier sitemap checks OK")
+        markets = client.get("/sitemaps/markets.xml")
+        assert markets.status_code == 200
+        assert "https://intellcluster.com/data/canada" in markets.text
+        assert "https://intellcluster.com/data/usa" in markets.text
+
+        canada = client.get("/data/canada")
+        assert canada.status_code == 200
+        assert "Canada Company &amp; Importer Intelligence" in canada.text
+        assert "CollectionPage" in canada.text
+        assert 'content="index,follow,max-image-preview:large,max-snippet:-1"' in canada.text
+
+        usa = client.get("/data/usa")
+        assert usa.status_code == 200
+        assert "U.S. Company, Carrier &amp; Public Intelligence" in usa.text
+        assert "FMCSA" in usa.text
+
+        thin_profile = client.get(f"/data/company/{thin_slug}")
+        assert thin_profile.status_code == 200
+        assert 'content="noindex,follow"' in thin_profile.text
+        assert thin_profile.headers.get("x-robots-tag") == "noindex, follow"
+
+        strong_profile = client.get(f"/data/company/{strong_slug}")
+        assert strong_profile.status_code == 200
+        assert 'content="index,follow,max-image-preview:large,max-snippet:-1"' in strong_profile.text
+        assert strong_profile.headers.get("x-robots-tag") is None
+
+        print("Evidence-tier sitemap and market SEO checks OK")
         return 0
     finally:
         _cleanup()
