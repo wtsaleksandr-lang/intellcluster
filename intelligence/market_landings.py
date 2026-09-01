@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 import os
-from urllib.parse import quote
+import time
 from xml.sax.saxutils import escape as xml_escape
 
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import and_, func, select
+from sqlalchemy import func, select
 
 from intelligence.database import connect, entities, importer_relationships, source_records
 
 router = APIRouter(tags=["intelligence-market-landings"])
 templates = Jinja2Templates(directory="intelligence/templates")
+_MARKET_STATS_TTL_SECONDS = 900
+_MARKET_STATS_CACHE: dict[str, tuple[float, dict]] = {}
 
 _MARKETS = {
     "canada": {
@@ -59,6 +61,11 @@ def _base_url() -> str:
 
 
 def _market_stats(code: str) -> dict:
+    now = time.monotonic()
+    cached = _MARKET_STATS_CACHE.get(code)
+    if cached and now - cached[0] < _MARKET_STATS_TTL_SECONDS:
+        return cached[1]
+
     country = func.upper(func.coalesce(entities.c.country, ""))
     with connect() as conn:
         company_count = int(
@@ -122,7 +129,7 @@ def _market_stats(code: str) -> dict:
             .limit(12)
         ).mappings().all()
 
-    return {
+    stats = {
         "company_count": company_count,
         "importer_count": importer_count,
         "strong_records": strong_records,
@@ -130,6 +137,8 @@ def _market_stats(code: str) -> dict:
         "regions": [dict(row) for row in regions],
         "cities": [dict(row) for row in cities],
     }
+    _MARKET_STATS_CACHE[code] = (now, stats)
+    return stats
 
 
 async def _market_page(request: Request, slug: str) -> HTMLResponse:
