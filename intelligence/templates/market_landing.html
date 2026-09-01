@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ market.title }} | IntellCluster{% endblock %}
+{% block meta_desc %}{{ market.description }}{% endblock %}
+{% block body %}
+<script type="application/ld+json">{{ collection_schema|tojson }}</script>
+<style>
+.market-page{max-width:1080px;margin:0 auto;padding:18px 18px 56px}.market-hero{padding:34px 0 26px;border-bottom:1px solid #e2e2e5}.market-kicker{font-size:11px;color:#74767e;font-weight:700;text-transform:uppercase;letter-spacing:.8px}.market-hero h1{font-size:36px;line-height:1.08;letter-spacing:-1.3px;color:#202123;margin:10px 0 13px;max-width:820px}.market-hero p{font-size:14px;line-height:1.7;color:#5e6068;max-width:780px;margin:0}.market-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.market-action{display:inline-flex;align-items:center;border:1px solid #202123;border-radius:8px;padding:10px 13px;font-size:11px;font-weight:700;background:#202123;color:#fff}.market-action.secondary{background:#fff;color:#202123;border-color:#d4d4d8}.market-action:hover{box-shadow:0 5px 16px rgba(0,0,0,.08)}.market-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.market-stat{border:1px solid #dedee1;border-radius:9px;padding:14px;background:#fff}.market-stat small{display:block;color:#83858c;font-size:8px;text-transform:uppercase;letter-spacing:.55px}.market-stat strong{display:block;color:#202123;font-size:21px;margin-top:5px}.market-section{margin:30px 0}.market-section h2{font-size:20px;letter-spacing:-.35px;color:#202123;margin:0 0 6px}.market-section>p{font-size:11px;color:#73757d;line-height:1.6;margin:0 0 14px}.topic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.topic-card{border:1px solid #dedee1;border-radius:9px;padding:15px;background:#fff}.topic-card strong{font-size:13px;color:#202123}.topic-card p{font-size:10px;line-height:1.55;color:#70727a;margin:7px 0 0}.place-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.place-link{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #e0e0e3;border-radius:7px;padding:10px 11px;background:#fff;color:#3a3b41}.place-link:hover{border-color:#b8b8bd;background:#fafafa}.place-link span{font-size:11px;font-weight:700}.place-link small{font-size:9px;color:#8a8c93}.method-note{border-left:3px solid #343541;background:#f7f7f8;padding:13px 14px;font-size:10px;color:#676971;line-height:1.6}.method-note strong{color:#343541}.cross-market{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.cross-market a{border:1px solid #d9d9dd;border-radius:999px;padding:7px 10px;font-size:9px;background:#fff}.cross-market a:hover{background:#f6f6f7}@media(max-width:760px){.market-hero h1{font-size:29px}.market-stats{grid-template-columns:repeat(2,1fr)}.topic-grid,.place-grid{grid-template-columns:1fr}.market-page{padding:10px 12px 42px}}
+</style>
+<main class="market-page">
+  <nav class="subnav">
+    <a href="/data">Search</a>
+    <a href="/data/companies">Companies</a>
+    <a href="/data/suppliers">Suppliers</a>
+    <a class="active" href="/data/{{ market_slug }}">{{ market.flag }} {{ market.name }}</a>
+  </nav>
+
+  <section class="market-hero">
+    <div class="market-kicker">{{ market.flag }} {{ market.name }} · Public business intelligence</div>
+    <h1>{{ market.title }}</h1>
+    <p>{{ market.description }}</p>
+    <div class="market-actions">
+      <a class="market-action" href="/data/companies?country={{ market.code }}">{{ market.directory_label }}</a>
+      <a class="market-action secondary" href="/data/search?country={{ market.code }}">Search {{ market.name }} intelligence</a>
+    </div>
+  </section>
+
+  <section class="market-stats" aria-label="Market coverage">
+    <div class="market-stat"><small>Companies indexed</small><strong>{{ "{:,}".format(stats.company_count) }}</strong></div>
+    <div class="market-stat"><small>Importer entities</small><strong>{{ "{:,}".format(stats.importer_count) }}</strong></div>
+    <div class="market-stat"><small>Strong public records</small><strong>{{ "{:,}".format(stats.strong_records) }}</strong></div>
+    <div class="market-stat"><small>Importer relationships</small><strong>{{ "{:,}".format(stats.relationship_count) }}</strong></div>
+  </section>
+
+  <section class="market-section">
+    <h2>What you can research</h2>
+    <p>IntellCluster connects public identity evidence with operational and trade signals while keeping source scope explicit.</p>
+    <div class="topic-grid">
+      {% for title, description in market.topics %}
+      <article class="topic-card"><strong>{{ title }}</strong><p>{{ description }}</p></article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if stats.regions %}
+  <section class="market-section">
+    <h2>Top regions</h2>
+    <p>Browse location intelligence pages for the largest company clusters currently stored for {{ market.name }}.</p>
+    <div class="place-grid">
+      {% for row in stats.regions %}
+      <a class="place-link" href="/data/location/{{ row.region|urlencode }}"><span>{{ row.region }}</span><small>{{ "{:,}".format(row.count) }} companies</small></a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if stats.cities %}
+  <section class="market-section">
+    <h2>Major company cities</h2>
+    <p>Use city pages to move from broad market research into local company clusters and public-data evidence.</p>
+    <div class="place-grid">
+      {% for row in stats.cities %}
+      <a class="place-link" href="/data/location/{{ row.region|urlencode }}/{{ row.city|urlencode }}"><span>{{ row.city }}, {{ row.region }}</span><small>{{ "{:,}".format(row.count) }}</small></a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="market-section">
+    <h2>Evidence and source scope</h2>
+    <div class="method-note"><strong>Primary public-data coverage:</strong> {{ market.primary_source }}. Company-level shipment or supplier evidence is shown only when the underlying source supports it; market-level Canadian trade context is not presented as company-specific shipment history.</div>
+    <div class="cross-market">
+      <a href="/data/canada">Canada intelligence</a>
+      <a href="/data/usa">U.S. intelligence</a>
+      <a href="/data/companies">Company directory</a>
+      <a href="/data/suppliers">Cached supplier directory</a>
+    </div>
+  </section>
+</main>
+{% endblock %}
