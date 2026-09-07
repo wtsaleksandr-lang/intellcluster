@@ -80,6 +80,8 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
     epa_echo = epa_echo if isinstance(epa_echo, dict) else None
     osha = enrichment.get("osha") if isinstance(enrichment, dict) else None
     osha = osha if isinstance(osha, dict) else None
+    uspto_patents = enrichment.get("uspto_patents") if isinstance(enrichment, dict) else None
+    uspto_patents = uspto_patents if isinstance(uspto_patents, dict) else None
     web = enrichment.get("web") if isinstance(enrichment, dict) else None
     web = web if isinstance(web, dict) else None
     hunter = enrichment.get("hunter") if isinstance(enrichment, dict) else None
@@ -111,7 +113,11 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
         "compliance": _state("planned", label="Compliance"),
         "contracts": _state("planned", label="Contracts"),
         "fleet": _state("planned", label="Fleet"),
-        "patents": _state("planned", label="Patents"),
+        "patents": (
+            _state("cached", label="Patents", source="USPTO PatentsView bulk cache")
+            if uspto_patents
+            else _state("planned", label="Patents")
+        ),
         "contacts": _state(
             "cached" if web or hunter else "on_demand",
             label="Contacts",
@@ -162,7 +168,16 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
             if fmcsa
             else _state("available" if company.get("usdot_number") else "planned", label="Fleet", source="FMCSA")
         )
-        sections["patents"] = _state("planned", label="Patents", source="USPTO")
+        sections["patents"] = (
+            _state("cached", label="Patents", source="USPTO PatentsView bulk cache")
+            if uspto_patents
+            else _state(
+                "pending",
+                label="Patents",
+                source="USPTO PatentsView annualized bulk data",
+                message="Patent evidence has not been matched from the current bulk snapshot for this company.",
+            )
+        )
     elif code == "CA":
         if importyeti:
             sections["trade"] = _state("cached", label="Trade", source="cached shipment intelligence")
@@ -185,7 +200,11 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
                 message="Company-level supplier shipment records are not currently available from Canadian public sources.",
             )
         sections["contracts"] = _state("planned", label="Contracts", source="CanadaBuys / public procurement")
-        sections["patents"] = _state("planned", label="Patents", source="CIPO / public records")
+        sections["patents"] = (
+            _state("cached", label="Patents", source="USPTO PatentsView cross-border bulk cache")
+            if uspto_patents
+            else _state("planned", label="Patents", source="CIPO / USPTO public records")
+        )
 
     return {
         "country": market,
