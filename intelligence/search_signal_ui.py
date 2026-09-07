@@ -105,6 +105,27 @@ def _signals(row: dict[str, Any]) -> list[dict[str, str]]:
             }
         )
 
+    patents = (
+        enrichment.get("uspto_patents")
+        if isinstance(enrichment.get("uspto_patents"), dict)
+        else None
+    )
+    if patents:
+        patent_count = _number(patents.get("total_patents"))
+        if patent_count is not None and patent_count > 0:
+            latest = str(patents.get("latest_grant_date") or "").strip()
+            value = f"{patent_count:,} granted"
+            if latest:
+                value += f" · latest {latest[:4]}"
+            signals.append(
+                {
+                    "label": "Patents",
+                    "value": value,
+                    "target": "uspto-patent-intelligence",
+                    "kind": "patent",
+                }
+            )
+
     echo = enrichment.get("epa_echo") if isinstance(enrichment.get("epa_echo"), dict) else None
     if echo:
         facilities = _number(echo.get("facility_count"))
@@ -132,7 +153,8 @@ def _signals(row: dict[str, Any]) -> list[dict[str, str]]:
             )
 
     # One signal per evidence layer gives users a broader picture than repeating
-    # several facts from the same fleet source. Keep cards compact at four signals.
+    # several facts from the same source. Keep cards compact at four signals.
+    # Patents rank ahead of compliance because they are a strong product/R&D signal.
     return signals[:4]
 
 
@@ -196,6 +218,7 @@ body[data-intell-search] .ic-us-signal:hover{{border-color:#aebfc7;background:#f
 body[data-intell-search] .ic-us-signal[data-kind="fleet"]{{border-left:3px solid #4e879d}}
 body[data-intell-search] .ic-us-signal[data-kind="contract"]{{border-left:3px solid #a48642}}
 body[data-intell-search] .ic-us-signal[data-kind="filing"]{{border-left:3px solid #66798b}}
+body[data-intell-search] .ic-us-signal[data-kind="patent"]{{border-left:3px solid #77649a}}
 body[data-intell-search] .ic-us-signal[data-kind="compliance"]{{border-left:3px solid #758e78}}
 </style>
 <script id="intellcluster-us-search-signal-data">
