@@ -74,6 +74,8 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
         importyeti = enrichment["importyeti"]
     usaspending = enrichment.get("usaspending") if isinstance(enrichment, dict) else None
     usaspending = usaspending if isinstance(usaspending, dict) else None
+    canadabuys = enrichment.get("canadabuys_contracts") if isinstance(enrichment, dict) else None
+    canadabuys = canadabuys if isinstance(canadabuys, dict) else None
     fmcsa = enrichment.get("fmcsa") if isinstance(enrichment, dict) else None
     fmcsa = fmcsa if isinstance(fmcsa, dict) else None
     epa_echo = enrichment.get("epa_echo") if isinstance(enrichment, dict) else None
@@ -111,7 +113,11 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
         ),
         "facilities": _state("planned", label="Facilities"),
         "compliance": _state("planned", label="Compliance"),
-        "contracts": _state("planned", label="Contracts"),
+        "contracts": (
+            _state("cached", label="Contracts", source="CanadaBuys contract-history cache")
+            if canadabuys
+            else _state("planned", label="Contracts")
+        ),
         "fleet": _state("planned", label="Fleet"),
         "patents": (
             _state("cached", label="Patents", source="USPTO PatentsView bulk cache")
@@ -158,11 +164,22 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
             sections["compliance"] = _state("cached", label="Compliance", source=" + ".join(sources) + " cache")
         else:
             sections["compliance"] = _state("on_demand", label="Compliance", source="EPA ECHO / OSHA")
-        sections["contracts"] = (
-            _state("cached", label="Contracts", source="USAspending.gov cache")
-            if usaspending
-            else _state("on_demand", label="Contracts", source="USAspending.gov")
-        )
+        if usaspending and canadabuys:
+            sections["contracts"] = _state(
+                "cached",
+                label="Contracts",
+                source="USAspending.gov + CanadaBuys caches",
+            )
+        elif usaspending:
+            sections["contracts"] = _state("cached", label="Contracts", source="USAspending.gov cache")
+        elif canadabuys:
+            sections["contracts"] = _state(
+                "cached",
+                label="Contracts",
+                source="CanadaBuys cross-border contract-history cache",
+            )
+        else:
+            sections["contracts"] = _state("on_demand", label="Contracts", source="USAspending.gov")
         sections["fleet"] = (
             _state("cached", label="Fleet", source="FMCSA Company Census cache")
             if fmcsa
@@ -199,7 +216,16 @@ def profile_capabilities(company: dict[str, Any] | None = None, *, country: str 
                 label="Suppliers",
                 message="Company-level supplier shipment records are not currently available from Canadian public sources.",
             )
-        sections["contracts"] = _state("planned", label="Contracts", source="CanadaBuys / public procurement")
+        sections["contracts"] = (
+            _state("cached", label="Contracts", source="CanadaBuys contract-history cache")
+            if canadabuys
+            else _state(
+                "pending",
+                label="Contracts",
+                source="CanadaBuys public procurement",
+                message="Federal contract-history evidence has not been matched from the current CanadaBuys bulk snapshot.",
+            )
+        )
         sections["patents"] = (
             _state("cached", label="Patents", source="USPTO PatentsView cross-border bulk cache")
             if uspto_patents
