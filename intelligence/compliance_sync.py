@@ -10,7 +10,12 @@ from sqlalchemy import and_, func, select
 
 from intelligence.database import connect, entities
 from intelligence.enrichment.epa_echo import EPAEchoClient, EchoFacility, compact_echo_profile
-from intelligence.enrichment.osha import OSHAClient, OSHAInspection, compact_osha_profile
+from intelligence.enrichment.osha import (
+    OSHAClient,
+    OSHAInspection,
+    OSHASourceUnavailable,
+    compact_osha_profile,
+)
 from intelligence.repository import get_entity_enrichment, set_entity_enrichment
 
 
@@ -146,6 +151,8 @@ async def _refresh(company: dict) -> dict[str, str]:
             result["osha"] = "matched"
         else:
             result["osha"] = "no_confident_match"
+    except OSHASourceUnavailable:
+        result["osha"] = "source_blocked"
     except (httpx.HTTPError, RuntimeError, ValueError):
         result["osha"] = "unavailable"
 
@@ -166,13 +173,20 @@ async def _refresh(company: dict) -> dict[str, str]:
 
 async def sync(limit: int = 100, max_age_days: int = 30, delay_seconds: float = 0.25) -> dict[str, int]:
     companies = _candidates(max(1, limit), max(1, max_age_days))
-    stats = {"checked": 0, "epa_matches": 0, "osha_matches": 0, "unavailable": 0}
+    stats = {
+        "checked": 0,
+        "epa_matches": 0,
+        "osha_matches": 0,
+        "unavailable": 0,
+        "source_blocked": 0,
+    }
     for index, company in enumerate(companies):
         result = await _refresh(company)
         stats["checked"] += 1
         stats["epa_matches"] += int(result.get("epa_echo") == "matched")
         stats["osha_matches"] += int(result.get("osha") == "matched")
         stats["unavailable"] += int("unavailable" in result.values())
+        stats["source_blocked"] += int("source_blocked" in result.values())
         print(f"[{stats['checked']}/{len(companies)}] {company['name']}: {result}", flush=True)
         if delay_seconds > 0 and index < len(companies) - 1:
             await asyncio.sleep(delay_seconds)
