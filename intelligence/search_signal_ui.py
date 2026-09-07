@@ -38,70 +38,97 @@ def _number(value: object) -> int | None:
 
 
 def _signals(row: dict[str, Any]) -> list[dict[str, str]]:
-    if str(row.get("country") or "").upper() != "US":
+    country = str(row.get("country") or "").upper()
+    if country not in {"US", "CA"}:
         return []
     enrichment = row.get("enrichment") if isinstance(row.get("enrichment"), dict) else {}
     signals: list[dict[str, str]] = []
 
-    fmcsa = enrichment.get("fmcsa") if isinstance(enrichment.get("fmcsa"), dict) else None
-    if fmcsa:
-        dot = str(fmcsa.get("dot_number") or fmcsa.get("usdot_number") or "").strip()
-        power_units = _number(fmcsa.get("power_units"))
-        drivers = _number(fmcsa.get("total_drivers") or fmcsa.get("drivers"))
-        parts: list[str] = []
-        if power_units is not None:
-            parts.append(f"{power_units:,} units")
-        elif drivers is not None:
-            parts.append(f"{drivers:,} drivers")
-        if dot:
-            parts.append(f"USDOT {dot}")
-        if parts:
+    if country == "US":
+        fmcsa = enrichment.get("fmcsa") if isinstance(enrichment.get("fmcsa"), dict) else None
+        if fmcsa:
+            dot = str(fmcsa.get("dot_number") or fmcsa.get("usdot_number") or "").strip()
+            power_units = _number(fmcsa.get("power_units"))
+            drivers = _number(fmcsa.get("total_drivers") or fmcsa.get("drivers"))
+            parts: list[str] = []
+            if power_units is not None:
+                parts.append(f"{power_units:,} units")
+            elif drivers is not None:
+                parts.append(f"{drivers:,} drivers")
+            if dot:
+                parts.append(f"USDOT {dot}")
+            if parts:
+                signals.append(
+                    {
+                        "label": "Fleet",
+                        "value": " · ".join(parts),
+                        "target": "us-public-intelligence",
+                        "kind": "fleet",
+                    }
+                )
+
+        spending = (
+            enrichment.get("usaspending")
+            if isinstance(enrichment.get("usaspending"), dict)
+            else None
+        )
+        if spending:
+            awards = _number(spending.get("contract_awards_shown"))
+            award_value = _money(spending.get("contract_award_value_shown"))
+            if award_value:
+                signals.append(
+                    {
+                        "label": "Federal Awards",
+                        "value": award_value,
+                        "target": "us-public-intelligence",
+                        "kind": "contract",
+                    }
+                )
+            elif awards is not None:
+                signals.append(
+                    {
+                        "label": "Federal Awards",
+                        "value": f"{awards:,} shown",
+                        "target": "us-public-intelligence",
+                        "kind": "contract",
+                    }
+                )
+
+        sec = enrichment.get("sec_edgar") if isinstance(enrichment.get("sec_edgar"), dict) else None
+        if sec:
+            ticker = str(sec.get("ticker") or "").strip()
+            latest_form = str(sec.get("latest_filing_form") or "").strip()
             signals.append(
                 {
-                    "label": "Fleet",
-                    "value": " · ".join(parts),
-                    "target": "us-public-intelligence",
-                    "kind": "fleet",
+                    "label": "SEC EDGAR",
+                    "value": ticker or latest_form or "filer evidence",
+                    "target": "sec-edgar-intelligence",
+                    "kind": "filing",
                 }
             )
 
-    spending = (
-        enrichment.get("usaspending")
-        if isinstance(enrichment.get("usaspending"), dict)
+    canadabuys = (
+        enrichment.get("canadabuys_contracts")
+        if isinstance(enrichment.get("canadabuys_contracts"), dict)
         else None
     )
-    if spending:
-        awards = _number(spending.get("contract_awards_shown"))
-        award_value = _money(spending.get("contract_award_value_shown"))
-        if award_value:
-            signals.append(
-                {
-                    "label": "Federal Awards",
-                    "value": award_value,
-                    "target": "us-public-intelligence",
-                    "kind": "contract",
-                }
-            )
-        elif awards is not None:
-            signals.append(
-                {
-                    "label": "Federal Awards",
-                    "value": f"{awards:,} shown",
-                    "target": "us-public-intelligence",
-                    "kind": "contract",
-                }
-            )
-
-    sec = enrichment.get("sec_edgar") if isinstance(enrichment.get("sec_edgar"), dict) else None
-    if sec:
-        ticker = str(sec.get("ticker") or "").strip()
-        latest_form = str(sec.get("latest_filing_form") or "").strip()
+    if canadabuys:
+        count = _number(canadabuys.get("contract_count"))
+        value = _money(canadabuys.get("cad_value_shown"))
+        if value:
+            display = f"{value} CAD"
+            if count:
+                display += f" · {count:,} contracts"
+        elif count:
+            display = f"{count:,} contracts"
+        else:
+            display = "federal contract evidence"
         signals.append(
             {
-                "label": "SEC EDGAR",
-                "value": ticker or latest_form or "filer evidence",
-                "target": "sec-edgar-intelligence",
-                "kind": "filing",
+                "label": "CanadaBuys",
+                "value": display,
+                "target": "canadabuys-contract-intelligence",
+                "kind": "contract-ca",
             }
         )
 
@@ -126,35 +153,35 @@ def _signals(row: dict[str, Any]) -> list[dict[str, str]]:
                 }
             )
 
-    echo = enrichment.get("epa_echo") if isinstance(enrichment.get("epa_echo"), dict) else None
-    if echo:
-        facilities = _number(echo.get("facility_count"))
-        if facilities is not None:
-            signals.append(
-                {
-                    "label": "EPA Facilities",
-                    "value": f"{facilities:,} cached",
-                    "target": "us-compliance-intelligence",
-                    "kind": "compliance",
-                }
-            )
+    if country == "US":
+        echo = enrichment.get("epa_echo") if isinstance(enrichment.get("epa_echo"), dict) else None
+        if echo:
+            facilities = _number(echo.get("facility_count"))
+            if facilities is not None:
+                signals.append(
+                    {
+                        "label": "EPA Facilities",
+                        "value": f"{facilities:,} cached",
+                        "target": "us-compliance-intelligence",
+                        "kind": "compliance",
+                    }
+                )
 
-    osha = enrichment.get("osha") if isinstance(enrichment.get("osha"), dict) else None
-    if osha and not echo:
-        inspections = _number(osha.get("inspection_count_shown"))
-        if inspections is not None:
-            signals.append(
-                {
-                    "label": "OSHA",
-                    "value": f"{inspections:,} inspections",
-                    "target": "us-compliance-intelligence",
-                    "kind": "compliance",
-                }
-            )
+        osha = enrichment.get("osha") if isinstance(enrichment.get("osha"), dict) else None
+        if osha and not echo:
+            inspections = _number(osha.get("inspection_count_shown"))
+            if inspections is not None:
+                signals.append(
+                    {
+                        "label": "OSHA",
+                        "value": f"{inspections:,} inspections",
+                        "target": "us-compliance-intelligence",
+                        "kind": "compliance",
+                    }
+                )
 
     # One signal per evidence layer gives users a broader picture than repeating
     # several facts from the same source. Keep cards compact at four signals.
-    # Patents rank ahead of compliance because they are a strong product/R&D signal.
     return signals[:4]
 
 
@@ -217,6 +244,7 @@ body[data-intell-search] .ic-us-signal b{{font-size:7px;text-transform:uppercase
 body[data-intell-search] .ic-us-signal:hover{{border-color:#aebfc7;background:#fff;color:#173846}}
 body[data-intell-search] .ic-us-signal[data-kind="fleet"]{{border-left:3px solid #4e879d}}
 body[data-intell-search] .ic-us-signal[data-kind="contract"]{{border-left:3px solid #a48642}}
+body[data-intell-search] .ic-us-signal[data-kind="contract-ca"]{{border-left:3px solid #9a6f3c}}
 body[data-intell-search] .ic-us-signal[data-kind="filing"]{{border-left:3px solid #66798b}}
 body[data-intell-search] .ic-us-signal[data-kind="patent"]{{border-left:3px solid #77649a}}
 body[data-intell-search] .ic-us-signal[data-kind="compliance"]{{border-left:3px solid #758e78}}
