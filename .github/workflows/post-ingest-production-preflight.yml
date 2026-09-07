@@ -1,0 +1,85 @@
+name: Production Post-Ingest Preflight
+
+on:
+  push:
+    branches:
+      - ops/post-ingest-preflight-20260907
+
+concurrency:
+  group: production-post-ingest-preflight
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: Read-only production readiness checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DATABASE_URL: ${{ secrets.INTELLIGENCE_PRODUCTION_DATABASE_URL }}
+      IMPORTYETI_ALLOW_LIVE: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify production database secret
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "INTELLIGENCE_PRODUCTION_DATABASE_URL is not configured; refusing to run."
+            exit 1
+          fi
+
+      - name: Confirm database connectivity and ingestion state
+        run: |
+          python -m intelligence.ingest status | tee ingest-status.txt
+
+      - name: Generate no-network readiness report
+        run: |
+          python -m intelligence.post_ingest_readiness | tee post-ingest-readiness.json
+
+      - name: Run database-only data-quality audit
+        run: |
+          python -m intelligence.data_quality | tee data-quality.json
+
+      - name: Enforce production blockers
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          readiness = json.loads(Path("post-ingest-readiness.json").read_text())
+          quality = json.loads(Path("data-quality.json").read_text())
+          print("deployment_safe=", readiness.get("deployment_safe"))
+          print("readiness_blockers=", readiness.get("blockers"))
+          print("quality_healthy=", quality.get("healthy"))
+          print("quality_blockers=", quality.get("blockers"))
+          print("quality_warnings=", quality.get("warnings"))
+          print("fmcsa_fast_seed=", readiness.get("fmcsa_fast_seed"))
+          print("supplier_index=", readiness.get("supplier_index"))
+          if not readiness.get("deployment_safe") or not quality.get("healthy"):
+              raise SystemExit(2)
+          PY
+
+      - name: Upload production preflight report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-ingest-production-preflight
+          path: |
+            ingest-status.txt
+            post-ingest-readiness.json
+            data-quality.json
+          if-no-files-found: warn
+          retention-days: 7
