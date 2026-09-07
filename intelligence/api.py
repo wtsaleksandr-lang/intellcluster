@@ -8,7 +8,7 @@ from intelligence.country_intelligence import COUNTRY_MARKETS, profile_capabilit
 from intelligence.database import connect, entities
 from intelligence.enrichment.epa_echo import EPAEchoClient, compact_echo_profile
 from intelligence.enrichment.fmcsa import FMCSAClient
-from intelligence.enrichment.osha import OSHAClient, compact_osha_profile
+from intelligence.enrichment.osha import OSHAClient, OSHASourceUnavailable, compact_osha_profile
 from intelligence.enrichment.usaspending import USAspendingClient
 from intelligence.entity_resolution import normalize_company_name
 from intelligence.freshness import directory_freshness
@@ -41,6 +41,12 @@ def _same_place(
     if expected_city and city and city.strip().casefold() != expected_city.casefold():
         return False
     return True
+
+
+def _fmcsa_name_match(expected: str, company) -> bool:
+    return _similar_name(expected, str(company.legal_name or "")) or _similar_name(
+        expected, str(company.dba_name or "")
+    )
 
 
 def _fmcsa_profile(company) -> dict[str, object]:
@@ -202,6 +208,8 @@ async def _compliance(row: dict, enrichment: dict, lookup: dict[str, str]) -> No
                 lookup["osha"] = "matched"
             else:
                 lookup["osha"] = "no_confident_match"
+        except OSHASourceUnavailable:
+            lookup["osha"] = "source_blocked"
         except (httpx.HTTPError, RuntimeError, ValueError):
             lookup["osha"] = "unavailable"
 
@@ -234,7 +242,7 @@ async def intelligence_company_us_public_enrichment(slug: str) -> dict[str, obje
             matches = [
                 match
                 for match in matches
-                if _similar_name(name, match.display_name)
+                if _fmcsa_name_match(name, match)
                 and _same_place(state, city, match.state, match.city)
             ]
             if len(matches) == 1:
