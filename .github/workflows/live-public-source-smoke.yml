@@ -1,0 +1,96 @@
+name: Live Public Source Smoke
+
+on:
+  push:
+    branches:
+      - ops/live-source-smoke-20260907
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Verify free public data integrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      IMPORTYETI_ALLOW_LIVE: "false"
+      SEC_EDGAR_USER_AGENT: "IntellCluster/1.0 contact@intellcluster.com"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Exercise live free-source clients
+        run: |
+          python - <<'PY'
+          import asyncio
+          import json
+
+          from intelligence.enrichment.epa_echo import EPAEchoClient
+          from intelligence.enrichment.fmcsa import FMCSAClient
+          from intelligence.enrichment.osha import OSHAClient
+          from intelligence.enrichment.sec_edgar import SECEDGARClient
+          from intelligence.enrichment.usaspending import USAspendingClient
+
+          async def main():
+              report = {}
+
+              fmcsa = await FMCSAClient(timeout=30).search("FedEx Ground", limit=5)
+              report["fmcsa"] = {
+                  "ok": bool(fmcsa),
+                  "count": len(fmcsa),
+                  "sample": fmcsa[0].display_name if fmcsa else None,
+              }
+              if not fmcsa:
+                  raise RuntimeError("FMCSA live search returned no FedEx Ground matches")
+
+              recipients = await USAspendingClient(timeout=30).search_recipients(
+                  "Lockheed Martin Corporation", limit=5
+              )
+              report["usaspending"] = {
+                  "ok": bool(recipients),
+                  "count": len(recipients),
+                  "sample": recipients[0].name if recipients else None,
+              }
+              if not recipients:
+                  raise RuntimeError("USAspending live recipient search returned no Lockheed Martin matches")
+
+              sec = await SECEDGARClient(timeout=30).search("Apple Inc", limit=5)
+              report["sec_edgar"] = {
+                  "ok": bool(sec),
+                  "count": len(sec),
+                  "sample": sec[0].name if sec else None,
+                  "cik": sec[0].cik if sec else None,
+              }
+              if not sec:
+                  raise RuntimeError("SEC EDGAR live company search returned no Apple match")
+
+              echo = await EPAEchoClient(timeout=30).search_facilities(
+                  "General Motors", state="MI", limit=5
+              )
+              report["epa_echo"] = {
+                  "ok": True,
+                  "count": len(echo),
+                  "sample": echo[0].name if echo else None,
+              }
+
+              osha = await OSHAClient(timeout=30).search("Walmart", state="TX", limit=10)
+              report["osha"] = {
+                  "ok": True,
+                  "count": len(osha),
+                  "sample": osha[0].establishment_name if osha else None,
+              }
+
+              print(json.dumps(report, indent=2, default=str))
+
+          asyncio.run(main())
+          PY
