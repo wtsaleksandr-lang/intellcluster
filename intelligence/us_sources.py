@@ -81,15 +81,16 @@ US_SOURCE_ROADMAP = (
     ),
     USIntelligenceSource(
         key="uspto",
-        name="USPTO",
+        name="USPTO PatentsView",
         layer="patents",
-        access="public_data",
+        access="official_bulk_data",
         cost="free",
         cache_policy=(
-            "defer implementation while PatentsView transitions to the USPTO Open "
-            "Data Portal; add company-linked IP cache after the replacement API is stable"
+            "offline-only ingestion from the official USPTO PatentsView annualized "
+            "CSV dataset; conservatively match assignees to existing canonical companies; "
+            "persist patent evidence and never call USPTO from normal page views"
         ),
-        status="blocked_external_transition",
+        status="implemented_bulk_cache",
     ),
 )
 
