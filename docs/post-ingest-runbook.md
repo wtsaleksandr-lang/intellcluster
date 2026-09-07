@@ -123,6 +123,33 @@ python -m intelligence.fmcsa_ingest --fast-seed
 
 The FMCSA job uses a USDOT keyset checkpoint and can resume after interruption.
 
+## 9. Optional: attach USPTO patent intelligence from the official bulk snapshot
+
+Patent intelligence is intentionally offline-first. Normal company pages do not call USPTO, and there is no dependency on a live PatentsView search API.
+
+Download the desired **PatentsView annualized patent CSV** from the USPTO Open Data Portal, then validate matching before writing anything:
+
+```bash
+python -m intelligence.uspto_bulk --csv /path/to/patentsview.csv --dry-run --limit-assignees 10000
+```
+
+If the dry run looks reasonable, attach the evidence:
+
+```bash
+python -m intelligence.uspto_bulk --csv /path/to/patentsview.csv
+```
+
+The loader:
+
+- reads the local official CSV only
+- creates **no new canonical companies**
+- matches exact normalized assignee names conservatively, using country/state/city to disambiguate duplicate names
+- stores matched grants in `enrichment.uspto_patents`
+- makes **zero network calls** while running
+- makes patent counts available on company profiles, CSV exports and U.S. search-card signals
+
+Use a recent official PatentsView annualized snapshot. The cache records the input filename and cache timestamp so the evidence can be refreshed later with a newer dataset.
+
 ## Paid-data rule
 
 Keep:
@@ -131,4 +158,4 @@ Keep:
 IMPORTYETI_ALLOW_LIVE=false
 ```
 
-unless an authenticated administrator is intentionally purchasing missing ImportYeti intelligence through the dedicated acquisition endpoint. Normal profile views, BOL views, supplier indexing, Canada ingestion, readiness checks, data-quality auditing and FMCSA ingestion do not require live ImportYeti access.
+unless an authenticated administrator is intentionally purchasing missing ImportYeti intelligence through the dedicated acquisition endpoint. Normal profile views, BOL views, supplier indexing, Canada ingestion, readiness checks, data-quality auditing, FMCSA ingestion and USPTO bulk patent ingestion do not require live ImportYeti access.
