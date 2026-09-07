@@ -25,6 +25,8 @@ from intelligence.seo import install_seo_middleware, router as seo_router
 from intelligence.sitemap_cache import install_sitemap_cache
 from intelligence.sync_observability import router as sync_observability_router
 from intelligence.thin_profile_seo import install_thin_profile_seo
+from intelligence.uspto_export import router as uspto_export_router
+from intelligence.uspto_profile_ui import install_uspto_profile_ui
 
 # ``main_data_core`` still imports the historical UI router for its page routes.
 # Remove the old duplicate U.S.-enrichment POST before mounting newer layers so
@@ -38,12 +40,14 @@ app.include_router(importyeti_api_router)
 app.include_router(market_landings_router)
 app.include_router(sec_api_router)
 app.include_router(sec_export_router)
+app.include_router(uspto_export_router)
 app.include_router(sync_observability_router)
 app.include_router(post_ingest_readiness_router)
 app.include_router(seo_router)
 install_profile_guard(app)
 install_cached_bol_compat(app)
 install_sec_profile_ui(app)
+install_uspto_profile_ui(app)
 install_search_empty_state(app)
 install_search_signal_ui(app)
 install_seo_middleware(app)
