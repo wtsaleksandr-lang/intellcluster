@@ -8,6 +8,8 @@ coupling SEO work to ingestion or the core directory UI.
 from main_data_core import app
 from intelligence.admin_operations import router as admin_operations_router
 from intelligence.bol_cache_compat import install_cached_bol_compat
+from intelligence.canadabuys_export import router as canadabuys_export_router
+from intelligence.canadabuys_profile_ui import install_canadabuys_profile_ui
 from intelligence.company_directory import router as company_directory_router
 from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
@@ -36,6 +38,7 @@ prune_shadowed_legacy_routes(app)
 app.include_router(admin_operations_router)
 app.include_router(company_directory_router)
 app.include_router(compliance_export_router)
+app.include_router(canadabuys_export_router)
 app.include_router(importyeti_api_router)
 app.include_router(market_landings_router)
 app.include_router(sec_api_router)
@@ -47,6 +50,7 @@ app.include_router(seo_router)
 install_profile_guard(app)
 install_cached_bol_compat(app)
 install_sec_profile_ui(app)
+install_canadabuys_profile_ui(app)
 install_uspto_profile_ui(app)
 install_search_empty_state(app)
 install_search_signal_ui(app)

@@ -150,6 +150,35 @@ The loader:
 
 Use a recent official PatentsView annualized snapshot. The cache records the input filename and cache timestamp so the evidence can be refreshed later with a newer dataset.
 
+## 10. Optional: attach CanadaBuys federal contract history
+
+CanadaBuys publishes the Government of Canada contract-history dataset as downloadable CSV and refreshes the consolidated post-June-2023 file monthly. Use the official current contract-history CSV from the Open Government / CanadaBuys dataset page.
+
+Validate supplier matching first:
+
+```bash
+python -m intelligence.canadabuys_bulk --csv /path/to/contractHistoryComplete-contratsOctroyesComplet.csv --dry-run --limit-suppliers 10000
+```
+
+Then attach the evidence:
+
+```bash
+python -m intelligence.canadabuys_bulk --csv /path/to/contractHistoryComplete-contratsOctroyesComplet.csv
+```
+
+The loader:
+
+- reads the local official CanadaBuys CSV only
+- creates **no new canonical companies**
+- links a supplier only when its normalized legal name identifies one canonical entity
+- collapses amendment history to the latest retained row per unique contract for profile KPIs
+- keeps the full history-row count as provenance context
+- stores matched evidence in `enrichment.canadabuys_contracts`
+- makes **zero network calls** while running
+- can attach Canadian federal contract evidence to Canadian companies and cross-border suppliers already in the U.S. graph
+
+Contract values are analytical context rather than audited supplier revenue. CanadaBuys contract history contains amendments, so IntellCluster explicitly labels the summarized CAD value and preserves the source/value caveat on the profile.
+
 ## Paid-data rule
 
 Keep:
@@ -158,4 +187,4 @@ Keep:
 IMPORTYETI_ALLOW_LIVE=false
 ```
 
-unless an authenticated administrator is intentionally purchasing missing ImportYeti intelligence through the dedicated acquisition endpoint. Normal profile views, BOL views, supplier indexing, Canada ingestion, readiness checks, data-quality auditing, FMCSA ingestion and USPTO bulk patent ingestion do not require live ImportYeti access.
+unless an authenticated administrator is intentionally purchasing missing ImportYeti intelligence through the dedicated acquisition endpoint. Normal profile views, BOL views, supplier indexing, Canada ingestion, readiness checks, data-quality auditing, FMCSA ingestion, USPTO bulk patent ingestion and CanadaBuys bulk contract ingestion do not require live ImportYeti access.
