@@ -35,62 +35,154 @@ jobs:
           import asyncio
           import json
 
+          import httpx
+
           from intelligence.enrichment.epa_echo import EPAEchoClient
           from intelligence.enrichment.fmcsa import FMCSAClient
           from intelligence.enrichment.osha import OSHAClient
           from intelligence.enrichment.sec_edgar import SECEDGARClient
           from intelligence.enrichment.usaspending import USAspendingClient
 
+          async def capture(report, key, operation, sample):
+              try:
+                  value = await operation()
+                  report[key] = sample(value)
+                  report[key]["transport_ok"] = True
+                  return value
+              except Exception as exc:
+                  report[key] = {
+                      "transport_ok": False,
+                      "error_type": type(exc).__name__,
+                      "error": str(exc)[:500],
+                  }
+                  return None
+
           async def main():
               report = {}
 
-              fmcsa = await FMCSAClient(timeout=30).search("FedEx Ground", limit=5)
-              report["fmcsa"] = {
-                  "ok": bool(fmcsa),
-                  "count": len(fmcsa),
-                  "sample": fmcsa[0].display_name if fmcsa else None,
-              }
-              if not fmcsa:
-                  raise RuntimeError("FMCSA live search returned no FedEx Ground matches")
-
-              recipients = await USAspendingClient(timeout=30).search_recipients(
-                  "Lockheed Martin Corporation", limit=5
+              fmcsa = await capture(
+                  report,
+                  "fmcsa",
+                  lambda: FMCSAClient(timeout=30).search("FedEx Ground", limit=5),
+                  lambda rows: {
+                      "count": len(rows),
+                      "sample": rows[0].display_name if rows else None,
+                  },
               )
-              report["usaspending"] = {
-                  "ok": bool(recipients),
-                  "count": len(recipients),
-                  "sample": recipients[0].name if recipients else None,
-              }
-              if not recipients:
-                  raise RuntimeError("USAspending live recipient search returned no Lockheed Martin matches")
-
-              sec = await SECEDGARClient(timeout=30).search("Apple Inc", limit=5)
-              report["sec_edgar"] = {
-                  "ok": bool(sec),
-                  "count": len(sec),
-                  "sample": sec[0].name if sec else None,
-                  "cik": sec[0].cik if sec else None,
-              }
-              if not sec:
-                  raise RuntimeError("SEC EDGAR live company search returned no Apple match")
-
-              echo = await EPAEchoClient(timeout=30).search_facilities(
-                  "General Motors", state="MI", limit=5
+              recipients = await capture(
+                  report,
+                  "usaspending",
+                  lambda: USAspendingClient(timeout=30).search_recipients(
+                      "Lockheed Martin Corporation", limit=5
+                  ),
+                  lambda rows: {
+                      "count": len(rows),
+                      "sample": rows[0].name if rows else None,
+                  },
               )
-              report["epa_echo"] = {
-                  "ok": True,
-                  "count": len(echo),
-                  "sample": echo[0].name if echo else None,
-              }
+              sec = await capture(
+                  report,
+                  "sec_edgar",
+                  lambda: SECEDGARClient(timeout=30).search("Apple Inc", limit=5),
+                  lambda rows: {
+                      "count": len(rows),
+                      "sample": rows[0].name if rows else None,
+                      "cik": rows[0].cik if rows else None,
+                  },
+              )
+              await capture(
+                  report,
+                  "epa_echo",
+                  lambda: EPAEchoClient(timeout=30).search_facilities(
+                      "General Motors", state="MI", limit=5
+                  ),
+                  lambda rows: {
+                      "count": len(rows),
+                      "sample": rows[0].name if rows else None,
+                  },
+              )
+              await capture(
+                  report,
+                  "osha_legacy_search",
+                  lambda: OSHAClient(timeout=30).search("Walmart", state="TX", limit=10),
+                  lambda rows: {
+                      "count": len(rows),
+                      "sample": rows[0].establishment_name if rows else None,
+                  },
+              )
 
-              osha = await OSHAClient(timeout=30).search("Walmart", state="TX", limit=10)
-              report["osha"] = {
-                  "ok": True,
-                  "count": len(osha),
-                  "sample": osha[0].establishment_name if osha else None,
-              }
+              async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+                  datasets = []
+                  for page in range(1, 8):
+                      try:
+                          response = await client.get(
+                              "https://apiprod.dol.gov/v4/datasets", params={"page": page}
+                          )
+                          response.raise_for_status()
+                          payload = response.json()
+                      except Exception as exc:
+                          report["dol_catalog"] = {
+                              "transport_ok": False,
+                              "error": str(exc)[:500],
+                          }
+                          break
+                      page_rows = payload.get("datasets") or []
+                      datasets.extend(page_rows)
+                      if not payload.get("meta", {}).get("next_page"):
+                          break
+                  else:
+                      payload = {}
+
+                  matches = [
+                      row
+                      for row in datasets
+                      if "inspection" in str(row.get("name") or "").casefold()
+                      and str((row.get("agency") or {}).get("abbr") or "").upper() == "OSHA"
+                  ]
+                  if datasets:
+                      report["dol_catalog"] = {
+                          "transport_ok": True,
+                          "datasets_seen": len(datasets),
+                          "inspection_matches": [
+                              {
+                                  "id": row.get("id"),
+                                  "name": row.get("name"),
+                                  "api_url": row.get("api_url"),
+                                  "tablename": row.get("tablename"),
+                              }
+                              for row in matches[:10]
+                          ],
+                      }
+
+                  for url in (
+                      "https://apiprod.dol.gov/v4/get/OSHA/inspection/json",
+                      "https://apiprod.dol.gov/v4/get/OSHA/inspection/json/metadata",
+                  ):
+                      try:
+                          response = await client.get(url)
+                          report.setdefault("dol_inspection_endpoints", []).append(
+                              {
+                                  "url": url,
+                                  "status": response.status_code,
+                                  "content_type": response.headers.get("content-type"),
+                                  "body_prefix": response.text[:240],
+                              }
+                          )
+                      except Exception as exc:
+                          report.setdefault("dol_inspection_endpoints", []).append(
+                              {"url": url, "error": str(exc)[:500]}
+                          )
 
               print(json.dumps(report, indent=2, default=str))
+
+              critical = {
+                  "fmcsa": fmcsa,
+                  "usaspending": recipients,
+                  "sec_edgar": sec,
+              }
+              failed = [key for key, value in critical.items() if not value]
+              if failed:
+                  raise RuntimeError(f"Critical live free-source failures: {failed}")
 
           asyncio.run(main())
           PY
