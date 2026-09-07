@@ -32,9 +32,11 @@ jobs:
       ENRICH_LIMIT: ${{ inputs.limit || '100' }}
       ENRICH_MAX_AGE_DAYS: ${{ inputs.max_age_days || '30' }}
     steps:
+      # Scheduled runs execute from the repository default branch. Manual runs
+      # execute the selected workflow ref. Do not pin this job to an obsolete
+      # feature branch: compliance refreshes must use the same code deployed by
+      # the current intelligence application.
       - uses: actions/checkout@v4
-        with:
-          ref: feature/intelligence-directory-platform
 
       - name: Set up Python
         uses: actions/setup-python@v5
