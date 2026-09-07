@@ -68,6 +68,12 @@ def run() -> int:
             set_entity_enrichment(
                 conn,
                 entity_id,
+                "uspto_patents",
+                {"total_patents": 18, "latest_grant_date": "2025-11-04"},
+            )
+            set_entity_enrichment(
+                conn,
+                entity_id,
                 "epa_echo",
                 {"facility_count": 3},
             )
@@ -88,8 +94,12 @@ def run() -> int:
         assert '"label":"Fleet","value":"54 units · USDOT 7654321"' in text
         assert '"label":"Federal Awards","value":"$3.5M"' in text
         assert '"label":"SEC EDGAR","value":"ICSG"' in text
-        assert '"label":"EPA Facilities","value":"3 cached"' in text
+        assert '"label":"Patents","value":"18 granted · latest 2025"' in text
+        assert '"target":"uspto-patent-intelligence","kind":"patent"' in text
+        # Cards deliberately show only the four strongest distinct evidence layers.
+        assert '"label":"EPA Facilities","value":"3 cached"' not in text
         assert text.count('"kind":"fleet"') == 1
+        assert text.count('"kind":"patent"') == 1
 
         print("U.S. search signal checks OK")
         return 0
