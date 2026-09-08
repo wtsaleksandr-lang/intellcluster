@@ -104,8 +104,8 @@ def _environment_gate_checks() -> None:
         os.environ.pop("DATABASE_URL", None)
         os.environ["PUBLIC_BASE_URL"] = "http://localhost:5000"
         os.environ["ADMIN_USERNAME"] = "admin"
-        os.environ["ADMIN_PASSWORD"] = "short"
-        os.environ["ADMIN_SECRET_KEY"] = "change-me"
+        os.environ["ADMIN_PASSWORD"] = "pw-42"
+        os.environ["ADMIN_SECRET_KEY"] = "key-42"
         os.environ["IMPORTYETI_ALLOW_LIVE"] = "true"
         os.environ["RATE_LIMIT_ENABLED"] = "false"
         os.environ["DEBUG"] = "true"
@@ -119,8 +119,8 @@ def _environment_gate_checks() -> None:
         assert "IMPORTYETI_ALLOW_LIVE" in joined
         assert "RATE_LIMIT_ENABLED" in joined
         assert "DEBUG" in joined
-        assert "short" not in str(unsafe)
-        assert "change-me" not in str(unsafe)
+        assert "pw-42" not in str(unsafe)
+        assert "key-42" not in str(unsafe)
 
         os.environ["DATABASE_URL"] = "postgresql://example.invalid/intellcluster"
         os.environ["PUBLIC_BASE_URL"] = "https://intellcluster.com"
