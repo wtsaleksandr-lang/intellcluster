@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import func, insert, select, text, update
 
 from intelligence.database import connect, entities, get_engine, sync_checkpoints
-from intelligence.materialize import SOURCE_KEY as MATERIALIZE_SOURCE, materialization_status, run_intelligence_materialization
+from intelligence.materialize import materialization_status, run_intelligence_materialization
 from intelligence.search_indexing import apply_search_indexes, search_index_status
 from intelligence.supplier_backfill import SOURCE_KEY as SUPPLIER_SOURCE, run_supplier_backfill
 from shared.admin import require_admin
