@@ -14,6 +14,7 @@ from intelligence.database import (
     sync_checkpoints,
     sync_runs,
 )
+from intelligence.launch_gate import launch_gate_report, production_environment_report
 from intelligence.models import SourceRecord
 from intelligence.post_ingest_readiness import post_ingest_readiness
 from intelligence.repository import upsert_source_record
@@ -85,6 +86,65 @@ def _seed(name: str, source_id: str, supplier: str) -> int:
     return int(entity_id)
 
 
+def _environment_gate_checks() -> None:
+    names = (
+        "DATABASE_URL",
+        "PUBLIC_BASE_URL",
+        "ADMIN_USERNAME",
+        "ADMIN_PASSWORD",
+        "ADMIN_SECRET_KEY",
+        "IMPORTYETI_ALLOW_LIVE",
+        "RATE_LIMIT_ENABLED",
+        "DEBUG",
+        "SEC_EDGAR_USER_AGENT",
+        "PLAUSIBLE_DOMAIN",
+    )
+    previous = {name: os.environ.get(name) for name in names}
+    try:
+        os.environ.pop("DATABASE_URL", None)
+        os.environ["PUBLIC_BASE_URL"] = "http://localhost:5000"
+        os.environ["ADMIN_USERNAME"] = "admin"
+        os.environ["ADMIN_PASSWORD"] = "short"
+        os.environ["ADMIN_SECRET_KEY"] = "change-me"
+        os.environ["IMPORTYETI_ALLOW_LIVE"] = "true"
+        os.environ["RATE_LIMIT_ENABLED"] = "false"
+        os.environ["DEBUG"] = "true"
+        unsafe = production_environment_report(production=True)
+        assert unsafe["healthy"] is False
+        joined = "\n".join(unsafe["blockers"])
+        assert "DATABASE_URL" in joined
+        assert "PUBLIC_BASE_URL" in joined
+        assert "ADMIN_PASSWORD" in joined
+        assert "ADMIN_SECRET_KEY" in joined
+        assert "IMPORTYETI_ALLOW_LIVE" in joined
+        assert "RATE_LIMIT_ENABLED" in joined
+        assert "DEBUG" in joined
+        assert "short" not in str(unsafe)
+        assert "change-me" not in str(unsafe)
+
+        os.environ["DATABASE_URL"] = "postgresql://example.invalid/intellcluster"
+        os.environ["PUBLIC_BASE_URL"] = "https://intellcluster.com"
+        os.environ["ADMIN_USERNAME"] = "ops@example.com"
+        os.environ["ADMIN_PASSWORD"] = "long-random-admin-passphrase"
+        os.environ["ADMIN_SECRET_KEY"] = "random-admin-signing-key-1234567890"
+        os.environ["IMPORTYETI_ALLOW_LIVE"] = "false"
+        os.environ["RATE_LIMIT_ENABLED"] = "true"
+        os.environ["DEBUG"] = "false"
+        os.environ["SEC_EDGAR_USER_AGENT"] = "IntellCluster test contact@example.com"
+        os.environ["PLAUSIBLE_DOMAIN"] = "intellcluster.com"
+        safe = production_environment_report(production=True)
+        assert safe["healthy"] is True, safe
+        assert safe["blockers"] == []
+        assert safe["paid_sources_called"] is False
+        assert safe["network_calls"] == 0
+    finally:
+        for name, value in previous.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value
+
+
 def run() -> int:
     _cleanup()
     try:
@@ -135,8 +195,20 @@ def run() -> int:
         assert quality["checks"]["orphan_source_records"] == 0
         assert quality["checks"]["orphan_supplier_relationships"] == 0
 
+        _environment_gate_checks()
+        gate = launch_gate_report(production=False)
+        assert gate["network_calls"] == 0
+        assert gate["paid_sources_called"] is False
+        assert "ingestion" in gate
+        assert "data_quality" in gate
+        assert "environment" in gate
+        assert isinstance(gate["ready_to_launch"], bool)
+
         anonymous = TestClient(app).get("/api/intelligence/admin/post-ingest-readiness")
         assert anonymous.status_code == 401
+        anonymous_gate = TestClient(app).get("/api/intelligence/admin/launch-gate")
+        assert anonymous_gate.status_code == 401
+
         admin = TestClient(app)
         admin.cookies.set(
             ADMIN_COOKIE,
@@ -145,8 +217,12 @@ def run() -> int:
         response = admin.get("/api/intelligence/admin/post-ingest-readiness")
         assert response.status_code == 200, response.text
         assert response.json()["paid_sources_called"] is False
+        gate_response = admin.get("/api/intelligence/admin/launch-gate?production=false")
+        assert gate_response.status_code == 200, gate_response.text
+        assert gate_response.json()["paid_sources_called"] is False
+        assert gate_response.json()["network_calls"] == 0
 
-        print("Post-ingest readiness checks OK")
+        print("Post-ingest readiness and launch-gate checks OK")
         return 0
     finally:
         _cleanup()
