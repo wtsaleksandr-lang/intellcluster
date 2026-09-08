@@ -10,6 +10,8 @@ from sqlalchemy import func, select
 
 from intelligence.database import connect, entities, source_records, sync_checkpoints
 from intelligence.fmcsa_fast_seed import fast_seed_readiness
+from intelligence.materialize import materialization_status
+from intelligence.search_indexing import search_index_status
 from intelligence.sync_observability import sync_status_snapshot
 from shared.admin import require_admin
 
@@ -47,13 +49,11 @@ def _is_expected_complete(source: str, stored: int, checkpoint_status: str | Non
     expected = EXPECTED_CANADA[source]
     if checkpoint_status == "completed":
         return True
-    # Older successful syncs may predate checkpoints. Accept near-total stored
-    # source rows as complete while keeping the threshold conservative.
     return stored >= int(expected * 0.995)
 
 
 def post_ingest_readiness() -> dict[str, Any]:
-    """Return a no-network deployment and U.S.-bootstrap readiness report."""
+    """Return a no-network deployment and post-ingestion processing readiness report."""
 
     sync = sync_status_snapshot()
     by_source = {str(row["source"]): row for row in sync["sources"]}
@@ -94,6 +94,18 @@ def post_ingest_readiness() -> dict[str, Any]:
             "Supplier index is empty; run the cached-only supplier backfill after Canada ingestion completes."
         )
 
+    materialization = materialization_status()
+    if not materialization["complete"]:
+        warnings.append(
+            "Combined company intelligence has not been fully materialized; run the database-only materialization after supplier backfill."
+        )
+
+    search_indexes = search_index_status()
+    if search_indexes["supported"] and not search_indexes.get("all_installed"):
+        warnings.append(
+            "PostgreSQL trigram search indexes are not fully installed; build them after materialization for large-directory search performance."
+        )
+
     importyeti_live = os.environ.get("IMPORTYETI_ALLOW_LIVE", "").strip().casefold() in {
         "1",
         "true",
@@ -117,6 +129,14 @@ def post_ingest_readiness() -> dict[str, Any]:
             "backfill_status": supplier_backfill_status,
             "recommended_command": "python -m intelligence.supplier_backfill",
         },
+        "materialization": {
+            **materialization,
+            "recommended_command": "python -m intelligence.materialize",
+        },
+        "search_indexes": {
+            **search_indexes,
+            "recommended_command": "python -m intelligence.search_indexing --apply --confirm",
+        },
         "fmcsa_fast_seed": fmcsa,
         "recommended_sequence": [
             "Wait until Canada ingestion reports complete and no sync is running.",
@@ -124,6 +144,8 @@ def post_ingest_readiness() -> dict[str, Any]:
             "Run python -m intelligence.post_ingest_readiness --strict.",
             "Run python -m intelligence.data_quality --strict and investigate any blocking integrity findings.",
             "Run python -m intelligence.supplier_backfill to index existing cached suppliers.",
+            "Run python -m intelligence.materialize to combine all already-linked source evidence into company intelligence.",
+            "Run python -m intelligence.search_indexing --apply --confirm on PostgreSQL after materialization completes.",
             "Run python -m intelligence.fmcsa_ingest --validate-fast-seed.",
             "If safe, validate with python -m intelligence.fmcsa_ingest --fast-seed --limit 1000.",
             "Review the 1,000-row validation before starting a full FMCSA bootstrap.",
