@@ -15,6 +15,7 @@ from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
 from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.market_landings import router as market_landings_router
+from intelligence.navigation_ui import install_intelligence_navigation
 from intelligence.post_ingest_readiness import router as post_ingest_readiness_router
 from intelligence.profile_guard import install_profile_guard
 from intelligence.root_discovery import install_root_discovery, router as root_discovery_router
@@ -63,5 +64,7 @@ install_thin_profile_seo(app)
 install_evidence_sitemaps(app)
 # Cache expensive evidence-backed sitemap responses before the final root policy.
 install_sitemap_cache(app)
-# Install last so /robots.txt cannot be replaced by an older SEO middleware layer.
+# Keep the final root robots policy outside older SEO middleware layers.
 install_root_discovery(app)
+# Install outermost so shared core pages expose /data after all HTML polish layers.
+install_intelligence_navigation(app)
