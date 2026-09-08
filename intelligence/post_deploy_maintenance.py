@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import threading
 from datetime import UTC, datetime
 from typing import Any
@@ -21,16 +20,19 @@ LOCK_KEY = 731_908_421_117
 REQUIRED_BASE_SOURCES = ("corporations_canada", "canadian_importers")
 
 
-def _is_replit_runtime() -> bool:
-    """Detect a Replit-hosted runtime without relying on deployment-only markers.
+def _autostart_eligible() -> bool:
+    """Run background maintenance only against the real PostgreSQL data store.
 
-    Replit autoscale workers do not consistently expose REPLIT_DEPLOYMENT to the
-    application process. REPL_ID / REPL_SLUG identify the Replit runtime in both
-    Preview and published deployments. The maintenance job is safe in either:
-    it is database-only, requires completed base ingestion, uses a PostgreSQL
-    advisory lock, resumes from checkpoints, and makes no paid/network calls.
+    Replit runtime markers have proven inconsistent between Preview and autoscale
+    workers. PostgreSQL is the stable boundary we actually care about: CI/test
+    environments do not qualify, while the populated Replit development and
+    production databases do. The job itself still requires completed ingestion,
+    is advisory-locked/resumable, and performs zero paid or external network calls.
     """
-    return bool(os.getenv("REPL_ID", "").strip() or os.getenv("REPL_SLUG", "").strip())
+    try:
+        return str(get_engine().dialect.name).lower() == "postgresql"
+    except Exception:  # noqa: BLE001 - startup guard must fail closed
+        return False
 
 
 def _checkpoint(source: str) -> dict[str, Any] | None:
@@ -108,7 +110,7 @@ def maintenance_status() -> dict[str, Any]:
     materialized = materialization_status()
     indexes = search_index_status()
     return {
-        "replit_runtime": _is_replit_runtime(),
+        "autostart_eligible": _autostart_eligible(),
         "base_ingestion_ready": ready,
         "base_ingestion_reason": reason,
         "status": str(own.get("status") or "not_started") if own else "not_started",
@@ -189,7 +191,7 @@ def install_post_deploy_maintenance(app) -> None:
 
     @app.on_event("startup")
     async def _start_post_deploy_maintenance() -> None:
-        if not _is_replit_runtime():
+        if not _autostart_eligible():
             return
         thread = threading.Thread(
             target=run_post_deploy_maintenance,
