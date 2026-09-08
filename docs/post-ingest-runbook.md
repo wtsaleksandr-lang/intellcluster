@@ -1,66 +1,87 @@
-# IntellCluster post-ingestion rollout runbook
+# IntellCluster post-ingestion launch runbook
 
-Use this sequence after a long production public-data ingestion has finished. The goal is to separate database completion checks, deployment, cached-only indexing and the first U.S. bootstrap validation so one step cannot accidentally interfere with another.
+Use this sequence after the long production Canada ingestion finishes. It is intentionally short: the goal is to get the directory live safely without mixing deployment, paid enrichment or multi-million-row U.S. ingestion into the same step.
 
-## 1. Confirm the Canada ingestion is finished
+## 1. Confirm the Canada ingestion has actually stopped
 
-Do not pull, redeploy or start another large database job while the current ingestion is still running.
+Do **not** pull, redeploy, switch workspaces or start another large database job while the current ingestion shell is still running.
 
-After it finishes, check persisted state:
+After it finishes:
 
 ```bash
 python -m intelligence.ingest status
 ```
 
-The Corporations Canada run should no longer show `running`. For a resumable full-source run, its checkpoint should normally be `completed`.
+The Corporations Canada run should no longer show `running`. A resumable full-source run should normally have a `completed` checkpoint.
 
-## 2. Run the no-network readiness preflight
+## 2. Pull the latest `main`
+
+Only after ingestion has stopped, bring production to the current GitHub build. IntellCluster must run through `main_data:app`; starting `main:app` omits the business-intelligence layer.
+
+## 3. Run the single strict launch gate
+
+Before public deployment:
+
+```bash
+python -m intelligence.launch_gate --production --strict
+```
+
+This is the authoritative pre-launch verdict. It combines the old readiness and data-quality checks with production environment safety. It performs **zero external network calls** and **zero paid-source calls**.
+
+It blocks launch when it detects any of the following:
+
+- Canada ingestion is still running or materially incomplete
+- blocking canonical-graph integrity errors
+- missing or SQLite production `DATABASE_URL`
+- missing/non-HTTPS `PUBLIC_BASE_URL`
+- weak/missing admin password or signing key
+- `IMPORTYETI_ALLOW_LIVE=true`
+- disabled API rate limiting
+- enabled debug mode
+
+Warnings are reported separately. For example, an empty supplier index is expected before the cached supplier backfill and does not by itself make the site unsafe to launch.
+
+For deeper troubleshooting, the component checks remain available:
 
 ```bash
 python -m intelligence.post_ingest_readiness --strict
-```
-
-This reads the existing database only. It does not call public websites, SEC, EPA, OSHA, FMCSA or ImportYeti.
-
-A strict preflight exits with status 2 if a Canada ingestion blocker remains. The report also shows:
-
-- Canada source-record counts and completion hints
-- current supplier-index state
-- whether the cached-only supplier backfill is recommended
-- FMCSA fast-seed safety for the current U.S. canonical graph
-- whether the ImportYeti live master switch is enabled
-
-## 3. Pull and deploy the latest `main`
-
-Only after the active ingestion is finished should production pull/redeploy the application code.
-
-After deployment, authenticated administrators can open the read-only operations console at:
-
-- `/admin/intelligence`
-
-The console shows persisted sync/checkpoint state, progress and ETA estimates, readiness blockers, supplier-index status and the recommended rollout sequence. Its **Run data-quality audit** button performs only database reads.
-
-The same information is also available as admin-only JSON:
-
-- `GET /api/intelligence/admin/sync-status`
-- `GET /api/intelligence/admin/post-ingest-readiness`
-- `GET /api/intelligence/admin/data-quality` (manual audit; may scan large tables)
-
-These routes require the signed admin session. They do not trigger paid enrichment.
-
-## 4. Run the database-only quality audit
-
-```bash
 python -m intelligence.data_quality --strict
 ```
 
-This checks the canonical intelligence graph for structural problems without making network calls. It reports orphan source/importer/supplier rows, duplicate source identities, duplicate corporation numbers, Canada records linked to the wrong country, importer-flag inconsistencies, source-less entities and unexpected country codes.
+Do not bypass the launch gate just to obtain a green deployment. Resolve blockers and rerun it.
 
-Blocking integrity findings should be investigated before a multi-million-row U.S. bootstrap. Some findings, such as duplicate corporation numbers or source-less entities, are reported as warnings because they can have legitimate explanations and should be reviewed rather than automatically treated as corruption.
+## 4. Deploy and smoke-test the public site
 
-## 5. Populate the supplier index from existing cache
+Deploy the latest `main_data:app`, then verify:
 
-The Canada public datasets do not provide named foreign suppliers. Supplier relationships are built only from already-cached ImportYeti company profiles.
+```bash
+curl https://intellcluster.com/api/health
+curl https://intellcluster.com/api/intelligence/health
+curl https://intellcluster.com/data
+curl https://intellcluster.com/data/canada
+curl https://intellcluster.com/data/usa
+curl https://intellcluster.com/data/companies
+curl https://intellcluster.com/robots.txt
+curl https://intellcluster.com/sitemap.xml
+curl https://intellcluster.com/sitemaps/site.xml
+```
+
+The root homepage should expose the Business Intelligence product, and the shared desktop/mobile/footer navigation should link to `/data`.
+
+Authenticated administrators can inspect the read-only operational endpoints:
+
+```text
+GET /api/intelligence/admin/sync-status
+GET /api/intelligence/admin/post-ingest-readiness
+GET /api/intelligence/admin/launch-gate
+GET /api/intelligence/admin/data-quality
+```
+
+The operational console is available at `/admin/intelligence`.
+
+## 5. Populate named suppliers from existing cache
+
+Canada public datasets do not provide named foreign suppliers. `intel_supplier_relationships` is populated from ImportYeti profiles that IntellCluster has already cached.
 
 Run:
 
@@ -68,123 +89,78 @@ Run:
 python -m intelligence.supplier_backfill
 ```
 
-This job:
+The backfill:
 
 - scans canonical entities by keyset ID
-- reads `enrichment.importyeti.suppliers_table` only when it is already cached
+- reads only existing `enrichment.importyeti.suppliers_table` values
 - writes `intel_supplier_relationships`
-- stores a resumable checkpoint in `intel_sync_checkpoints`
+- stores a resumable checkpoint
 - makes **zero network calls**
 - consumes **zero ImportYeti credits**
 
-For a controlled test:
+For a controlled first pass:
 
 ```bash
 python -m intelligence.supplier_backfill --limit-entities 10000
 python -m intelligence.supplier_backfill
 ```
 
-The second command resumes from the saved entity-ID checkpoint.
+## 6. Validate the U.S. FMCSA bootstrap
 
-## 6. Validate FMCSA bootstrap safety without downloading data
+First perform the no-download safety check:
 
 ```bash
 python -m intelligence.fmcsa_ingest --validate-fast-seed
 ```
 
-Fast seed is intended only for a fresh or previously FMCSA-only U.S. canonical graph. If unrelated U.S. entities already exist, the preflight intentionally fails and the conservative entity-resolution path should be used instead.
-
-## 7. Run a 1,000-record FMCSA validation
-
-If fast-seed preflight is safe:
+If it reports that fast seed is safe, validate only 1,000 rows:
 
 ```bash
 python -m intelligence.fmcsa_ingest --fast-seed --limit 1000
 ```
 
-Then review:
+Review entity/source counts, USDOT/status fields, search/profile rendering, duplicate behavior, checkpoint state and representative records before starting the full U.S. load.
 
-- entity/source-record counts
-- USDOT values and status fields
-- search cards/profile rendering
-- duplicate behavior
-- checkpoint position
-- representative company matches
-
-Do not proceed directly from preflight to a multi-million-row run without reviewing this sample.
-
-## 8. Start the full FMCSA bootstrap only after validation
-
-If the 1,000-record result is correct:
+Only after the sample looks correct:
 
 ```bash
 python -m intelligence.fmcsa_ingest --fast-seed
 ```
 
-The FMCSA job uses a USDOT keyset checkpoint and can resume after interruption.
+The FMCSA loader uses USDOT keyset checkpoints and can resume after interruption.
 
-## 9. Optional: attach USPTO patent intelligence from the official bulk snapshot
+## 7. Optional offline intelligence layers
 
-Patent intelligence is intentionally offline-first. Normal company pages do not call USPTO, and there is no dependency on a live PatentsView search API.
+These improve profiles but are not blockers for the initial public launch.
 
-Download the desired **PatentsView annualized patent CSV** from the USPTO Open Data Portal, then validate matching before writing anything:
+### USPTO patents
+
+Use an official PatentsView annualized CSV. Validate before attaching:
 
 ```bash
 python -m intelligence.uspto_bulk --csv /path/to/patentsview.csv --dry-run --limit-assignees 10000
-```
-
-If the dry run looks reasonable, attach the evidence:
-
-```bash
 python -m intelligence.uspto_bulk --csv /path/to/patentsview.csv
 ```
 
-The loader:
+The loader creates no new canonical companies, matches conservatively and makes zero network calls while running.
 
-- reads the local official CSV only
-- creates **no new canonical companies**
-- matches exact normalized assignee names conservatively, using country/state/city to disambiguate duplicate names
-- stores matched grants in `enrichment.uspto_patents`
-- makes **zero network calls** while running
-- makes patent counts available on company profiles, CSV exports and U.S. search-card signals
+### CanadaBuys federal contracts
 
-Use a recent official PatentsView annualized snapshot. The cache records the input filename and cache timestamp so the evidence can be refreshed later with a newer dataset.
-
-## 10. Optional: attach CanadaBuys federal contract history
-
-CanadaBuys publishes the Government of Canada contract-history dataset as downloadable CSV and refreshes the consolidated post-June-2023 file monthly. Use the official current contract-history CSV from the Open Government / CanadaBuys dataset page.
-
-Validate supplier matching first:
+Use the official CanadaBuys/Open Government contract-history CSV:
 
 ```bash
 python -m intelligence.canadabuys_bulk --csv /path/to/contractHistoryComplete-contratsOctroyesComplet.csv --dry-run --limit-suppliers 10000
-```
-
-Then attach the evidence:
-
-```bash
 python -m intelligence.canadabuys_bulk --csv /path/to/contractHistoryComplete-contratsOctroyesComplet.csv
 ```
 
-The loader:
-
-- reads the local official CanadaBuys CSV only
-- creates **no new canonical companies**
-- links a supplier only when its normalized legal name identifies one canonical entity
-- collapses amendment history to the latest retained row per unique contract for profile KPIs
-- keeps the full history-row count as provenance context
-- stores matched evidence in `enrichment.canadabuys_contracts`
-- makes **zero network calls** while running
-- can attach Canadian federal contract evidence to Canadian companies and cross-border suppliers already in the U.S. graph
-
-Contract values are analytical context rather than audited supplier revenue. CanadaBuys contract history contains amendments, so IntellCluster explicitly labels the summarized CAD value and preserves the source/value caveat on the profile.
+This loader also creates no new canonical companies and makes zero network calls while running.
 
 ## Paid-data rule
 
-Keep:
+Keep this setting for normal launch and normal browsing:
 
 ```text
 IMPORTYETI_ALLOW_LIVE=false
 ```
 
-unless an authenticated administrator is intentionally purchasing missing ImportYeti intelligence through the dedicated acquisition endpoint. Normal profile views, BOL views, supplier indexing, Canada ingestion, readiness checks, data-quality auditing, FMCSA ingestion, USPTO bulk patent ingestion and CanadaBuys bulk contract ingestion do not require live ImportYeti access.
+A stored ImportYeti key does not authorize spending. Paid acquisition is intentionally separated behind the signed admin session, the live master switch, an explicitly live-enabled client and `confirm_paid=true`. Normal profile views, BOL views, supplier indexing, Canada ingestion, launch/readiness checks, FMCSA ingestion, USPTO bulk ingestion and CanadaBuys bulk ingestion do not need paid ImportYeti access.
