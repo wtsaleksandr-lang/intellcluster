@@ -8,6 +8,8 @@ from fastapi.responses import Response
 
 _CACHE_TTLS = {
     "/sitemap.xml": 900,
+    "/sitemaps/site.xml": 21_600,
+    "/sitemaps/markets.xml": 21_600,
     "/sitemaps/intelligence.xml": 21_600,
     "/sitemaps/suppliers.xml": 21_600,
 }
