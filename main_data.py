@@ -18,6 +18,10 @@ from intelligence.launch_gate import router as launch_gate_router
 from intelligence.market_landings import router as market_landings_router
 from intelligence.materialized_profile_ui import install_materialized_profile_ui
 from intelligence.navigation_ui import install_intelligence_navigation
+from intelligence.post_deploy_maintenance import (
+    install_post_deploy_maintenance,
+    router as post_deploy_maintenance_router,
+)
 from intelligence.post_ingest_readiness import router as post_ingest_readiness_router
 from intelligence.profile_guard import install_profile_guard
 from intelligence.root_discovery import install_root_discovery, router as root_discovery_router
@@ -50,6 +54,7 @@ app.include_router(sec_export_router)
 app.include_router(uspto_export_router)
 app.include_router(sync_observability_router)
 app.include_router(post_ingest_readiness_router)
+app.include_router(post_deploy_maintenance_router)
 app.include_router(launch_gate_router)
 app.include_router(root_discovery_router)
 app.include_router(seo_router)
@@ -70,5 +75,7 @@ install_evidence_sitemaps(app)
 install_sitemap_cache(app)
 # Keep the final root robots policy outside older SEO middleware layers.
 install_root_discovery(app)
+# Start resumable, database-only maintenance only inside published Replit workers.
+install_post_deploy_maintenance(app)
 # Install outermost so shared core pages expose /data after all HTML polish layers.
 install_intelligence_navigation(app)
