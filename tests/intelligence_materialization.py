@@ -11,7 +11,7 @@ from intelligence.database import (
 )
 from intelligence.materialize import materialize_rows
 from intelligence.models import SourceRecord
-from intelligence.repository import upsert_source_record
+from intelligence.repository import search_entities, upsert_source_record
 
 SOURCE_A = "materialization-test-a"
 SOURCE_B = "materialization-test-b"
@@ -109,7 +109,17 @@ def run() -> int:
             assert written == 1
 
         with connect() as conn:
+            for query in (
+                "Materialization Example",
+                "Industrial pump parts",
+                "8413910000",
+                "Example Pump Components",
+                "MAT-CORP-1",
+            ):
+                matches = search_entities(conn, q=query, limit=10)
+                assert any(int(match["id"]) == entity_id for match in matches), query
             entity = conn.execute(select(entities).where(entities.c.id == entity_id)).mappings().one()
+
         enrichment = entity["enrichment"]
         assert isinstance(enrichment, dict)
         intelligence = enrichment.get("intelligence")
@@ -130,7 +140,7 @@ def run() -> int:
         assert "observed import" in str(entity["summary"]).casefold()
         assert "evidence from 2 source datasets" in str(entity["summary"]).casefold()
 
-        print("Intelligence materialization checks OK")
+        print("Intelligence materialization and unified search checks OK")
         return 0
     finally:
         _cleanup()
