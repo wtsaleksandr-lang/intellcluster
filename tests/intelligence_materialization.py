@@ -10,6 +10,7 @@ from intelligence.database import (
     supplier_relationships,
 )
 from intelligence.materialize import materialize_rows
+from intelligence.materialized_profile_ui import _profile_payload, _profile_ui
 from intelligence.models import SourceRecord
 from intelligence.repository import search_entities, upsert_source_record
 
@@ -140,7 +141,18 @@ def run() -> int:
         assert "observed import" in str(entity["summary"]).casefold()
         assert "evidence from 2 source datasets" in str(entity["summary"]).casefold()
 
-        print("Intelligence materialization and unified search checks OK")
+        payload = _profile_payload(str(entity["slug"]))
+        assert payload is not None
+        assert payload["buyer_score"] == int(entity["buyer_score"] or 0)
+        assert payload["intelligence"]["evidence_score"] == intelligence["evidence_score"]
+        profile_markup = _profile_ui(payload)
+        assert "Intelligence Snapshot" in profile_markup
+        assert "Evidence strength" in profile_markup
+        assert "Matched datasets" in profile_markup
+        assert "Linked relationships" in profile_markup
+        assert "intellcluster-materialized-profile-ui" in profile_markup
+
+        print("Intelligence materialization, unified search and profile snapshot checks OK")
         return 0
     finally:
         _cleanup()

@@ -16,6 +16,7 @@ from intelligence.evidence_sitemap import install_evidence_sitemaps
 from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.launch_gate import router as launch_gate_router
 from intelligence.market_landings import router as market_landings_router
+from intelligence.materialized_profile_ui import install_materialized_profile_ui
 from intelligence.navigation_ui import install_intelligence_navigation
 from intelligence.post_ingest_readiness import router as post_ingest_readiness_router
 from intelligence.profile_guard import install_profile_guard
@@ -57,6 +58,7 @@ install_cached_bol_compat(app)
 install_sec_profile_ui(app)
 install_canadabuys_profile_ui(app)
 install_uspto_profile_ui(app)
+install_materialized_profile_ui(app)
 install_search_empty_state(app)
 install_search_signal_ui(app)
 install_seo_middleware(app)
