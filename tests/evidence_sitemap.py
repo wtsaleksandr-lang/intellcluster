@@ -87,9 +87,34 @@ def run() -> int:
 
         index = client.get("/sitemap.xml")
         assert index.status_code == 200
+        assert "/sitemaps/site.xml" in index.text
         assert "/sitemaps/companies-1.xml" in index.text
         assert "/sitemaps/suppliers.xml" in index.text
         assert "/sitemaps/markets.xml" in index.text
+
+        site = client.get("/sitemaps/site.xml")
+        assert site.status_code == 200
+        assert "https://intellcluster.com/</loc>" in site.text
+        assert "https://intellcluster.com/advisory" in site.text
+        assert "https://intellcluster.com/synthesis" in site.text
+        assert "https://intellcluster.com/blog" in site.text
+
+        robots = client.get("/robots.txt")
+        assert robots.status_code == 200
+        assert "Allow: /" in robots.text
+        assert "Disallow: /auth/" in robots.text
+        assert "Disallow: /account/" in robots.text
+        assert "Disallow: /data/suggest" in robots.text
+        assert "Disallow: /data/search?" in robots.text
+        assert "User-agent: AhrefsBot\nDisallow: /" in robots.text
+        assert "Sitemap: https://intellcluster.com/sitemap.xml" in robots.text
+
+        home = client.get("/")
+        assert home.status_code == 200
+        assert "Business intelligence · live directory" in home.text
+        assert 'href="/data"' in home.text
+        assert 'href="/data/canada"' in home.text
+        assert 'href="/data/usa"' in home.text
 
         markets = client.get("/sitemaps/markets.xml")
         assert markets.status_code == 200
@@ -117,7 +142,7 @@ def run() -> int:
         assert 'content="index,follow,max-image-preview:large,max-snippet:-1"' in strong_profile.text
         assert strong_profile.headers.get("x-robots-tag") is None
 
-        print("Evidence-tier sitemap and market SEO checks OK")
+        print("Evidence-tier sitemap, discovery and market SEO checks OK")
         return 0
     finally:
         _cleanup()
