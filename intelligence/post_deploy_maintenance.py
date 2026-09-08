@@ -22,10 +22,10 @@ _KICK_LOCK = threading.Lock()
 
 
 def _autostart_eligible() -> bool:
-    """Run background maintenance only against the real PostgreSQL data store."""
+    """Report whether the current database can execute the maintenance sequence."""
     try:
         return str(get_engine().dialect.name).lower() == "postgresql"
-    except Exception:  # noqa: BLE001 - startup guard must fail closed
+    except Exception:  # noqa: BLE001 - status helper must fail closed
         return False
 
 
@@ -190,8 +190,9 @@ def run_post_deploy_maintenance() -> dict[str, Any]:
 
 
 def _kick_maintenance(app, trigger: str) -> None:
-    if not _autostart_eligible():
-        return
+    # Always schedule the safe runner once. The runner itself is responsible for
+    # checking the database dialect and ingestion readiness. This avoids relying
+    # on environment/runtime detection before the background thread can even log.
     with _KICK_LOCK:
         if getattr(app.state, "post_deploy_maintenance_kicked", False):
             return
