@@ -92,6 +92,7 @@ def _sitemap_index() -> Response:
         )
     pages = max(1, math.ceil(total / SITEMAP_PAGE_SIZE))
     paths = [
+        "/sitemaps/site.xml",
         "/sitemaps/static.xml",
         "/sitemaps/markets.xml",
         "/sitemaps/intelligence.xml",
