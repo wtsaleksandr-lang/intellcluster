@@ -21,6 +21,8 @@ from intelligence.repository import upsert_source_record
 from intelligence.supplier_backfill import SOURCE_KEY, run_supplier_backfill
 from main_data import app
 from shared.admin import ADMIN_COOKIE, create_admin_token
+from tests.intelligence_materialization import run as run_materialization_checks
+from tests.search_indexing import run as run_search_indexing_checks
 
 TEST_SOURCE = "post-ingest-readiness-test"
 
@@ -148,6 +150,9 @@ def _environment_gate_checks() -> None:
 def run() -> int:
     _cleanup()
     try:
+        assert run_materialization_checks() == 0
+        assert run_search_indexing_checks() == 0
+
         first = _seed("Backfill Resume One LLC", "READY-1", "Supplier Alpha Ltd")
         second = _seed("Backfill Resume Two LLC", "READY-2", "Supplier Beta Ltd")
         assert second > first
@@ -188,6 +193,8 @@ def run() -> int:
         assert report["paid_sources_called"] is False
         assert "recommended_sequence" in report
         assert report["supplier_index"]["recommended_command"] == "python -m intelligence.supplier_backfill"
+        assert report["materialization"]["recommended_command"] == "python -m intelligence.materialize"
+        assert report["search_indexes"]["network_calls"] == 0
 
         quality = data_quality_report()
         assert quality["network_calls"] == 0
