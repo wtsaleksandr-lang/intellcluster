@@ -14,6 +14,7 @@ from intelligence.company_directory import router as company_directory_router
 from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
 from intelligence.importyeti_api import router as importyeti_api_router
+from intelligence.launch_gate import router as launch_gate_router
 from intelligence.market_landings import router as market_landings_router
 from intelligence.navigation_ui import install_intelligence_navigation
 from intelligence.post_ingest_readiness import router as post_ingest_readiness_router
@@ -48,6 +49,7 @@ app.include_router(sec_export_router)
 app.include_router(uspto_export_router)
 app.include_router(sync_observability_router)
 app.include_router(post_ingest_readiness_router)
+app.include_router(launch_gate_router)
 app.include_router(root_discovery_router)
 app.include_router(seo_router)
 install_profile_guard(app)
