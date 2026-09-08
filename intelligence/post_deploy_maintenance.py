@@ -21,8 +21,16 @@ LOCK_KEY = 731_908_421_117
 REQUIRED_BASE_SOURCES = ("corporations_canada", "canadian_importers")
 
 
-def _is_replit_production() -> bool:
-    return os.getenv("REPLIT_DEPLOYMENT", "").strip() == "1"
+def _is_replit_runtime() -> bool:
+    """Detect a Replit-hosted runtime without relying on deployment-only markers.
+
+    Replit autoscale workers do not consistently expose REPLIT_DEPLOYMENT to the
+    application process. REPL_ID / REPL_SLUG identify the Replit runtime in both
+    Preview and published deployments. The maintenance job is safe in either:
+    it is database-only, requires completed base ingestion, uses a PostgreSQL
+    advisory lock, resumes from checkpoints, and makes no paid/network calls.
+    """
+    return bool(os.getenv("REPL_ID", "").strip() or os.getenv("REPL_SLUG", "").strip())
 
 
 def _checkpoint(source: str) -> dict[str, Any] | None:
@@ -100,7 +108,7 @@ def maintenance_status() -> dict[str, Any]:
     materialized = materialization_status()
     indexes = search_index_status()
     return {
-        "production_runtime": _is_replit_production(),
+        "replit_runtime": _is_replit_runtime(),
         "base_ingestion_ready": ready,
         "base_ingestion_reason": reason,
         "status": str(own.get("status") or "not_started") if own else "not_started",
@@ -181,7 +189,7 @@ def install_post_deploy_maintenance(app) -> None:
 
     @app.on_event("startup")
     async def _start_post_deploy_maintenance() -> None:
-        if not _is_replit_production():
+        if not _is_replit_runtime():
             return
         thread = threading.Thread(
             target=run_post_deploy_maintenance,
