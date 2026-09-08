@@ -13,6 +13,7 @@ from intelligence.canadabuys_profile_ui import install_canadabuys_profile_ui
 from intelligence.company_directory import router as company_directory_router
 from intelligence.compliance_export import router as compliance_export_router
 from intelligence.evidence_sitemap import install_evidence_sitemaps
+from intelligence.fast_suggest import install_fast_suggest
 from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.launch_gate import router as launch_gate_router
 from intelligence.market_landings import router as market_landings_router
@@ -75,7 +76,9 @@ install_evidence_sitemaps(app)
 install_sitemap_cache(app)
 # Keep the final root robots policy outside older SEO middleware layers.
 install_root_discovery(app)
-# Start resumable, database-only maintenance only inside published Replit workers.
+# Replace the heavyweight cross-dataset autocomplete with an indexed name-first path.
+install_fast_suggest(app)
+# Start/resume safe database-only maintenance on startup, with first-request fallback.
 install_post_deploy_maintenance(app)
 # Install outermost so shared core pages expose /data after all HTML polish layers.
 install_intelligence_navigation(app)
