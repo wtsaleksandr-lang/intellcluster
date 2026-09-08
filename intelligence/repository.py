@@ -13,6 +13,7 @@ from intelligence.database import (
     normalize_name,
     slugify,
     source_records,
+    supplier_relationships,
 )
 from intelligence.entity_resolution import score_company_match
 from intelligence.models import SourceRecord
@@ -233,7 +234,8 @@ def search_entities(
     stmt = select(entities)
     conditions = []
     if q:
-        term = f"%{q.casefold()}%"
+        cleaned = q.strip()
+        term = f"%{cleaned.casefold()}%"
         rel_text = exists(
             select(importer_relationships.c.id).where(
                 and_(
@@ -242,7 +244,36 @@ def search_entities(
                 )
             )
         )
-        conditions.append(or_(func.lower(entities.c.canonical_name).like(term), rel_text))
+        supplier_text = exists(
+            select(supplier_relationships.c.id).where(
+                and_(
+                    supplier_relationships.c.importer_entity_id == entities.c.id,
+                    func.lower(func.coalesce(supplier_relationships.c.supplier_name, "")).like(term),
+                )
+            )
+        )
+        query_matches = [
+            func.lower(entities.c.canonical_name).like(term),
+            func.lower(func.coalesce(entities.c.corporation_number, "")).like(term),
+            rel_text,
+            supplier_text,
+        ]
+        digits = "".join(ch for ch in cleaned if ch.isdigit())
+        if len(digits) >= 4:
+            query_matches.append(
+                exists(
+                    select(importer_relationships.c.id).where(
+                        and_(
+                            importer_relationships.c.entity_id == entities.c.id,
+                            or_(
+                                importer_relationships.c.hs6.like(f"{digits}%"),
+                                importer_relationships.c.hs10.like(f"{digits}%"),
+                            ),
+                        )
+                    )
+                )
+            )
+        conditions.append(or_(*query_matches))
     if country:
         normalized_country = country.strip().upper()
         aliases = {"CANADA": "CA", "CAN": "CA", "USA": "US", "UNITED STATES": "US", "UNITED STATES OF AMERICA": "US"}
