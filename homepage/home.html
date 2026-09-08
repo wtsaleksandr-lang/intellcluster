@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}IntellCluster — Multi-model AI intelligence{% endblock %}
-{% block meta_desc %}Two AI tools in one research lab. Phronesis ranks your options with blind multi-analyst evaluation. Synthesis runs deep multi-model research. Both use GPT, Claude, Gemini, DeepSeek, and Grok in parallel.{% endblock %}
-{% block og_title %}IntellCluster — Multi-model AI intelligence{% endblock %}
-{% block og_desc %}Phronesis ranks options. Synthesis runs deep research. Both powered by 5 frontier AI models working in parallel.{% endblock %}
+{% block title %}IntellCluster — AI Research & Business Intelligence{% endblock %}
+{% block meta_desc %}IntellCluster combines multi-model AI research with searchable Canada and U.S. business intelligence across companies, importers, suppliers, HS codes, contracts, fleet, patents and public records.{% endblock %}
+{% block og_title %}IntellCluster — AI Research & Business Intelligence{% endblock %}
+{% block og_desc %}Search public company intelligence across Canada and the U.S., or use IntellCluster's multi-model AI tools for decisions and deep research.{% endblock %}
 
 {% block structured_data %}
 {{ super() }}
@@ -14,13 +14,16 @@
   "url": "https://intellcluster.com",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
-  "description": "Multi-model AI intelligence platform. Phronesis ranks options with blind multi-analyst evaluation. Synthesis runs deep multi-model research. Powered by GPT, Claude, Gemini, DeepSeek, and Grok.",
+  "description": "Business intelligence and multi-model AI research platform with searchable Canada and U.S. company, trade, supplier and public-record intelligence.",
   "offers": [
     {"@type": "Offer", "name": "Free",    "price": "0",  "priceCurrency": "USD"},
     {"@type": "Offer", "name": "Starter", "price": "9",  "priceCurrency": "USD"},
     {"@type": "Offer", "name": "Pro",     "price": "19", "priceCurrency": "USD"}
   ],
   "featureList": [
+    "Canada and U.S. company intelligence search",
+    "Importer, supplier and HS-code discovery",
+    "Public contracts, fleet, compliance and patent evidence",
     "Blind multi-analyst decision ranking",
     "Multi-model deep research synthesis",
     "Weighted criteria evaluation",
@@ -35,6 +38,38 @@
 {% block content %}
 
 {% include "partials/_hero_bento.html" %}
+
+<!-- ════════ BUSINESS INTELLIGENCE DIRECTORY ════════ -->
+<section id="business-intelligence" style="padding: clamp(38px, 6vw, 66px) 24px; max-width: 1100px; margin: 0 auto;">
+  <div style="position:relative;overflow:hidden;border:1px solid var(--border-decor);border-radius:10px;padding:clamp(24px,4vw,42px);background:linear-gradient(135deg,var(--surface2),var(--surface));">
+    <div class="fin-brackets" aria-hidden="true"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+    <div style="position:relative;z-index:3;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr);gap:clamp(24px,5vw,56px);align-items:center;">
+      <div>
+        <span class="fin-label">Business intelligence · live directory</span>
+        <h2 class="t-display" style="margin-top:20px;font-size:clamp(34px,5vw,60px);line-height:1.02;letter-spacing:-1.2px;">
+          Search the companies behind <em style="color:var(--accent);font-style:italic;">real business activity.</em>
+        </h2>
+        <p style="margin-top:18px;color:var(--text-secondary);font-size:14px;line-height:1.7;max-width:700px;">
+          Explore Canada and U.S. companies, importers, products, HS codes, sourcing origins, cached suppliers, government contracts, fleet, compliance, patents and other public evidence in one connected directory.
+        </p>
+        <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="/data" style="padding:12px 20px;border-radius:6px;background:var(--accent);color:#fff;font-weight:600;font-size:13px;text-decoration:none;">Explore business intelligence →</a>
+          <a href="/data/canada" style="padding:12px 16px;border-radius:6px;border:1px solid var(--border-decor);color:var(--text-primary);text-decoration:none;font-size:13px;">Canada</a>
+          <a href="/data/usa" style="padding:12px 16px;border-radius:6px;border:1px solid var(--border-decor);color:var(--text-primary);text-decoration:none;font-size:13px;">United States</a>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+        {% for label, value in [('Companies','Registry + public evidence'),('Trade','Importers + HS codes'),('Signals','Contracts · fleet · patents'),('Suppliers','Cached shipment evidence')] %}
+        <div style="min-height:96px;border:1px solid var(--border);border-radius:7px;padding:13px;background:var(--bg-deep);">
+          <div class="t-mono" style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);">{{ label }}</div>
+          <div style="margin-top:9px;font-size:12px;line-height:1.45;color:var(--text-secondary);">{{ value }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+<style>@media(max-width:760px){#business-intelligence>div>div{grid-template-columns:1fr!important}#business-intelligence>div>div>div:last-child{grid-template-columns:1fr 1fr!important}}</style>
 
 {% include "partials/_pipeline_phronesis.html" %}
 
