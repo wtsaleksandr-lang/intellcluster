@@ -4,7 +4,7 @@ import threading
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy import func, insert, select, text, update
 
 from intelligence.database import connect, entities, get_engine, sync_checkpoints
@@ -18,17 +18,11 @@ router = APIRouter(prefix="/api/intelligence/admin", tags=["intelligence-admin"]
 SOURCE_KEY = "post_deploy_maintenance"
 LOCK_KEY = 731_908_421_117
 REQUIRED_BASE_SOURCES = ("corporations_canada", "canadian_importers")
+_KICK_LOCK = threading.Lock()
 
 
 def _autostart_eligible() -> bool:
-    """Run background maintenance only against the real PostgreSQL data store.
-
-    Replit runtime markers have proven inconsistent between Preview and autoscale
-    workers. PostgreSQL is the stable boundary we actually care about: CI/test
-    environments do not qualify, while the populated Replit development and
-    production databases do. The job itself still requires completed ingestion,
-    is advisory-locked/resumable, and performs zero paid or external network calls.
-    """
+    """Run background maintenance only against the real PostgreSQL data store."""
     try:
         return str(get_engine().dialect.name).lower() == "postgresql"
     except Exception:  # noqa: BLE001 - startup guard must fail closed
@@ -128,26 +122,28 @@ def maintenance_status() -> dict[str, Any]:
 
 
 def run_post_deploy_maintenance() -> dict[str, Any]:
-    ready, reason = _base_ingestion_ready()
-    if not ready:
-        _save_status("waiting", reason)
-        return {"status": "waiting", "reason": reason}
-
-    engine = get_engine()
-    if str(engine.dialect.name).lower() != "postgresql":
-        _save_status("skipped", "post-deploy automation requires PostgreSQL")
-        return {"status": "skipped", "reason": "postgresql_required"}
-
-    lock_conn = engine.connect().execution_options(isolation_level="AUTOCOMMIT")
-    acquired = bool(
-        lock_conn.execute(text("SELECT pg_try_advisory_lock(:key)"), {"key": LOCK_KEY}).scalar_one()
-    )
-    if not acquired:
-        lock_conn.close()
-        return {"status": "already_running"}
-
+    """Run the safe, resumable post-ingestion maintenance sequence."""
+    lock_conn = None
+    acquired = False
     try:
+        engine = get_engine()
+        if str(engine.dialect.name).lower() != "postgresql":
+            return {"status": "skipped", "reason": "postgresql_required"}
+
+        ready, reason = _base_ingestion_ready()
+        if not ready:
+            _save_status("waiting", reason)
+            return {"status": "waiting", "reason": reason}
+
+        lock_conn = engine.connect().execution_options(isolation_level="AUTOCOMMIT")
+        acquired = bool(
+            lock_conn.execute(text("SELECT pg_try_advisory_lock(:key)"), {"key": LOCK_KEY}).scalar_one()
+        )
+        if not acquired:
+            return {"status": "already_running"}
+
         _save_status("running", "Post-deploy maintenance started")
+        print("[post-deploy-maintenance] started", flush=True)
 
         # Existing cached ImportYeti profiles need supplier rows before company
         # intelligence is materialized. If there are no cached profiles yet,
@@ -172,16 +168,48 @@ def run_post_deploy_maintenance() -> dict[str, Any]:
             "Post-deploy maintenance completed: materialization and search acceleration are ready",
             position=int(final.get("materialization", {}).get("position") or 0),
         )
+        print("[post-deploy-maintenance] completed", flush=True)
         return {"status": "completed", "finished_at": datetime.now(UTC).isoformat()}
-    except Exception as exc:  # noqa: BLE001 - failure must never crash the web app
-        _save_status("failed", f"Post-deploy maintenance failed: {str(exc)[:1200]}")
-        print(f"[post-deploy-maintenance] failed: {exc}", flush=True)
+    except Exception as exc:  # noqa: BLE001 - maintenance must never crash the web app
+        try:
+            _save_status("failed", f"Post-deploy maintenance failed: {str(exc)[:1200]}")
+        except Exception as status_exc:  # noqa: BLE001
+            print(
+                f"[post-deploy-maintenance] could not persist failure status: {status_exc}",
+                flush=True,
+            )
+        print(f"[post-deploy-maintenance] failed: {type(exc).__name__}: {exc}", flush=True)
         return {"status": "failed", "error": str(exc)[:500]}
     finally:
-        try:
-            lock_conn.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": LOCK_KEY})
-        finally:
-            lock_conn.close()
+        if lock_conn is not None:
+            try:
+                if acquired:
+                    lock_conn.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": LOCK_KEY})
+            finally:
+                lock_conn.close()
+
+
+def _kick_maintenance(app, trigger: str) -> None:
+    if not _autostart_eligible():
+        return
+    with _KICK_LOCK:
+        if getattr(app.state, "post_deploy_maintenance_kicked", False):
+            return
+        app.state.post_deploy_maintenance_kicked = True
+    print(f"[post-deploy-maintenance] scheduling from {trigger}", flush=True)
+
+    def _runner() -> None:
+        result = run_post_deploy_maintenance()
+        print(
+            f"[post-deploy-maintenance] runner finished with {result.get('status', 'unknown')}",
+            flush=True,
+        )
+
+    threading.Thread(
+        target=_runner,
+        name="intellcluster-post-deploy-maintenance",
+        daemon=True,
+    ).start()
 
 
 def install_post_deploy_maintenance(app) -> None:
@@ -191,14 +219,13 @@ def install_post_deploy_maintenance(app) -> None:
 
     @app.on_event("startup")
     async def _start_post_deploy_maintenance() -> None:
-        if not _autostart_eligible():
-            return
-        thread = threading.Thread(
-            target=run_post_deploy_maintenance,
-            name="intellcluster-post-deploy-maintenance",
-            daemon=True,
-        )
-        thread.start()
+        _kick_maintenance(app, "startup")
+
+    @app.middleware("http")
+    async def _maintenance_request_fallback(request: Request, call_next):
+        response = await call_next(request)
+        _kick_maintenance(app, "first_request")
+        return response
 
 
 @router.get("/post-deploy-maintenance")
