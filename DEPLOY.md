@@ -13,11 +13,12 @@ DATABASE_URL=<production PostgreSQL URL>
 PUBLIC_BASE_URL=https://intellcluster.com
 
 ADMIN_USERNAME=admin@intellcluster.com
-ADMIN_PASSWORD=<strong password>
+ADMIN_PASSWORD=<strong 12+ character password>
 ADMIN_SECRET_KEY=<32+ random chars>
 
 RATE_LIMIT_ENABLED=true
 RATE_LIMIT_PER_MINUTE=30
+DEBUG=false
 
 # Paid trade intelligence stays disabled by default.
 IMPORTYETI_API_KEY=<stored key if used>
@@ -25,6 +26,9 @@ IMPORTYETI_ALLOW_LIVE=false
 
 # Free SEC automation should identify the application/operator.
 SEC_EDGAR_USER_AGENT=IntellCluster/1.0 contact@intellcluster.com
+
+# Recommended for launch analytics.
+PLAUSIBLE_DOMAIN=intellcluster.com
 ```
 
 Optional LLM, SMTP and Stripe variables remain configured as required by the rest of the product. Never commit live credentials.
@@ -78,6 +82,34 @@ The repository `Procfile` starts:
 uvicorn main_data:app --host 0.0.0.0 --port $PORT
 ```
 
+## Strict launch gate
+
+After a production ingestion has finished and the latest `main` code is present, run the single no-network launch verdict before exposing the new build:
+
+```bash
+python -m intelligence.launch_gate --production --strict
+```
+
+The command combines:
+
+- Canada ingestion completion/readiness
+- canonical database integrity checks
+- production PostgreSQL configuration
+- HTTPS public-base URL configuration
+- admin credential/signing-key safety
+- rate-limit and debug-mode safety
+- the requirement that paid ImportYeti acquisition remain disabled by default
+
+It performs **zero external network calls**, never invokes ImportYeti, and exits with status `2` when a launch blocker remains. Warnings such as missing analytics or an empty cached supplier index are reported separately and do not automatically block launch.
+
+The same report is available to a signed-in administrator at:
+
+```text
+GET /api/intelligence/admin/launch-gate
+```
+
+Do not weaken or bypass the strict gate to make a deployment appear ready; resolve its blockers instead.
+
 ## Post-deploy verification
 
 Verify both the core application **and** the intelligence layer:
@@ -86,9 +118,12 @@ Verify both the core application **and** the intelligence layer:
 curl https://intellcluster.com/api/health
 curl https://intellcluster.com/api/intelligence/health
 curl https://intellcluster.com/data
+curl https://intellcluster.com/data/canada
+curl https://intellcluster.com/data/usa
 curl https://intellcluster.com/data/companies
 curl https://intellcluster.com/robots.txt
 curl https://intellcluster.com/sitemap.xml
+curl https://intellcluster.com/sitemaps/site.xml
 ```
 
 `/api/intelligence/health` should report an `ok` status and the current entity count. A deployment where `/api/health` works but `/data` or `/api/intelligence/health` returns 404 is using the wrong entrypoint.
@@ -98,6 +133,7 @@ Authenticated administrators also have read-only operational checks after deploy
 ```text
 GET /api/intelligence/admin/sync-status
 GET /api/intelligence/admin/post-ingest-readiness
+GET /api/intelligence/admin/launch-gate
 ```
 
 Before beginning the first large U.S. bootstrap, follow `docs/post-ingest-runbook.md` rather than jumping directly to a full FMCSA run.
