@@ -115,6 +115,17 @@ def run() -> int:
         assert 'href="/data"' in home.text
         assert 'href="/data/canada"' in home.text
         assert 'href="/data/usa"' in home.text
+        assert home.text.count('data-intelligence-nav="desktop"') == 1
+        assert home.text.count('data-intelligence-nav="mobile"') == 1
+        assert home.text.count('data-intelligence-nav="footer"') == 1
+        assert '<a href="/data" class="nav-tool"' in home.text
+        assert ">Business Intelligence</a>" in home.text
+
+        pricing = client.get("/pricing")
+        assert pricing.status_code == 200
+        assert pricing.text.count('data-intelligence-nav="desktop"') == 1
+        assert pricing.text.count('data-intelligence-nav="mobile"') == 1
+        assert pricing.text.count('data-intelligence-nav="footer"') == 1
 
         markets = client.get("/sitemaps/markets.xml")
         assert markets.status_code == 200
