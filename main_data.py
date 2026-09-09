@@ -16,6 +16,7 @@ from intelligence.evidence_sitemap import install_evidence_sitemaps
 from intelligence.fast_suggest import install_fast_suggest
 from intelligence.importyeti_api import router as importyeti_api_router
 from intelligence.launch_gate import router as launch_gate_router
+from intelligence.low_data_profile_ui import install_low_data_profile_ui
 from intelligence.market_landings import router as market_landings_router
 from intelligence.materialized_profile_ui import install_materialized_profile_ui
 from intelligence.navigation_ui import install_intelligence_navigation
@@ -65,6 +66,9 @@ install_sec_profile_ui(app)
 install_canadabuys_profile_ui(app)
 install_uspto_profile_ui(app)
 install_materialized_profile_ui(app)
+# Ensure public-source importer profiles still present a complete analytics view
+# even when shipment-level ImportYeti/BOL enrichment is not available.
+install_low_data_profile_ui(app)
 install_search_empty_state(app)
 install_search_signal_ui(app)
 install_seo_middleware(app)
