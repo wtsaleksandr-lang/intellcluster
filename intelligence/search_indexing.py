@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from typing import Any
 
 from sqlalchemy import func, select, text
@@ -9,6 +10,7 @@ from sqlalchemy import func, select, text
 from intelligence.database import connect, get_engine, sync_checkpoints
 
 TRIGRAM_EXTENSION = "pg_trgm"
+TRIGRAM_ENABLE_ENV = "INTELLCLUSTER_ENABLE_TRIGRAM_INDEXES"
 SEARCH_INDEXES = (
     {
         "name": "ix_intel_entities_canonical_name_trgm",
@@ -53,6 +55,15 @@ SEARCH_INDEXES = (
 )
 
 
+def _trigram_enabled() -> bool:
+    return os.getenv(TRIGRAM_ENABLE_ENV, "").strip().casefold() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
 def _running_sync_count() -> int:
     with connect() as conn:
         return int(
@@ -70,11 +81,14 @@ def search_index_status() -> dict[str, Any]:
     running_syncs = _running_sync_count()
     engine = get_engine()
     dialect = str(engine.dialect.name or "").lower()
+    enabled = _trigram_enabled()
+    postgres = dialect == "postgresql"
     result: dict[str, Any] = {
         "dialect": dialect,
-        "supported": dialect == "postgresql",
+        "enabled": enabled,
+        "supported": postgres and enabled,
         "running_sync_checkpoints": running_syncs,
-        "safe_to_apply": dialect == "postgresql" and running_syncs == 0,
+        "safe_to_apply": postgres and enabled and running_syncs == 0,
         "extension": {"name": TRIGRAM_EXTENSION, "installed": False},
         "indexes": [
             {
@@ -88,7 +102,7 @@ def search_index_status() -> dict[str, Any]:
         "network_calls": 0,
         "paid_sources_called": False,
     }
-    if dialect != "postgresql":
+    if not postgres:
         result["reason"] = (
             "Trigram acceleration is PostgreSQL-specific; SQLite/local preview keeps existing indexes."
         )
@@ -116,13 +130,20 @@ def search_index_status() -> dict[str, Any]:
     result["all_installed"] = extension_installed and all(
         bool(row["installed"]) for row in result["indexes"]
     )
-    if running_syncs:
+
+    if not enabled:
+        result["reason"] = (
+            "Optional pg_trgm acceleration is disabled by default because managed Replit "
+            "production schema validation does not reliably provision PostgreSQL extensions. "
+            "Current autocomplete uses B-tree prefix indexes and does not require pg_trgm."
+        )
+    elif running_syncs:
         result["reason"] = (
             "A resumable intelligence sync is still marked running. Wait for ingestion/processing to finish before building large text indexes."
         )
     elif not result["all_installed"]:
         result["reason"] = (
-            "Optional PostgreSQL trigram indexes are not fully installed. Apply them after post-ingestion materialization to improve large-directory search latency."
+            "Optional PostgreSQL trigram indexes are not fully installed. Enable and apply them only in an environment that explicitly supports pg_trgm."
         )
     else:
         result["reason"] = "Optional PostgreSQL text-search acceleration is installed."
@@ -130,11 +151,13 @@ def search_index_status() -> dict[str, Any]:
 
 
 def apply_search_indexes(*, confirm: bool = False) -> dict[str, Any]:
-    """Install optional PostgreSQL trigram indexes after bulk processing."""
+    """Install optional PostgreSQL trigram indexes only when explicitly enabled."""
     if not confirm:
         raise RuntimeError("Search-index creation requires explicit confirmation.")
 
     before = search_index_status()
+    if not before.get("enabled"):
+        return {**before, "applied": False, "disabled": True}
     if not before["supported"]:
         return {**before, "applied": False}
     if before["running_sync_checkpoints"]:
@@ -167,7 +190,7 @@ def main() -> None:
     parser.add_argument(
         "--apply",
         action="store_true",
-        help="Install pg_trgm and the optional GIN search indexes.",
+        help="Install pg_trgm and the optional GIN search indexes when explicitly enabled.",
     )
     parser.add_argument(
         "--confirm",
