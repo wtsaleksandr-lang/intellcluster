@@ -85,12 +85,15 @@ def _has_cached_importyeti_profiles() -> bool:
     if str(engine.dialect.name).lower() != "postgresql":
         return False
     with engine.connect() as conn:
+        # ``enrichment`` is a PostgreSQL JSON column, not JSONB. The JSON
+        # extraction operator works on both and avoids the JSONB-only ``?``
+        # operator that previously failed the production maintenance run.
         return bool(
             conn.execute(
                 text(
                     "SELECT EXISTS ("
                     "SELECT 1 FROM intel_entities "
-                    "WHERE enrichment ? 'importyeti' LIMIT 1"
+                    "WHERE enrichment -> 'importyeti' IS NOT NULL LIMIT 1"
                     ")"
                 )
             ).scalar_one()
@@ -157,7 +160,16 @@ def run_post_deploy_maintenance() -> dict[str, Any]:
         materialized = materialization_status()
         if not materialized.get("complete"):
             run_intelligence_materialization(resume=True, batch_size=5000)
+        materialized = materialization_status()
 
+        # The orchestration checkpoint itself must no longer be marked "running"
+        # when search_index_status() checks for active ingestion/sync work. Actual
+        # data-processing checkpoints still block index creation as intended.
+        _save_status(
+            "indexing",
+            "Materialization complete; building PostgreSQL search indexes",
+            position=int(materialized.get("position") or 0),
+        )
         index_status = search_index_status()
         if index_status.get("supported") and not index_status.get("all_installed"):
             apply_search_indexes(confirm=True)

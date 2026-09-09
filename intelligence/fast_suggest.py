@@ -2,24 +2,46 @@ from __future__ import annotations
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, select
 
 from intelligence.database import connect, entities, normalize_name
 
 
-def _suggest_rows(term: str, limit: int = 8) -> list[dict[str, object]]:
-    normalized = normalize_name(term)
-    if len(normalized) < 2:
-        return []
+def _prefix_upper_bound(value: str) -> str | None:
+    """Return a selective lexical upper bound for normalized ASCII prefixes.
 
-    # Use the existing B-tree on name_normalized as a prefix range instead of
-    # running the full cross-dataset search (products/suppliers/HS) on every
-    # autocomplete keystroke. Corporation number remains a second indexed path.
-    name_prefix = and_(
-        entities.c.name_normalized >= normalized,
-        entities.c.name_normalized < f"{normalized}\uffff",
-    )
-    corporation_prefix = entities.c.corporation_number.like(f"{term.strip()}%")
+    ``normalize_name`` emits lowercase letters, digits, and spaces. Carry across
+    trailing ``z``/``9`` characters so common prefixes remain compatible with
+    the existing PostgreSQL B-tree collation instead of relying on a high
+    Unicode sentinel that does not sort reliably in production.
+    """
+    chars = list(value)
+    for index in range(len(chars) - 1, -1, -1):
+        char = chars[index]
+        if "a" <= char < "z":
+            chars[index] = chr(ord(char) + 1)
+            return "".join(chars[: index + 1])
+        if "0" <= char < "9":
+            chars[index] = chr(ord(char) + 1)
+            return "".join(chars[: index + 1])
+        if char in {"z", "9"}:
+            continue
+        # Normalized trailing spaces are not expected, but if one appears,
+        # continue carrying rather than inventing a collation-sensitive bound.
+    return None
+
+
+def _name_rows(conn, normalized: str, limit: int) -> list[dict[str, object]]:
+    upper = _prefix_upper_bound(normalized)
+    if upper is None:
+        # Extremely unusual all-z/all-9 prefixes can safely fall back to exact
+        # equality rather than triggering a full-directory LIKE scan.
+        predicate = entities.c.name_normalized == normalized
+    else:
+        predicate = and_(
+            entities.c.name_normalized >= normalized,
+            entities.c.name_normalized < upper,
+        )
     stmt = (
         select(
             entities.c.canonical_name,
@@ -28,12 +50,55 @@ def _suggest_rows(term: str, limit: int = 8) -> list[dict[str, object]]:
             entities.c.city,
             entities.c.region,
         )
-        .where(or_(name_prefix, corporation_prefix))
+        .where(predicate)
         .order_by(entities.c.name_normalized.asc(), entities.c.canonical_name.asc())
-        .limit(max(1, min(int(limit), 20)))
+        .limit(limit)
     )
+    return [dict(row) for row in conn.execute(stmt).mappings().all()]
+
+
+def _corporation_rows(conn, term: str, limit: int) -> list[dict[str, object]]:
+    """Use the corporation-number index only for numeric-looking input."""
+    compact = "".join(ch for ch in term if ch.isdigit())
+    if len(compact) < 2 or compact != "".join(ch for ch in term if not ch.isspace()):
+        return []
+    upper = _prefix_upper_bound(compact)
+    if upper is None:
+        predicate = entities.c.corporation_number == compact
+    else:
+        predicate = and_(
+            entities.c.corporation_number >= compact,
+            entities.c.corporation_number < upper,
+        )
+    stmt = (
+        select(
+            entities.c.canonical_name,
+            entities.c.slug,
+            entities.c.is_importer,
+            entities.c.city,
+            entities.c.region,
+        )
+        .where(predicate)
+        .order_by(entities.c.corporation_number.asc(), entities.c.canonical_name.asc())
+        .limit(limit)
+    )
+    return [dict(row) for row in conn.execute(stmt).mappings().all()]
+
+
+def _suggest_rows(term: str, limit: int = 8) -> list[dict[str, object]]:
+    normalized = normalize_name(term)
+    if len(normalized) < 2:
+        return []
+
+    capped = max(1, min(int(limit), 20))
     with connect() as conn:
-        rows = conn.execute(stmt).mappings().all()
+        rows = _name_rows(conn, normalized, capped)
+        if len(rows) < capped:
+            seen = {str(row["slug"]) for row in rows}
+            for row in _corporation_rows(conn, term.strip(), capped - len(rows)):
+                if str(row["slug"]) not in seen:
+                    rows.append(row)
+                    seen.add(str(row["slug"]))
 
     return [
         {
